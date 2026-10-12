@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 
+import Link from "next/link";
 import { AppShell } from "@/components/layout/AppShell";
 import { Topbar } from "@/components/layout/Topbar";
 import { Card } from "@/components/ui/Card";
@@ -39,9 +40,12 @@ export default async function TrangNhanSu() {
             <div className="font-semibold text-slate-900">
               Danh sách nhân viên ({danhSachNhanVien.length})
             </div>
-            <button className="rounded-lg bg-omyn-primary px-4 py-2 text-sm font-medium text-white hover:bg-omyn-primary-dark">
+            <Link
+              href="/nhan-su/them"
+              className="rounded-lg bg-omyn-primary px-4 py-2 text-sm font-medium text-white hover:bg-omyn-primary-dark"
+            >
               + Thêm nhân viên
-            </button>
+            </Link>
           </div>
           <Bang cot={cot} duLieu={danhSachNhanVien} khoa={(n) => n.id} />
         </Card>

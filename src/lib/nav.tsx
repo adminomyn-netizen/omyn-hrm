@@ -8,13 +8,17 @@ import {
   BarChart3,
   FileText,
   Settings,
+  Activity,
   type LucideIcon,
 } from "lucide-react";
+import type { VaiTro } from "@/lib/auth";
 
 export type MucMenu = {
   ten: string;
   duong_dan: string;
   icon: LucideIcon;
+  // không khai = mọi vai trò đều thấy
+  chiVaiTro?: VaiTro[];
 };
 
 export const menuChinh: MucMenu[] = [
@@ -26,5 +30,6 @@ export const menuChinh: MucMenu[] = [
   { ten: "Tuyển dụng", duong_dan: "/tuyen-dung", icon: Briefcase },
   { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia", icon: BarChart3 },
   { ten: "Báo cáo & biểu mẫu", duong_dan: "/bao-cao", icon: FileText },
-  { ten: "Cài đặt & phân quyền", duong_dan: "/cai-dat", icon: Settings },
+  { ten: "Kỹ thuật", duong_dan: "/ky-thuat", icon: Activity, chiVaiTro: ["ky_thuat", "admin"] },
+  { ten: "Cài đặt & phân quyền", duong_dan: "/cai-dat", icon: Settings, chiVaiTro: ["admin"] },
 ];

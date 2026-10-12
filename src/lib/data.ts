@@ -124,6 +124,36 @@ export async function layTuyenDung() {
   }));
 }
 
+export async function layThongKeHeThong() {
+  const supabase = createAdminClient();
+  const bang = [
+    "nhan_vien",
+    "khoi",
+    "cham_cong",
+    "don_tu",
+    "bang_luong",
+    "tin_tuyen_dung",
+    "ung_vien",
+    "danh_gia_hieu_suat",
+  ] as const;
+
+  const ketQua = await Promise.all(
+    bang.map(async (ten) => {
+      const { count, error } = await supabase.from(ten).select("*", { count: "exact", head: true });
+      if (error) throw error;
+      return { bang: ten, soDong: count ?? 0 };
+    }),
+  );
+
+  const { count: soDonChoDuyet, error: loiDon } = await supabase
+    .from("don_tu")
+    .select("*", { count: "exact", head: true })
+    .eq("trang_thai", "Chờ duyệt");
+  if (loiDon) throw loiDon;
+
+  return { bang: ketQua, soDonChoDuyet: soDonChoDuyet ?? 0 };
+}
+
 export async function layDanhGiaKPI() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
