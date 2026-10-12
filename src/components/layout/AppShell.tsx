@@ -12,7 +12,10 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen w-full bg-background">
       <Sidebar vaiTro={vaiTro} />
-      <div className="flex min-h-screen flex-1 flex-col">
+      {/* min-w-0: bỏ qua min-width:auto mặc định của flex item — không có dòng
+       * này thì nội dung rộng bên trong (vd lưới react-big-calendar) sẽ ép
+       * khung này không chịu co lại, đẩy tràn ngang cả trang trên di động. */}
+      <div className="flex min-h-screen min-w-0 flex-1 flex-col">
         <MobileNav vaiTro={vaiTro} />
         {children}
       </div>
