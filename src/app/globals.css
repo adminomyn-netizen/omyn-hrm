@@ -1,0 +1,32 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f8fafc;
+  --foreground: #0f172a;
+
+  /* Màu thương hiệu Omyn — TẠM, đổi ở đây khi có bộ nhận diện thật */
+  --omyn-primary: #0f766e;
+  --omyn-primary-dark: #0b5a54;
+  --omyn-primary-light: #ccfbf1;
+  --omyn-accent: #f59e0b;
+  --omyn-surface: #ffffff;
+  --omyn-border: #e2e8f0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-omyn-primary: var(--omyn-primary);
+  --color-omyn-primary-dark: var(--omyn-primary-dark);
+  --color-omyn-primary-light: var(--omyn-primary-light);
+  --color-omyn-accent: var(--omyn-accent);
+  --color-omyn-surface: var(--omyn-surface);
+  --color-omyn-border: var(--omyn-border);
+  --font-sans: var(--font-inter);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+}
