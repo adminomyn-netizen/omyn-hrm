@@ -68,43 +68,47 @@ export function LichChamCong({
   const ngayMacDinh = useMemo(() => new Date(nam, thang - 1, 1), [nam, thang]);
 
   return (
-    <div className="omyn-rbc" style={{ height: 640 }}>
-      <Calendar
-        localizer={localizer}
-        culture="vi"
-        events={danhSachSuKien}
-        defaultDate={ngayMacDinh}
-        date={ngayMacDinh}
-        view="month"
-        views={["month"]}
-        onView={() => {}}
-        onNavigate={(ngayMoi) => {
-          const n = ngayMoi.getFullYear();
-          const t = ngayMoi.getMonth() + 1;
-          router.push(`/cham-cong?nam=${n}&thang=${t}`);
-        }}
-        messages={{
-          next: "Tháng sau",
-          previous: "Tháng trước",
-          today: "Hôm nay",
-          noEventsInRange: "Không có dữ liệu chấm công trong khoảng này.",
-        }}
-        eventPropGetter={(event: SuKienLich) => {
-          const mau = MAU_THEO_TRANG_THAI[event.trangThai] ?? { bg: "#e2e8f0", border: "#64748b" };
-          return {
-            style: {
-              backgroundColor: mau.bg,
-              borderLeft: `3px solid ${mau.border}`,
-              color: "#0f172a",
-            },
-          };
-        }}
-        components={{
-          event: ({ event }: EventProps<SuKienLich>) => (
-            <span className="truncate text-xs font-medium">{event.title}</span>
-          ),
-        }}
-      />
+    // overflow-x-auto khoanh vùng lịch này — lưới RBC có bề rộng cố định tối
+    // thiểu, không bọc thì nó đẩy tràn ngang cả trang trên di động.
+    <div className="overflow-x-auto">
+      <div className="omyn-rbc" style={{ height: 640, minWidth: 720 }}>
+        <Calendar
+          localizer={localizer}
+          culture="vi"
+          events={danhSachSuKien}
+          defaultDate={ngayMacDinh}
+          date={ngayMacDinh}
+          view="month"
+          views={["month"]}
+          onView={() => {}}
+          onNavigate={(ngayMoi) => {
+            const n = ngayMoi.getFullYear();
+            const t = ngayMoi.getMonth() + 1;
+            router.push(`/cham-cong?nam=${n}&thang=${t}`);
+          }}
+          messages={{
+            next: "Tháng sau",
+            previous: "Tháng trước",
+            today: "Hôm nay",
+            noEventsInRange: "Không có dữ liệu chấm công trong khoảng này.",
+          }}
+          eventPropGetter={(event: SuKienLich) => {
+            const mau = MAU_THEO_TRANG_THAI[event.trangThai] ?? { bg: "#e2e8f0", border: "#64748b" };
+            return {
+              style: {
+                backgroundColor: mau.bg,
+                borderLeft: `3px solid ${mau.border}`,
+                color: "#0f172a",
+              },
+            };
+          }}
+          components={{
+            event: ({ event }: EventProps<SuKienLich>) => (
+              <span className="truncate text-xs font-medium">{event.title}</span>
+            ),
+          }}
+        />
+      </div>
     </div>
   );
 }
