@@ -7,6 +7,7 @@ import { Card, ThongKe } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Bang, type Cot } from "@/components/ui/Table";
 import { layBangLuongKyGanNhat } from "@/lib/data";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 type DongLuong = NonNullable<Awaited<ReturnType<typeof layBangLuongKyGanNhat>>>["chiTiet"][number];
 
@@ -21,6 +22,7 @@ const cot: Cot<DongLuong>[] = [
 ];
 
 export default async function TrangLuong() {
+  await yeuCauVaiTro(["admin", "ky_thuat"]);
   const luong = await layBangLuongKyGanNhat();
 
   if (!luong) {

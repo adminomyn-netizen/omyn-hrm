@@ -3,9 +3,11 @@ import { AppShell } from "@/components/layout/AppShell";
 import { Topbar } from "@/components/layout/Topbar";
 import { Card } from "@/components/ui/Card";
 import { layDanhSachKhoi } from "@/lib/data";
-import { FormThemNhanVien } from "./FormThemNhanVien";
+import { FormNhanVien } from "@/components/nhan-su/FormNhanVien";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 export default async function TrangThemNhanVien() {
+  await yeuCauVaiTro(["admin", "ky_thuat"]);
   const khoi = await layDanhSachKhoi();
 
   return (
@@ -17,7 +19,7 @@ export default async function TrangThemNhanVien() {
         </Link>
 
         <Card className="max-w-2xl">
-          <FormThemNhanVien khoi={khoi} />
+          <FormNhanVien khoi={khoi} />
         </Card>
       </main>
     </AppShell>

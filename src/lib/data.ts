@@ -7,8 +7,32 @@ import { createAdminClient } from "./supabase/admin";
 
 /** "Hôm nay" phải tính theo giờ HCM — server Vercel chạy UTC, nên sau 17h HCM
  * `new Date().toISOString()` đã sang ngày hôm sau ở UTC và lệch ngày. */
-function ngayHomNayHCM(): string {
+export function ngayHomNayHCM(): string {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date());
+}
+
+/** Giờ hiện tại theo HCM, dạng "HH:MM:SS" — dùng khi chấm công vào/ra. */
+export function gioHienTaiHCM(): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  }).format(new Date());
+}
+
+/** Tìm hồ sơ nhân sự gắn với 1 tài khoản đăng nhập — null nếu tài khoản
+ * (ví dụ admin/kỹ thuật tạo tay) chưa được gắn với nhân viên nào. */
+export async function layNhanVienIdTheoUser(userId: string): Promise<string | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("nhan_vien")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) throw error;
+  return data?.id ?? null;
 }
 
 export async function layDanhSachKhoi() {
@@ -29,6 +53,17 @@ export async function layDanhSachNhanVien() {
     .order("ngay_vao_lam");
   if (error) throw error;
   return data.map((n) => ({ ...n, khoi_ten: n.khoi?.ten ?? "" }));
+}
+
+export async function layNhanVienTheoId(id: string) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("nhan_vien")
+    .select("id, ma_nhan_vien, ho_ten, chuc_danh, khoi_id, email, ngay_vao_lam, trang_thai")
+    .eq("id", id)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
 }
 
 export async function layChamCongHomNay() {
@@ -67,19 +102,24 @@ export function thangHienTaiHCM() {
   return { nam, thang };
 }
 
-export async function layChamCongThang(nam: number, thang: number) {
+/** `nhanVienId` nếu truyền vào thì chỉ lấy chấm công của riêng người đó —
+ * dùng cho vai trò nhân viên, không được thấy lịch của người khác. */
+export async function layChamCongThang(nam: number, thang: number, nhanVienId?: string) {
   const supabase = createAdminClient();
   const thang2 = String(thang).padStart(2, "0");
   const tuNgay = `${nam}-${thang2}-01`;
   const ngayCuoiThang = new Date(nam, thang, 0).getDate();
   const denNgay = `${nam}-${thang2}-${String(ngayCuoiThang).padStart(2, "0")}`;
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("cham_cong")
     .select("id, ngay, gio_vao, gio_ra, trang_thai, nhan_vien(ho_ten)")
     .gte("ngay", tuNgay)
     .lte("ngay", denNgay)
     .order("ngay");
+  if (nhanVienId) query = query.eq("nhan_vien_id", nhanVienId);
+
+  const { data, error } = await query;
   if (error) throw error;
 
   return data.map((c) => ({
@@ -92,6 +132,20 @@ export async function layChamCongThang(nam: number, thang: number) {
   }));
 }
 
+/** Chấm công hôm nay của riêng 1 nhân viên — null nếu chưa chấm công. */
+export async function layChamCongHomNayCuaToi(nhanVienId: string) {
+  const supabase = createAdminClient();
+  const homNay = ngayHomNayHCM();
+  const { data, error } = await supabase
+    .from("cham_cong")
+    .select("gio_vao, gio_ra, trang_thai")
+    .eq("nhan_vien_id", nhanVienId)
+    .eq("ngay", homNay)
+    .maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
 export async function layDonTu() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -100,6 +154,19 @@ export async function layDonTu() {
     .order("tu_ngay", { ascending: false });
   if (error) throw error;
   return data.map((d) => ({ ...d, nhan_vien_ho_ten: d.nhan_vien?.ho_ten ?? "" }));
+}
+
+/** Đơn từ của riêng 1 nhân viên — dùng cho vai trò nhân viên, không thấy
+ * đơn của người khác. */
+export async function layDonTuCuaToi(nhanVienId: string) {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("don_tu")
+    .select("id, loai, tu_ngay, den_ngay, trang_thai")
+    .eq("nhan_vien_id", nhanVienId)
+    .order("tu_ngay", { ascending: false });
+  if (error) throw error;
+  return data;
 }
 
 export async function layBangLuongKyGanNhat() {

@@ -8,6 +8,8 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Bang, type Cot } from "@/components/ui/Table";
 import { layDanhSachNhanVien } from "@/lib/data";
+import { HanhDongNhanVien } from "@/components/nhan-su/HanhDongNhanVien";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 type NhanVien = Awaited<ReturnType<typeof layDanhSachNhanVien>>[number];
 
@@ -26,9 +28,11 @@ const cot: Cot<NhanVien>[] = [
       </Badge>
     ),
   },
+  { nhan: "", hienThi: (n) => <HanhDongNhanVien id={n.id} hoTen={n.ho_ten} /> },
 ];
 
 export default async function TrangNhanSu() {
+  await yeuCauVaiTro(["admin", "ky_thuat"]);
   const danhSachNhanVien = await layDanhSachNhanVien();
 
   return (

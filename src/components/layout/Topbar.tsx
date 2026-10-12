@@ -24,7 +24,11 @@ export async function Topbar({ tieuDe }: { tieuDe: string }) {
             <div className="hidden text-right sm:block">
               <div className="text-sm font-medium text-slate-700">{nguoiDung.hoTen}</div>
               <div className="text-xs text-slate-400">
-                {nguoiDung.vaiTro === "admin" ? "Quản trị" : "Kỹ thuật"}
+                {nguoiDung.vaiTro === "admin"
+                  ? "Quản trị"
+                  : nguoiDung.vaiTro === "ky_thuat"
+                    ? "Kỹ thuật"
+                    : "Nhân viên"}
               </div>
             </div>
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-omyn-primary-light text-sm font-semibold text-omyn-primary-dark">

@@ -5,6 +5,7 @@ import { Topbar } from "@/components/layout/Topbar";
 import { Card, ThongKe } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { layThongKeHeThong } from "@/lib/data";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 const TEN_BANG: Record<string, string> = {
   nhan_vien: "Nhân viên",
@@ -18,6 +19,7 @@ const TEN_BANG: Record<string, string> = {
 };
 
 export default async function TrangKyThuat() {
+  await yeuCauVaiTro(["admin", "ky_thuat"]);
   const he = await layThongKeHeThong();
   const tongDong = he.bang.reduce((t, b) => t + b.soDong, 0);
 

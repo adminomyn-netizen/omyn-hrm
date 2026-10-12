@@ -1,7 +1,10 @@
+export const dynamic = "force-dynamic";
+
 import { AppShell } from "@/components/layout/AppShell";
 import { Topbar } from "@/components/layout/Topbar";
 import { Card } from "@/components/ui/Card";
 import { FileText, Download } from "lucide-react";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 const bieuMau = [
   { ten: "Báo cáo tình hình sử dụng lao động (6 tháng/năm)", can_cu: "Điều 20 BLLĐ 2019" },
@@ -11,7 +14,8 @@ const bieuMau = [
   { ten: "Quyết định bổ nhiệm / điều chuyển / kỷ luật", can_cu: "Nội quy công ty" },
 ];
 
-export default function TrangBaoCao() {
+export default async function TrangBaoCao() {
+  await yeuCauVaiTro(["admin", "ky_thuat"]);
   return (
     <AppShell>
       <Topbar tieuDe="Báo cáo & biểu mẫu" />

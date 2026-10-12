@@ -13,8 +13,10 @@ import {
   layDanhGiaKPI,
   layBangLuongKyGanNhat,
 } from "@/lib/data";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 export default async function TrangTongQuan() {
+  await yeuCauVaiTro(["admin", "ky_thuat"]);
   const [khoi, nhanVien, chamCong, donTu, kpi, luong] = await Promise.all([
     layDanhSachKhoi(),
     layDanhSachNhanVien(),

@@ -1,7 +1,10 @@
+export const dynamic = "force-dynamic";
+
 import { AppShell } from "@/components/layout/AppShell";
 import { Topbar } from "@/components/layout/Topbar";
 import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 const vaiTro = [
   { ten: "Quản trị hệ thống", quyen: "Toàn quyền" },
@@ -10,7 +13,8 @@ const vaiTro = [
   { ten: "Nhân viên", quyen: "Chỉ xem hồ sơ & gửi đơn của mình" },
 ];
 
-export default function TrangCaiDat() {
+export default async function TrangCaiDat() {
+  await yeuCauVaiTro(["admin"]);
   return (
     <AppShell>
       <Topbar tieuDe="Cài đặt & phân quyền" />

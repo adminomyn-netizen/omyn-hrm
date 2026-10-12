@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Bang, type Cot } from "@/components/ui/Table";
 import { layTuyenDung } from "@/lib/data";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 type TuyenDung = Awaited<ReturnType<typeof layTuyenDung>>[number];
 
@@ -26,6 +27,7 @@ const cot: Cot<TuyenDung>[] = [
 ];
 
 export default async function TrangTuyenDung() {
+  await yeuCauVaiTro(["admin", "ky_thuat"]);
   const danhSachTuyenDung = await layTuyenDung();
 
   return (

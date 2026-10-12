@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Bang, type Cot } from "@/components/ui/Table";
 import { layDanhGiaKPI } from "@/lib/data";
+import { yeuCauVaiTro } from "@/lib/auth";
 
 type DanhGiaKPI = Awaited<ReturnType<typeof layDanhGiaKPI>>[number];
 
@@ -26,6 +27,7 @@ const cot: Cot<DanhGiaKPI>[] = [
 ];
 
 export default async function TrangDanhGia() {
+  await yeuCauVaiTro(["admin", "ky_thuat"]);
   const danhSachKPI = await layDanhGiaKPI();
 
   return (

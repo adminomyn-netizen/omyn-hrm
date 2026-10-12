@@ -234,6 +234,7 @@ export type Database = {
           ma_nhan_vien: string | null
           ngay_vao_lam: string | null
           trang_thai: string
+          user_id: string | null
         }
         Insert: {
           chuc_danh?: string | null
@@ -245,6 +246,7 @@ export type Database = {
           ma_nhan_vien?: string | null
           ngay_vao_lam?: string | null
           trang_thai?: string
+          user_id?: string | null
         }
         Update: {
           chuc_danh?: string | null
@@ -256,6 +258,7 @@ export type Database = {
           ma_nhan_vien?: string | null
           ngay_vao_lam?: string | null
           trang_thai?: string
+          user_id?: string | null
         }
         Relationships: [
           {
