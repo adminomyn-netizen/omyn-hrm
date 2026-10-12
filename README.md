@@ -10,8 +10,15 @@ deploy trên Vercel.
 - Branding đang dùng **màu tạm + chữ "OMYN"** thay logo (folder "4.1 Bộ nhận diện thương hiệu"
   trên Drive đang trống). Khi có file logo thật, đổi ở `src/app/globals.css` (biến `--omyn-*`)
   và `src/components/layout/Sidebar.tsx`.
-- Schema Supabase đã soạn sẵn ở `supabase/migrations/0001_khung_ban_dau.sql` và
-  `supabase/seed.sql`, chưa chạy lên project thật (chờ token đăng nhập Supabase CLI).
+- Schema Supabase khung ban đầu ở `supabase/migrations/0001_khung_ban_dau.sql` (9 bảng tối giản)
+  **đã được mở rộng** ở `supabase/migrations/0002_mo_rong_theo_nghiep_vu_thuc.sql` để bám sát
+  cấu trúc app HR thật trên Lark Base của sếp Lâm (37 bảng, 4 base con) — đối chiếu chi tiết từng
+  bảng ở `docs/mapping-lark-hr.md`. Cả 2 migration **CHƯA chạy** lên project thật (chờ token đăng
+  nhập Supabase CLI) — `supabase/seed.sql` hiện chỉ khớp schema `0001`, cần viết thêm seed cho
+  các bảng mới ở `0002` trước khi demo dữ liệu đầy đủ.
+- **Còn 3 trang trong app HR Lark chưa tra được cấu trúc** ("Nhân viên đến hạn HĐLĐ", "Sinh nhật
+  nhân viên", "Lịch nghỉ phép") vì base chứa chúng (`V70gblwgkaq7M1sXk4ojD6QMpmc`) trả lỗi thật
+  `91403 you don't have permission` — cần sếp cấp quyền đọc base này rồi tra lại, không bịa.
 
 ## Các module và lý do lược so với app mẫu
 
@@ -34,7 +41,16 @@ npm run dev
 ## Việc còn lại trước khi dùng thật
 
 1. Đăng nhập Vercel CLI (`vercel login`) và Supabase CLI (`supabase login --token <token>`).
-2. Tạo project Supabase thật, `supabase link`, `supabase db push` để chạy migration.
-3. Nối `src/lib/supabase/*` vào các trang (thay cho `demo-data.ts`).
-4. Thêm trang đăng nhập + phân quyền theo vai trò thật.
-5. Thay bộ nhận diện thương hiệu thật khi có.
+2. Tạo project Supabase thật, `supabase link`, `supabase db push` để chạy CẢ HAI migration
+   (`0001` rồi `0002`).
+3. Viết thêm seed cho các bảng mới ở `0002` (hiện `supabase/seed.sql` chỉ khớp `0001`).
+4. Nối `src/lib/supabase/*` vào các trang (thay cho `demo-data.ts`) — làm theo từng cụm nghiệp vụ
+   trong `docs/mapping-lark-hr.md`, không cần làm hết 1 lần.
+5. Thêm trang đăng nhập + phân quyền theo vai trò thật, rồi viết RLS policy cho các bảng mới
+   (đang chỉ bật RLS không có policy).
+6. Xin sếp cấp quyền đọc base Lark `V70gblwgkaq7M1sXk4ojD6QMpmc` để tra cấu trúc 3 trang còn
+   thiếu (HĐLĐ đến hạn / sinh nhật / lịch nghỉ phép), rồi bổ sung bảng tương ứng.
+7. Dựng các VIEW báo cáo (phân nhóm độ tuổi/giới tính/thâm niên/hợp đồng, dashboard theo chức vụ,
+   cơ cấu lương, báo cáo lương theo tháng) khi đã có dữ liệu thật để tính — xem cuối
+   `docs/mapping-lark-hr.md`.
+8. Thay bộ nhận diện thương hiệu thật khi có.
