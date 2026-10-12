@@ -33,3 +33,7 @@ export const menuChinh: MucMenu[] = [
   { ten: "Kỹ thuật", duong_dan: "/ky-thuat", icon: Activity, chiVaiTro: ["ky_thuat", "admin"] },
   { ten: "Cài đặt & phân quyền", duong_dan: "/cai-dat", icon: Settings, chiVaiTro: ["admin"] },
 ];
+
+export function locMenuTheoVaiTro(vaiTro: VaiTro | null): MucMenu[] {
+  return menuChinh.filter((m) => !m.chiVaiTro || (vaiTro && m.chiVaiTro.includes(vaiTro)));
+}

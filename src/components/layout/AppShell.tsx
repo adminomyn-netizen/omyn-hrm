@@ -1,19 +1,19 @@
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
-import { menuChinh } from "@/lib/nav";
 import { layNguoiDungHienTai } from "@/lib/auth";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const nguoiDung = await layNguoiDungHienTai();
-  const menu = menuChinh.filter(
-    (m) => !m.chiVaiTro || (nguoiDung && m.chiVaiTro.includes(nguoiDung.vaiTro)),
-  );
+  // CHỈ truyền chuỗi vai trò xuống client, không truyền cả mảng menu (có icon
+  // là hàm React) — Next.js không cho truyền hàm từ Server Component sang
+  // Client Component. Sidebar/MobileNav tự import menuChinh rồi lọc theo vaiTro.
+  const vaiTro = nguoiDung?.vaiTro ?? null;
 
   return (
     <div className="flex min-h-screen w-full bg-background">
-      <Sidebar menu={menu} />
+      <Sidebar vaiTro={vaiTro} />
       <div className="flex min-h-screen flex-1 flex-col">
-        <MobileNav menu={menu} />
+        <MobileNav vaiTro={vaiTro} />
         {children}
       </div>
     </div>

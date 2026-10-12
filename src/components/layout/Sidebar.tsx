@@ -4,13 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
-import type { MucMenu } from "@/lib/nav";
+import { locMenuTheoVaiTro } from "@/lib/nav";
+import type { VaiTro } from "@/lib/auth";
 
 const KHOA_LUU = "omyn-hrm-sidebar-thu-gon";
 
-export function Sidebar({ menu }: { menu: MucMenu[] }) {
+export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
   const pathname = usePathname();
   const [thuGon, setThuGon] = useState(false);
+  const menu = locMenuTheoVaiTro(vaiTro);
 
   useEffect(() => {
     try {

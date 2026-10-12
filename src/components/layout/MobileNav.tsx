@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import type { MucMenu } from "@/lib/nav";
+import { locMenuTheoVaiTro } from "@/lib/nav";
+import type { VaiTro } from "@/lib/auth";
 
-export function MobileNav({ menu }: { menu: MucMenu[] }) {
+export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
   const pathname = usePathname();
+  const menu = locMenuTheoVaiTro(vaiTro);
   const [mo, setMo] = useState(false);
 
   // đóng drawer mỗi khi chuyển trang
