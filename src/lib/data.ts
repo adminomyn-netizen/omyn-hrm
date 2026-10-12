@@ -5,6 +5,12 @@ import { createAdminClient } from "./supabase/admin";
 // component, để sau này đổi nguồn (ví dụ bật RLS + client theo người dùng) chỉ
 // phải sửa một chỗ.
 
+/** "Hôm nay" phải tính theo giờ HCM — server Vercel chạy UTC, nên sau 17h HCM
+ * `new Date().toISOString()` đã sang ngày hôm sau ở UTC và lệch ngày. */
+function ngayHomNayHCM(): string {
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Ho_Chi_Minh" }).format(new Date());
+}
+
 export async function layDanhSachKhoi() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -27,7 +33,7 @@ export async function layDanhSachNhanVien() {
 
 export async function layChamCongHomNay() {
   const supabase = createAdminClient();
-  const homNay = new Date().toISOString().slice(0, 10);
+  const homNay = ngayHomNayHCM();
 
   const [{ data: nhanVienDangLam, error: loi1 }, { data: chamCong, error: loi2 }] =
     await Promise.all([
@@ -53,6 +59,37 @@ export async function layChamCongHomNay() {
       trang_thai: c.trang_thai,
     })),
   };
+}
+
+/** Trả về (năm, tháng) hiện tại theo giờ HCM — dùng làm mặc định khi mở lịch chấm công. */
+export function thangHienTaiHCM() {
+  const [nam, thang] = ngayHomNayHCM().split("-").map(Number);
+  return { nam, thang };
+}
+
+export async function layChamCongThang(nam: number, thang: number) {
+  const supabase = createAdminClient();
+  const thang2 = String(thang).padStart(2, "0");
+  const tuNgay = `${nam}-${thang2}-01`;
+  const ngayCuoiThang = new Date(nam, thang, 0).getDate();
+  const denNgay = `${nam}-${thang2}-${String(ngayCuoiThang).padStart(2, "0")}`;
+
+  const { data, error } = await supabase
+    .from("cham_cong")
+    .select("id, ngay, gio_vao, gio_ra, trang_thai, nhan_vien(ho_ten)")
+    .gte("ngay", tuNgay)
+    .lte("ngay", denNgay)
+    .order("ngay");
+  if (error) throw error;
+
+  return data.map((c) => ({
+    id: c.id as string,
+    ngay: c.ngay as string,
+    hoTen: c.nhan_vien?.ho_ten ?? "",
+    gioVao: c.gio_vao as string | null,
+    gioRa: c.gio_ra as string | null,
+    trangThai: c.trang_thai as string,
+  }));
 }
 
 export async function layDonTu() {

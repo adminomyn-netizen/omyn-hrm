@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { locMenuTheoVaiTro } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
+import { Logo } from "@/components/brand/Logo";
 
 export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
   const pathname = usePathname();
@@ -20,12 +21,7 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
   return (
     <>
       <div className="flex items-center justify-between border-b border-omyn-border bg-omyn-surface px-4 py-3 lg:hidden">
-        <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-omyn-primary text-sm font-bold text-white">
-            O
-          </div>
-          <div className="text-sm font-semibold text-slate-900">OMYN HRM</div>
-        </div>
+        <Logo size="sm" />
         <button
           onClick={() => setMo(true)}
           aria-label="Mở menu"
@@ -44,15 +40,7 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
           />
           <nav className="absolute left-0 top-0 flex h-full w-72 max-w-[85vw] flex-col bg-omyn-surface shadow-xl">
             <div className="flex items-center justify-between px-4 py-4">
-              <div className="flex items-center gap-2">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-omyn-primary text-sm font-bold text-white">
-                  O
-                </div>
-                <div>
-                  <div className="font-semibold leading-tight text-slate-900">OMYN</div>
-                  <div className="text-xs leading-tight text-slate-500">HRM nội bộ</div>
-                </div>
-              </div>
+              <Logo size="sm" />
               <button
                 onClick={() => setMo(false)}
                 aria-label="Đóng menu"

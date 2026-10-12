@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ChevronsLeft, ChevronsRight } from "lucide-react";
 import { locMenuTheoVaiTro } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
+import { Logo, LogoMark } from "@/components/brand/Logo";
 
 const KHOA_LUU = "omyn-hrm-sidebar-thu-gon";
 
@@ -36,16 +37,8 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
         thuGon ? "w-[72px]" : "w-64"
       }`}
     >
-      <div className={`flex items-center gap-2 px-4 py-5 ${thuGon ? "justify-center px-0" : ""}`}>
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-omyn-primary text-white font-bold text-sm">
-          O
-        </div>
-        {!thuGon && (
-          <div>
-            <div className="font-semibold text-slate-900 leading-tight">OMYN</div>
-            <div className="text-xs text-slate-500 leading-tight">HRM nội bộ</div>
-          </div>
-        )}
+      <div className={`flex items-center px-4 py-5 ${thuGon ? "justify-center px-0" : ""}`}>
+        {thuGon ? <LogoMark size="sm" /> : <Logo size="sm" />}
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-2">

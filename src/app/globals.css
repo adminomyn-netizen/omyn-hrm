@@ -30,3 +30,60 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Lớp giao diện cho react-big-calendar (lưới lịch chấm công) — khoác lại theo
+ * tông Omyn, thư viện gốc dùng màu xanh mặc định không khớp. */
+.omyn-rbc .rbc-calendar {
+  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.8125rem;
+}
+.omyn-rbc .rbc-month-view,
+.omyn-rbc .rbc-time-view {
+  border-color: var(--omyn-border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+.omyn-rbc .rbc-header {
+  border-color: var(--omyn-border);
+  background: #f8fafc;
+  padding: 0.5rem 0;
+  font-weight: 600;
+  color: #475569;
+}
+.omyn-rbc .rbc-day-bg + .rbc-day-bg,
+.omyn-rbc .rbc-month-row + .rbc-month-row,
+.omyn-rbc .rbc-month-row,
+.omyn-rbc .rbc-header + .rbc-header {
+  border-color: var(--omyn-border);
+}
+.omyn-rbc .rbc-today {
+  background-color: var(--omyn-primary-light);
+}
+.omyn-rbc .rbc-off-range-bg {
+  background: #f8fafc;
+}
+.omyn-rbc .rbc-toolbar button {
+  border-color: var(--omyn-border);
+  color: #334155;
+  border-radius: 0.5rem;
+}
+.omyn-rbc .rbc-toolbar button:hover {
+  background: #f1f5f9;
+}
+.omyn-rbc .rbc-toolbar button.rbc-active {
+  background: var(--omyn-primary);
+  border-color: var(--omyn-primary);
+  color: #fff;
+}
+.omyn-rbc .rbc-toolbar-label {
+  font-weight: 600;
+  color: #0f172a;
+}
+.omyn-rbc .rbc-event {
+  border-radius: 0.25rem;
+  padding: 1px 4px;
+}
+.omyn-rbc .rbc-show-more {
+  color: var(--omyn-primary-dark);
+  font-weight: 600;
+}

@@ -2,17 +2,16 @@
 
 import { useActionState } from "react";
 import { dangNhap } from "./actions";
+import { LogoMark } from "@/components/brand/Logo";
 
 export default function TrangDangNhap() {
   const [state, action, dangXuLy] = useActionState(dangNhap, undefined);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="w-full max-w-sm rounded-xl border border-omyn-border bg-omyn-surface p-8 shadow-sm">
-        <div className="mb-6 flex flex-col items-center gap-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-omyn-primary text-lg font-bold text-white">
-            O
-          </div>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-omyn-primary-light via-background to-background px-4">
+      <div className="w-full max-w-sm rounded-xl border border-omyn-border bg-omyn-surface p-8 shadow-lg shadow-slate-900/5">
+        <div className="mb-6 flex flex-col items-center gap-3">
+          <LogoMark size="lg" />
           <div className="text-center">
             <div className="text-lg font-semibold text-slate-900">OMYN HRM</div>
             <div className="text-sm text-slate-500">Đăng nhập hệ thống nội bộ</div>

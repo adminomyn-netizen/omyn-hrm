@@ -5,17 +5,26 @@ deploy trên Vercel.
 
 ## Trạng thái hiện tại (12/10/2026)
 
-- Khung giao diện đã dựng đủ 9 module, chạy bằng **dữ liệu mẫu** trong `src/lib/demo-data.ts`
-  (chưa nối Supabase thật — chị chốt dùng dữ liệu giả để xem giao diện trước).
-- Branding đang dùng **màu tạm + chữ "OMYN"** thay logo (folder "4.1 Bộ nhận diện thương hiệu"
-  trên Drive đang trống). Khi có file logo thật, đổi ở `src/app/globals.css` (biến `--omyn-*`)
-  và `src/components/layout/Sidebar.tsx`.
-- Schema Supabase khung ban đầu ở `supabase/migrations/0001_khung_ban_dau.sql` (9 bảng tối giản)
-  **đã được mở rộng** ở `supabase/migrations/0002_mo_rong_theo_nghiep_vu_thuc.sql` để bám sát
-  cấu trúc app HR thật trên Lark Base của sếp Lâm (37 bảng, 4 base con) — đối chiếu chi tiết từng
-  bảng ở `docs/mapping-lark-hr.md`. Cả 2 migration **CHƯA chạy** lên project thật (chờ token đăng
-  nhập Supabase CLI) — `supabase/seed.sql` hiện chỉ khớp schema `0001`, cần viết thêm seed cho
-  các bảng mới ở `0002` trước khi demo dữ liệu đầy đủ.
+- Đã deploy thật lên Vercel (region Singapore), nối Supabase thật (region Singapore) — **không
+  còn dữ liệu mẫu tĩnh**, mọi trang đọc qua `src/lib/data.ts` (service role) từ DB thật đã seed.
+  Đăng nhập 2 vai trò thật qua Supabase Auth (admin / kỹ thuật), có RSC đã verify qua trình duyệt
+  thật cho cả hai tài khoản, local và production.
+- Trang Chấm công có **đồng hồ realtime theo giờ Hồ Chí Minh** (`DongHoHCM.tsx`, client-only,
+  tránh lệch giờ UTC của server Vercel) và **lưới lịch quản lý chấm công theo tháng** dựng bằng
+  `react-big-calendar` (`LichChamCong.tsx`), điều hướng tháng trước/sau qua URL
+  (`/cham-cong?nam=&thang=`) để luôn lấy dữ liệu mới từ server.
+- Đã thiết kế logo đặt chỗ: biểu trưng giọt serum cách điệu (`src/components/brand/Logo.tsx`,
+  favicon ở `src/app/icon.svg`) — **đây là logo do AI thiết kế tạm, chưa phải bộ nhận diện
+  chính thức của Omyn** (folder "4.1 Bộ nhận diện thương hiệu" trên Drive vẫn đang trống). Khi có
+  file logo thật, đổi tại `src/components/brand/Logo.tsx` + `src/app/icon.svg`, màu thương hiệu
+  ở biến `--omyn-*` trong `src/app/globals.css`.
+- Schema Supabase khung ban đầu ở `supabase/migrations/0001_khung_ban_dau.sql` (9 bảng, **đã
+  chạy lên DB thật + đã seed**) được mở rộng ở
+  `supabase/migrations/0002_mo_rong_theo_nghiep_vu_thuc.sql` để bám sát cấu trúc app HR thật trên
+  Lark Base của sếp Lâm (37 bảng, 4 base con) — đối chiếu chi tiết từng bảng ở
+  `docs/mapping-lark-hr.md`. Migration `0002` **soạn xong nhưng CHƯA chạy lên DB thật** — đang
+  chờ sếp xác nhận nguồn nhân sự thật (hồ sơ Drive hay import từ Lark Base) trước khi đổ dữ liệu
+  thật của người, và `supabase/seed.sql` hiện chỉ khớp schema `0001`.
 - **Còn 3 trang trong app HR Lark chưa tra được cấu trúc** ("Nhân viên đến hạn HĐLĐ", "Sinh nhật
   nhân viên", "Lịch nghỉ phép") vì base chứa chúng (`V70gblwgkaq7M1sXk4ojD6QMpmc`) trả lỗi thật
   `91403 you don't have permission` — cần sếp cấp quyền đọc base này rồi tra lại, không bịa.
@@ -40,17 +49,17 @@ npm run dev
 
 ## Việc còn lại trước khi dùng thật
 
-1. Đăng nhập Vercel CLI (`vercel login`) và Supabase CLI (`supabase login --token <token>`).
-2. Tạo project Supabase thật, `supabase link`, `supabase db push` để chạy CẢ HAI migration
-   (`0001` rồi `0002`).
-3. Viết thêm seed cho các bảng mới ở `0002` (hiện `supabase/seed.sql` chỉ khớp `0001`).
-4. Nối `src/lib/supabase/*` vào các trang (thay cho `demo-data.ts`) — làm theo từng cụm nghiệp vụ
-   trong `docs/mapping-lark-hr.md`, không cần làm hết 1 lần.
-5. Thêm trang đăng nhập + phân quyền theo vai trò thật, rồi viết RLS policy cho các bảng mới
-   (đang chỉ bật RLS không có policy).
+1. ~~Đăng nhập Vercel CLI, Supabase CLI, GitHub CLI~~ — xong, auto-deploy khi push `main`.
+2. ~~Chạy migration `0001` + seed lên DB thật~~ — xong. Migration `0002` soạn xong, **chờ sếp
+   chốt nguồn nhân sự thật** rồi mới `supabase db push` + viết seed cho các bảng mới.
+3. Wire 2 nút Duyệt/Từ chối ở `/don-tu` vào server action thật (hiện là nút tĩnh, chưa nối DB).
+4. Thêm kiểm tra quyền truy cập phía server cho `/cai-dat` (hiện chỉ ẩn khỏi menu, chưa chặn
+   thật nếu gõ thẳng URL).
+5. Viết RLS policy cho mọi bảng (đang chỉ bật RLS, chưa có policy — mọi trang đọc qua service
+   role nên tạm ổn, nhưng cần thiết khi mở client-side truy vấn trực tiếp sau này).
 6. Xin sếp cấp quyền đọc base Lark `V70gblwgkaq7M1sXk4ojD6QMpmc` để tra cấu trúc 3 trang còn
    thiếu (HĐLĐ đến hạn / sinh nhật / lịch nghỉ phép), rồi bổ sung bảng tương ứng.
 7. Dựng các VIEW báo cáo (phân nhóm độ tuổi/giới tính/thâm niên/hợp đồng, dashboard theo chức vụ,
    cơ cấu lương, báo cáo lương theo tháng) khi đã có dữ liệu thật để tính — xem cuối
    `docs/mapping-lark-hr.md`.
-8. Thay bộ nhận diện thương hiệu thật khi có.
+8. Thay logo đặt chỗ bằng bộ nhận diện thương hiệu chính thức khi sếp gửi file thật.
