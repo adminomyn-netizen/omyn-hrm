@@ -52,8 +52,8 @@ export function AuthShell({
             <LogoMark size="lg" />
           </div>
           <div className="mb-6 text-center lg:text-left">
-            <div className="text-lg font-semibold text-slate-900">{tieuDe}</div>
-            <div className="text-sm text-slate-500">{moTa}</div>
+            <div className="text-lg font-semibold text-slate-900 dark:text-white">{tieuDe}</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">{moTa}</div>
           </div>
           {children}
         </div>

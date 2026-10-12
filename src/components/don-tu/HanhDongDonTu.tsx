@@ -27,7 +27,7 @@ export function HanhDongDonTu({ id }: { id: string }) {
         type="button"
         disabled={dangXuLy}
         onClick={() => guiHanhDong("tu_choi")}
-        className="rounded-md bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 disabled:opacity-50"
+        className="rounded-md bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600 disabled:opacity-50 dark:bg-slate-800 dark:text-slate-300"
       >
         Từ chối
       </button>

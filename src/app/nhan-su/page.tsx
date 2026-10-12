@@ -41,7 +41,7 @@ export default async function TrangNhanSu() {
       <main className="flex-1 space-y-6 p-4 lg:p-8">
         <Card>
           <div className="mb-4 flex items-center justify-between">
-            <div className="font-semibold text-slate-900">
+            <div className="font-semibold text-slate-900 dark:text-white">
               Danh sách nhân viên ({danhSachNhanVien.length})
             </div>
             <Link

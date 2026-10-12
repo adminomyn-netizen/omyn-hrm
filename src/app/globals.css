@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Chế độ tối bật bằng class .dark trên <html> (đặt tay qua nút bấm, không
+ * theo prefers-color-scheme của hệ thống) — mặc định luôn là sáng. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
@@ -11,6 +15,18 @@
   --omyn-accent: #f59e0b;
   --omyn-surface: #ffffff;
   --omyn-border: #e2e8f0;
+}
+
+.dark {
+  --background: #0b1120;
+  --foreground: #e2e8f0;
+
+  --omyn-primary: #2dd4bf;
+  --omyn-primary-dark: #14b8a6;
+  --omyn-primary-light: #0f3f3a;
+  --omyn-accent: #fbbf24;
+  --omyn-surface: #0f172a;
+  --omyn-border: #1e293b;
 }
 
 @theme inline {
@@ -45,10 +61,13 @@ body {
 }
 .omyn-rbc .rbc-header {
   border-color: var(--omyn-border);
-  background: #f8fafc;
+  background: var(--background);
   padding: 0.5rem 0;
   font-weight: 600;
   color: #475569;
+}
+.dark .omyn-rbc .rbc-header {
+  color: #94a3b8;
 }
 .omyn-rbc .rbc-day-bg + .rbc-day-bg,
 .omyn-rbc .rbc-month-row + .rbc-month-row,
@@ -60,15 +79,21 @@ body {
   background-color: var(--omyn-primary-light);
 }
 .omyn-rbc .rbc-off-range-bg {
-  background: #f8fafc;
+  background: var(--background);
 }
 .omyn-rbc .rbc-toolbar button {
   border-color: var(--omyn-border);
   color: #334155;
   border-radius: 0.5rem;
 }
+.dark .omyn-rbc .rbc-toolbar button {
+  color: #cbd5e1;
+}
 .omyn-rbc .rbc-toolbar button:hover {
   background: #f1f5f9;
+}
+.dark .omyn-rbc .rbc-toolbar button:hover {
+  background: #1e293b;
 }
 .omyn-rbc .rbc-toolbar button.rbc-active {
   background: var(--omyn-primary);
@@ -77,7 +102,7 @@ body {
 }
 .omyn-rbc .rbc-toolbar-label {
   font-weight: 600;
-  color: #0f172a;
+  color: var(--foreground);
 }
 .omyn-rbc .rbc-event {
   border-radius: 0.25rem;

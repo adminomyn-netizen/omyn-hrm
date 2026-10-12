@@ -51,7 +51,7 @@ export default async function TrangDonTu() {
         <main className="flex-1 space-y-6 p-4 lg:p-8">
           <Card>
             <div className="mb-4 flex items-center justify-between">
-              <div className="font-semibold text-slate-900">Đơn của tôi ({danhSachCuaToi.length})</div>
+              <div className="font-semibold text-slate-900 dark:text-white">Đơn của tôi ({danhSachCuaToi.length})</div>
               <Link
                 href="/don-tu/moi"
                 className="rounded-lg bg-omyn-primary px-4 py-2 text-sm font-medium text-white hover:bg-omyn-primary-dark"
@@ -73,7 +73,7 @@ export default async function TrangDonTu() {
       <Topbar tieuDe="Đơn từ & phê duyệt" />
       <main className="flex-1 space-y-6 p-4 lg:p-8">
         <Card>
-          <div className="mb-4 font-semibold text-slate-900">
+          <div className="mb-4 font-semibold text-slate-900 dark:text-white">
             Tất cả đơn ({danhSachDonTu.length})
           </div>
           <Bang cot={cotQuanLy} duLieu={danhSachDonTu} khoa={(d) => d.id} />

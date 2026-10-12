@@ -13,7 +13,7 @@ export function HanhDongNhanVien({ id, hoTen }: { id: string; hoTen: string }) {
       <Link
         href={`/nhan-su/${id}/sua`}
         title="Sửa thông tin"
-        className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-omyn-primary"
+        className="rounded-md p-1.5 text-slate-500 hover:bg-slate-100 hover:text-omyn-primary dark:text-slate-400 dark:hover:bg-slate-800"
       >
         <Pencil className="h-4 w-4" />
       </Link>

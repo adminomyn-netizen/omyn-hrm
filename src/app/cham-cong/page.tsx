@@ -69,7 +69,7 @@ export default async function TrangChamCong({
           </div>
 
           {!nhanVienId && (
-            <div className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700 ring-1 ring-amber-200">
+            <div className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-700 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/30">
               Tài khoản của bạn chưa gắn với hồ sơ nhân sự nào — liên hệ quản trị viên để được gắn
               hồ sơ trước khi chấm công.
             </div>
@@ -77,8 +77,8 @@ export default async function TrangChamCong({
 
           <Card>
             <div className="mb-4 flex items-center justify-between">
-              <div className="font-semibold text-slate-900">Lịch chấm công của tôi</div>
-              <div className="text-sm text-slate-500">
+              <div className="font-semibold text-slate-900 dark:text-white">Lịch chấm công của tôi</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">
                 Tháng {thang}/{nam}
               </div>
             </div>
@@ -107,8 +107,8 @@ export default async function TrangChamCong({
 
         <Card>
           <div className="mb-4 flex items-center justify-between">
-            <div className="font-semibold text-slate-900">Lưới lịch chấm công theo tháng</div>
-            <div className="text-sm text-slate-500">
+            <div className="font-semibold text-slate-900 dark:text-white">Lưới lịch chấm công theo tháng</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">
               Tháng {thang}/{nam}
             </div>
           </div>
@@ -116,7 +116,7 @@ export default async function TrangChamCong({
         </Card>
 
         <Card>
-          <div className="mb-4 font-semibold text-slate-900">Chấm công hôm nay</div>
+          <div className="mb-4 font-semibold text-slate-900 dark:text-white">Chấm công hôm nay</div>
           <Bang cot={cot} duLieu={chamCong.chiTiet} khoa={(d) => d.nhan_vien_ho_ten} />
         </Card>
       </main>

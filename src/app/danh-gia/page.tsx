@@ -35,7 +35,7 @@ export default async function TrangDanhGia() {
       <Topbar tieuDe="Đánh giá hiệu suất" />
       <main className="flex-1 space-y-6 p-4 lg:p-8">
         <Card>
-          <div className="mb-4 font-semibold text-slate-900">Kết quả đánh giá theo kỳ</div>
+          <div className="mb-4 font-semibold text-slate-900 dark:text-white">Kết quả đánh giá theo kỳ</div>
           <Bang cot={cot} duLieu={danhSachKPI} khoa={(k) => k.id} />
         </Card>
       </main>

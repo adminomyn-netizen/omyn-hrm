@@ -36,7 +36,7 @@ export default async function TrangTuyenDung() {
       <main className="flex-1 space-y-6 p-4 lg:p-8">
         <Card>
           <div className="mb-4 flex items-center justify-between">
-            <div className="font-semibold text-slate-900">
+            <div className="font-semibold text-slate-900 dark:text-white">
               Tin tuyển dụng đang mở ({danhSachTuyenDung.length})
             </div>
             <button className="rounded-lg bg-omyn-primary px-4 py-2 text-sm font-medium text-white hover:bg-omyn-primary-dark">

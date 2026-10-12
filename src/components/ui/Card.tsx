@@ -25,9 +25,9 @@ export function ThongKe({
 }) {
   return (
     <Card>
-      <div className="text-sm text-slate-500">{nhan}</div>
-      <div className="mt-1 text-2xl font-semibold text-slate-900">{giaTri}</div>
-      {ghiChu && <div className="mt-1 text-xs text-slate-400">{ghiChu}</div>}
+      <div className="text-sm text-slate-500 dark:text-slate-400">{nhan}</div>
+      <div className="mt-1 text-2xl font-semibold text-slate-900 dark:text-white">{giaTri}</div>
+      {ghiChu && <div className="mt-1 text-xs text-slate-400 dark:text-slate-500">{ghiChu}</div>}
     </Card>
   );
 }

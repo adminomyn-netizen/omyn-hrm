@@ -50,8 +50,8 @@ export function Logo({
       <LogoMark size={size} />
       {showText && (
         <div className="leading-tight">
-          <div className={`font-semibold tracking-tight text-slate-900 ${chu}`}>OMYN</div>
-          <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400">
+          <div className={`font-semibold tracking-tight text-slate-900 dark:text-white ${chu}`}>OMYN</div>
+          <div className="text-[11px] font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
             HRM nội bộ
           </div>
         </div>

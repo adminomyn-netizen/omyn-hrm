@@ -46,7 +46,7 @@ export default function TrangDangKy() {
         </div>
 
         {state?.loi && (
-          <div className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200">
+          <div className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/30">
             {state.loi}
           </div>
         )}
@@ -59,7 +59,7 @@ export default function TrangDangKy() {
           {dangXuLy ? "Đang tạo tài khoản..." : "Đăng ký"}
         </button>
 
-        <div className="pt-1 text-center text-sm text-slate-500">
+        <div className="pt-1 text-center text-sm text-slate-500 dark:text-slate-400">
           Đã có tài khoản?{" "}
           <Link href="/dang-nhap" className="font-medium text-omyn-primary hover:underline">
             Đăng nhập

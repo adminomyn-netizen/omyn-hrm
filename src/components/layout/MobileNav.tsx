@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 import { locMenuTheoVaiTro } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
 import { Logo } from "@/components/brand/Logo";
+import { ChuyenCheDo } from "@/components/layout/ChuyenCheDo";
 
 export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
   const pathname = usePathname();
@@ -22,13 +23,16 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
     <>
       <div className="flex items-center justify-between border-b border-omyn-border bg-omyn-surface px-4 py-3 lg:hidden">
         <Logo size="sm" />
-        <button
-          onClick={() => setMo(true)}
-          aria-label="Mở menu"
-          className="rounded-lg p-2 text-slate-600 hover:bg-slate-100"
-        >
-          <Menu className="h-5 w-5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <ChuyenCheDo />
+          <button
+            onClick={() => setMo(true)}
+            aria-label="Mở menu"
+            className="rounded-lg p-2 text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+          >
+            <Menu className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       {mo && (
@@ -44,7 +48,7 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
               <button
                 onClick={() => setMo(false)}
                 aria-label="Đóng menu"
-                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100"
+                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -62,7 +66,7 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
                     className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
                       dangChon
                         ? "bg-omyn-primary-light text-omyn-primary-dark"
-                        : "text-slate-600 hover:bg-slate-100"
+                        : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                     }`}
                   >
                     <Icon className="h-4 w-4 shrink-0" />

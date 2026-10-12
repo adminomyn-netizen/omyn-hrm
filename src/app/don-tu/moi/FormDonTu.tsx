@@ -73,7 +73,7 @@ export function FormDonTu() {
       </div>
 
       {loi && (
-        <div className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200">{loi}</div>
+        <div className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/30">{loi}</div>
       )}
 
       <div className="flex justify-end gap-2 pt-2">

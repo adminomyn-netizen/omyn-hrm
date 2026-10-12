@@ -21,18 +21,18 @@ export default async function TrangBaoCao() {
       <Topbar tieuDe="Báo cáo & biểu mẫu" />
       <main className="flex-1 space-y-6 p-4 lg:p-8">
         <Card>
-          <div className="mb-4 font-semibold text-slate-900">Biểu mẫu & quy định hành chính nhân sự</div>
+          <div className="mb-4 font-semibold text-slate-900 dark:text-white">Biểu mẫu & quy định hành chính nhân sự</div>
           <div className="divide-y divide-omyn-border">
             {bieuMau.map((b) => (
               <div key={b.ten} className="flex items-center justify-between py-3">
                 <div className="flex items-center gap-3">
                   <FileText className="h-5 w-5 text-omyn-primary" />
                   <div>
-                    <div className="text-sm font-medium text-slate-800">{b.ten}</div>
-                    <div className="text-xs text-slate-400">Căn cứ: {b.can_cu}</div>
+                    <div className="text-sm font-medium text-slate-800 dark:text-slate-200">{b.ten}</div>
+                    <div className="text-xs text-slate-400 dark:text-slate-500">Căn cứ: {b.can_cu}</div>
                   </div>
                 </div>
-                <button className="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200">
+                <button className="flex items-center gap-1.5 rounded-md bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700">
                   <Download className="h-3.5 w-3.5" />
                   Tải mẫu
                 </button>

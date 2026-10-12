@@ -18,7 +18,7 @@ const cot: Cot<DongLuong>[] = [
   { nhan: "Khối", hienThi: (d) => d.khoi_ten },
   { nhan: "Lương cơ bản", hienThi: (d) => tien(d.luong_co_ban) },
   { nhan: "Phụ cấp", hienThi: (d) => tien(d.phu_cap) },
-  { nhan: "Thực lĩnh", hienThi: (d) => <span className="font-semibold text-slate-900">{tien(d.thuc_linh)}</span> },
+  { nhan: "Thực lĩnh", hienThi: (d) => <span className="font-semibold text-slate-900 dark:text-white">{tien(d.thuc_linh)}</span> },
 ];
 
 export default async function TrangLuong() {
@@ -31,7 +31,7 @@ export default async function TrangLuong() {
         <Topbar tieuDe="Bảng lương" />
         <main className="flex-1 p-4 lg:p-8">
           <Card>
-            <div className="text-sm text-slate-500">Chưa có kỳ lương nào trong hệ thống.</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">Chưa có kỳ lương nào trong hệ thống.</div>
           </Card>
         </main>
       </AppShell>
@@ -46,7 +46,7 @@ export default async function TrangLuong() {
           <ThongKe nhan="Kỳ lương" giaTri={luong.ky} />
           <ThongKe nhan="Tổng quỹ lương" giaTri={`${(luong.tongQuyLuong / 1_000_000).toLocaleString("vi-VN")}tr`} />
           <Card>
-            <div className="text-sm text-slate-500">Trạng thái</div>
+            <div className="text-sm text-slate-500 dark:text-slate-400">Trạng thái</div>
             <div className="mt-1">
               <Badge mau={luong.daThanhToan ? "xanh" : "vang"}>
                 {luong.daThanhToan ? "Đã thanh toán" : "Chưa thanh toán"}
@@ -57,7 +57,7 @@ export default async function TrangLuong() {
 
         <Card>
           <div className="mb-4 flex items-center justify-between">
-            <div className="font-semibold text-slate-900">Chi tiết bảng lương — {luong.ky}</div>
+            <div className="font-semibold text-slate-900 dark:text-white">Chi tiết bảng lương — {luong.ky}</div>
             <button className="rounded-lg bg-omyn-primary px-4 py-2 text-sm font-medium text-white hover:bg-omyn-primary-dark">
               Xuất file chuyển khoản
             </button>
