@@ -46,3 +46,29 @@ export async function chayVoiKhach<T extends Dong = Dong>(db: PGlite, sql: strin
     await db.exec(`reset role;`);
   }
 }
+
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
+
+/** Dựng DB giống Supabase rồi chạy migration THẬT theo thứ tự (V-G0-12 / K-G1). Mô phỏng:
+ *  - bảng auth.users tối thiểu;
+ *  - quyền mặc định của Supabase: bảng mới tự cấp toàn quyền cho anon/authenticated/service_role
+ *    (đây là mối nguy mà migration phải thu hồi). */
+export async function taoDbVoiMigration(denMigration = "9999") {
+  const db = await taoDb();
+  await db.exec(`
+    create table auth.users (id uuid primary key default gen_random_uuid(), email text);
+    alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
+    alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
+    alter default privileges in schema public grant execute on functions to anon, authenticated, service_role;
+  `);
+  const thuMuc = join(process.cwd(), "supabase", "migrations");
+  const tep = readdirSync(thuMuc).filter((f) => f.endsWith(".sql")).sort();
+  for (const f of tep) {
+    if (f.slice(0, 4) > denMigration) break;
+    // PGlite có sẵn gen_random_uuid(); bỏ dòng cài tiện ích pgcrypto.
+    const sql = readFileSync(join(thuMuc, f), "utf8").replace(/create extension[^;]*;/gi, "");
+    await db.exec(sql);
+  }
+  return db;
+}
