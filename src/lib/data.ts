@@ -1,3 +1,4 @@
+import { hopViTri, tachViTri } from "@/lib/chuc-vu";
 import "server-only";
 import { createAdminClient } from "./supabase/admin";
 
@@ -587,7 +588,7 @@ export async function layKhoiDayDu() {
   const db = createAdminClient();
   const [khoi, nv, tin] = await Promise.all([
     db.from("khoi").select("id, ten, mo_ta").order("ten"),
-    db.from("nhan_vien").select("khoi_id").neq("trang_thai", "Đã nghỉ"),
+    db.from("nhan_vien").select("khoi_id, chuc_danh").neq("trang_thai", "Đã nghỉ"),
     db.from("tin_tuyen_dung").select("khoi_id").neq("trang_thai", "Đã đóng"),
   ]);
   if (khoi.error) throw khoi.error;
@@ -598,7 +599,10 @@ export async function layKhoiDayDu() {
   };
   const dn = dem(nv.data);
   const dt = dem(tin.data);
-  return khoi.data.map((k) => ({ ...k, soNhanVien: dn.get(k.id) ?? 0, soTinMo: dt.get(k.id) ?? 0 }));
+  // Vị trí của khối: những vị trí khai báo ở khối + chức vụ của nhân viên đang làm trong khối (tự động).
+  const theoKhoi = new Map<string, string[]>();
+  for (const n of nv.data ?? []) if (n.khoi_id && n.chuc_danh) theoKhoi.set(n.khoi_id, [...(theoKhoi.get(n.khoi_id) ?? []), n.chuc_danh]);
+  return khoi.data.map((k) => ({ ...k, viTri: hopViTri(tachViTri(k.mo_ta), theoKhoi.get(k.id) ?? []), soNhanVien: dn.get(k.id) ?? 0, soTinMo: dt.get(k.id) ?? 0 }));
 }
 
 // ───────────────────────── LƯƠNG ─────────────────────────

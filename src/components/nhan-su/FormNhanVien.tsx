@@ -4,10 +4,10 @@ import { useRef, useState, useTransition } from "react";
 import { themNhanVien, suaNhanVien } from "@/lib/actions";
 import { Chon } from "@/components/ui/Chon";
 import { NgayChon } from "@/components/ui/NgayChon";
-import { CHUC_VU } from "@/lib/chuc-vu";
+import { CHUC_VU, hopViTri } from "@/lib/chuc-vu";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 
-export type Khoi = { id: string; ten: string };
+export type Khoi = { id: string; ten: string; viTri?: string[] };
 
 export type NhanVienCoSan = {
   id: string;
@@ -37,6 +37,9 @@ export function FormNhanVien({
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
+  const [khoiId, setKhoiId] = useState(coSan?.khoi_id ?? "");
+  // Chức vụ: vị trí của khối đang chọn (tự lấy theo khối) trước, rồi các cấp chuẩn; giữ giá trị cũ của nhân viên.
+  const luaChonChucVu = hopViTri(khoi.find((k) => k.id === khoiId)?.viTri ?? [], [...CHUC_VU], [coSan?.chuc_danh]);
 
   const gui = () => {
     if (!formRef.current || !formRef.current.reportValidity()) return;
@@ -62,11 +65,11 @@ export function FormNhanVien({
         </div>
         <div>
           <label htmlFor="nv-chuc-danh" className={NHAN_O}>Chức vụ</label>
-          <Chon id="nv-chuc-danh" ten="chuc_danh" trong="Chọn chức vụ" giaTriMacDinh={coSan?.chuc_danh ?? ""} luaChon={[...CHUC_VU, ...(coSan?.chuc_danh && !(CHUC_VU as readonly string[]).includes(coSan.chuc_danh) ? [coSan.chuc_danh] : [])].map((c) => ({ gia_tri: c, nhan: c }))} />
+          <Chon id="nv-chuc-danh" ten="chuc_danh" trong="Chọn chức vụ" giaTriMacDinh={coSan?.chuc_danh ?? ""} luaChon={luaChonChucVu.map((c) => ({ gia_tri: c, nhan: c }))} />
         </div>
         <div>
           <label htmlFor="nv-khoi" className={NHAN_O}>Khối *</label>
-          <Chon id="nv-khoi" ten="khoi_id" batBuoc trong="Chọn khối" giaTriMacDinh={coSan?.khoi_id ?? ""} luaChon={khoi.map((k) => ({ gia_tri: k.id, nhan: k.ten }))} />
+          <Chon id="nv-khoi" ten="khoi_id" batBuoc trong="Chọn khối" giaTri={khoiId} onDoi={setKhoiId} luaChon={khoi.map((k) => ({ gia_tri: k.id, nhan: k.ten }))} />
         </div>
         <div>
           <label htmlFor="nv-email" className={NHAN_O}>Email</label>
