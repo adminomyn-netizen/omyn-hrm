@@ -264,3 +264,5 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 - **Kỹ thuật = quyền cao nhất** (22/10): làm mọi thứ và xem mọi số liệu, kể cả Lương (kỳ, thỏa thuận, tham số, xác nhận tham số). Không thể hạ tài khoản Kỹ thuật/Quản trị cuối cùng.
 
 - **Chức vụ chọn dropdown** (22/10): biểu mẫu nhân viên dùng ô chọn Chức vụ (Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc, Trưởng bộ phận, Leader, Chuyên viên, Nhân viên, Thực tập sinh); giá trị cũ ngoài danh sách vẫn giữ làm một lựa chọn. Danh sách ở `src/lib/chuc-vu.ts`.
+
+- **Lãnh đạo = như Hành chính nhân sự** (22/10): hồ sơ có chức vụ Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc, hoặc phòng ban Hành chính nhân sự, thì ô vai trò khi duyệt tài khoản gợi ý Quản trị (người duyệt vẫn bấm xác nhận; hệ thống KHÔNG tự nâng quyền khi lưu chức vụ). Hàm `nenLaQuanTri` ở `src/lib/chuc-danh.ts`.
