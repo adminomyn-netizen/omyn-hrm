@@ -24,6 +24,15 @@ export function gioHienTaiHCM(): string {
 
 /** Tìm hồ sơ nhân sự gắn với 1 tài khoản đăng nhập — null nếu tài khoản
  * (ví dụ admin/kỹ thuật tạo tay) chưa được gắn với nhân viên nào. */
+const NHAN_VAI_TRO_NGAN = { admin: "Quản trị", ky_thuat: "Kỹ thuật", nhan_vien: "", cho_duyet: "" } as const;
+
+/** Dòng "vị trí" hiện trong menu avatar: chức danh · phòng ban (+ vai trò hệ thống nếu là Quản trị/Kỹ thuật). */
+export async function layViTriHienThi(userId: string, vaiTro: keyof typeof NHAN_VAI_TRO_NGAN) {
+  const { data } = await createAdminClient().from("nhan_vien").select("chuc_danh, khoi(ten)").eq("user_id", userId).maybeSingle();
+  const phan = [data?.chuc_danh, data?.khoi?.ten, NHAN_VAI_TRO_NGAN[vaiTro]].filter(Boolean) as string[];
+  return phan.length ? phan.join(" · ") : "Chưa có hồ sơ nhân sự";
+}
+
 export async function layNhanVienIdTheoUser(userId: string): Promise<string | null> {
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -275,8 +284,8 @@ export type TaiKhoanChoDuyet = {
   email: string;
   hoTen: string;
   taoLuc: string;
-  /** Vị trí/bộ phận người đăng ký TỰ CHỌN — chỉ để tham khảo khi duyệt. */
-  yeuCau: { viTri: string; khoiId: string; khoiTen: string } | null;
+  /** Phòng ban người đăng ký TỰ CHỌN — chỉ để tham khảo khi duyệt. */
+  yeuCau: { khoiId: string; khoiTen: string } | null;
 };
 
 /** Tài khoản đã tự đăng ký nhưng chưa có vai trò (app_metadata.vai_tro trống). */
@@ -292,14 +301,13 @@ export async function layTaiKhoanChoDuyet(): Promise<TaiKhoanChoDuyet[]> {
   }
   return cho
     .map((u) => {
-      const viTri = String(u.app_metadata?.yeu_cau_vi_tri ?? "");
       const khoiId = String(u.app_metadata?.yeu_cau_khoi_id ?? "");
       return {
         id: u.id,
         email: u.email ?? "",
         hoTen: (u.app_metadata?.ho_ten as string) || (u.email ?? ""),
         taoLuc: u.created_at,
-        yeuCau: viTri ? { viTri, khoiId, khoiTen: khoiTen.get(khoiId) ?? "" } : null,
+        yeuCau: khoiId ? { khoiId, khoiTen: khoiTen.get(khoiId) ?? "" } : null,
       };
     })
     .sort((a, b) => b.taoLuc.localeCompare(a.taoLuc));

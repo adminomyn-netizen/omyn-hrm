@@ -8,5 +8,5 @@ insert into khoi (ten, mo_ta) values
   ('Marketing & Ecom', 'Marketing, nội dung, video, KOL/KOC, vận hành sàn, livestream'),
   ('Kinh doanh', 'CSKH sỉ và đại lý, CSKH lẻ'),
   ('Tài chính - Kế toán', 'Kế toán tổng hợp, kho và đóng hàng'),
-  ('Nhân sự', 'HCNS và tuyển dụng')
+  ('Hành chính nhân sự', 'HCNS và tuyển dụng; có quyền Quản trị')
 on conflict do nothing;

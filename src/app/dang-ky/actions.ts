@@ -3,7 +3,6 @@
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
-import { laViTriDangKy } from "@/lib/vi-tri-dang-ky";
 
 /** Tự đăng ký (chủ dự án giữ mở, 22/10/2026) — nhưng tài khoản mới CHƯA có
  * quyền gì: không gán vai trò, không tạo hồ sơ nhân viên, không tự gắn theo
@@ -34,25 +33,18 @@ export async function dangKy(_truoc: { loi?: string } | undefined, formData: For
     return { loi: "Hai mật khẩu chưa khớp nhau." };
   }
 
-  // Vị trí/bộ phận chỉ là YÊU CẦU để người duyệt xem — không bao giờ dùng để cấp quyền.
-  const viTri = String(formData.get("vi_tri") || "nhan_vien");
+  // Phòng ban chỉ là YÊU CẦU để người duyệt xem — không bao giờ dùng để cấp quyền.
   const khoiId = String(formData.get("khoi_id") || "");
-  if (!laViTriDangKy(viTri)) return { loi: "Vị trí chưa hợp lệ." };
-
   const admin = createAdminClient();
-  if (khoiId) {
-    const { data: k } = await admin.from("khoi").select("id").eq("id", khoiId).maybeSingle();
-    if (!k) return { loi: "Bộ phận chưa hợp lệ." };
-  } else if (viTri !== "hr") {
-    return { loi: "Bạn chọn bộ phận của mình giúp mình." };
-  }
+  const { data: khoi } = khoiId ? await admin.from("khoi").select("id").eq("id", khoiId).maybeSingle() : { data: null };
+  if (!khoi) return { loi: "Bạn chọn phòng ban của mình giúp mình." };
 
   const { error } = await admin.auth.admin.createUser({
     email,
     password: matKhau,
     email_confirm: true,
     // KHÔNG có vai_tro: thiếu vai trò = "chờ duyệt", không thấy dữ liệu nào.
-    app_metadata: { ho_ten: hoTen, cho_duyet: true, yeu_cau_vi_tri: viTri, ...(khoiId ? { yeu_cau_khoi_id: khoiId } : {}) },
+    app_metadata: { ho_ten: hoTen, cho_duyet: true, yeu_cau_khoi_id: khoiId },
   });
 
   if (error) {
