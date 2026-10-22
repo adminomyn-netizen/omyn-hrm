@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { laChucDanhNhayCam } from "@/lib/chuc-danh";
+import { VI_TRI_DANG_KY, laViTriDangKy } from "@/lib/vi-tri-dang-ky";
+import { ngayHomNayHCM } from "@/lib/data";
 
 export type KetQuaTaiKhoan = { loi?: string; ok?: boolean };
 
@@ -21,14 +23,15 @@ export async function duyetTaiKhoan(formData: FormData): Promise<KetQuaTaiKhoan>
 
   const userId = String(formData.get("user_id") || "");
   const vaiTro = String(formData.get("vai_tro") || "") as VaiTroGan;
-  const hoSoId = String(formData.get("nhan_vien_id") || "");
+  const yeuTaoMoi = String(formData.get("nhan_vien_id") || "") === "__moi__";
+  let hoSoId = yeuTaoMoi ? "" : String(formData.get("nhan_vien_id") || "");
 
   if (!userId || !VAI_TRO_HOP_LE.includes(vaiTro)) return { loi: "Thiếu tài khoản hoặc vai trò." };
   if (userId === nguoiGoi.id) return { loi: "Bạn không tự duyệt tài khoản của chính mình." };
   if (vaiTro !== "nhan_vien" && nguoiGoi.vaiTro !== "admin") {
     return { loi: "Chỉ Quản trị mới gán được vai trò Quản trị hoặc Kỹ thuật." };
   }
-  if (vaiTro === "nhan_vien" && !hoSoId) {
+  if (vaiTro === "nhan_vien" && !hoSoId && !yeuTaoMoi) {
     return { loi: "Chọn hồ sơ nhân sự để gắn cho nhân viên này." };
   }
 
@@ -36,6 +39,26 @@ export async function duyetTaiKhoan(formData: FormData): Promise<KetQuaTaiKhoan>
   const { data: tk, error: loiLay } = await supabase.auth.admin.getUserById(userId);
   if (loiLay || !tk.user) return { loi: "Không tìm thấy tài khoản." };
   if (tk.user.app_metadata?.vai_tro) return { loi: "Tài khoản này đã được duyệt trước đó." };
+
+  // Tạo hồ sơ mới theo vị trí/bộ phận người đăng ký đã chọn (đọc từ tài khoản, không tin dữ liệu từ form).
+  let hoSoMoiId = "";
+  if (yeuTaoMoi) {
+    const viTri = String(tk.user.app_metadata?.yeu_cau_vi_tri ?? "");
+    if (vaiTro !== "nhan_vien" || !laViTriDangKy(viTri)) return { loi: "Tài khoản này không có yêu cầu vị trí để tạo hồ sơ." };
+    const chucDanh = VI_TRI_DANG_KY.find((v) => v.gia_tri === viTri)!.chucDanh;
+    if (laChucDanhNhayCam(chucDanh) && nguoiGoi.vaiTro !== "admin") {
+      return { loi: "Vị trí nhân sự (HCNS) chỉ Quản trị mới duyệt được." };
+    }
+    const khoiId = String(tk.user.app_metadata?.yeu_cau_khoi_id ?? "") || null;
+    const { data: moi, error: loiTao } = await supabase
+      .from("nhan_vien")
+      .insert({ ho_ten: String(tk.user.app_metadata?.ho_ten || tk.user.email || ""), email: tk.user.email ?? null, chuc_danh: chucDanh, khoi_id: khoiId, ngay_vao_lam: ngayHomNayHCM(), trang_thai: "Đang làm", user_id: userId })
+      .select("id")
+      .single();
+    if (loiTao || !moi) return { loi: "Không tạo được hồ sơ nhân sự. Thử lại sau." };
+    hoSoMoiId = moi.id;
+    hoSoId = "";
+  }
 
   // Gắn hồ sơ NGUYÊN TỬ: chỉ gắn khi hồ sơ còn trống (user_id is null) — hai người duyệt
   // cùng lúc thì một người thắng; nếu gán vai trò thất bại thì hoàn tác phần gắn.
@@ -63,6 +86,7 @@ export async function duyetTaiKhoan(formData: FormData): Promise<KetQuaTaiKhoan>
     app_metadata: { ...tk.user.app_metadata, vai_tro: vaiTro, cho_duyet: false },
   });
   if (error) {
+    if (hoSoMoiId) await supabase.from("nhan_vien").delete().eq("id", hoSoMoiId).eq("user_id", userId);
     if (hoSoId) await supabase.from("nhan_vien").update({ user_id: null }).eq("id", hoSoId).eq("user_id", userId);
     return { loi: "Không gán được vai trò. Thử lại sau." };
   }

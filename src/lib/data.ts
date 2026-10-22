@@ -275,6 +275,8 @@ export type TaiKhoanChoDuyet = {
   email: string;
   hoTen: string;
   taoLuc: string;
+  /** Vị trí/bộ phận người đăng ký TỰ CHỌN — chỉ để tham khảo khi duyệt. */
+  yeuCau: { viTri: string; khoiId: string; khoiTen: string } | null;
 };
 
 /** Tài khoản đã tự đăng ký nhưng chưa có vai trò (app_metadata.vai_tro trống). */
@@ -282,14 +284,24 @@ export async function layTaiKhoanChoDuyet(): Promise<TaiKhoanChoDuyet[]> {
   const supabase = createAdminClient();
   const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 200 });
   if (error) throw error;
-  return data.users
-    .filter((u) => !u.app_metadata?.vai_tro)
-    .map((u) => ({
-      id: u.id,
-      email: u.email ?? "",
-      hoTen: (u.app_metadata?.ho_ten as string) || (u.email ?? ""),
-      taoLuc: u.created_at,
-    }))
+  const cho = data.users.filter((u) => !u.app_metadata?.vai_tro);
+  const khoiTen = new Map<string, string>();
+  if (cho.some((u) => u.app_metadata?.yeu_cau_khoi_id)) {
+    const { data: ds } = await supabase.from("khoi").select("id, ten");
+    for (const k of ds ?? []) khoiTen.set(k.id, k.ten);
+  }
+  return cho
+    .map((u) => {
+      const viTri = String(u.app_metadata?.yeu_cau_vi_tri ?? "");
+      const khoiId = String(u.app_metadata?.yeu_cau_khoi_id ?? "");
+      return {
+        id: u.id,
+        email: u.email ?? "",
+        hoTen: (u.app_metadata?.ho_ten as string) || (u.email ?? ""),
+        taoLuc: u.created_at,
+        yeuCau: viTri ? { viTri, khoiId, khoiTen: khoiTen.get(khoiId) ?? "" } : null,
+      };
+    })
     .sort((a, b) => b.taoLuc.localeCompare(a.taoLuc));
 }
 
