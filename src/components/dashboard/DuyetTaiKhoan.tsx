@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { duyetTaiKhoan, tuChoiTaiKhoan } from "@/app/dashboard/actions";
+import { duyetTaiKhoan, tuChoiTaiKhoan } from "@/app/(app)/dashboard/actions";
 import type { VaiTro } from "@/lib/auth";
 import { laChucDanhNhayCam } from "@/lib/chuc-danh";
 

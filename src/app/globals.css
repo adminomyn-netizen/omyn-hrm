@@ -187,68 +187,23 @@ body {
   }
 }
 
-/* Lớp giao diện cho react-big-calendar (lưới lịch chấm công) — khoác lại theo
- * tông Omyn, thư viện gốc dùng màu xanh mặc định không khớp. */
-.omyn-rbc .rbc-calendar {
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
-  font-size: 0.8125rem;
-}
-.omyn-rbc .rbc-month-view,
-.omyn-rbc .rbc-time-view {
-  border-color: var(--omyn-border);
-  border-radius: 0.5rem;
-  overflow: hidden;
-}
-.omyn-rbc .rbc-header {
-  border-color: var(--omyn-border);
-  background: var(--background);
-  padding: 0.5rem 0;
-  font-weight: 600;
-  color: #475569;
-}
-.dark .omyn-rbc .rbc-header {
-  color: #94a3b8;
-}
-.omyn-rbc .rbc-day-bg + .rbc-day-bg,
-.omyn-rbc .rbc-month-row + .rbc-month-row,
-.omyn-rbc .rbc-month-row,
-.omyn-rbc .rbc-header + .rbc-header {
-  border-color: var(--omyn-border);
-}
-.omyn-rbc .rbc-today {
-  background-color: var(--omyn-primary-light);
-}
-.omyn-rbc .rbc-off-range-bg {
-  background: var(--background);
-}
-.omyn-rbc .rbc-toolbar button {
-  border-color: var(--omyn-border);
-  color: #334155;
-  border-radius: 0.5rem;
-}
-.dark .omyn-rbc .rbc-toolbar button {
-  color: #cbd5e1;
-}
-.omyn-rbc .rbc-toolbar button:hover {
-  background: #f1f5f9;
-}
-.dark .omyn-rbc .rbc-toolbar button:hover {
-  background: #1e293b;
-}
-.omyn-rbc .rbc-toolbar button.rbc-active {
-  background: var(--omyn-primary);
-  border-color: var(--omyn-primary);
-  color: #fff;
-}
-.omyn-rbc .rbc-toolbar-label {
-  font-weight: 600;
-  color: var(--foreground);
-}
-.omyn-rbc .rbc-event {
-  border-radius: 0.25rem;
-  padding: 1px 4px;
-}
-.omyn-rbc .rbc-show-more {
-  color: var(--omyn-primary-dark);
-  font-weight: 600;
-}
+/* Lịch chấm công (react-big-calendar) khoác theo bộ màu OMYN, tự đổi theo chế độ sáng/tối. */
+.omyn-rbc .rbc-calendar { font-family: var(--font-sans); font-size: 0.8125rem; color: var(--muc); }
+.omyn-rbc .rbc-month-view { border: 1px solid var(--vien); border-radius: 6px; overflow: hidden; background: var(--giay-sang); }
+.omyn-rbc .rbc-header { border-bottom: 1px solid var(--vien); border-left: 1px solid var(--vien); padding: 10px 4px; font-size: 12px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muc-3); }
+.omyn-rbc .rbc-header:first-child { border-left: 0; }
+.omyn-rbc .rbc-month-row + .rbc-month-row, .omyn-rbc .rbc-day-bg + .rbc-day-bg { border-color: var(--vien); }
+.omyn-rbc .rbc-day-bg.rbc-today { background: var(--nhan-nhat); }
+.omyn-rbc .rbc-off-range-bg { background: var(--giay-tram); }
+.omyn-rbc .rbc-off-range { color: var(--muc-3); }
+.omyn-rbc .rbc-date-cell { padding: 6px 8px; text-align: right; font-variant-numeric: tabular-nums; }
+.omyn-rbc .rbc-date-cell.rbc-now { font-weight: 700; color: var(--nhan-dam); }
+.omyn-rbc .rbc-toolbar { margin-bottom: 14px; gap: 8px; }
+.omyn-rbc .rbc-toolbar .rbc-toolbar-label { font-family: var(--font-serif); font-size: 28px; font-weight: 600; color: var(--muc); }
+.omyn-rbc .rbc-toolbar button { color: var(--muc-2); border: 1px solid var(--vien-dam); background: transparent; border-radius: 4px; padding: 6px 12px; font-size: 13px; }
+.omyn-rbc .rbc-toolbar button:hover { background: var(--giay-tram); color: var(--muc); }
+.omyn-rbc .rbc-toolbar button:active, .omyn-rbc .rbc-toolbar button.rbc-active { background: var(--giay-tram); box-shadow: none; color: var(--muc); }
+.omyn-rbc .rbc-event { padding: 2px 6px; }
+.omyn-rbc .rbc-event:focus { outline: 2px solid var(--nhan); }
+.omyn-rbc .rbc-show-more { color: var(--nhan-dam); font-weight: 500; }
+.omyn-rbc .rbc-month-row, .omyn-rbc .rbc-month-view .rbc-row-bg { border-color: var(--vien); }

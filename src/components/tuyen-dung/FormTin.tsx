@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { luuTin } from "@/app/tuyen-dung/actions";
+import { luuTin } from "@/app/(app)/tuyen-dung/actions";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import { TRANG_THAI_TIN } from "@/lib/tuyen-dung";
 

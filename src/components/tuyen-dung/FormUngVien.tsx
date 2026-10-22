@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { luuUngVien } from "@/app/tuyen-dung/actions";
+import { luuUngVien } from "@/app/(app)/tuyen-dung/actions";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import { BUOC_UNG_VIEN, NGUON_UNG_VIEN } from "@/lib/tuyen-dung";
 

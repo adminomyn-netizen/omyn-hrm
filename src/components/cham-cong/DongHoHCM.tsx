@@ -1,26 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Clock } from "lucide-react";
 
-const DINH_DANG_GIO = new Intl.DateTimeFormat("vi-VN", {
-  timeZone: "Asia/Ho_Chi_Minh",
-  hour: "2-digit",
-  minute: "2-digit",
-  second: "2-digit",
-  hour12: false,
-});
+const GIO = new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false });
+const NGAY = new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", weekday: "long", day: "numeric", month: "long", year: "numeric" });
 
-const DINH_DANG_NGAY = new Intl.DateTimeFormat("vi-VN", {
-  timeZone: "Asia/Ho_Chi_Minh",
-  weekday: "long",
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-});
-
-/** Đồng hồ realtime theo giờ Hồ Chí Minh — chỉ chạy ở client, tránh lệch giờ
- * server (Vercel chạy UTC) và tránh hydration mismatch (render null lúc đầu). */
+/** Đồng hồ giờ Hồ Chí Minh chạy ở trình duyệt (server Vercel chạy UTC). Lúc đầu để trống để khỏi lệch khi hydrate. */
 export function DongHoHCM() {
   const [now, setNow] = useState<Date | null>(null);
 
@@ -34,16 +19,10 @@ export function DongHoHCM() {
   }, []);
 
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-gradient-to-br from-omyn-primary to-omyn-primary-dark px-5 py-4 text-white shadow-sm">
-      <Clock className="h-6 w-6 shrink-0 opacity-90" />
-      <div>
-        <div className="font-mono text-2xl font-semibold tabular-nums leading-tight">
-          {now ? DINH_DANG_GIO.format(now) : "--:--:--"}
-        </div>
-        <div className="text-xs capitalize text-white/80">
-          {now ? `${DINH_DANG_NGAY.format(now)} · Giờ Hồ Chí Minh (UTC+7)` : "Đang đồng bộ giờ..."}
-        </div>
-      </div>
+    <div>
+      <div className="nhan-muc">Giờ Hồ Chí Minh</div>
+      <div className="mt-1 text-[48px] font-medium leading-none tabular-nums text-muc">{now ? GIO.format(now) : "--:--:--"}</div>
+      <div className="chu-tieu-de mt-2 text-[28px] italic capitalize text-muc-2">{now ? NGAY.format(now) : " "}</div>
     </div>
   );
 }
