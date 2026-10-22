@@ -9,7 +9,7 @@ export function MucTrang({
   children: React.ReactNode;
 }) {
   return (
-    <section>
+    <section className="min-w-0">
       <div className="flex items-baseline justify-between gap-4 border-b border-vien pb-2.5">
         <h2 className="text-[15px] font-semibold text-muc">{tieuDe}</h2>
         {phai && <div className="text-[13px]">{phai}</div>}

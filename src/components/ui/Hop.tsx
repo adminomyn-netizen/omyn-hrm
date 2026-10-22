@@ -65,13 +65,13 @@ export function Hop({
         role="dialog"
         aria-modal="true"
         aria-label={tieuDe}
-        className={`relative w-full rounded-vua border border-vien bg-giay-sang shadow-[0_8px_24px_rgba(42,34,24,0.12)] ${
+        className={`relative w-full rounded-hop border border-vien bg-giay-sang shadow-[0_24px_60px_rgba(0,0,0,0.30)] ${
           rong === "rong" ? "max-w-3xl" : "max-w-xl"
         }`}
       >
-        <div className="dau-trang-vang flex items-start justify-between gap-4 rounded-t-vua border-b border-vien px-6 pb-4 pt-5">
+        <div className="flex items-start justify-between gap-4 rounded-t-hop border-b border-vien px-7 pb-4 pt-5" style={{ background: "linear-gradient(90deg, var(--nhan-nhat), transparent 72%)" }}>
           <div>
-            <h2 className="chu-tieu-de text-[28px] text-muc">{tieuDe}</h2>
+            <h2 className="chu-tieu-de text-[30px] text-muc">{tieuDe}</h2>
             {moTa && <p className="mt-1 text-[14px] text-muc-2">{moTa}</p>}
           </div>
           <button
@@ -84,7 +84,7 @@ export function Hop({
             <X strokeWidth={1.5} className="h-5 w-5" />
           </button>
         </div>
-        <div className="px-6 py-5">{children}</div>
+        <div className="px-7 py-6">{children}</div>
       </div>
     </div>
   );

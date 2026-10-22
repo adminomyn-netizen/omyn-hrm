@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { HangChiSo } from "@/components/ui/HangChiSo";
+import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { MucTrang } from "@/components/ui/MucTrang";
 import { ThanhTyLe } from "@/components/ui/ThanhTyLe";
 import { layThongKeHeThong } from "@/lib/data";
@@ -31,6 +32,7 @@ export default async function TrangKyThuat() {
 
   return (
     <div className="space-y-10">
+      <TieuDeTrang tieuDe="Kỹ thuật" phu="Tình trạng hệ thống và số dòng dữ liệu" />
       <HangChiSo
         muc={[
           { nhan: "Tổng số dòng dữ liệu", so: tongDong.toLocaleString("vi-VN"), ghiChu: `${he.bang.length} bảng` },

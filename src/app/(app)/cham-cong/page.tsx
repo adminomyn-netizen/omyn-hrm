@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { HangChiSo } from "@/components/ui/HangChiSo";
 import { MucTrang } from "@/components/ui/MucTrang";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
@@ -17,6 +18,38 @@ import { LichChamCongTre } from "@/components/cham-cong/LichChamCongTre";
 import { NutChamCong } from "@/components/cham-cong/NutChamCong";
 
 type DongChamCong = Awaited<ReturnType<typeof layChamCongHomNay>>["chiTiet"][number];
+/** Dải 7 ngày của tuần này: ngày đã chấm công có nền nhạt, hôm nay có nền vàng. */
+function TuanNay({ suKien }: { suKien: { ngay: string }[] }) {
+  const homNay = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
+  const [y, m, d] = homNay.split("-").map(Number);
+  const thu = (new Date(Date.UTC(y, m - 1, d)).getUTCDay() + 6) % 7;
+  const co = new Set(suKien.map((s) => s.ngay));
+  const ngay = Array.from({ length: 7 }, (_, i) => {
+    const dt = new Date(Date.UTC(y, m - 1, d - thu + i));
+    return { iso: dt.toISOString().slice(0, 10), so: dt.getUTCDate(), ten: ["T2", "T3", "T4", "T5", "T6", "T7", "CN"][i] };
+  });
+  return (
+    <div className="mx-auto flex max-w-sm justify-between" aria-label="Tuần này">
+      {ngay.map((n) => {
+        const laHomNay = n.iso === homNay;
+        const daCham = co.has(n.iso);
+        return (
+          <div key={n.iso} className="flex flex-col items-center gap-1.5 text-[11px] text-muc-3">
+            <span>{n.ten}</span>
+            <span
+              className={`flex h-9 w-9 items-center justify-center text-[13px] font-medium ${laHomNay ? "text-[var(--chu-tren-vang)]" : daCham ? "bg-nhan-nhat text-nhan-dam" : "border border-vien text-muc-3"}`}
+              style={{ borderRadius: 9999, ...(laHomNay ? { background: "var(--gradient-vang)" } : {}) }}
+              aria-label={`${n.so}: ${daCham ? "đã chấm công" : laHomNay ? "hôm nay" : "chưa có"}`}
+            >
+              {n.so}
+            </span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 const kieu = (t: string) => (t === "Đúng giờ" ? "tot" : t === "Đi muộn" ? "cho" : "loi");
 
 const cot: Cot<DongChamCong>[] = [
@@ -44,10 +77,12 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
     ]);
     return (
       <div className="space-y-10">
-        <section className="grid gap-x-16 gap-y-10 lg:grid-cols-2">
-          <DongHoHCM />
+        <TieuDeTrang tieuDe="Chấm công" phu="Chấm công vào, ra và xem lịch công của bạn" />
+        <section className="grid items-start gap-x-16 gap-y-10 lg:grid-cols-2">
+          <DongHoHCM canGiua />
           <NutChamCong gioVao={homNay?.gio_vao ?? null} gioRa={homNay?.gio_ra ?? null} trangThai={homNay?.trang_thai ?? null} />
         </section>
+        <TuanNay suKien={suKien} />
         {!nhanVienId && (
           <div role="status" className="rounded-nho bg-canh-bao-nen px-4 py-3 text-[14px] text-canh-bao">
             Tài khoản của bạn chưa gắn với hồ sơ nhân sự nào. Báo bộ phận Nhân sự để được gắn hồ sơ trước khi chấm công.
@@ -64,6 +99,7 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
 
   return (
     <div className="space-y-10">
+      <TieuDeTrang tieuDe="Chấm công" phu="Theo dõi chấm công của cả công ty trong ngày và trong tháng" />
       <DongHoHCM />
       <HangChiSo
         muc={[

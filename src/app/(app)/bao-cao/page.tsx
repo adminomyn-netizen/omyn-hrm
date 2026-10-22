@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { Download } from "lucide-react";
+import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { MucTrang } from "@/components/ui/MucTrang";
 import { yeuCauVaiTro } from "@/lib/auth";
 
@@ -15,7 +16,9 @@ const bieuMau = [
 export default async function TrangBaoCao() {
   await yeuCauVaiTro(["admin", "ky_thuat"]);
   return (
-    <MucTrang tieuDe="Biểu mẫu và quy định hành chính nhân sự">
+    <div className="space-y-10">
+      <TieuDeTrang tieuDe="Báo cáo và biểu mẫu" phu="Biểu mẫu và quy định hành chính nhân sự" />
+      <MucTrang tieuDe="Biểu mẫu và quy định hành chính nhân sự">
       <ul>
         {bieuMau.map((b) => (
           <li key={b.ten} className="flex items-center justify-between gap-4 border-b border-vien py-4 last:border-b-0">
@@ -31,5 +34,6 @@ export default async function TrangBaoCao() {
         ))}
       </ul>
     </MucTrang>
+    </div>
   );
 }

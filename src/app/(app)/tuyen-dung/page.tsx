@@ -4,7 +4,8 @@ import { DanhSachTuyenDung } from "@/components/tuyen-dung/DanhSachTuyenDung";
 import { layDanhSachKhoi, layTuyenDungDayDu } from "@/lib/data";
 import { yeuCauVaiTro } from "@/lib/auth";
 
-export default async function TrangTuyenDung() {
+export default async function TrangTuyenDung({ searchParams }: { searchParams: Promise<{ tin?: string; dang?: string }> }) {
+  const { tin: tinThamSo, dang } = await searchParams;
   await yeuCauVaiTro(["admin", "ky_thuat"]);
   const [{ tin, ungVien }, khoi] = await Promise.all([layTuyenDungDayDu(), layDanhSachKhoi()]);
 
@@ -23,6 +24,8 @@ export default async function TrangTuyenDung() {
           }))}
           ungVien={ungVien}
           khoi={khoi.map((k) => ({ id: k.id, ten: k.ten }))}
+          tinBanDau={tinThamSo}
+          moDangTuyen={dang === "1"}
         />
     </>
   );

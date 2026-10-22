@@ -4,6 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Hop } from "@/components/ui/Hop";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
+import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY } from "@/components/ui/dinh-dang";
 import { duyetDonTu } from "@/app/(app)/don-tu/actions";
 import { FormDonTu } from "./FormDonTu";
@@ -47,20 +48,20 @@ export function DanhSachDonTu({ che, don }: { che: "quan-ly" | "ca-nhan"; don: D
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <TieuDeTrang tieuDe="Đơn từ và phê duyệt" phu={che === "quan-ly" ? `${soCho} đơn chờ duyệt · ${hien.length} đơn tất cả` : `${hien.length} đơn của bạn`}>
+        {che === "ca-nhan" && <button type="button" className={NUT_CHINH} onClick={() => setNop(true)}>Nộp đơn mới</button>}
+      </TieuDeTrang>
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-vien">
         {che === "quan-ly" ? (
           <div className="flex items-center gap-6" role="tablist" aria-label="Lọc đơn">
             {([["cho", `Chờ duyệt ${soCho}`], ["tat-ca", `Tất cả ${hien.length}`]] as const).map(([k, nhan]) => (
-              <button key={k} type="button" role="tab" aria-selected={loc === k} onClick={() => setLoc(k)} className={`border-b-2 pb-1.5 text-[14px] ${loc === k ? "border-nhan font-semibold text-muc" : "border-transparent text-muc-2 hover:text-muc"}`}>
+              <button key={k} type="button" role="tab" aria-selected={loc === k} onClick={() => setLoc(k)} className={`-mb-px border-b-2 pb-2.5 text-[14px] ${loc === k ? "border-nhan font-semibold text-muc" : "border-transparent text-muc-2 hover:text-muc"}`}>
                 {nhan}
               </button>
             ))}
           </div>
         ) : (
-          <h2 className="text-[15px] font-semibold text-muc">Đơn của tôi ({hien.length})</h2>
-        )}
-        {che === "ca-nhan" && (
-          <button type="button" className={NUT_CHINH} onClick={() => setNop(true)}>Nộp đơn mới</button>
+          <h2 className="pb-2.5 text-[14px] font-semibold text-muc">Đơn của tôi</h2>
         )}
       </div>
 

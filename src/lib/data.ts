@@ -348,14 +348,15 @@ const ngayVN = (d: string) => d.split("-").reverse().join("/");
  *  - nhân viên: kết quả duyệt đơn của mình (14 ngày), nhắc chưa chấm công, chưa gắn hồ sơ. */
 export async function layThongBao(
   nguoiDung: { id: string; vaiTro: "admin" | "ky_thuat" | "nhan_vien" },
-): Promise<ThongBao[]> {
+): Promise<{ ds: ThongBao[]; dem: Record<string, number> }> {
   const db = createAdminClient();
   const ra: ThongBao[] = [];
+  const dem: Record<string, number> = {};
   const bayNgayTruoc = new Date(Date.now() - 7 * 86400_000).toISOString();
   const muoiBonNgayTruoc = new Date(Date.now() - 14 * 86400_000).toISOString();
 
   if (nguoiDung.vaiTro === "admin" || nguoiDung.vaiTro === "ky_thuat") {
-    const [tk, don, uv, tin] = await Promise.all([
+    const [tk, don, uv, tin, demDon, demUv] = await Promise.all([
       layTaiKhoanChoDuyet(),
       db
         .from("don_tu")
@@ -370,7 +371,12 @@ export async function layThongBao(
         .order("ngay_nhan_ho_so", { ascending: false })
         .limit(10),
       db.from("tin_tuyen_dung").select("id, vi_tri, han_nop, trang_thai").neq("trang_thai", "Đã đóng").not("han_nop", "is", null),
+      db.from("don_tu").select("id", { count: "exact", head: true }).eq("trang_thai", "Chờ duyệt"),
+      db.from("ung_vien").select("id", { count: "exact", head: true }).eq("trang_thai", "Mới nộp"),
     ]);
+    dem["/dashboard"] = tk.length;
+    dem["/don-tu"] = demDon.count ?? 0;
+    dem["/tuyen-dung"] = demUv.count ?? 0;
     for (const t of tk.slice(0, 10)) {
       ra.push({ id: `tk-${t.id}`, loai: "tai_khoan", tieuDe: "Tài khoản mới chờ duyệt", noiDung: `${t.hoTen} (${t.email}) vừa đăng ký.`, thoiDiem: t.taoLuc, href: "/dashboard" });
     }
@@ -432,7 +438,7 @@ export async function layThongBao(
     }
   }
 
-  return ra.sort((a, b) => b.thoiDiem.localeCompare(a.thoiDiem)).slice(0, 25);
+  return { ds: ra.sort((a, b) => b.thoiDiem.localeCompare(a.thoiDiem)).slice(0, 25), dem };
 }
 
 /** Danh sách tài khoản đăng nhập + vai trò + hồ sơ nhân sự gắn kèm — chỉ để Quản trị xem ở Cài đặt. */
@@ -455,4 +461,108 @@ export async function layDanhSachTaiKhoan() {
       dangNhapLuc: u.last_sign_in_at ?? null,
     }))
     .sort((a, b) => a.email.localeCompare(b.email));
+}
+
+const BUOC_PHAU = ["Mới nộp", "Hẹn phỏng vấn", "Vòng 1", "Vòng 2", "Đề nghị", "Nhận việc"];
+const cong = (iso: string, soNgay: number) => new Date(new Date(`${iso}T00:00:00+07:00`).getTime() + soNgay * 86400_000).toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
+
+/** Toàn bộ số liệu cho trang Tổng quan (đều từ dữ liệu thật; dải xu hướng tính từ ngày tạo/ngày vào làm). */
+export async function layDuLieuTongQuan() {
+  const db = createAdminClient();
+  const homNay = ngayHomNayHCM();
+  const [nv, cc, don, uv, tin, luong, tk] = await Promise.all([
+    db.from("nhan_vien").select("id, trang_thai, ngay_vao_lam, khoi(ten)"),
+    db.from("cham_cong").select("gio_vao, trang_thai").eq("ngay", homNay),
+    db.from("don_tu").select("id, loai, tu_ngay, den_ngay, trang_thai, created_at, nhan_vien:nhan_vien_id(ho_ten)"),
+    db.from("ung_vien").select("id, ho_ten, trang_thai, ngay_phong_van, ngay_nhan_ho_so, tin_tuyen_dung_id, tin:tin_tuyen_dung_id(vi_tri)"),
+    db.from("tin_tuyen_dung").select("id, vi_tri, so_luong_can, han_nop, trang_thai"),
+    layBangLuongKyGanNhat(),
+    layTaiKhoanChoDuyet(),
+  ]);
+  for (const r of [nv, cc, don, uv, tin]) if (r.error) throw r.error;
+
+  const nhanVien = nv.data!;
+  const dangLamDs = nhanVien.filter((n) => n.trang_thai !== "Đã nghỉ");
+  const tong = dangLamDs.length;
+
+  // xu hướng nhân sự: số người có mặt ở cuối 6 tháng gần nhất
+  const cuoiThang = Array.from({ length: 6 }, (_, i) => {
+    const [y, m] = homNay.split("-").map(Number);
+    const d = new Date(Date.UTC(y, m - 1 - (5 - i) + 1, 0));
+    return d.toISOString().slice(0, 10);
+  });
+  const xuHuongNv = cuoiThang.map((c) => dangLamDs.filter((n) => (n.ngay_vao_lam ?? "9999") <= (c > homNay ? homNay : c)).length);
+  const moiVao30 = dangLamDs.filter((n) => (n.ngay_vao_lam ?? "0") >= cong(homNay, -30)).length;
+
+  // đơn: chờ duyệt + xu hướng theo tuần (7 tuần)
+  const donCho = don.data!.filter((d) => d.trang_thai === "Chờ duyệt");
+  const xuHuongDon = Array.from({ length: 7 }, (_, i) => {
+    const den = cong(homNay, -(6 - i) * 7);
+    const tu = cong(den, -6);
+    return don.data!.filter((d) => d.created_at.slice(0, 10) >= tu && d.created_at.slice(0, 10) <= den).length;
+  });
+
+  // ứng viên 7 ngày
+  const uvMoi = uv.data!.filter((u) => u.ngay_nhan_ho_so >= cong(homNay, -6));
+  const xuHuongUv = Array.from({ length: 7 }, (_, i) => {
+    const ngay = cong(homNay, -(6 - i));
+    return uv.data!.filter((u) => u.ngay_nhan_ho_so === ngay).length;
+  });
+  const dangPv = uv.data!.filter((u) => ["Hẹn phỏng vấn", "Vòng 1", "Vòng 2", "Đề nghị"].includes(u.trang_thai)).length;
+
+  // chấm công hôm nay: 10 ô nửa giờ từ 07:00
+  const gioVao = cc.data!.map((c) => c.gio_vao).filter(Boolean) as string[];
+  const o = Array.from({ length: 10 }, (_, i) => {
+    const batDau = 7 * 60 + i * 30;
+    return gioVao.filter((g) => {
+      const ph = Number(g.slice(0, 2)) * 60 + Number(g.slice(3, 5));
+      return ph >= batDau && ph < batDau + 30;
+    }).length;
+  });
+  const daCham = cc.data!.length;
+  const diMuon = cc.data!.filter((c) => c.trang_thai === "Đi muộn").length;
+
+  // việc cần bạn
+  const phongVan = uv.data!
+    .filter((u) => u.ngay_phong_van && u.ngay_phong_van >= homNay && ["Hẹn phỏng vấn", "Vòng 1", "Vòng 2"].includes(u.trang_thai))
+    .sort((a, b) => (a.ngay_phong_van! < b.ngay_phong_van! ? -1 : 1))
+    .slice(0, 3);
+  const viec: { loai: "tk" | "don" | "pv"; tieuDe: string; phu: string; nut: string; href: string }[] = [
+    ...tk.slice(0, 2).map((t) => ({ loai: "tk" as const, tieuDe: "Duyệt tài khoản mới đăng ký", phu: `${t.hoTen} · ${t.email}`, nut: "Duyệt", href: "/dashboard#tai-khoan" })),
+    ...donCho.slice(0, 3).map((d) => ({ loai: "don" as const, tieuDe: d.loai, phu: `${(d.nhan_vien as { ho_ten?: string } | null)?.ho_ten ?? ""} · ${d.tu_ngay.split("-").reverse().slice(0, 2).join("/")}`, nut: "Xem đơn", href: "/don-tu" })),
+    ...phongVan.map((u) => ({ loai: "pv" as const, tieuDe: `Phỏng vấn: ${u.ho_ten}`, phu: `${(u.tin as { vi_tri?: string } | null)?.vi_tri ?? ""} · ${u.ngay_phong_van!.split("-").reverse().slice(0, 2).join("/")}`, nut: "Xem hồ sơ", href: `/tuyen-dung?tin=${u.tin_tuyen_dung_id}` })),
+  ].slice(0, 5);
+
+  // tin đang tuyển + tiến độ phễu
+  const tinMo = tin.data!.filter((t) => t.trang_thai !== "Đã đóng").map((t) => {
+    const ds = uv.data!.filter((u) => u.tin_tuyen_dung_id === t.id);
+    const maxBuoc = ds.reduce((m, u) => Math.max(m, BUOC_PHAU.indexOf(u.trang_thai) + 1), 0);
+    return { id: t.id, viTri: t.vi_tri, trangThai: t.trang_thai, can: t.so_luong_can, hanNop: t.han_nop, soUv: ds.length, buoc: maxBuoc };
+  });
+
+  const theoKhoi = new Map<string, number>();
+  for (const n of dangLamDs) {
+    const k = (n.khoi as { ten?: string } | null)?.ten ?? "Chưa gán khối";
+    theoKhoi.set(k, (theoKhoi.get(k) ?? 0) + 1);
+  }
+
+  return {
+    tong,
+    tongHoSo: nhanVien.length,
+    dangLam: nhanVien.filter((n) => n.trang_thai === "Đang làm").length,
+    thuViec: nhanVien.filter((n) => n.trang_thai === "Thử việc").length,
+    xuHuongNv,
+    moiVao30,
+    donCho: donCho.length,
+    xuHuongDon,
+    uvMoi: uvMoi.length,
+    xuHuongUv,
+    dangPv,
+    luong,
+    chamCong: { tong, da: daCham, diMuon, chua: Math.max(0, tong - daCham), dungGio: Math.max(0, daCham - diMuon), o },
+    viec,
+    soTaiKhoanCho: tk.length,
+    tinMo,
+    khoi: [...theoKhoi.entries()].map(([ten, so]) => ({ ten, so })).sort((a, b) => b.so - a.so),
+  };
 }

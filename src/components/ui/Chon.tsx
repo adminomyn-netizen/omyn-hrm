@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useNoi } from "./noi";
 import { Check, ChevronDown } from "lucide-react";
 
 export type LuaChon = { gia_tri: string; nhan: string };
@@ -41,24 +43,26 @@ export function Chon({
   const [noiBo, setNoiBo] = useState(giaTriMacDinh);
   const gia = giaTri ?? noiBo;
   const [mo, setMo] = useState(false);
-  const [len, setLen] = useState(false);
   const [dangTro, setDangTro] = useState(0);
   const goc = useRef<HTMLDivElement>(null);
   const kiemTra = useRef<HTMLInputElement>(null);
+  const nutRef = useRef<HTMLButtonElement>(null);
+  const dsRef = useRef<HTMLUListElement>(null);
   const idDs = useId();
   const chon = luaChon.find((l) => l.gia_tri === gia);
 
   useEffect(() => {
     if (!mo) return;
-    const ngoai = (e: MouseEvent) => goc.current && !goc.current.contains(e.target as Node) && setMo(false);
+    const ngoai = (e: MouseEvent) => {
+      const dich = e.target as Node;
+      if (goc.current && !goc.current.contains(dich) && !dsRef.current?.contains(dich)) setMo(false);
+    };
     document.addEventListener("mousedown", ngoai);
     return () => document.removeEventListener("mousedown", ngoai);
   }, [mo]);
 
   const moDs = () => {
     if (voHieu) return;
-    const r = goc.current?.getBoundingClientRect();
-    if (r) setLen(window.innerHeight - r.bottom < 280 && r.top > window.innerHeight - r.bottom);
     setDangTro(Math.max(0, luaChon.findIndex((l) => l.gia_tri === gia)));
     setMo(true);
   };
@@ -69,6 +73,8 @@ export function Chon({
     onDoi?.(v);
     setMo(false);
   };
+
+  useNoi(mo, nutRef, dsRef, { caoUoc: Math.min(256, luaChon.length * 42 + 14) });
 
   const phim = (e: React.KeyboardEvent) => {
     if (e.key === "Escape" && mo) {
@@ -102,6 +108,7 @@ export function Chon({
   return (
     <div ref={goc} className={`relative ${className}`} onKeyDown={phim}>
       <button
+        ref={nutRef}
         type="button"
         id={id}
         disabled={voHieu}
@@ -130,12 +137,15 @@ export function Chon({
           className="pointer-events-none absolute bottom-0 left-0 h-0 w-full opacity-0"
         />
       )}
-      {mo && (
-        <ul
+      {mo &&
+        createPortal(
+          <ul
+          ref={dsRef}
           id={idDs}
           role="listbox"
           aria-label={ariaLabel}
-          className={`absolute left-0 right-0 z-40 max-h-64 min-w-[10rem] overflow-y-auto rounded-vua border border-vien bg-giay-sang p-1.5 ${BONG} ${len ? "bottom-full mb-1.5" : "top-full mt-1.5"}`}
+          style={{ position: "fixed", visibility: "hidden" }}
+          className={`z-[70] overflow-y-auto rounded-the border border-vien bg-giay-sang p-1.5 ${BONG}`}
         >
           {luaChon.map((l, i) => {
             const dangChon = l.gia_tri === gia;
@@ -155,8 +165,9 @@ export function Chon({
               </li>
             );
           })}
-        </ul>
-      )}
+          </ul>,
+          document.body,
+        )}
     </div>
   );
 }
