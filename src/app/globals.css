@@ -32,6 +32,16 @@
   --canh-bao: #a0522d;
   --canh-bao-nen: #f6e6dc;
 
+  /* Menu trái luôn nền espresso (cả khi giao diện sáng) — điểm tựa của bố cục. */
+  --menu: #1c160e;
+  --menu-chu: #cdbfa3;
+  --menu-chu-phu: #a89a7c;
+  --menu-sang: #f6ebd0;
+  --menu-nhan: #e2be66;
+  --menu-chon: rgba(246, 235, 208, 0.09);
+  --menu-hover: rgba(246, 235, 208, 0.06);
+  --menu-vien: rgba(246, 235, 208, 0.1);
+
   --gradient-vang: linear-gradient(135deg, #f0d896 0%, #d4ae5a 48%, #b8923a 100%);
   --gradient-vang-hover: linear-gradient(135deg, #f5e2a8 0%, #dcb766 48%, #c29b43 100%);
   --gradient-toi: linear-gradient(155deg, #3a2e1f 0%, #2a2218 45%, #17110a 100%);
@@ -68,6 +78,7 @@
   --nhan: #d9b45c;
   --nhan-dam: #e8cf8a;
   --nhan-nhat: #3a2f17;
+  --menu: #100c07;
   --loi: #f0a091;
   --loi-nen: #3b1f1a;
   --canh-bao: #e8a77a;
@@ -110,10 +121,21 @@
   --color-omyn-accent: var(--omyn-accent);
   --color-omyn-surface: var(--omyn-surface);
   --color-omyn-border: var(--omyn-border);
+  --color-menu: var(--menu);
+  --color-menu-chu: var(--menu-chu);
+  --color-menu-chu-phu: var(--menu-chu-phu);
+  --color-menu-sang: var(--menu-sang);
+  --color-menu-nhan: var(--menu-nhan);
+  --color-menu-chon: var(--menu-chon);
+  --color-menu-hover: var(--menu-hover);
+  --color-menu-vien: var(--menu-vien);
   --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
   --font-serif: var(--font-cormorant), "Times New Roman", serif;
-  --radius-nho: 4px;
-  --radius-vua: 6px;
+  --radius-tag: 5px;   /* nhãn trạng thái */
+  --radius-nho: 8px;   /* nút, ô nhập, mục menu */
+  --radius-the: 10px;  /* thẻ, danh sách thả xuống */
+  --radius-vua: 12px;  /* hộp nổi (thông báo, menu người dùng) */
+  --radius-hop: 14px;  /* hộp thoại */
 }
 
 html {

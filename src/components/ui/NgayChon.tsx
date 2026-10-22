@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { useNoi } from "./noi";
 import { CalendarDays, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 
 const THU = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
@@ -49,25 +51,27 @@ export function NgayChon({
   const gia = giaTri ?? noiBo;
   const dangChon = tach(gia);
   const [mo, setMo] = useState(false);
-  const [len, setLen] = useState(false);
   const [man, setMan] = useState<"ngay" | "thang" | "nam">("ngay");
   const [xem, setXem] = useState(() => dangChon ?? tach(homNayHCM())!);
   const [cuaSoNam, setCuaSoNam] = useState(0);
   const goc = useRef<HTMLDivElement>(null);
   const kiemTra = useRef<HTMLInputElement>(null);
+  const nutRef = useRef<HTMLButtonElement>(null);
+  const lichRef = useRef<HTMLDivElement>(null);
   const hom = homNayHCM();
 
   useEffect(() => {
     if (!mo) return;
-    const ngoai = (e: MouseEvent) => goc.current && !goc.current.contains(e.target as Node) && setMo(false);
+    const ngoai = (e: MouseEvent) => {
+      const dich = e.target as Node;
+      if (goc.current && !goc.current.contains(dich) && !lichRef.current?.contains(dich)) setMo(false);
+    };
     document.addEventListener("mousedown", ngoai);
     return () => document.removeEventListener("mousedown", ngoai);
   }, [mo]);
 
   const moLich = () => {
     if (voHieu) return;
-    const r = goc.current?.getBoundingClientRect();
-    if (r) setLen(window.innerHeight - r.bottom < 400 && r.top > window.innerHeight - r.bottom);
     setXem(tach(gia) ?? tach(homNayHCM())!);
     setMan("ngay");
     setMo(true);
@@ -86,6 +90,8 @@ export function NgayChon({
     if (y < tuNam || y > denNam) return;
     setXem({ y, m: ((t % 12) + 12) % 12, d: 1 });
   };
+
+  useNoi(mo, nutRef, lichRef, { rong: 312, caoUoc: 400 });
 
   const phim = (e: React.KeyboardEvent) => {
     if (e.key === "Escape" && mo) {
@@ -118,6 +124,7 @@ export function NgayChon({
   return (
     <div ref={goc} className={`relative ${className}`} onKeyDown={phim}>
       <button
+        ref={nutRef}
         type="button"
         id={id}
         disabled={voHieu}
@@ -146,11 +153,14 @@ export function NgayChon({
         />
       )}
 
-      {mo && (
+      {mo &&
+        createPortal(
         <div
+          ref={lichRef}
           role="dialog"
           aria-label="Chọn ngày"
-          className={`absolute left-0 z-40 w-[19.5rem] max-w-[calc(100vw-2rem)] rounded-[10px] border border-vien bg-giay-sang p-3.5 ${BONG} ${len ? "bottom-full mb-1.5" : "top-full mt-1.5"}`}
+          style={{ position: "fixed", visibility: "hidden" }}
+          className={`z-[70] overflow-y-auto rounded-[12px] border border-vien bg-giay-sang p-3.5 ${BONG}`}
         >
           <div className="flex items-center gap-1.5">
             <button
@@ -274,7 +284,8 @@ export function NgayChon({
               </button>
             )}
           </div>
-        </div>
+        </div>,
+        document.body,
       )}
     </div>
   );

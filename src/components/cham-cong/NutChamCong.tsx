@@ -1,13 +1,13 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { LogIn, LogOut } from "lucide-react";
+import { LogIn, LogOut, Check } from "lucide-react";
 import { chamCongVao, chamCongRa } from "@/app/(app)/cham-cong/actions";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 
-/** Chấm công vào/ra của chính mình. Giữ <form action> + useActionState như bản cũ (đã chạy đúng ở đây). */
+/** Chấm công của chính mình: một nút tròn lớn (vàng khi chưa vào; xám ngà khi đã vào, bấm để ra). Giờ hiện NGAY khi bấm (lạc quan), lỗi thì hoàn lại.
+ * Giữ <form action> + useActionState như bản cũ (đã chạy đúng ở đây). */
 export function NutChamCong({ gioVao, gioRa, trangThai }: { gioVao: string | null; gioRa: string | null; trangThai: string | null }) {
-  // Hiện giờ vừa bấm NGAY (lạc quan); máy chủ xác nhận xong thì số thật thay vào, lỗi thì hoàn lại.
   const [tam, setTam] = useState<{ vao?: string; ra?: string }>({});
   const bayGio = () => new Date().toLocaleTimeString("en-GB", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", minute: "2-digit" });
   const [stateVao, actionVao, dangVao] = useActionState(async () => {
@@ -22,43 +22,50 @@ export function NutChamCong({ gioVao, gioRa, trangThai }: { gioVao: string | nul
     if (kq?.loi) setTam((t) => ({ ...t, ra: undefined }));
     return kq;
   }, {});
-  gioVao = gioVao ?? tam.vao ?? null;
-  gioRa = gioRa ?? tam.ra ?? null;
+  const vao = gioVao ?? tam.vao ?? null;
+  const ra = gioRa ?? tam.ra ?? null;
   const loi = stateVao?.loi || stateRa?.loi;
+  const xong = !!vao && !!ra;
 
   return (
-    <div>
-      <div className="nhan-muc">Chấm công của tôi hôm nay</div>
-      <dl className="mt-3 grid grid-cols-2 border-y border-vien py-4">
-        <div className="pr-6">
-          <dt className="text-[13px] text-muc-3">Giờ vào</dt>
-          <dd className="mt-1 text-[28px] font-medium leading-none tabular-nums text-muc">{gioVao ?? "--:--"}</dd>
-        </div>
-        <div className="border-l border-vien pl-6">
-          <dt className="text-[13px] text-muc-3">Giờ ra</dt>
-          <dd className="mt-1 text-[28px] font-medium leading-none tabular-nums text-muc">{gioRa ?? "--:--"}</dd>
-        </div>
-      </dl>
-
-      <div className="mt-4 grid grid-cols-2 gap-3">
-        <form action={actionVao}>
-          <button type="submit" disabled={dangVao || !!gioVao} className="nut-vang flex h-14 w-full items-center justify-center gap-2 rounded-nho text-[15px] disabled:opacity-50">
-            <LogIn strokeWidth={1.5} className="h-[18px] w-[18px]" />
-            {gioVao ? "Đã chấm vào" : dangVao ? "Đang chấm" : "Chấm công vào"}
-          </button>
-        </form>
-        <form action={actionRa}>
-          <button type="submit" disabled={dangRa || !gioVao || !!gioRa} className="flex h-14 w-full items-center justify-center gap-2 rounded-nho border border-vien-dam text-[15px] font-medium text-muc hover:bg-giay-tram disabled:opacity-50">
-            <LogOut strokeWidth={1.5} className="h-[18px] w-[18px]" />
-            {gioRa ? "Đã chấm ra" : dangRa ? "Đang chấm" : "Chấm công ra"}
+    <div className="mx-auto flex w-full max-w-sm flex-col items-center text-center">
+      <div className="relative mt-2 flex h-[236px] w-[236px] items-center justify-center">
+        <span aria-hidden className="absolute inset-0 border border-vien" style={{ borderRadius: 9999 }} />
+        <span aria-hidden className="absolute inset-4 border border-vien opacity-70" style={{ borderRadius: 9999 }} />
+        <form action={vao && !ra ? actionRa : actionVao}>
+          <button
+            type="submit"
+            disabled={xong || dangVao || dangRa}
+            aria-label={xong ? "Đã hoàn tất chấm công hôm nay" : vao ? "Chấm công ra" : "Chấm công vào"}
+            className="relative flex h-[184px] w-[184px] flex-col items-center justify-center gap-1.5 text-[18px] font-semibold text-[var(--chu-tren-vang)] disabled:cursor-default"
+            style={{
+              borderRadius: 9999,
+              background: vao ? "linear-gradient(135deg,#E8DEC8,#C9B98E)" : "var(--gradient-vang)",
+              boxShadow: "inset 0 2px 0 rgba(255,255,255,.5), 0 14px 30px rgba(143,108,32,.38)",
+              opacity: xong ? 0.8 : 1,
+            }}
+          >
+            {xong ? <Check strokeWidth={1.8} className="h-8 w-8" /> : vao ? <LogOut strokeWidth={1.7} className="h-8 w-8" /> : <LogIn strokeWidth={1.7} className="h-8 w-8" />}
+            <span>{xong ? "Đã xong hôm nay" : dangVao || dangRa ? "Đang chấm" : vao ? "Chấm công ra" : "Chấm công vào"}</span>
           </button>
         </form>
       </div>
 
-      {loi && <div role="alert" className="mt-3 rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</div>}
+      <dl className="mt-6 grid w-full grid-cols-2 border-y border-vien py-4">
+        <div className="px-2">
+          <dt className="text-[12px] text-muc-3">Giờ vào</dt>
+          <dd className="mt-0.5 text-[28px] font-medium leading-none tabular-nums text-muc">{vao ?? "--:--"}</dd>
+        </div>
+        <div className="border-l border-vien px-2">
+          <dt className="text-[12px] text-muc-3">Giờ ra</dt>
+          <dd className="mt-0.5 text-[28px] font-medium leading-none tabular-nums text-muc">{ra ?? "--:--"}</dd>
+        </div>
+      </dl>
+
+      {loi && <div role="alert" className="mt-3 w-full rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</div>}
       {trangThai && (
         <p className="mt-3 text-[13px] text-muc-3">
-          Trạng thái hôm nay: <NhanTrangThai kieu={trangThai === "Đúng giờ" ? "tot" : trangThai === "Đi muộn" ? "cho" : "loi"}>{trangThai}</NhanTrangThai>
+          Hôm nay: <NhanTrangThai kieu={trangThai === "Đúng giờ" ? "tot" : trangThai === "Đi muộn" ? "cho" : "loi"}>{trangThai}</NhanTrangThai>
         </p>
       )}
     </div>

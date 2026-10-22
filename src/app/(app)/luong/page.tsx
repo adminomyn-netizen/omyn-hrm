@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { HangChiSo } from "@/components/ui/HangChiSo";
+import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { MucTrang } from "@/components/ui/MucTrang";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { Bang, type Cot } from "@/components/ui/Table";
@@ -25,14 +26,18 @@ export default async function TrangLuong() {
 
   if (!luong) {
     return (
-      <p className="chu-tieu-de py-20 text-center text-[28px] italic text-muc-3">
-        Chưa có kỳ lương nào. Khi có kỳ lương đầu tiên, bảng lương sẽ hiện ở đây.
-      </p>
+      <>
+        <TieuDeTrang tieuDe="Bảng lương" phu="Quỹ lương và chi tiết theo kỳ" />
+        <p className="chu-tieu-de py-20 text-center text-[28px] italic text-muc-3">
+          Chưa có kỳ lương nào. Khi có kỳ lương đầu tiên, bảng lương sẽ hiện ở đây.
+        </p>
+      </>
     );
   }
 
   return (
     <div className="space-y-10">
+      <TieuDeTrang tieuDe="Bảng lương" phu="Quỹ lương và chi tiết theo kỳ" />
       <HangChiSo
         muc={[
           { nhan: "Kỳ lương", so: luong.ky },

@@ -16,6 +16,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { ChuyenCheDo } from "./ChuyenCheDo";
+import { TimKiem } from "./TimKiem";
+import { datDemMenu } from "@/lib/dem-menu";
 import { SU_KIEN_MO_MENU } from "./MobileNav";
 import { Hop } from "@/components/ui/Hop";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
@@ -79,8 +81,11 @@ function useThongBao() {
       try {
         const r = await fetch("/api/thong-bao", { cache: "no-store" });
         if (!r.ok || !r.headers.get("content-type")?.includes("json")) return;
-        const j = (await r.json()) as { thongBao: ThongBao[] };
-        if (!huy) setDs(j.thongBao);
+        const j = (await r.json()) as { thongBao: ThongBao[]; dem?: Record<string, number> };
+        if (!huy) {
+          setDs(j.thongBao);
+          datDemMenu(j.dem ?? {});
+        }
       } catch {
         // mất mạng thoáng qua: giữ danh sách cũ
       }
@@ -285,10 +290,9 @@ function MenuAvatar({ hoTen, email }: { hoTen: string; email: string }) {
 export function DauTrang({ hoTen, email, vaiTro }: { hoTen: string; email: string; vaiTro: VaiTro }) {
   const pathname = usePathname();
   const tieuDe = menuChinh.find((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"))?.ten ?? "OMYN";
-  void vaiTro;
   return (
-    <header className="dau-trang-vang sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-vien px-3 lg:px-8">
-      <div className="flex min-w-0 items-center gap-1">
+    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-vien bg-giay-sang px-3 lg:px-8">
+      <div className="flex min-w-0 items-center gap-1.5">
         <button
           type="button"
           onClick={() => window.dispatchEvent(new Event(SU_KIEN_MO_MENU))}
@@ -297,7 +301,8 @@ export function DauTrang({ hoTen, email, vaiTro }: { hoTen: string; email: strin
         >
           <Menu strokeWidth={1.5} className="h-5 w-5" />
         </button>
-        <h1 className="truncate text-[16px] font-semibold text-muc">{tieuDe}</h1>
+        <span className="truncate text-[15px] font-semibold text-muc lg:hidden">{tieuDe}</span>
+        <TimKiem vaiTro={vaiTro} />
       </div>
       <div className="flex shrink-0 items-center gap-1">
         <ChuyenCheDo />

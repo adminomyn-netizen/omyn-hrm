@@ -8,6 +8,6 @@ const KIEU = {
 /** Nhãn trạng thái: chữ nhỏ trên nền nhạt cùng sắc — không viền, không bo tròn lớn. */
 export function NhanTrangThai({ kieu = "tram", children }: { kieu?: keyof typeof KIEU; children: React.ReactNode }) {
   return (
-    <span className={`inline-block rounded-nho px-2 py-0.5 text-[12px] font-medium ${KIEU[kieu]}`}>{children}</span>
+    <span className={`inline-block rounded-tag px-2 py-0.5 text-[12px] font-medium ${KIEU[kieu]}`}>{children}</span>
   );
 }

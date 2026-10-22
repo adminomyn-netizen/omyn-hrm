@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Search } from "lucide-react";
 import { Hop } from "@/components/ui/Hop";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
+import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 import { FormNhanVien, type Khoi, type NhanVienCoSan } from "./FormNhanVien";
 import { choNghiViec, xoaNhanVien } from "@/lib/actions";
@@ -15,11 +16,11 @@ const LOC = ["Tất cả", "Đang làm", "Thử việc", "Đã nghỉ"] as const
 const kieu = (t: string) => (t === "Đang làm" ? "tot" : t === "Thử việc" ? "cho" : "tram");
 const ngayVN = (d: string | null) => (d ? d.split("-").reverse().join("/") : "");
 
-export function DanhSachNhanSu({ nhanVien, khoi }: { nhanVien: DongNhanVien[]; khoi: Khoi[] }) {
+export function DanhSachNhanSu({ nhanVien, khoi, moBanDau, timBanDau = "" }: { nhanVien: DongNhanVien[]; khoi: Khoi[]; moBanDau?: boolean; timBanDau?: string }) {
   const router = useRouter();
   const [loc, setLoc] = useState<(typeof LOC)[number]>("Tất cả");
-  const [tim, setTim] = useState("");
-  const [hop, setHop] = useState<{ kieu: "them" } | { kieu: "sua"; nv: DongNhanVien } | { kieu: "xoa"; nv: DongNhanVien } | null>(null);
+  const [tim, setTim] = useState(timBanDau);
+  const [hop, setHop] = useState<{ kieu: "them" } | { kieu: "sua"; nv: DongNhanVien } | { kieu: "xoa"; nv: DongNhanVien } | null>(moBanDau ? { kieu: "them" } : null);
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
 
@@ -58,7 +59,12 @@ export function DanhSachNhanSu({ nhanVien, khoi }: { nhanVien: DongNhanVien[]; k
 
   return (
     <>
-      <div className="flex flex-wrap items-end justify-between gap-4">
+      <TieuDeTrang tieuDe="Hồ sơ nhân sự" phu={`${nhanVien.length} người · ${dem["Đang làm"] ?? 0} đang làm · ${dem["Thử việc"] ?? 0} thử việc`}>
+        <button type="button" onClick={() => setHop({ kieu: "them" })} className={NUT_CHINH}>
+          + Thêm nhân viên
+        </button>
+      </TieuDeTrang>
+      <div className="flex flex-wrap items-end justify-between gap-4 border-b border-vien">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2" role="tablist" aria-label="Lọc theo trạng thái">
           {LOC.map((l) => (
             <button
@@ -67,7 +73,7 @@ export function DanhSachNhanSu({ nhanVien, khoi }: { nhanVien: DongNhanVien[]; k
               role="tab"
               aria-selected={loc === l}
               onClick={() => setLoc(l)}
-              className={`border-b-2 pb-1.5 text-[14px] transition-colors ${
+              className={`-mb-px border-b-2 pb-2.5 text-[14px] transition-colors ${
                 loc === l ? "border-nhan font-semibold text-muc" : "border-transparent text-muc-2 hover:text-muc"
               }`}
             >
@@ -75,7 +81,7 @@ export function DanhSachNhanSu({ nhanVien, khoi }: { nhanVien: DongNhanVien[]; k
             </button>
           ))}
         </div>
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3 pb-2">
           <div className="relative">
             <Search strokeWidth={1.5} className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muc-3" />
             <input
@@ -86,9 +92,6 @@ export function DanhSachNhanSu({ nhanVien, khoi }: { nhanVien: DongNhanVien[]; k
               className={`${O_NHAP} h-10 w-64 pl-9`}
             />
           </div>
-          <button type="button" onClick={() => setHop({ kieu: "them" })} className={NUT_CHINH}>
-            Thêm nhân viên
-          </button>
         </div>
       </div>
 
@@ -106,11 +109,16 @@ export function DanhSachNhanSu({ nhanVien, khoi }: { nhanVien: DongNhanVien[]; k
           </thead>
           <tbody>
             {hien.map((n) => (
-              <tr key={n.id} className="h-[60px] border-b border-vien transition-colors hover:bg-giay-tram/60">
+              <tr key={n.id} className="h-[64px] border-b border-vien transition-colors hover:bg-giay-tram/60">
                 <td className="py-2 pr-4">
-                  <div className="font-medium text-muc">{n.ho_ten}</div>
-                  <div className="text-[13px] text-muc-3">
-                    {[n.ma_nhan_vien, n.email].filter(Boolean).join(" · ")}
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center bg-nhan-nhat text-[13px] font-semibold text-nhan-dam" style={{ borderRadius: 9999 }}>
+                      {n.ho_ten.trim().split(/\s+/).pop()?.charAt(0).toUpperCase()}
+                    </span>
+                    <div className="min-w-0">
+                      <div className="truncate font-medium text-muc">{n.ho_ten}</div>
+                      <div className="truncate text-[13px] text-muc-3">{[n.ma_nhan_vien, n.email].filter(Boolean).join(" · ")}</div>
+                    </div>
                   </div>
                 </td>
                 <td className="py-2 pr-4 text-muc-2">{n.chuc_danh}</td>

@@ -8,8 +8,8 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const nguoiDung = await layNguoiDungHienTai();
   if (!nguoiDung || nguoiDung.vaiTro === "cho_duyet") {
-    return NextResponse.json({ thongBao: [] }, { status: 401, headers: { "Cache-Control": "private, no-store" } });
+    return NextResponse.json({ thongBao: [], dem: {} }, { status: 401, headers: { "Cache-Control": "private, no-store" } });
   }
-  const thongBao = await layThongBao({ id: nguoiDung.id, vaiTro: nguoiDung.vaiTro }).catch(() => []);
-  return NextResponse.json({ thongBao }, { headers: { "Cache-Control": "private, no-store" } });
+  const kq = await layThongBao({ id: nguoiDung.id, vaiTro: nguoiDung.vaiTro }).catch(() => ({ ds: [], dem: {} }));
+  return NextResponse.json({ thongBao: kq.ds, dem: kq.dem }, { headers: { "Cache-Control": "private, no-store" } });
 }

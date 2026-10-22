@@ -1,5 +1,6 @@
 export const dynamic = "force-dynamic";
 
+import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { MucTrang } from "@/components/ui/MucTrang";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { Bang, type Cot } from "@/components/ui/Table";
@@ -29,6 +30,7 @@ export default async function TrangCaiDat() {
 
   return (
     <div className="space-y-10">
+      <TieuDeTrang tieuDe="Cài đặt và phân quyền" phu="Vai trò, quyền và tài khoản đăng nhập" />
       <MucTrang tieuDe="Vai trò và quyền đang áp dụng">
         <dl>
           {VAI_TRO.map((v) => (

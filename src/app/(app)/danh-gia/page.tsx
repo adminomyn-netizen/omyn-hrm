@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { HangChiSo } from "@/components/ui/HangChiSo";
+import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { MucTrang } from "@/components/ui/MucTrang";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { Bang, type Cot } from "@/components/ui/Table";
@@ -25,6 +26,7 @@ export default async function TrangDanhGia() {
 
   return (
     <div className="space-y-10">
+      <TieuDeTrang tieuDe="Đánh giá hiệu suất" phu="Điểm và xếp loại theo kỳ" />
       <HangChiSo
         muc={[
           { nhan: "Lượt đánh giá", so: String(ds.length) },
