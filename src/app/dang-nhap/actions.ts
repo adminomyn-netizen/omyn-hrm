@@ -16,5 +16,5 @@ export async function dangNhap(_truoc: { loi?: string } | undefined, formData: F
 
   // Về thẳng trang của vai trò để khỏi nhảy qua nhiều bước chuyển hướng.
   const vaiTro = data.user?.app_metadata?.vai_tro;
-  redirect(vaiTro === "nhan_vien" ? "/cham-cong" : vaiTro === "admin" || vaiTro === "ky_thuat" ? "/dashboard" : "/cho-duyet");
+  redirect(vaiTro === "nhan_vien" || vaiTro === "admin" || vaiTro === "ky_thuat" ? "/dashboard" : "/cho-duyet");
 }

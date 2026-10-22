@@ -15,8 +15,8 @@ type VaiTroGan = (typeof VAI_TRO_HOP_LE)[number];
  * không ai tự duyệt tài khoản của chính mình. */
 export async function duyetTaiKhoan(formData: FormData): Promise<KetQuaTaiKhoan> {
   const nguoiGoi = await layNguoiDungHienTai();
-  if (!nguoiGoi || (nguoiGoi.vaiTro !== "admin" && nguoiGoi.vaiTro !== "ky_thuat")) {
-    return { loi: "Bạn không có quyền duyệt tài khoản." };
+  if (!nguoiGoi || nguoiGoi.vaiTro !== "ky_thuat") {
+    return { loi: "Chỉ tài khoản Kỹ thuật mới duyệt được tài khoản." };
   }
 
   const userId = String(formData.get("user_id") || "");
@@ -84,8 +84,8 @@ export async function duyetTaiKhoan(formData: FormData): Promise<KetQuaTaiKhoan>
 /** Từ chối: xoá tài khoản CHƯA duyệt (không đụng tài khoản đã có vai trò). */
 export async function tuChoiTaiKhoan(formData: FormData): Promise<KetQuaTaiKhoan> {
   const nguoiGoi = await layNguoiDungHienTai();
-  if (!nguoiGoi || (nguoiGoi.vaiTro !== "admin" && nguoiGoi.vaiTro !== "ky_thuat")) {
-    return { loi: "Bạn không có quyền từ chối tài khoản." };
+  if (!nguoiGoi || nguoiGoi.vaiTro !== "ky_thuat") {
+    return { loi: "Chỉ tài khoản Kỹ thuật mới từ chối được tài khoản." };
   }
   const userId = String(formData.get("user_id") || "");
   if (!userId || userId === nguoiGoi.id) return { loi: "Tài khoản không hợp lệ." };

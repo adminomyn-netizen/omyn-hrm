@@ -269,3 +269,5 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 
 - **Khối có cột Vị trí** (22/10): thay cột Mô tả; vị trí khai báo ở khối + chức vụ của nhân viên đang làm trong khối tự được gộp vào. Ô Chức vụ trong biểu mẫu nhân viên tự hiện vị trí của khối đang chọn trước, rồi các cấp chuẩn.
 - **Chỉ tài khoản Kỹ thuật** xem được mục Kỹ thuật và Cài đặt và phân quyền (kể cả đổi vai trò); Quản trị và Nhân viên không thấy menu, gõ thẳng đường dẫn thì bị đưa về Chấm công.
+
+- **Tổng quan ai cũng thấy, nội dung theo tài khoản** (22/10): Nhân viên thấy việc của chính mình (chấm công hôm nay, công tháng, đơn của tôi, hồ sơ, phiếu lương mới nhất); Quản trị thấy số liệu công ty; Kỹ thuật thấy thêm danh sách tài khoản chờ duyệt. Duyệt/từ chối tài khoản CHỈ Kỹ thuật (thông báo và đếm cũng chỉ Kỹ thuật). Đăng nhập xong ai cũng vào Tổng quan.

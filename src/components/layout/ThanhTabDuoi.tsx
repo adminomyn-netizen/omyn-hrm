@@ -11,7 +11,8 @@ import { SU_KIEN_MO_TAI_KHOAN, SU_KIEN_MO_THONG_BAO } from "./DauTrang";
 type Tab = { ten: string; Icon: LucideIcon; href?: string; sk?: string; dem?: string };
 
 const TAB_NHAN_VIEN: Tab[] = [
-  { ten: "Hôm nay", Icon: Clock, href: "/cham-cong" },
+  { ten: "Tổng quan", Icon: LayoutDashboard, href: "/dashboard" },
+  { ten: "Chấm công", Icon: Clock, href: "/cham-cong" },
   { ten: "Đơn từ", Icon: Inbox, href: "/don-tu" },
   { ten: "Thông báo", Icon: Bell, sk: SU_KIEN_MO_THONG_BAO, dem: "chua-doc" },
   { ten: "Tôi", Icon: User, sk: SU_KIEN_MO_TAI_KHOAN },
@@ -25,7 +26,7 @@ const TAB_QUAN_LY: Tab[] = [
 ];
 
 /** Thanh tab dưới cùng cho điện thoại (ẩn từ 1024 px): vào thẳng việc hay dùng, ngón cái với tới được.
- * Nhân viên: Hôm nay · Đơn từ · Thông báo · Tôi. Quản lý: Tổng quan · Nhân sự · Tuyển dụng · Đơn từ · Menu (mở ngăn kéo đủ mục). */
+ * Nhân viên: Tổng quan · Chấm công · Đơn từ · Thông báo · Tôi. Quản lý: Tổng quan · Nhân sự · Tuyển dụng · Đơn từ · Menu (mở ngăn kéo đủ mục). */
 export function ThanhTabDuoi({ vaiTro }: { vaiTro: VaiTro }) {
   const pathname = usePathname();
   const dem = useDemMenu();

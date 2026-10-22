@@ -52,7 +52,7 @@ export async function capNhatPhien(request: NextRequest) {
 
   if (user && laTrangCongKhai) {
     const url = request.nextUrl.clone();
-    url.pathname = !daDuyet ? "/cho-duyet" : vaiTro === "nhan_vien" ? "/cham-cong" : "/dashboard";
+    url.pathname = !daDuyet ? "/cho-duyet" : "/dashboard";
     return NextResponse.redirect(url);
   }
 
