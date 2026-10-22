@@ -12,18 +12,23 @@ import {
   layDonTu,
   layDanhGiaKPI,
   layBangLuongKyGanNhat,
+  layTaiKhoanChoDuyet,
+  layHoSoChuaGanTaiKhoan,
 } from "@/lib/data";
+import { DuyetTaiKhoan } from "@/components/dashboard/DuyetTaiKhoan";
 import { yeuCauVaiTro } from "@/lib/auth";
 
 export default async function TrangTongQuan() {
-  await yeuCauVaiTro(["admin", "ky_thuat"]);
-  const [khoi, nhanVien, chamCong, donTu, kpi, luong] = await Promise.all([
+  const nguoiGoi = await yeuCauVaiTro(["admin", "ky_thuat"]);
+  const [khoi, nhanVien, chamCong, donTu, kpi, luong, taiKhoanChoDuyet, hoSoTrong] = await Promise.all([
     layDanhSachKhoi(),
     layDanhSachNhanVien(),
     layChamCongHomNay(),
     layDonTu(),
     layDanhGiaKPI(),
     layBangLuongKyGanNhat(),
+    layTaiKhoanChoDuyet(),
+    layHoSoChuaGanTaiKhoan(),
   ]);
 
   const dangLam = nhanVien.filter((n) => n.trang_thai === "Đang làm").length;
@@ -33,6 +38,7 @@ export default async function TrangTongQuan() {
     <AppShell>
       <Topbar tieuDe="Tổng quan" />
       <main className="flex-1 space-y-6 p-4 lg:p-8">
+        <DuyetTaiKhoan taiKhoan={taiKhoanChoDuyet} hoSo={hoSoTrong} nguoiGoi={nguoiGoi.vaiTro} />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <ThongKe nhan="Nhân viên đang làm" giaTri={String(dangLam)} ghiChu={`Tổng ${nhanVien.length} người`} />
           <ThongKe nhan="Đơn chờ duyệt" giaTri={String(choDuyet.length)} ghiChu="Nghỉ phép, tạm ứng..." />

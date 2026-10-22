@@ -25,9 +25,12 @@ export function DongHoHCM() {
   const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
-    setNow(new Date());
+    const batDau = setTimeout(() => setNow(new Date()), 0);
     const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
+    return () => {
+      clearTimeout(batDau);
+      clearInterval(timer);
+    };
   }, []);
 
   return (

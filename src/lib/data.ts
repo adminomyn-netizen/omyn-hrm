@@ -274,3 +274,39 @@ export async function layDanhGiaKPI() {
     xep_loai: k.xep_loai,
   }));
 }
+
+export type TaiKhoanChoDuyet = {
+  id: string;
+  email: string;
+  hoTen: string;
+  taoLuc: string;
+};
+
+/** Tài khoản đã tự đăng ký nhưng chưa có vai trò (app_metadata.vai_tro trống). */
+export async function layTaiKhoanChoDuyet(): Promise<TaiKhoanChoDuyet[]> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 200 });
+  if (error) throw error;
+  return data.users
+    .filter((u) => !u.app_metadata?.vai_tro)
+    .map((u) => ({
+      id: u.id,
+      email: u.email ?? "",
+      hoTen: (u.app_metadata?.ho_ten as string) || (u.email ?? ""),
+      taoLuc: u.created_at,
+    }))
+    .sort((a, b) => b.taoLuc.localeCompare(a.taoLuc));
+}
+
+/** Hồ sơ nhân sự chưa gắn tài khoản — để gắn khi duyệt. */
+export async function layHoSoChuaGanTaiKhoan() {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("nhan_vien")
+    .select("id, ho_ten, chuc_danh, email")
+    .is("user_id", null)
+    .neq("trang_thai", "Đã nghỉ")
+    .order("ho_ten");
+  if (error) throw error;
+  return data;
+}

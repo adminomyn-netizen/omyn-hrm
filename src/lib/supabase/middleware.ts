@@ -37,9 +37,19 @@ export async function capNhatPhien(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  const vaiTro = user?.app_metadata?.vai_tro;
+  const daDuyet = vaiTro === "admin" || vaiTro === "ky_thuat" || vaiTro === "nhan_vien";
+
   if (user && laTrangCongKhai) {
     const url = request.nextUrl.clone();
-    url.pathname = user.app_metadata?.vai_tro === "nhan_vien" ? "/cham-cong" : "/dashboard";
+    url.pathname = !daDuyet ? "/cho-duyet" : vaiTro === "nhan_vien" ? "/cham-cong" : "/dashboard";
+    return NextResponse.redirect(url);
+  }
+
+  // Chưa được duyệt: chỉ được ở /cho-duyet (chặn ngay ở cổng, không phụ thuộc thứ tự dựng trang).
+  if (user && !daDuyet && !request.nextUrl.pathname.startsWith("/cho-duyet")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/cho-duyet";
     return NextResponse.redirect(url);
   }
 

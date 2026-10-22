@@ -6,47 +6,71 @@ import { dangKy } from "./actions";
 import { AuthShell } from "@/components/auth/AuthShell";
 
 const o =
-  "w-full rounded-lg border border-omyn-border px-3 py-2.5 text-sm outline-none transition-colors focus:border-omyn-primary focus:ring-2 focus:ring-omyn-primary-light";
-const nhan = "mb-1 block text-sm font-medium text-slate-700";
+  "h-11 w-full rounded-nho border border-vien-dam bg-giay-sang px-3 text-[16px] text-muc outline-none placeholder:text-muc-3 focus:border-nhan focus:ring-2 focus:ring-nhan/25";
+const nhan = "mb-1.5 block text-[13px] font-medium text-muc-2";
 
 export default function TrangDangKy() {
   const [state, action, dangXuLy] = useActionState(dangKy, undefined);
 
   return (
     <AuthShell
-      tieuDe="Đăng ký tài khoản"
-      moTa="Tạo tài khoản nhân viên để tự chấm công và theo dõi lịch làm việc của riêng bạn."
+      tieuDe="Đăng ký"
+      moTa="Tạo tài khoản của bạn. Nhân sự sẽ duyệt và mở quyền trước khi bạn dùng được."
     >
-      <form action={action} className="space-y-4 rounded-xl border border-omyn-border bg-omyn-surface p-6 shadow-sm">
+      <form action={action} className="space-y-5">
+        {/* ô bẫy máy, ẩn với người thật */}
+        <input name="website" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
         <div>
-          <label className={nhan}>
-            Họ và tên <span className="text-rose-500">*</span>
+          <label htmlFor="ho_ten" className={nhan}>
+            Họ và tên
           </label>
-          <input name="ho_ten" required className={o} placeholder="Nguyễn Văn A" />
+          <input id="ho_ten" name="ho_ten" required autoComplete="name" className={o} />
         </div>
         <div>
-          <label className={nhan}>
-            Email <span className="text-rose-500">*</span>
+          <label htmlFor="email" className={nhan}>
+            Email
           </label>
-          <input name="email" type="email" required className={o} placeholder="ten@omyn.vn" />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            autoComplete="username"
+            className={o}
+            placeholder="ten@omyn.vn"
+          />
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          <div>
-            <label className={nhan}>
-              Mật khẩu <span className="text-rose-500">*</span>
-            </label>
-            <input name="mat_khau" type="password" required minLength={6} className={o} placeholder="Ít nhất 6 ký tự" />
-          </div>
-          <div>
-            <label className={nhan}>
-              Xác nhận mật khẩu <span className="text-rose-500">*</span>
-            </label>
-            <input name="xac_nhan_mat_khau" type="password" required minLength={6} className={o} />
-          </div>
+        <div>
+          <label htmlFor="mat_khau" className={nhan}>
+            Mật khẩu (8 ký tự trở lên, có chữ in hoa và ký tự đặc biệt)
+          </label>
+          <input
+            id="mat_khau"
+            name="mat_khau"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            className={o}
+          />
+        </div>
+        <div>
+          <label htmlFor="xac_nhan_mat_khau" className={nhan}>
+            Nhập lại mật khẩu
+          </label>
+          <input
+            id="xac_nhan_mat_khau"
+            name="xac_nhan_mat_khau"
+            type="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
+            className={o}
+          />
         </div>
 
         {state?.loi && (
-          <div className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/30">
+          <div role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">
             {state.loi}
           </div>
         )}
@@ -54,17 +78,17 @@ export default function TrangDangKy() {
         <button
           type="submit"
           disabled={dangXuLy}
-          className="w-full rounded-lg bg-omyn-primary py-2.5 text-sm font-medium text-white shadow-sm transition-colors hover:bg-omyn-primary-dark disabled:opacity-60"
+          className="h-11 w-full rounded-nho nut-vang text-[15px] disabled:opacity-60"
         >
-          {dangXuLy ? "Đang tạo tài khoản..." : "Đăng ký"}
+          {dangXuLy ? "Đang tạo tài khoản" : "Tạo tài khoản"}
         </button>
 
-        <div className="pt-1 text-center text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-[13px] text-muc-3">
           Đã có tài khoản?{" "}
-          <Link href="/dang-nhap" className="font-medium text-omyn-primary hover:underline">
+          <Link href="/dang-nhap" className="font-medium text-nhan underline underline-offset-4">
             Đăng nhập
           </Link>
-        </div>
+        </p>
       </form>
     </AuthShell>
   );

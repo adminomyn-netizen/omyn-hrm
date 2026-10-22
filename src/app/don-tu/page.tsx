@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/Card";
 import { Badge } from "@/components/ui/Badge";
 import { Bang, type Cot } from "@/components/ui/Table";
 import { layDonTu, layDonTuCuaToi, layNhanVienIdTheoUser } from "@/lib/data";
-import { layNguoiDungHienTai } from "@/lib/auth";
+import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { HanhDongDonTu } from "@/components/don-tu/HanhDongDonTu";
 
 type DonTu = Awaited<ReturnType<typeof layDonTu>>[number];
@@ -39,9 +39,9 @@ const cotCaNhan: Cot<DonTuCuaToi>[] = [
 ];
 
 export default async function TrangDonTu() {
-  const nguoiDung = await layNguoiDungHienTai();
+  const nguoiDung = await layNguoiDungDaDuyet();
 
-  if (nguoiDung?.vaiTro === "nhan_vien") {
+  if (nguoiDung.vaiTro === "nhan_vien") {
     const nhanVienId = await layNhanVienIdTheoUser(nguoiDung.id);
     const danhSachCuaToi = nhanVienId ? await layDonTuCuaToi(nhanVienId) : [];
 

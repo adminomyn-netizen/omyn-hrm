@@ -1,0 +1,123 @@
+{
+ "src/app/bao-cao/page.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/cai-dat/page.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/cham-cong/page.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/danh-gia/page.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/dashboard/page.tsx": {
+  "ma": [
+   "bo-lon",
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/don-tu/moi/FormDonTu.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/don-tu/page.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/globals.css": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/ky-thuat/page.tsx": {
+  "ma": [
+   "bo-lon",
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/luong/page.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/nhan-su/page.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/app/tuyen-dung/page.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/components/cham-cong/DongHoHCM.tsx": {
+  "ma": [],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/components/cham-cong/NutChamCong.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/components/don-tu/HanhDongDonTu.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/components/nhan-su/FormNhanVien.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/components/nhan-su/HanhDongNhanVien.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/components/ui/Badge.tsx": {
+  "ma": [
+   "bo-lon",
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/components/ui/Card.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ },
+ "src/components/ui/Table.tsx": {
+  "ma": [
+   "dark"
+  ],
+  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
+ }
+}
