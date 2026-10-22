@@ -2,6 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { themNhanVien, suaNhanVien } from "@/lib/actions";
+import { Chon } from "@/components/ui/Chon";
+import { NgayChon } from "@/components/ui/NgayChon";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 
 export type Khoi = { id: string; ten: string };
@@ -63,12 +65,7 @@ export function FormNhanVien({
         </div>
         <div>
           <label htmlFor="nv-khoi" className={NHAN_O}>Khối *</label>
-          <select id="nv-khoi" name="khoi_id" required defaultValue={coSan?.khoi_id ?? ""} className={O_NHAP}>
-            <option value="" disabled>Chọn khối</option>
-            {khoi.map((k) => (
-              <option key={k.id} value={k.id}>{k.ten}</option>
-            ))}
-          </select>
+          <Chon id="nv-khoi" ten="khoi_id" batBuoc trong="Chọn khối" giaTriMacDinh={coSan?.khoi_id ?? ""} luaChon={khoi.map((k) => ({ gia_tri: k.id, nhan: k.ten }))} />
         </div>
         <div>
           <label htmlFor="nv-email" className={NHAN_O}>Email</label>
@@ -76,15 +73,11 @@ export function FormNhanVien({
         </div>
         <div>
           <label htmlFor="nv-ngay" className={NHAN_O}>Ngày vào làm *</label>
-          <input id="nv-ngay" name="ngay_vao_lam" type="date" required defaultValue={coSan?.ngay_vao_lam ?? ""} className={O_NHAP} />
+          <NgayChon id="nv-ngay" ten="ngay_vao_lam" batBuoc giaTriMacDinh={coSan?.ngay_vao_lam ?? ""} />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="nv-tt" className={NHAN_O}>Trạng thái</label>
-          <select id="nv-tt" name="trang_thai" defaultValue={coSan?.trang_thai ?? "Đang làm"} className={O_NHAP}>
-            <option value="Đang làm">Đang làm</option>
-            <option value="Thử việc">Thử việc</option>
-            <option value="Đã nghỉ">Đã nghỉ</option>
-          </select>
+          <Chon id="nv-tt" ten="trang_thai" giaTriMacDinh={coSan?.trang_thai ?? "Đang làm"} luaChon={[{ gia_tri: "Đang làm", nhan: "Đang làm" }, { gia_tri: "Thử việc", nhan: "Thử việc" }, { gia_tri: "Đã nghỉ", nhan: "Đã nghỉ" }]} />
         </div>
       </div>
 

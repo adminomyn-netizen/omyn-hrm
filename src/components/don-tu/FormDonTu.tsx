@@ -2,7 +2,9 @@
 
 import { useRef, useState, useTransition } from "react";
 import { taoDonTu } from "@/app/(app)/don-tu/actions";
-import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
+import { Chon } from "@/components/ui/Chon";
+import { NgayChon } from "@/components/ui/NgayChon";
+import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 
 const LOAI_DON = ["Nghỉ phép năm", "Nghỉ ốm", "Tạm ứng lương", "Công tác"];
 
@@ -26,21 +28,16 @@ export function FormDonTu({ xong, huy }: { xong: () => void; huy: () => void }) 
     <form ref={formRef} className="space-y-4" onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA" && e.preventDefault()}>
       <div>
         <label htmlFor="d-loai" className={NHAN_O}>Loại đơn *</label>
-        <select id="d-loai" name="loai" required defaultValue="" className={O_NHAP}>
-          <option value="" disabled>Chọn loại đơn</option>
-          {LOAI_DON.map((l) => (
-            <option key={l} value={l}>{l}</option>
-          ))}
-        </select>
+        <Chon id="d-loai" ten="loai" batBuoc trong="Chọn loại đơn" luaChon={LOAI_DON.map((l) => ({ gia_tri: l, nhan: l }))} />
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
           <label htmlFor="d-tu" className={NHAN_O}>Từ ngày *</label>
-          <input id="d-tu" name="tu_ngay" type="date" required className={O_NHAP} />
+          <NgayChon id="d-tu" ten="tu_ngay" batBuoc />
         </div>
         <div>
           <label htmlFor="d-den" className={NHAN_O}>Đến ngày *</label>
-          <input id="d-den" name="den_ngay" type="date" required className={O_NHAP} />
+          <NgayChon id="d-den" ten="den_ngay" batBuoc />
         </div>
       </div>
       <div>

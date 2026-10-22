@@ -10,6 +10,7 @@ const QUY_TAC = [
   { ma: "emoji", re: /\p{Extended_Pictographic}/u, vi: "emoji" },
   { ma: "phong-cam", re: /\b(Inter|Roboto|Arial|Poppins)\b/, vi: "phông mặc định bị cấm" },
   { ma: "tim-xanh", re: /\b(from|via|to)-(violet|purple|indigo|fuchsia|blue|sky|cyan|teal|emerald|green|lime|pink|rose)-/, vi: "dải màu ngoài tông vàng (tím/xanh/lục)" },
+  { ma: "select-ngay-macdinh", re: /<select[\s>]|type=["']date["']/, vi: "ô chọn/ngày mặc định của trình duyệt (dùng Chon / NgayChon)", boQua: /\/\*\*|\* / },
   { ma: "van-phong", re: /Chào mừng bạn đến với|Oops|Lorem ipsum|John Doe|Acme|Đã xảy ra lỗi!?["'`<]/, vi: "văn phong cấm (E.7)" },
 ];
 
@@ -32,7 +33,7 @@ for (const tep of duyet(join(GOC, "src"))) {
   const dong = readFileSync(tep, "utf8").split("\n");
   dong.forEach((nd, i) => {
     for (const q of QUY_TAC) {
-      if (!q.re.test(nd)) continue;
+      if (!q.re.test(nd) || (q.boQua && q.boQua.test(nd))) continue;
       const ngoaiLe = choPhep[ten];
       if (ngoaiLe && (ngoaiLe.ma.includes("*") || ngoaiLe.ma.includes(q.ma))) {
         demNgoaiLe[ten] = (demNgoaiLe[ten] ?? 0) + 1;

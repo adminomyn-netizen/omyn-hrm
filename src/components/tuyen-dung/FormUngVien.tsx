@@ -2,6 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { luuUngVien } from "@/app/(app)/tuyen-dung/actions";
+import { Chon } from "@/components/ui/Chon";
+import { NgayChon } from "@/components/ui/NgayChon";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import { BUOC_UNG_VIEN, NGUON_UNG_VIEN } from "@/lib/tuyen-dung";
 
@@ -59,12 +61,7 @@ export function FormUngVien({ tinId, coSan, xong, huy }: { tinId: string; coSan?
         </div>
         <div>
           <label htmlFor="u-nguon" className={NHAN_O}>Nguồn</label>
-          <select id="u-nguon" name="nguon" defaultValue={coSan?.nguon ?? ""} className={O_NHAP}>
-            <option value="">Chưa rõ</option>
-            {NGUON_UNG_VIEN.map((n) => (
-              <option key={n} value={n}>{n}</option>
-            ))}
-          </select>
+          <Chon id="u-nguon" ten="nguon" trong="Chưa rõ" giaTriMacDinh={coSan?.nguon ?? ""} luaChon={[{ gia_tri: "", nhan: "Chưa rõ" }, ...NGUON_UNG_VIEN.map((n) => ({ gia_tri: n, nhan: n }))]} />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="u-cv" className={NHAN_O}>Link CV</label>
@@ -72,19 +69,15 @@ export function FormUngVien({ tinId, coSan, xong, huy }: { tinId: string; coSan?
         </div>
         <div>
           <label htmlFor="u-nhan" className={NHAN_O}>Ngày nhận hồ sơ</label>
-          <input id="u-nhan" name="ngay_nhan_ho_so" type="date" defaultValue={coSan?.ngay_nhan_ho_so ?? homNay} disabled={!!coSan} className={O_NHAP} />
+          <NgayChon id="u-nhan" ten="ngay_nhan_ho_so" giaTriMacDinh={coSan?.ngay_nhan_ho_so ?? homNay} voHieu={!!coSan} tuNam={2024} />
         </div>
         <div>
           <label htmlFor="u-pv" className={NHAN_O}>Ngày phỏng vấn</label>
-          <input id="u-pv" name="ngay_phong_van" type="date" defaultValue={coSan?.ngay_phong_van ?? ""} className={O_NHAP} />
+          <NgayChon id="u-pv" ten="ngay_phong_van" giaTriMacDinh={coSan?.ngay_phong_van ?? ""} tuNam={2024} />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="u-buoc" className={NHAN_O}>Bước hiện tại</label>
-          <select id="u-buoc" name="trang_thai" defaultValue={coSan?.trang_thai ?? "Mới nộp"} className={O_NHAP}>
-            {BUOC_UNG_VIEN.map((b) => (
-              <option key={b} value={b}>{b}</option>
-            ))}
-          </select>
+          <Chon id="u-buoc" ten="trang_thai" giaTriMacDinh={coSan?.trang_thai ?? "Mới nộp"} luaChon={BUOC_UNG_VIEN.map((b) => ({ gia_tri: b, nhan: b }))} />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="u-ghi" className={NHAN_O}>Ghi chú</label>
