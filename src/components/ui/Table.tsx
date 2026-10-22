@@ -41,7 +41,7 @@ export function Bang<T>({
           ))}
         </tbody>
       </table>
-      {duLieu.length === 0 && <p className="chu-tieu-de py-12 text-center text-[24px] italic text-muc-3">{trong}</p>}
+      {duLieu.length === 0 && <p className="chu-tieu-de py-12 text-center text-[24px] text-muc-3">{trong}</p>}
     </div>
   );
 }

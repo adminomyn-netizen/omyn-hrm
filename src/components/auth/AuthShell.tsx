@@ -12,7 +12,7 @@ export function AuthShell({ children, tieuDe, moTa }: { children: React.ReactNod
         </svg>
         <Logo size="lg" nenToi className="relative" />
         <div className="relative max-w-[520px]">
-          <p className="chu-tieu-de text-[52px] italic leading-[1.12] text-[#f6ebd0]">
+          <p className="chu-tieu-de text-[52px] leading-[1.12] text-[#f6ebd0]">
             Làm đẹp bắt đầu từ
             <br />
             <span className="chu-vang">một đội ngũ được chăm chút.</span>

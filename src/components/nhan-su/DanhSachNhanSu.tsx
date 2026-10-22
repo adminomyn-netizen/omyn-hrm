@@ -136,7 +136,7 @@ export function DanhSachNhanSu({ nhanVien, khoi, moBanDau, timBanDau = "" }: { n
           </tbody>
         </table>
         {hien.length === 0 && (
-          <p className="chu-tieu-de py-14 text-center text-[24px] italic text-muc-3">
+          <p className="chu-tieu-de py-14 text-center text-[24px] text-muc-3">
             {nhanVien.length === 0 ? "Chưa có nhân viên nào. Thêm người đầu tiên để bắt đầu." : "Không có ai khớp với bộ lọc này."}
           </p>
         )}

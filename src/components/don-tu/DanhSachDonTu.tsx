@@ -105,7 +105,7 @@ export function DanhSachDonTu({ che, don }: { che: "quan-ly" | "ca-nhan"; don: D
           </tbody>
         </table>
         {ds.length === 0 && (
-          <p className="chu-tieu-de py-14 text-center text-[24px] italic text-muc-3">
+          <p className="chu-tieu-de py-14 text-center text-[24px] text-muc-3">
             {che === "quan-ly" ? (loc === "cho" ? "Không có đơn nào đang chờ bạn duyệt." : "Chưa có đơn nào.") : "Bạn chưa nộp đơn nào."}
           </p>
         )}

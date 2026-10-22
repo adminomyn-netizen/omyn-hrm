@@ -9,6 +9,7 @@ import {
   layChamCongHomNay,
   layChamCongHomNayCuaToi,
   layChamCongThang,
+  layChamCongKhoang,
   layNhanVienIdTheoUser,
   thangHienTaiHCM,
 } from "@/lib/data";
@@ -16,6 +17,34 @@ import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { DongHoHCM } from "@/components/cham-cong/DongHoHCM";
 import { LichChamCongTre } from "@/components/cham-cong/LichChamCongTre";
 import { NutChamCong } from "@/components/cham-cong/NutChamCong";
+import { BoLocThoiGian } from "@/components/cham-cong/BoLocThoiGian";
+
+type SuKienCC = { id: string; ngay: string; hoTen: string; khoiTen: string; gioVao: string | null; gioRa: string | null; trangThai: string };
+const dMY = (iso: string) => iso.split("-").reverse().join("/");
+const laNgay = (s?: string) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s));
+/** Khoảng ngày hợp lệ: đủ hai đầu, đầu ≤ cuối, tối đa 93 ngày. */
+const khoangHopLe = (tu?: string, den?: string) => laNgay(tu) && laNgay(den) && tu! <= den! && (Date.parse(den!) - Date.parse(tu!)) / 864e5 <= 92;
+
+const cotKhoang: Cot<SuKienCC>[] = [
+  { nhan: "Ngày", hienThi: (d) => dMY(d.ngay) },
+  { nhan: "Nhân viên", hienThi: (d) => <span className="font-medium text-muc">{d.hoTen}</span> },
+  { nhan: "Bộ phận", hienThi: (d) => d.khoiTen || "—" },
+  { nhan: "Giờ vào", phai: true, hienThi: (d) => d.gioVao?.slice(0, 5) ?? "--:--" },
+  { nhan: "Giờ ra", phai: true, hienThi: (d) => d.gioRa?.slice(0, 5) ?? "--:--" },
+  { nhan: "Trạng thái", hienThi: (d) => <NhanTrangThai kieu={kieu(d.trangThai)}>{d.trangThai}</NhanTrangThai> },
+];
+
+/** Thanh chọn thời gian + lịch tháng, hoặc bảng theo khoảng ngày khi người dùng chọn tuỳ chỉnh. */
+function KhuVucLich({ tieuDe, nam, thang, tu, den, suKien, homNay }: { tieuDe: string; nam: number; thang: number; tu?: string; den?: string; suKien: SuKienCC[]; homNay: { nam: number; thang: number } }) {
+  const khoang = khoangHopLe(tu, den);
+  return (
+    <MucTrang tieuDe={khoang ? `${tieuDe} · ${dMY(tu!)} – ${dMY(den!)}` : `${tieuDe} · Tháng ${thang}/${nam}`}>
+      <BoLocThoiGian nam={nam} thang={thang} tu={khoang ? tu : undefined} den={khoang ? den : undefined} homNay={homNay} />
+      {khoang ? <Bang cot={cotKhoang} duLieu={suKien} khoa={(d) => d.id} trong="Không có dữ liệu chấm công trong khoảng này." /> : <LichChamCongTre suKien={suKien} nam={nam} thang={thang} />}
+      <p className="mt-4 text-[13px] text-muc-3">Giờ hiển thị là giờ bấm chấm công thực tế. Công và lương vẫn tính theo ca đã định (ca hành chính 08:30 – 17:30), không tính theo giờ bấm.</p>
+    </MucTrang>
+  );
+}
 
 type DongChamCong = Awaited<ReturnType<typeof layChamCongHomNay>>["chiTiet"][number];
 /** Dải 7 ngày của tuần này: ngày đã chấm công có nền nhạt, hôm nay có nền vàng. */
@@ -60,9 +89,10 @@ const cot: Cot<DongChamCong>[] = [
   { nhan: "Trạng thái", hienThi: (d) => <NhanTrangThai kieu={kieu(d.trang_thai)}>{d.trang_thai}</NhanTrangThai> },
 ];
 
-export default async function TrangChamCong({ searchParams }: { searchParams: Promise<{ nam?: string; thang?: string }> }) {
+export default async function TrangChamCong({ searchParams }: { searchParams: Promise<{ nam?: string; thang?: string; tu?: string; den?: string }> }) {
   const macDinh = thangHienTaiHCM();
-  const { nam: namThamSo, thang: thangThamSo } = await searchParams;
+  const { nam: namThamSo, thang: thangThamSo, tu, den } = await searchParams;
+  const khoang = khoangHopLe(tu, den);
   const nam = Number(namThamSo) || macDinh.nam;
   const thang = Number(thangThamSo) || macDinh.thang;
 
@@ -73,7 +103,7 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
   if (nguoiDung.vaiTro === "nhan_vien") {
     const [homNay, suKien] = await Promise.all([
       nhanVienId ? layChamCongHomNayCuaToi(nhanVienId) : null,
-      nhanVienId ? layChamCongThang(nam, thang, nhanVienId) : Promise.resolve([]),
+      nhanVienId ? (khoang ? layChamCongKhoang(tu!, den!, nhanVienId) : layChamCongThang(nam, thang, nhanVienId)) : Promise.resolve([]),
     ]);
     return (
       <div className="space-y-10">
@@ -88,14 +118,12 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
             Tài khoản của bạn chưa gắn với hồ sơ nhân sự nào. Báo bộ phận Nhân sự để được gắn hồ sơ trước khi chấm công.
           </div>
         )}
-        <MucTrang tieuDe={`Lịch chấm công của tôi · Tháng ${thang}/${nam}`}>
-          <LichChamCongTre suKien={suKien} nam={nam} thang={thang} />
-        </MucTrang>
+        <KhuVucLich tieuDe="Lịch chấm công của tôi" nam={nam} thang={thang} tu={tu} den={den} suKien={suKien} homNay={macDinh} />
       </div>
     );
   }
 
-  const [chamCong, suKien] = await Promise.all([layChamCongHomNay(), layChamCongThang(nam, thang)]);
+  const [chamCong, suKien] = await Promise.all([layChamCongHomNay(), khoang ? layChamCongKhoang(tu!, den!) : layChamCongThang(nam, thang)]);
 
   return (
     <div className="space-y-10">
@@ -108,9 +136,7 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
           { nhan: "Vắng mặt", so: String(chamCong.vangMat) },
         ]}
       />
-      <MucTrang tieuDe={`Lịch chấm công · Tháng ${thang}/${nam}`}>
-        <LichChamCongTre suKien={suKien} nam={nam} thang={thang} />
-      </MucTrang>
+      <KhuVucLich tieuDe="Lịch chấm công" nam={nam} thang={thang} tu={tu} den={den} suKien={suKien} homNay={macDinh} />
       <MucTrang tieuDe="Chấm công hôm nay">
         <Bang cot={cot} duLieu={chamCong.chiTiet} khoa={(d) => d.nhan_vien_ho_ten} trong="Hôm nay chưa ai chấm công." />
       </MucTrang>

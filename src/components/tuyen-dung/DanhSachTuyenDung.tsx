@@ -109,7 +109,7 @@ export function DanhSachTuyenDung({
       </TieuDeTrang>
 
       {tin.length === 0 ? (
-        <p className="chu-tieu-de py-20 text-center text-[28px] italic text-muc-3">Chưa có tin tuyển dụng nào. Đăng tin đầu tiên để nhận hồ sơ.</p>
+        <p className="chu-tieu-de py-20 text-center text-[28px] text-muc-3">Chưa có tin tuyển dụng nào. Đăng tin đầu tiên để nhận hồ sơ.</p>
       ) : (
         <div className="space-y-5">
           {/* chọn tin */}

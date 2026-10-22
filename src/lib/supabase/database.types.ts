@@ -16,28 +16,127 @@ export type Database = {
     Tables: {
       bang_luong: {
         Row: {
+          an_ca: boolean
+          bh_cty: number
+          bh_tn: number
+          bh_xh: number
+          bh_yt: number
+          cong_chuan: number
+          cong_huong: number
+          dong_bh: boolean
+          ghi_chu: string | null
+          giam_tru: number
+          gio_ot_le: number
+          gio_ot_nghi_tuan: number
+          gio_ot_thuong: number
+          hoa_hong: number
           id: string
+          khau_tru_khac: number
+          kieu_cong: string
           ky_luong_id: string
+          luong_chuc_danh: number
           luong_co_ban: number
+          luong_kpi: number
+          luong_thoa_thuan: number
+          ngay_lam: number
           nhan_vien_id: string
           phu_cap: number
-          thuc_linh: number | null
+          phu_cap_mien_thue: boolean
+          phu_cap_thuc: number
+          so_nguoi_phu_thuoc: number
+          thu_nhap_tinh_thue: number
+          thu_viec: boolean
+          thuc_linh: number
+          thue_tncn: number
+          thuong_khac: number
+          tien_an: number
+          tien_ot: number
+          tinh_luc: string | null
+          tong_thu_nhap: number
+          ty_le_ht_kpi: number
+          ty_le_kpi: number
         }
         Insert: {
+          an_ca?: boolean
+          bh_cty?: number
+          bh_tn?: number
+          bh_xh?: number
+          bh_yt?: number
+          cong_chuan?: number
+          cong_huong?: number
+          dong_bh?: boolean
+          ghi_chu?: string | null
+          giam_tru?: number
+          gio_ot_le?: number
+          gio_ot_nghi_tuan?: number
+          gio_ot_thuong?: number
+          hoa_hong?: number
           id?: string
+          khau_tru_khac?: number
+          kieu_cong?: string
           ky_luong_id: string
+          luong_chuc_danh?: number
           luong_co_ban?: number
+          luong_kpi?: number
+          luong_thoa_thuan?: number
+          ngay_lam?: number
           nhan_vien_id: string
           phu_cap?: number
-          thuc_linh?: number | null
+          phu_cap_mien_thue?: boolean
+          phu_cap_thuc?: number
+          so_nguoi_phu_thuoc?: number
+          thu_nhap_tinh_thue?: number
+          thu_viec?: boolean
+          thuc_linh?: number
+          thue_tncn?: number
+          thuong_khac?: number
+          tien_an?: number
+          tien_ot?: number
+          tinh_luc?: string | null
+          tong_thu_nhap?: number
+          ty_le_ht_kpi?: number
+          ty_le_kpi?: number
         }
         Update: {
+          an_ca?: boolean
+          bh_cty?: number
+          bh_tn?: number
+          bh_xh?: number
+          bh_yt?: number
+          cong_chuan?: number
+          cong_huong?: number
+          dong_bh?: boolean
+          ghi_chu?: string | null
+          giam_tru?: number
+          gio_ot_le?: number
+          gio_ot_nghi_tuan?: number
+          gio_ot_thuong?: number
+          hoa_hong?: number
           id?: string
+          khau_tru_khac?: number
+          kieu_cong?: string
           ky_luong_id?: string
+          luong_chuc_danh?: number
           luong_co_ban?: number
+          luong_kpi?: number
+          luong_thoa_thuan?: number
+          ngay_lam?: number
           nhan_vien_id?: string
           phu_cap?: number
-          thuc_linh?: number | null
+          phu_cap_mien_thue?: boolean
+          phu_cap_thuc?: number
+          so_nguoi_phu_thuoc?: number
+          thu_nhap_tinh_thue?: number
+          thu_viec?: boolean
+          thuc_linh?: number
+          thue_tncn?: number
+          thuong_khac?: number
+          tien_an?: number
+          tien_ot?: number
+          tinh_luc?: string | null
+          tong_thu_nhap?: number
+          ty_le_ht_kpi?: number
+          ty_le_kpi?: number
         }
         Relationships: [
           {
@@ -274,21 +373,86 @@ export type Database = {
       }
       ky_luong: {
         Row: {
+          chuyen_luc: string | null
           da_thanh_toan: boolean
+          ghi_chu: string | null
           id: string
+          nam: number | null
           ten_ky: string
+          thang: number | null
+          trang_thai: string
         }
         Insert: {
+          chuyen_luc?: string | null
           da_thanh_toan?: boolean
+          ghi_chu?: string | null
           id?: string
+          nam?: number | null
           ten_ky: string
+          thang?: number | null
+          trang_thai?: string
         }
         Update: {
+          chuyen_luc?: string | null
           da_thanh_toan?: boolean
+          ghi_chu?: string | null
           id?: string
+          nam?: number | null
           ten_ky?: string
+          thang?: number | null
+          trang_thai?: string
         }
         Relationships: []
+      }
+      luong_thoa_thuan: {
+        Row: {
+          an_ca: boolean
+          cap_nhat_luc: string
+          dong_bh: boolean
+          ghi_chu: string | null
+          kieu_cong: string
+          luong_thoa_thuan: number
+          nhan_vien_id: string
+          phu_cap: number
+          phu_cap_mien_thue: boolean
+          so_nguoi_phu_thuoc: number
+          ty_le_kpi: number
+        }
+        Insert: {
+          an_ca?: boolean
+          cap_nhat_luc?: string
+          dong_bh?: boolean
+          ghi_chu?: string | null
+          kieu_cong?: string
+          luong_thoa_thuan: number
+          nhan_vien_id: string
+          phu_cap?: number
+          phu_cap_mien_thue?: boolean
+          so_nguoi_phu_thuoc?: number
+          ty_le_kpi?: number
+        }
+        Update: {
+          an_ca?: boolean
+          cap_nhat_luc?: string
+          dong_bh?: boolean
+          ghi_chu?: string | null
+          kieu_cong?: string
+          luong_thoa_thuan?: number
+          nhan_vien_id?: string
+          phu_cap?: number
+          phu_cap_mien_thue?: boolean
+          so_nguoi_phu_thuoc?: number
+          ty_le_kpi?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "luong_thoa_thuan_nhan_vien_id_fkey"
+            columns: ["nhan_vien_id"]
+            isOneToOne: true
+            referencedRelation: "nhan_vien"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       nhan_vien: {
         Row: {
@@ -421,6 +585,39 @@ export type Database = {
             referencedColumns: ["ma"]
           },
         ]
+      }
+      tham_so_luong: {
+        Row: {
+          cap_nhat_luc: string
+          don_vi: string
+          gia_tri: number
+          khoa: string
+          nguon: string | null
+          nhan: string
+          xac_nhan_boi: string | null
+          xac_nhan_luc: string | null
+        }
+        Insert: {
+          cap_nhat_luc?: string
+          don_vi: string
+          gia_tri: number
+          khoa: string
+          nguon?: string | null
+          nhan: string
+          xac_nhan_boi?: string | null
+          xac_nhan_luc?: string | null
+        }
+        Update: {
+          cap_nhat_luc?: string
+          don_vi?: string
+          gia_tri?: number
+          khoa?: string
+          nguon?: string | null
+          nhan?: string
+          xac_nhan_boi?: string | null
+          xac_nhan_luc?: string | null
+        }
+        Relationships: []
       }
       tin_tuyen_dung: {
         Row: {

@@ -10,22 +10,16 @@ import { VongChamCong } from "@/components/dashboard/VongChamCong";
 import { DuongXuHuong } from "@/components/dashboard/DuongXuHuong";
 import { layDuLieuTongQuan, layHoSoChuaGanTaiKhoan, layTaiKhoanChoDuyet } from "@/lib/data";
 import { yeuCauVaiTro } from "@/lib/auth";
-import { ngayVN, trieuVN } from "@/lib/dinh-dang";
+import { gioMayChu, ngayVN, trieuVN } from "@/lib/dinh-dang";
+import { LoiChaoDongHo } from "@/components/dashboard/LoiChaoDongHo";
 import { NUT_CHINH, NUT_PHU } from "@/components/ui/dinh-dang";
 
 const IC = { tk: Check, don: Inbox, pv: CalendarClock } as const;
-
-function loiChao(gio: number) {
-  return gio < 11 ? "Chào buổi sáng" : gio < 14 ? "Chào buổi trưa" : gio < 18 ? "Chào buổi chiều" : "Chào buổi tối";
-}
 
 export default async function TrangTongQuan() {
   const nguoiGoi = await yeuCauVaiTro(["admin", "ky_thuat"]);
   const [d, taiKhoanChoDuyet, hoSoTrong] = await Promise.all([layDuLieuTongQuan(), layTaiKhoanChoDuyet(), layHoSoChuaGanTaiKhoan()]);
 
-  const bayGio = new Date();
-  const gio = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Ho_Chi_Minh", hour: "2-digit", hour12: false }).format(bayGio));
-  const ngayDai = new Intl.DateTimeFormat("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", weekday: "long", day: "numeric", month: "long", year: "numeric" }).format(bayGio);
   const ten = nguoiGoi.hoTen.trim().split(/\s+/).pop();
   const soViec = d.viec.length;
   const cc = d.chamCong;
@@ -44,14 +38,12 @@ export default async function TrangTongQuan() {
         <DuyetTaiKhoan taiKhoan={taiKhoanChoDuyet} hoSo={hoSoTrong} nguoiGoi={nguoiGoi.vaiTro} />
       </div>
 
-      {/* chào + hành động nhanh */}
-      <section className="flex flex-wrap items-end justify-between gap-5">
-        <div>
-          <div className="nhan-muc capitalize">{ngayDai}</div>
-          <h1 className="chu-tieu-de mt-1.5 text-[40px] italic leading-[1.1] text-muc lg:text-[52px]">
-            {loiChao(gio)}, {ten}.
-          </h1>
-          <p className="mt-2 text-[15px] text-muc-2">
+      {/* chào + đồng hồ realtime + hành động nhanh */}
+      <LoiChaoDongHo
+        ten={ten ?? ""}
+        batDau={gioMayChu()}
+        phu={
+          <>
             {soViec > 0 ? (
               <>
                 Hôm nay có <strong className="text-muc">{soViec} việc</strong> đang chờ bạn
@@ -60,13 +52,12 @@ export default async function TrangTongQuan() {
               "Hôm nay chưa có việc nào đang chờ bạn"
             )}{" "}
             và <strong className="text-muc">{cc.da} trên {cc.tong}</strong> người đã chấm công.
-          </p>
-        </div>
-        <div className="flex gap-2.5">
-          <Link href="/tuyen-dung?dang=1" className={`${NUT_PHU} inline-flex items-center`}>Đăng tuyển</Link>
-          <Link href="/nhan-su?them=1" className={`${NUT_CHINH} inline-flex items-center`}>+ Thêm nhân viên</Link>
-        </div>
-      </section>
+          </>
+        }
+      >
+        <Link href="/tuyen-dung?dang=1" className={`${NUT_PHU} inline-flex items-center`}>Đăng tuyển</Link>
+        <Link href="/nhan-su?them=1" className={`${NUT_CHINH} inline-flex items-center`}>+ Thêm nhân viên</Link>
+      </LoiChaoDongHo>
 
       {/* hàng chính */}
       <section className="grid gap-5 lg:grid-cols-12">

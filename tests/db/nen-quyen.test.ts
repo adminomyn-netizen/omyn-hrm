@@ -44,7 +44,7 @@ describe("Nền phân quyền 0004 (K-G1)", () => {
         ('${NV.tp}', 'Nghỉ ốm', '2026-11-06', '2026-11-06'),
         ('${NV.kho}', 'Nghỉ ốm', '2026-11-07', '2026-11-07');
       insert into public.ky_luong (id, ten_ky) values ('${u(950)}', 'Tháng 11/2026');
-      insert into public.bang_luong (ky_luong_id, nhan_vien_id, luong_co_ban) values
+      insert into public.bang_luong (ky_luong_id, nhan_vien_id, thuc_linh) values
         ('${u(950)}', '${NV.content}', 10000000), ('${u(950)}', '${NV.kho}', 9000000),
         ('${u(950)}', '${NV.tgd}', 90000000), ('${u(950)}', '${NV.pho}', 80000000);
     `);
