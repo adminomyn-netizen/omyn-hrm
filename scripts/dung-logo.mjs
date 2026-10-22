@@ -12,8 +12,8 @@ const GOC = join(dirname(fileURLToPath(import.meta.url)), "..");
 const RA = join(GOC, "public", "brand");
 mkdirSync(RA, { recursive: true });
 
-const MUC = "#221E1A";
-const NHAN = "#2F4538";
+const MUC = "#2A2218"; // nâu espresso
+const NHAN = "#B08A35"; // hạt vàng
 
 const buf = readFileSync(join(GOC, "scripts/phong/CormorantGaramond-600.ttf"));
 const phong = opentype.parse(buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength));
@@ -95,10 +95,8 @@ function ngangSvg(m, nen = null, le = 12) {
 function dungSvg(m, nen = null) {
   const L = logotype(m);
   // Biểu tượng (O) trên, chữ dưới; khoảng cách = 0,5 chiều cao chữ O.
-  const bt = 120;
   const khoang = 0.5 * 96;
   const heSo = (L.dai * 0.62) / 96; // O nhỏ hơn bề ngang chữ
-  const oW = 120 * heSo;
   const W = L.dai + 48;
   const oX = (W - 96 * heSo) / 2 - 12 * heSo;
   const chuX = 24;
@@ -120,6 +118,7 @@ function dungSvg(m, nen = null) {
 
 const bo = { mauChu: MUC, mauO: MUC, mauHat: NHAN, coHat: true };
 const den = { mauChu: "#000000", mauO: "#000000", mauHat: "#000000", coHat: true };
+const nenToi = { mauChu: "#F6EBD0", mauO: "#F6EBD0", mauHat: "#E2BE66", coHat: true };
 const trang = { mauChu: "#FFFFFF", mauO: "#FFFFFF", mauHat: "#FFFFFF", coHat: true };
 
 const tep = {
@@ -128,8 +127,9 @@ const tep = {
   "bieu-tuong.svg": bieuTuongSvg({ mauO: MUC, mauHat: NHAN }),
   "logo-don-sac-den.svg": ngangSvg(den),
   "logo-don-sac-trang.svg": ngangSvg(trang),
+  "logo-tren-nen-toi.svg": ngangSvg(nenToi),
   // Ở 16 px chấm hạt gây rối ⇒ favicon bỏ chấm (ghi lý do trong nhật ký giai đoạn).
-  "favicon.svg": bieuTuongSvg({ mauO: NHAN, mauHat: NHAN, coHat: false, vien: 6, nen: "#F7F3EC" }),
+  "favicon.svg": bieuTuongSvg({ mauO: MUC, mauHat: NHAN, coHat: false, vien: 6, nen: "#FBF7EE" }),
 };
 for (const [ten, nd] of Object.entries(tep)) {
   writeFileSync(join(RA, ten), nd);

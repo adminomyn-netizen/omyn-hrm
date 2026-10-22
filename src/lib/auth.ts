@@ -2,7 +2,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
-export type VaiTro = "admin" | "ky_thuat" | "nhan_vien";
+export type VaiTro = "admin" | "ky_thuat" | "nhan_vien" | "cho_duyet";
 
 export async function layNguoiDungHienTai() {
   const supabase = await createClient();
@@ -15,9 +15,9 @@ export async function layNguoiDungHienTai() {
     id: user.id,
     email: user.email ?? "",
     hoTen: (user.app_metadata?.ho_ten as string) || (user.email ?? ""),
-    // Mặc định "nhan_vien" (quyền thấp nhất) nếu tài khoản chưa được gán vai
-    // trò rõ ràng — tránh lỡ cấp quyền admin cho tài khoản tự đăng ký.
-    vaiTro: (user.app_metadata?.vai_tro as VaiTro) ?? "nhan_vien",
+    // Thiếu vai trò = "cho_duyet": tài khoản tự đăng ký chưa được Nhân sự duyệt,
+    // không có quyền gì. app_metadata chỉ máy chủ sửa được (người dùng thì không).
+    vaiTro: (user.app_metadata?.vai_tro as VaiTro) ?? "cho_duyet",
   };
 }
 
@@ -30,4 +30,12 @@ export async function yeuCauVaiTro(choPhep: VaiTro[]) {
     redirect("/cham-cong");
   }
   return nguoiDung;
+}
+
+/** Dùng trong Server Action: trả về true nếu người gọi có một trong các vai trò.
+ * Mọi action đụng dữ liệu nhân sự PHẢI gọi hàm này — Server Action là điểm
+ * cuối POST công khai với ai đã đăng nhập, ẩn nút ở giao diện không chặn được. */
+export async function coVaiTro(choPhep: VaiTro[]) {
+  const nguoiDung = await layNguoiDungHienTai();
+  return !!nguoiDung && choPhep.includes(nguoiDung.vaiTro);
 }

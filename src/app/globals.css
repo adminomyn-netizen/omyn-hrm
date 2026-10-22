@@ -1,35 +1,48 @@
 @import "tailwindcss";
 
-/* Không có chế độ tối: giữ biến thể dark gắn với class .dark (không bao giờ bật)
- * để các lớp dark: còn sót ở trang cũ không bị kích hoạt theo hệ điều hành. */
+/* Không có chế độ tối: giữ biến thể tối gắn với class .dark (không bao giờ bật)
+ * để các lớp tối còn sót ở trang cũ không bị kích hoạt theo hệ điều hành. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Bộ nhận diện OMYN (Phụ lục E của plan): giấy ấm + mực + MỘT màu nhấn rêu.
  * Giao diện chỉ có bản sáng. Các tên --omyn-* giữ lại để các trang cũ chưa
  * làm lại vẫn chạy; giá trị trỏ về bảng màu mới. */
 :root {
-  --giay: #f7f3ec;
-  --giay-sang: #fcfaf6;
-  --giay-tram: #eee8dd;
-  --muc: #221e1a;
-  --muc-2: #5a5148;
-  --muc-3: #6f665b;
-  --vien: #e2d9cb;
-  --vien-dam: #867c6d;
-  --nhan: #2f4538;
-  --nhan-dam: #223228;
-  --nhan-nhat: #e6ece6;
+  /* Vàng champagne + nâu espresso (chủ dự án chốt 22/10: tông vàng sang trọng,
+   * không dùng xanh; có dải màu gradient vàng cho nút và mảng nhấn). */
+  --giay: #fbf7ee;
+  --giay-sang: #fffdf8;
+  --giay-tram: #f3ebd9;
+  --muc: #2a2218;
+  --muc-2: #5d5142;
+  --muc-3: #75684f;
+  --vien: #e8dec8;
+  --vien-dam: #8d7f60;
+  --nhan: #8f6c20;
+  --nhan-dam: #6e5119;
+  --nhan-nhat: #f5ebcf;
+  --vang-sang: #e8cf8a;
+  --vang: #c9a24b;
+  --vang-tram: #a9832f;
+  --espresso: #2a2218;
+  --espresso-sau: #17110a;
   --loi: #9e3426;
   --loi-nen: #f4e3df;
-  --canh-bao: #8a5a12;
-  --canh-bao-nen: #f3e8d2;
+  --canh-bao: #a0522d;
+  --canh-bao-nen: #f6e6dc;
+
+  --gradient-vang: linear-gradient(135deg, #f0d896 0%, #d4ae5a 48%, #b8923a 100%);
+  --gradient-vang-hover: linear-gradient(135deg, #f5e2a8 0%, #dcb766 48%, #c29b43 100%);
+  --gradient-toi: linear-gradient(155deg, #3a2e1f 0%, #2a2218 45%, #17110a 100%);
+  --gradient-nen: linear-gradient(180deg, #fffdf8 0%, #fbf7ee 55%, #f3ebd9 100%);
+  --gradient-dau-trang: linear-gradient(90deg, #f7ecd0 0%, #fbf7ee 60%, #fbf7ee 100%);
 
   --background: var(--giay);
   --foreground: var(--muc);
   --omyn-primary: var(--nhan);
   --omyn-primary-dark: var(--nhan-dam);
   --omyn-primary-light: var(--nhan-nhat);
-  --omyn-accent: var(--canh-bao);
+  --omyn-accent: var(--vang);
   --omyn-surface: var(--giay-sang);
   --omyn-border: var(--vien);
 }
@@ -48,6 +61,11 @@
   --color-nhan: var(--nhan);
   --color-nhan-dam: var(--nhan-dam);
   --color-nhan-nhat: var(--nhan-nhat);
+  --color-vang-sang: var(--vang-sang);
+  --color-vang: var(--vang);
+  --color-vang-tram: var(--vang-tram);
+  --color-espresso: var(--espresso);
+  --color-espresso-sau: var(--espresso-sau);
   --color-loi: var(--loi);
   --color-loi-nen: var(--loi-nen);
   --color-canh-bao: var(--canh-bao);
@@ -69,11 +87,43 @@ html {
 }
 
 body {
-  background: var(--background);
+  background: var(--gradient-nen) fixed, var(--background);
   color: var(--foreground);
   font-family: var(--font-sans);
   line-height: 1.55;
   font-variant-numeric: tabular-nums;
+}
+
+/* Nút vàng: dải vàng champagne, chữ nâu đậm (tương phản ≥ 7:1). */
+.nut-vang {
+  background: var(--gradient-vang);
+  color: var(--muc);
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(143 108 32 / 0.25);
+  transition: filter 150ms ease-out, box-shadow 150ms ease-out;
+}
+.nut-vang:hover:not(:disabled) {
+  background: var(--gradient-vang-hover);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 2px 8px rgb(143 108 32 / 0.3);
+}
+/* Mảng tối espresso có ánh vàng, dùng cho panel thương hiệu. */
+.nen-toi {
+  background:
+    radial-gradient(120% 80% at 100% 0%, rgb(201 162 75 / 0.28) 0%, transparent 55%),
+    var(--gradient-toi);
+}
+.nen-trang {
+  background: var(--gradient-nen);
+}
+.dau-trang-vang {
+  background: var(--gradient-dau-trang);
+}
+/* Chữ vàng ánh kim cho dòng nhấn trên nền tối. */
+.chu-vang {
+  background: linear-gradient(135deg, #f3dd9c 0%, #d9b45c 60%, #c29b43 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Tiêu đề hiển thị: chữ serif, chỉ dùng từ 28 px trở lên (tiếng Việt đủ dấu). */

@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { dangNhap } from "./actions";
 import { AuthShell } from "@/components/auth/AuthShell";
 
@@ -12,7 +13,7 @@ export default function TrangDangNhap() {
   const [state, action, dangXuLy] = useActionState(dangNhap, undefined);
 
   return (
-    <AuthShell tieuDe="Đăng nhập" moTa="Dùng email công ty và mật khẩu HCNS đã cấp cho bạn.">
+    <AuthShell tieuDe="Đăng nhập" moTa="Dùng email và mật khẩu bạn đã đăng ký.">
       <form action={action} className="space-y-5">
         <div>
           <label htmlFor="email" className={nhan}>
@@ -51,12 +52,18 @@ export default function TrangDangNhap() {
         <button
           type="submit"
           disabled={dangXuLy}
-          className="h-11 w-full rounded-nho bg-nhan text-[15px] font-medium text-white transition-colors hover:bg-nhan-dam disabled:opacity-60"
+          className="h-11 w-full rounded-nho nut-vang text-[15px] disabled:opacity-60"
         >
           {dangXuLy ? "Đang đăng nhập" : "Đăng nhập"}
         </button>
 
-        <p className="text-[13px] text-muc-3">Quên mật khẩu? Nhờ bộ phận Nhân sự đặt lại giúp bạn.</p>
+        <p className="text-[13px] text-muc-3">
+          Chưa có tài khoản?{" "}
+          <Link href="/dang-ky" className="font-medium text-nhan underline underline-offset-4">
+            Đăng ký
+          </Link>
+          . Quên mật khẩu thì nhờ bộ phận Nhân sự đặt lại giúp bạn.
+        </p>
       </form>
     </AuthShell>
   );

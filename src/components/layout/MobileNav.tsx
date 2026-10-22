@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
@@ -12,11 +12,6 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
   const pathname = usePathname();
   const nhom = gomTheoNhom(locMenuTheoVaiTro(vaiTro));
   const [mo, setMo] = useState(false);
-
-  // đóng menu mỗi khi chuyển trang
-  useEffect(() => {
-    setMo(false);
-  }, [pathname]);
 
   return (
     <>
@@ -60,6 +55,7 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
                       <Link
                         key={muc.duong_dan}
                         href={muc.duong_dan}
+                        onClick={() => setMo(false)}
                         className={`block border-l-2 px-3 py-3 text-[15px] ${
                           dangChon
                             ? "border-nhan font-semibold text-muc"

@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "kiem-tra-thiet-ke": "node scripts/kiem-tra-thiet-ke.mjs",
+    "test": "vitest run",
+    "kiem-tra": "eslint && tsc --noEmit && vitest run && node scripts/kiem-tra-thiet-ke.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
@@ -20,8 +23,9 @@
     "server-only": "^0.0.1"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.11",
     "@tailwindcss/turbopack": "^4",
-    "@types/node": "^20",
+    "@types/node": "^24.19.2",
     "@types/react": "^19",
     "@types/react-big-calendar": "^1.16.3",
     "@types/react-dom": "^19",
@@ -29,6 +33,7 @@
     "eslint-config-next": "16.4.0",
     "opentype.js": "^2.0.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^5.0.5"
   }
 }

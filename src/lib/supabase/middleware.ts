@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-const DUONG_DAN_CONG_KHAI = ["/dang-nhap"];
+const DUONG_DAN_CONG_KHAI = ["/dang-nhap", "/dang-ky"];
 
 export async function capNhatPhien(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -39,7 +39,8 @@ export async function capNhatPhien(request: NextRequest) {
 
   if (user && laTrangCongKhai) {
     const url = request.nextUrl.clone();
-    url.pathname = user.app_metadata?.vai_tro === "nhan_vien" ? "/cham-cong" : "/dashboard";
+    const vaiTro = user.app_metadata?.vai_tro;
+    url.pathname = !vaiTro ? "/cho-duyet" : vaiTro === "nhan_vien" ? "/cham-cong" : "/dashboard";
     return NextResponse.redirect(url);
   }
 

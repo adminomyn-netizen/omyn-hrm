@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { coVaiTro } from "@/lib/auth";
+
+const QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
+const KHONG_DU_QUYEN = "Bạn không có quyền thực hiện thao tác này.";
 
 export async function dangXuat() {
   const supabase = await createClient();
@@ -41,6 +45,7 @@ function thongBaoLoiNhanVien(error: { message: string }) {
 export type KetQuaNhanVien = { loi?: string; ok?: boolean };
 
 export async function themNhanVien(formData: FormData): Promise<KetQuaNhanVien> {
+  if (!(await coVaiTro(QUAN_LY))) return { loi: KHONG_DU_QUYEN };
   const d = docFormNhanVien(formData);
   if (!d.hoTen || !d.khoiId || !d.ngayVaoLam) {
     return { loi: "Thiếu họ tên, khối hoặc ngày vào làm." };
@@ -65,6 +70,7 @@ export async function themNhanVien(formData: FormData): Promise<KetQuaNhanVien> 
 }
 
 export async function suaNhanVien(formData: FormData): Promise<KetQuaNhanVien> {
+  if (!(await coVaiTro(QUAN_LY))) return { loi: KHONG_DU_QUYEN };
   const id = String(formData.get("id") || "");
   const d = docFormNhanVien(formData);
   if (!id || !d.hoTen || !d.khoiId || !d.ngayVaoLam) {
@@ -93,6 +99,7 @@ export async function suaNhanVien(formData: FormData): Promise<KetQuaNhanVien> {
 }
 
 export async function xoaNhanVien(formData: FormData) {
+  if (!(await coVaiTro(QUAN_LY))) throw new Error(KHONG_DU_QUYEN);
   const id = String(formData.get("id") || "");
   if (!id) return;
 

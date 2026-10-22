@@ -1,5 +1,6 @@
 import { Sidebar } from "./Sidebar";
 import { MobileNav } from "./MobileNav";
+import { redirect } from "next/navigation";
 import { layNguoiDungHienTai } from "@/lib/auth";
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
@@ -7,6 +8,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
   // CHỈ truyền chuỗi vai trò xuống client, không truyền cả mảng menu (có icon
   // là hàm React) — Next.js không cho truyền hàm từ Server Component sang
   // Client Component. Sidebar/MobileNav tự import menuChinh rồi lọc theo vaiTro.
+  if (nguoiDung?.vaiTro === "cho_duyet") redirect("/cho-duyet");
   const vaiTro = nguoiDung?.vaiTro ?? null;
 
   return (

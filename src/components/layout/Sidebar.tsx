@@ -11,7 +11,7 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
   const nhom = gomTheoNhom(locMenuTheoVaiTro(vaiTro));
 
   return (
-    <aside className="hidden w-[248px] shrink-0 flex-col border-r border-vien bg-giay-sang lg:flex">
+    <aside className="hidden w-[248px] shrink-0 flex-col border-r border-vien nen-trang lg:flex">
       <div className="px-6 pb-6 pt-8">
         <Logo size="md" />
       </div>

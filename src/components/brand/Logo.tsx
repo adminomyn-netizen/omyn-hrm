@@ -21,11 +21,20 @@ export function LogoMark({ size = "md", className }: { size?: KichThuocLogo; cla
 }
 
 /** Logo ngang: chữ OMYN (Cormorant Garamond chuyển thành đường) + "O" vẽ riêng. */
-export function Logo({ size = "md", className }: { size?: KichThuocLogo; className?: string }) {
+export function Logo({
+  size = "md",
+  nenToi = false,
+  className,
+}: {
+  size?: KichThuocLogo;
+  /** true khi đặt trên mảng tối espresso: chữ sáng ngà, hạt vàng. */
+  nenToi?: boolean;
+  className?: string;
+}) {
   const h = CAO[size];
   return (
     <Image
-      src="/brand/logo-ngang.svg"
+      src={nenToi ? "/brand/logo-tren-nen-toi.svg" : "/brand/logo-ngang.svg"}
       alt="OMYN"
       width={Math.round(h * 4.3)}
       height={h}
