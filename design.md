@@ -262,3 +262,5 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 - **Menu avatar** (bấm ảnh đại diện): họ và tên đầy đủ, vị trí (chức danh · phòng ban · vai trò Quản trị/Kỹ thuật nếu có), email.
 
 - **Kỹ thuật = quyền cao nhất** (22/10): làm mọi thứ và xem mọi số liệu, kể cả Lương (kỳ, thỏa thuận, tham số, xác nhận tham số). Không thể hạ tài khoản Kỹ thuật/Quản trị cuối cùng.
+
+- **Chức vụ chọn dropdown** (22/10): biểu mẫu nhân viên dùng ô chọn Chức vụ (Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc, Trưởng bộ phận, Leader, Chuyên viên, Nhân viên, Thực tập sinh); giá trị cũ ngoài danh sách vẫn giữ làm một lựa chọn. Danh sách ở `src/lib/chuc-vu.ts`.
