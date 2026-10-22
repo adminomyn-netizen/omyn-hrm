@@ -1,5 +1,7 @@
 "use client";
 
+import { Chon } from "@/components/ui/Chon";
+
 import { useState, useTransition } from "react";
 import { duyetTaiKhoan, tuChoiTaiKhoan } from "@/app/(app)/dashboard/actions";
 import type { VaiTro } from "@/lib/auth";
@@ -7,9 +9,6 @@ import { laChucDanhNhayCam } from "@/lib/chuc-danh";
 
 type HoSo = { id: string; ho_ten: string; chuc_danh: string | null; email: string | null };
 type TaiKhoan = { id: string; email: string; hoTen: string; taoLuc: string };
-
-const chon =
-  "h-9 rounded-nho border border-vien-dam bg-giay-sang px-2 text-[13px] text-muc outline-none focus:border-nhan";
 
 /** Một dòng tài khoản chờ duyệt. Nút type="button" gọi action qua onClick — KHÔNG
  * dùng <form> submit (xem ghi chú ở src/lib/actions.ts). */
@@ -42,24 +41,10 @@ function Dong({ tk, hoSo, nguoiGoi }: { tk: TaiKhoan; hoSo: HoSo[]; nguoiGoi: Va
         </div>
       </td>
       <td className="py-3 pr-4">
-        <select value={vaiTro} onChange={(e) => setVaiTro(e.target.value)} className={chon} aria-label="Vai trò">
-          <option value="nhan_vien">Nhân viên</option>
-          {nguoiGoi === "admin" && <option value="ky_thuat">Kỹ thuật</option>}
-          {nguoiGoi === "admin" && <option value="admin">Quản trị</option>}
-        </select>
+        <Chon nho ariaLabel="Vai trò" giaTri={vaiTro} onDoi={setVaiTro} className="w-36" luaChon={[{ gia_tri: "nhan_vien", nhan: "Nhân viên" }, ...(nguoiGoi === "admin" ? [{ gia_tri: "ky_thuat", nhan: "Kỹ thuật" }, { gia_tri: "admin", nhan: "Quản trị" }] : [])]} />
       </td>
       <td className="py-3 pr-4">
-        <select value={hoSoId} onChange={(e) => setHoSoId(e.target.value)} className={`${chon} max-w-[240px]`} aria-label="Hồ sơ nhân sự">
-          <option value="">{vaiTro === "nhan_vien" ? "Chọn hồ sơ nhân sự" : "Không gắn hồ sơ"}</option>
-          {hoSo
-            .filter((h) => nguoiGoi === "admin" || !laChucDanhNhayCam(h.chuc_danh))
-            .map((h) => (
-            <option key={h.id} value={h.id}>
-              {h.ho_ten}
-              {h.chuc_danh ? ` · ${h.chuc_danh}` : ""}
-            </option>
-          ))}
-        </select>
+        <Chon nho ariaLabel="Hồ sơ nhân sự" giaTri={hoSoId} onDoi={setHoSoId} className="w-60" luaChon={[{ gia_tri: "", nhan: vaiTro === "nhan_vien" ? "Chọn hồ sơ nhân sự" : "Không gắn hồ sơ" }, ...hoSo.filter((h) => nguoiGoi === "admin" || !laChucDanhNhayCam(h.chuc_danh)).map((h) => ({ gia_tri: h.id, nhan: `${h.ho_ten}${h.chuc_danh ? " · " + h.chuc_danh : ""}` }))]} />
         {loi && <div className="mt-1 text-[12px] text-loi">{loi}</div>}
       </td>
       <td className="py-3 text-right">

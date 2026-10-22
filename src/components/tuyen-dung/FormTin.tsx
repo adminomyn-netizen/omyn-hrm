@@ -2,6 +2,8 @@
 
 import { useRef, useState, useTransition } from "react";
 import { luuTin } from "@/app/(app)/tuyen-dung/actions";
+import { Chon } from "@/components/ui/Chon";
+import { NgayChon } from "@/components/ui/NgayChon";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import { TRANG_THAI_TIN } from "@/lib/tuyen-dung";
 
@@ -42,12 +44,7 @@ export function FormTin({ khoi, coSan, xong, huy }: { khoi: KhoiLuaChon[]; coSan
         </div>
         <div>
           <label htmlFor="t-khoi" className={NHAN_O}>Khối *</label>
-          <select id="t-khoi" name="khoi_id" required defaultValue={coSan?.khoi_id ?? ""} className={O_NHAP}>
-            <option value="" disabled>Chọn khối</option>
-            {khoi.map((k) => (
-              <option key={k.id} value={k.id}>{k.ten}</option>
-            ))}
-          </select>
+          <Chon id="t-khoi" ten="khoi_id" batBuoc trong="Chọn khối" giaTriMacDinh={coSan?.khoi_id ?? ""} luaChon={khoi.map((k) => ({ gia_tri: k.id, nhan: k.ten }))} />
         </div>
         <div>
           <label htmlFor="t-sl" className={NHAN_O}>Số lượng cần *</label>
@@ -55,15 +52,11 @@ export function FormTin({ khoi, coSan, xong, huy }: { khoi: KhoiLuaChon[]; coSan
         </div>
         <div>
           <label htmlFor="t-tt" className={NHAN_O}>Trạng thái</label>
-          <select id="t-tt" name="trang_thai" defaultValue={coSan?.trang_thai ?? "Đang tuyển"} className={O_NHAP}>
-            {TRANG_THAI_TIN.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+          <Chon id="t-tt" ten="trang_thai" giaTriMacDinh={coSan?.trang_thai ?? "Đang tuyển"} luaChon={TRANG_THAI_TIN.map((t) => ({ gia_tri: t, nhan: t }))} />
         </div>
         <div>
           <label htmlFor="t-han" className={NHAN_O}>Hạn nộp hồ sơ</label>
-          <input id="t-han" name="han_nop" type="date" defaultValue={coSan?.han_nop ?? ""} className={O_NHAP} />
+          <NgayChon id="t-han" ten="han_nop" giaTriMacDinh={coSan?.han_nop ?? ""} denNam={2100} tuNam={2024} />
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="t-mo-ta" className={NHAN_O}>Mô tả công việc, yêu cầu</label>

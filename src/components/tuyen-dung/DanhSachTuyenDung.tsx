@@ -1,10 +1,12 @@
 "use client";
 
+import { Chon } from "@/components/ui/Chon";
+
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Hop } from "@/components/ui/Hop";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
-import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
+import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU } from "@/components/ui/dinh-dang";
 import { FormTin, type KhoiLuaChon, type TinCoSan } from "./FormTin";
 import { FormUngVien, type UngVien } from "./FormUngVien";
 import { doiBuocUngVien, xoaTin, xoaUngVien } from "@/app/(app)/tuyen-dung/actions";
@@ -85,12 +87,7 @@ export function DanhSachTuyenDung({ tin, ungVien, khoi }: { tin: Tin[]; ungVien:
       <div className="mt-8 flex flex-wrap items-end justify-between gap-4">
         <h2 className="chu-tieu-de text-[28px] text-muc">Tin tuyển dụng</h2>
         <div className="flex flex-wrap items-center gap-3">
-          <select aria-label="Lọc trạng thái tin" value={loc} onChange={(e) => setLoc(e.target.value)} className={`${O_NHAP} h-10 w-44`}>
-            <option value="">Mọi trạng thái</option>
-            <option value="Đang tuyển">Đang tuyển</option>
-            <option value="Đang phỏng vấn">Đang phỏng vấn</option>
-            <option value="Đã đóng">Đã đóng</option>
-          </select>
+          <Chon nho ariaLabel="Lọc trạng thái tin" giaTri={loc} onDoi={setLoc} className="w-48" luaChon={[{ gia_tri: "", nhan: "Mọi trạng thái" }, { gia_tri: "Đang tuyển", nhan: "Đang tuyển" }, { gia_tri: "Đang phỏng vấn", nhan: "Đang phỏng vấn" }, { gia_tri: "Đã đóng", nhan: "Đã đóng" }]} />
           <button type="button" onClick={() => setHop({ k: "tin" })} className={NUT_CHINH}>Đăng tuyển</button>
         </div>
       </div>
@@ -219,17 +216,7 @@ export function DanhSachTuyenDung({ tin, ungVien, khoi }: { tin: Tin[]; ungVien:
                           <td className="py-3 pr-3 text-muc-2">{u.nguon}</td>
                           <td className="py-3 pr-3 tabular-nums text-muc-2">{ngayVN(u.ngay_phong_van)}</td>
                           <td className="py-3 pr-3">
-                            <select
-                              aria-label={`Bước của ${u.ho_ten}`}
-                              value={u.trang_thai}
-                              disabled={dangXuLy}
-                              onChange={(e) => chay(doiBuocUngVien, u.id, undefined, "id", { trang_thai: e.target.value })}
-                              className="h-9 rounded-nho border border-vien-dam bg-giay-sang px-2 text-[13px] text-muc outline-none focus:border-nhan"
-                            >
-                              {BUOC_UNG_VIEN.map((b) => (
-                                <option key={b} value={b}>{b}</option>
-                              ))}
-                            </select>
+                            <Chon nho ariaLabel={`Bước của ${u.ho_ten}`} giaTri={u.trang_thai} voHieu={dangXuLy} className="w-40" onDoi={(v) => chay(doiBuocUngVien, u.id, undefined, "id", { trang_thai: v })} luaChon={BUOC_UNG_VIEN.map((b) => ({ gia_tri: b, nhan: b }))} />
                             <div className="mt-1"><NhanTrangThai kieu={kieuBuoc(u.trang_thai)}>{u.trang_thai}</NhanTrangThai></div>
                           </td>
                           <td className="py-3 text-right">
