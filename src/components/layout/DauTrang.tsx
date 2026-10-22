@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   Bell,
@@ -22,7 +22,17 @@ import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 import { dangXuat } from "@/lib/actions";
 import { capNhatThongTinCaNhan } from "@/app/ca-nhan-actions";
 import { useLuuTru } from "@/lib/luu-tru";
-import type { ThongBao } from "@/lib/data";
+import { menuChinh } from "@/lib/nav";
+import type { VaiTro } from "@/lib/auth";
+
+export type ThongBao = {
+  id: string;
+  loai: "tai_khoan" | "don_tu" | "ung_vien" | "tin" | "cham_cong" | "he_thong";
+  tieuDe: string;
+  noiDung: string;
+  thoiDiem: string;
+  href: string;
+};
 
 const KHOA_DA_DOC = "omyn-hrm-tb-da-doc";
 const ICON: Record<ThongBao["loai"], LucideIcon> = {
@@ -58,7 +68,38 @@ function useDongKhiBamNgoai(mo: boolean, dong: () => void) {
   return ref;
 }
 
-function Chuong({ thongBao }: { thongBao: ThongBao[] }) {
+const CHU_KY_LAM_MOI = 90_000;
+
+/** Tải thông báo SAU khi trang đã hiện; làm mới khi quay lại tab và mỗi 90 giây. */
+function useThongBao() {
+  const [ds, setDs] = useState<ThongBao[]>([]);
+  useEffect(() => {
+    let huy = false;
+    const tai = async () => {
+      try {
+        const r = await fetch("/api/thong-bao", { cache: "no-store" });
+        if (!r.ok || !r.headers.get("content-type")?.includes("json")) return;
+        const j = (await r.json()) as { thongBao: ThongBao[] };
+        if (!huy) setDs(j.thongBao);
+      } catch {
+        // mất mạng thoáng qua: giữ danh sách cũ
+      }
+    };
+    tai();
+    const dinhKy = setInterval(tai, CHU_KY_LAM_MOI);
+    const khiQuayLai = () => document.visibilityState === "visible" && tai();
+    document.addEventListener("visibilitychange", khiQuayLai);
+    return () => {
+      huy = true;
+      clearInterval(dinhKy);
+      document.removeEventListener("visibilitychange", khiQuayLai);
+    };
+  }, []);
+  return ds;
+}
+
+function Chuong() {
+  const thongBao = useThongBao();
   const [mo, setMo] = useState(false);
   const [raw, ghi] = useLuuTru(KHOA_DA_DOC, "[]");
   const [bayGio] = useState(() => Date.now());
@@ -241,7 +282,10 @@ function MenuAvatar({ hoTen, email }: { hoTen: string; email: string }) {
 }
 
 /** Đầu trang mỏng 56 px: tiêu đề trang bên trái; bên phải: sáng/tối, thông báo, avatar + tên (bấm vào để sửa thông tin / đăng xuất). */
-export function DauTrang({ tieuDe, hoTen, email, thongBao }: { tieuDe: string; hoTen: string; email: string; thongBao: ThongBao[] }) {
+export function DauTrang({ hoTen, email, vaiTro }: { hoTen: string; email: string; vaiTro: VaiTro }) {
+  const pathname = usePathname();
+  const tieuDe = menuChinh.find((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"))?.ten ?? "OMYN";
+  void vaiTro;
   return (
     <header className="dau-trang-vang sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-vien px-3 lg:px-8">
       <div className="flex min-w-0 items-center gap-1">
@@ -257,7 +301,7 @@ export function DauTrang({ tieuDe, hoTen, email, thongBao }: { tieuDe: string; h
       </div>
       <div className="flex shrink-0 items-center gap-1">
         <ChuyenCheDo />
-        <Chuong thongBao={thongBao} />
+        <Chuong />
         <MenuAvatar hoTen={hoTen} email={email} />
       </div>
     </header>

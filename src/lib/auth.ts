@@ -1,4 +1,5 @@
 import "server-only";
+import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -11,7 +12,8 @@ function chuanHoaVaiTro(v: unknown): VaiTro {
   return (VAI_TRO_DA_DUYET as readonly unknown[]).includes(v) ? (v as VaiTro) : "cho_duyet";
 }
 
-export async function layNguoiDungHienTai() {
+/** Mỗi yêu cầu chỉ hỏi Supabase Auth MỘT lần (React cache): layout, trang và hàm bảo vệ dùng chung kết quả. */
+export const layNguoiDungHienTai = cache(async () => {
   const supabase = await createClient();
   const {
     data: { user },
@@ -26,7 +28,7 @@ export async function layNguoiDungHienTai() {
     // không có quyền gì. app_metadata chỉ máy chủ sửa được (người dùng thì không).
     vaiTro: chuanHoaVaiTro(user.app_metadata?.vai_tro),
   };
-}
+});
 
 /** Chặn thật ở server cho các trang chỉ admin/kỹ thuật được xem — nav chỉ ẩn
  * mục menu, không chặn việc gõ thẳng URL, nên các trang toàn công ty phải

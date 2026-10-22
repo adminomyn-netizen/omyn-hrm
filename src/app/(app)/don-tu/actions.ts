@@ -47,23 +47,30 @@ export async function taoDonTu(formData: FormData): Promise<KetQuaDonTu> {
   return { ok: true };
 }
 
-export async function duyetDonTu(formData: FormData) {
+/** Duyệt/từ chối đơn. Chỉ đổi được đơn còn "Chờ duyệt" (không lật quyết định cũ) và không tự duyệt đơn của chính mình. */
+export async function duyetDonTu(formData: FormData): Promise<KetQuaDonTu> {
   const nguoiDuyet = await yeuCauVaiTro(["admin", "ky_thuat"]);
   const id = String(formData.get("id") || "");
   const hanhDong = String(formData.get("hanh_dong") || "");
-  if (!id || (hanhDong !== "duyet" && hanhDong !== "tu_choi")) return;
+  if (!id || (hanhDong !== "duyet" && hanhDong !== "tu_choi")) return { loi: "Dữ liệu không hợp lệ." };
 
-  const nguoiDuyetNhanVienId = await layNhanVienIdTheoUser(nguoiDuyet.id);
   const supabase = createAdminClient();
-  const { error } = await supabase
+  const nguoiDuyetNhanVienId = await layNhanVienIdTheoUser(nguoiDuyet.id);
+  const { data: don } = await supabase.from("don_tu").select("id, nhan_vien_id, trang_thai").eq("id", id).maybeSingle();
+  if (!don) return { loi: "Không tìm thấy đơn." };
+  if (don.trang_thai !== "Chờ duyệt") return { loi: "Đơn này đã được xử lý rồi." };
+  if (nguoiDuyetNhanVienId && don.nhan_vien_id === nguoiDuyetNhanVienId) return { loi: "Bạn không tự duyệt đơn của chính mình." };
+
+  const { data: capNhat, error } = await supabase
     .from("don_tu")
-    .update({
-      trang_thai: hanhDong === "duyet" ? "Đã duyệt" : "Từ chối",
-      nguoi_duyet_id: nguoiDuyetNhanVienId,
-    })
-    .eq("id", id);
-  if (error) throw error;
+    .update({ trang_thai: hanhDong === "duyet" ? "Đã duyệt" : "Từ chối", nguoi_duyet_id: nguoiDuyetNhanVienId })
+    .eq("id", id)
+    .eq("trang_thai", "Chờ duyệt")
+    .select("id");
+  if (error) return { loi: "Chưa lưu được quyết định. Thử lại sau." };
+  if (!capNhat || capNhat.length === 0) return { loi: "Đơn này vừa được người khác xử lý." };
 
   revalidatePath("/don-tu");
   revalidatePath("/dashboard");
+  return { ok: true };
 }

@@ -32,11 +32,12 @@ type SuKienLich = {
   trangThai: string;
 };
 
-const MAU_THEO_TRANG_THAI: Record<string, { bg: string; border: string }> = {
-  "Đúng giờ": { bg: "#ccfbf1", border: "#0f766e" },
-  "Đi muộn": { bg: "#fef3c7", border: "#d97706" },
-  "Vắng mặt": { bg: "#fee2e2", border: "#dc2626" },
-  "Nghỉ phép": { bg: "#e0e7ff", border: "#4338ca" },
+// Màu theo trạng thái dùng biến màu của giao diện nên tự đổi theo chế độ sáng/tối.
+const MAU_THEO_TRANG_THAI: Record<string, { bg: string; border: string; chu: string }> = {
+  "Đúng giờ": { bg: "var(--nhan-nhat)", border: "var(--nhan)", chu: "var(--nhan-dam)" },
+  "Đi muộn": { bg: "var(--canh-bao-nen)", border: "var(--canh-bao)", chu: "var(--canh-bao)" },
+  "Vắng mặt": { bg: "var(--loi-nen)", border: "var(--loi)", chu: "var(--loi)" },
+  "Nghỉ phép": { bg: "var(--giay-tram)", border: "var(--vien-dam)", chu: "var(--muc-2)" },
 };
 
 export function LichChamCong({
@@ -93,12 +94,13 @@ export function LichChamCong({
             noEventsInRange: "Không có dữ liệu chấm công trong khoảng này.",
           }}
           eventPropGetter={(event: SuKienLich) => {
-            const mau = MAU_THEO_TRANG_THAI[event.trangThai] ?? { bg: "#e2e8f0", border: "#64748b" };
+            const mau = MAU_THEO_TRANG_THAI[event.trangThai] ?? { bg: "var(--giay-tram)", border: "var(--vien-dam)", chu: "var(--muc-2)" };
             return {
               style: {
                 backgroundColor: mau.bg,
                 borderLeft: `3px solid ${mau.border}`,
-                color: "#0f172a",
+                borderRadius: 3,
+                color: mau.chu,
               },
             };
           }}

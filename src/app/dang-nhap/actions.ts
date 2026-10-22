@@ -8,11 +8,13 @@ export async function dangNhap(_truoc: { loi?: string } | undefined, formData: F
   const matKhau = String(formData.get("mat_khau") || "");
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password: matKhau });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password: matKhau });
 
   if (error) {
     return { loi: "Email hoặc mật khẩu chưa đúng. Bạn kiểm tra lại, hoặc nhờ Nhân sự đặt lại mật khẩu." };
   }
 
-  redirect("/dashboard");
+  // Về thẳng trang của vai trò để khỏi nhảy qua nhiều bước chuyển hướng.
+  const vaiTro = data.user?.app_metadata?.vai_tro;
+  redirect(vaiTro === "nhan_vien" ? "/cham-cong" : vaiTro === "admin" || vaiTro === "ky_thuat" ? "/dashboard" : "/cho-duyet");
 }

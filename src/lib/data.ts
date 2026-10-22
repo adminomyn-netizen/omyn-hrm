@@ -150,7 +150,7 @@ export async function layDonTu() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("don_tu")
-    .select("id, loai, tu_ngay, den_ngay, trang_thai, nhan_vien:nhan_vien_id(ho_ten)")
+    .select("id, loai, tu_ngay, den_ngay, ly_do, trang_thai, nhan_vien:nhan_vien_id(ho_ten)")
     .order("tu_ngay", { ascending: false });
   if (error) throw error;
   return data.map((d) => ({ ...d, nhan_vien_ho_ten: d.nhan_vien?.ho_ten ?? "" }));
@@ -162,7 +162,7 @@ export async function layDonTuCuaToi(nhanVienId: string) {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("don_tu")
-    .select("id, loai, tu_ngay, den_ngay, trang_thai")
+    .select("id, loai, tu_ngay, den_ngay, ly_do, trang_thai")
     .eq("nhan_vien_id", nhanVienId)
     .order("tu_ngay", { ascending: false });
   if (error) throw error;
@@ -433,4 +433,26 @@ export async function layThongBao(
   }
 
   return ra.sort((a, b) => b.thoiDiem.localeCompare(a.thoiDiem)).slice(0, 25);
+}
+
+/** Danh sách tài khoản đăng nhập + vai trò + hồ sơ nhân sự gắn kèm — chỉ để Quản trị xem ở Cài đặt. */
+export async function layDanhSachTaiKhoan() {
+  const db = createAdminClient();
+  const [{ data: ds, error }, { data: hoSo }] = await Promise.all([
+    db.auth.admin.listUsers({ page: 1, perPage: 200 }),
+    db.from("nhan_vien").select("user_id, ho_ten, chuc_danh").not("user_id", "is", null),
+  ]);
+  if (error) throw error;
+  const theoUser = new Map((hoSo ?? []).map((h) => [h.user_id as string, h]));
+  return ds.users
+    .map((u) => ({
+      id: u.id,
+      email: u.email ?? "",
+      hoTen: (u.app_metadata?.ho_ten as string) || (u.email ?? ""),
+      vaiTro: (["admin", "ky_thuat", "nhan_vien"].includes(String(u.app_metadata?.vai_tro)) ? String(u.app_metadata?.vai_tro) : "cho_duyet") as "admin" | "ky_thuat" | "nhan_vien" | "cho_duyet",
+      hoSo: theoUser.get(u.id)?.ho_ten ?? null,
+      taoLuc: u.created_at,
+      dangNhapLuc: u.last_sign_in_at ?? null,
+    }))
+    .sort((a, b) => a.email.localeCompare(b.email));
 }

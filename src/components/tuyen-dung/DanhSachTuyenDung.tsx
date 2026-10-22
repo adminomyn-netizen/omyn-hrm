@@ -7,7 +7,7 @@ import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 import { FormTin, type KhoiLuaChon, type TinCoSan } from "./FormTin";
 import { FormUngVien, type UngVien } from "./FormUngVien";
-import { doiBuocUngVien, xoaTin, xoaUngVien } from "@/app/tuyen-dung/actions";
+import { doiBuocUngVien, xoaTin, xoaUngVien } from "@/app/(app)/tuyen-dung/actions";
 import { BUOC_UNG_VIEN } from "@/lib/tuyen-dung";
 
 export type Tin = TinCoSan & { khoi_ten: string };
