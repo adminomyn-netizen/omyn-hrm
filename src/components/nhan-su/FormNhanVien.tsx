@@ -4,6 +4,7 @@ import { useRef, useState, useTransition } from "react";
 import { themNhanVien, suaNhanVien } from "@/lib/actions";
 import { Chon } from "@/components/ui/Chon";
 import { NgayChon } from "@/components/ui/NgayChon";
+import { CHUC_VU } from "@/lib/chuc-vu";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 
 export type Khoi = { id: string; ten: string };
@@ -60,8 +61,8 @@ export function FormNhanVien({
           <input id="nv-ma" name="ma_nhan_vien" placeholder="NV009" defaultValue={coSan?.ma_nhan_vien ?? ""} className={O_NHAP} />
         </div>
         <div>
-          <label htmlFor="nv-chuc-danh" className={NHAN_O}>Chức danh</label>
-          <input id="nv-chuc-danh" name="chuc_danh" defaultValue={coSan?.chuc_danh ?? ""} className={O_NHAP} />
+          <label htmlFor="nv-chuc-danh" className={NHAN_O}>Chức vụ</label>
+          <Chon id="nv-chuc-danh" ten="chuc_danh" trong="Chọn chức vụ" giaTriMacDinh={coSan?.chuc_danh ?? ""} luaChon={[...CHUC_VU, ...(coSan?.chuc_danh && !(CHUC_VU as readonly string[]).includes(coSan.chuc_danh) ? [coSan.chuc_danh] : [])].map((c) => ({ gia_tri: c, nhan: c }))} />
         </div>
         <div>
           <label htmlFor="nv-khoi" className={NHAN_O}>Khối *</label>

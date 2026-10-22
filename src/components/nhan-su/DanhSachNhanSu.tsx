@@ -100,7 +100,7 @@ export function DanhSachNhanSu({ nhanVien, khoi, moBanDau, timBanDau = "" }: { n
           <thead>
             <tr className="nhan-muc border-b border-vien">
               <th className="py-3 pr-4 font-medium">Nhân viên</th>
-              <th className="py-3 pr-4 font-medium">Chức danh</th>
+              <th className="py-3 pr-4 font-medium">Chức vụ</th>
               <th className="py-3 pr-4 font-medium">Khối</th>
               <th className="py-3 pr-4 font-medium">Ngày vào làm</th>
               <th className="py-3 pr-4 font-medium">Trạng thái</th>
