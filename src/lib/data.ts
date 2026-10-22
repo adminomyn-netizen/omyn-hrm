@@ -105,15 +105,17 @@ export function thangHienTaiHCM() {
 /** `nhanVienId` nếu truyền vào thì chỉ lấy chấm công của riêng người đó —
  * dùng cho vai trò nhân viên, không được thấy lịch của người khác. */
 export async function layChamCongThang(nam: number, thang: number, nhanVienId?: string) {
-  const supabase = createAdminClient();
   const thang2 = String(thang).padStart(2, "0");
-  const tuNgay = `${nam}-${thang2}-01`;
   const ngayCuoiThang = new Date(nam, thang, 0).getDate();
-  const denNgay = `${nam}-${thang2}-${String(ngayCuoiThang).padStart(2, "0")}`;
+  return layChamCongKhoang(`${nam}-${thang2}-01`, `${nam}-${thang2}-${String(ngayCuoiThang).padStart(2, "0")}`, nhanVienId);
+}
 
+/** Chấm công trong một khoảng ngày bất kỳ (YYYY-MM-DD, gồm cả hai đầu). */
+export async function layChamCongKhoang(tuNgay: string, denNgay: string, nhanVienId?: string) {
+  const supabase = createAdminClient();
   let query = supabase
     .from("cham_cong")
-    .select("id, ngay, gio_vao, gio_ra, trang_thai, nhan_vien(ho_ten)")
+    .select("id, ngay, gio_vao, gio_ra, trang_thai, nhan_vien(ho_ten, khoi(ten))")
     .gte("ngay", tuNgay)
     .lte("ngay", denNgay)
     .order("ngay");
@@ -126,6 +128,7 @@ export async function layChamCongThang(nam: number, thang: number, nhanVienId?: 
     id: c.id as string,
     ngay: c.ngay as string,
     hoTen: c.nhan_vien?.ho_ten ?? "",
+    khoiTen: c.nhan_vien?.khoi?.ten ?? "",
     gioVao: c.gio_vao as string | null,
     gioRa: c.gio_ra as string | null,
     trangThai: c.trang_thai as string,
@@ -169,35 +172,27 @@ export async function layDonTuCuaToi(nhanVienId: string) {
   return data;
 }
 
+/** Kỳ lương gần nhất (theo năm/tháng) kèm tổng — dùng cho chỉ số "Quỹ lương" ở Tổng quan. */
 export async function layBangLuongKyGanNhat() {
   const supabase = createAdminClient();
   const { data: ky, error: loi1 } = await supabase
     .from("ky_luong")
-    .select("id, ten_ky, da_thanh_toan")
-    .order("ten_ky", { ascending: false })
+    .select("id, ten_ky, trang_thai")
+    .order("nam", { ascending: false })
+    .order("thang", { ascending: false })
     .limit(1)
     .maybeSingle();
   if (loi1) throw loi1;
   if (!ky) return null;
 
-  const { data: chiTiet, error: loi2 } = await supabase
-    .from("bang_luong")
-    .select("luong_co_ban, phu_cap, thuc_linh, nhan_vien(ho_ten, khoi(ten))")
-    .eq("ky_luong_id", ky.id);
+  const { data: chiTiet, error: loi2 } = await supabase.from("bang_luong").select("tong_thu_nhap, thuc_linh").eq("ky_luong_id", ky.id);
   if (loi2) throw loi2;
 
   return {
     ky: ky.ten_ky,
-    daThanhToan: ky.da_thanh_toan,
-    tongQuyLuong: chiTiet.reduce((tong, r) => tong + (r.thuc_linh ?? 0), 0),
+    daThanhToan: ky.trang_thai === "da_chi",
+    tongQuyLuong: chiTiet.reduce((tong, r) => tong + Number(r.tong_thu_nhap ?? 0), 0),
     soNhanVien: chiTiet.length,
-    chiTiet: chiTiet.map((r) => ({
-      nhan_vien_ho_ten: r.nhan_vien?.ho_ten ?? "",
-      khoi_ten: r.nhan_vien?.khoi?.ten ?? "",
-      luong_co_ban: r.luong_co_ban,
-      phu_cap: r.phu_cap,
-      thuc_linh: r.thuc_linh ?? 0,
-    })),
   };
 }
 
@@ -565,4 +560,94 @@ export async function layDuLieuTongQuan() {
     tinMo,
     khoi: [...theoKhoi.entries()].map(([ten, so]) => ({ ten, so })).sort((a, b) => b.so - a.so),
   };
+}
+
+/** Khối kèm số nhân viên đang làm và số tin tuyển dụng đang mở. */
+export async function layKhoiDayDu() {
+  const db = createAdminClient();
+  const [khoi, nv, tin] = await Promise.all([
+    db.from("khoi").select("id, ten, mo_ta").order("ten"),
+    db.from("nhan_vien").select("khoi_id").neq("trang_thai", "Đã nghỉ"),
+    db.from("tin_tuyen_dung").select("khoi_id").neq("trang_thai", "Đã đóng"),
+  ]);
+  if (khoi.error) throw khoi.error;
+  const dem = (ds: { khoi_id: string | null }[] | null) => {
+    const m = new Map<string, number>();
+    for (const x of ds ?? []) if (x.khoi_id) m.set(x.khoi_id, (m.get(x.khoi_id) ?? 0) + 1);
+    return m;
+  };
+  const dn = dem(nv.data);
+  const dt = dem(tin.data);
+  return khoi.data.map((k) => ({ ...k, soNhanVien: dn.get(k.id) ?? 0, soTinMo: dt.get(k.id) ?? 0 }));
+}
+
+// ───────────────────────── LƯƠNG ─────────────────────────
+export async function layThamSoLuong() {
+  const { data, error } = await createAdminClient().from("tham_so_luong").select("khoa, nhan, gia_tri, don_vi, nguon, xac_nhan_luc").order("khoa");
+  if (error) throw error;
+  return data.map((t) => ({ ...t, gia_tri: Number(t.gia_tri) }));
+}
+
+export async function layKyLuong() {
+  const db = createAdminClient();
+  const [ky, dong] = await Promise.all([
+    db.from("ky_luong").select("id, ten_ky, thang, nam, trang_thai, ghi_chu, chuyen_luc").order("nam", { ascending: false }).order("thang", { ascending: false }),
+    db.from("bang_luong").select("ky_luong_id, thuc_linh, tong_thu_nhap"),
+  ]);
+  if (ky.error) throw ky.error;
+  const tong = new Map<string, { soNguoi: number; thucLinh: number; tongThuNhap: number }>();
+  for (const d of dong.data ?? []) {
+    const t = tong.get(d.ky_luong_id) ?? { soNguoi: 0, thucLinh: 0, tongThuNhap: 0 };
+    t.soNguoi++;
+    t.thucLinh += Number(d.thuc_linh);
+    t.tongThuNhap += Number(d.tong_thu_nhap);
+    tong.set(d.ky_luong_id, t);
+  }
+  return ky.data.map((k) => ({ ...k, ...(tong.get(k.id) ?? { soNguoi: 0, thucLinh: 0, tongThuNhap: 0 }) }));
+}
+
+export async function layDongLuongCuaKy(kyId: string) {
+  const { data, error } = await createAdminClient()
+    .from("bang_luong")
+    .select("*, nhan_vien(ho_ten, chuc_danh, ma_nhan_vien, khoi(ten))")
+    .eq("ky_luong_id", kyId);
+  if (error) throw error;
+  return data
+    .map((d) => ({ ...d, ho_ten: d.nhan_vien?.ho_ten ?? "", chuc_danh: d.nhan_vien?.chuc_danh ?? "", khoi_ten: d.nhan_vien?.khoi?.ten ?? "" }))
+    .sort((a, b) => a.ho_ten.localeCompare(b.ho_ten, "vi"));
+}
+
+/** Nhân viên còn làm + thỏa thuận lương (nếu đã nhập). */
+export async function layThoaThuanLuong() {
+  const db = createAdminClient();
+  const [nv, tt] = await Promise.all([
+    db.from("nhan_vien").select("id, ho_ten, chuc_danh, trang_thai, khoi(ten)").neq("trang_thai", "Đã nghỉ").order("ho_ten"),
+    db.from("luong_thoa_thuan").select("*"),
+  ]);
+  if (nv.error) throw nv.error;
+  const map = new Map((tt.data ?? []).map((t) => [t.nhan_vien_id, t]));
+  return nv.data.map((n) => ({ id: n.id, ho_ten: n.ho_ten, chuc_danh: n.chuc_danh ?? "", trang_thai: n.trang_thai, khoi_ten: n.khoi?.ten ?? "", thoaThuan: map.get(n.id) ?? null }));
+}
+
+/** Phiếu lương của chính mình: chỉ kỳ đã duyệt hoặc đã chi. */
+export async function layPhieuLuongCuaToi(nhanVienId: string) {
+  const { data, error } = await createAdminClient()
+    .from("bang_luong")
+    .select("*, ky:ky_luong_id(ten_ky, thang, nam, trang_thai)")
+    .eq("nhan_vien_id", nhanVienId);
+  if (error) throw error;
+  return data
+    .filter((d) => d.ky && ["da_duyet", "da_chi"].includes(d.ky.trang_thai))
+    .sort((a, b) => (b.ky!.nam! - a.ky!.nam!) * 100 + ((b.ky!.thang ?? 0) - (a.ky!.thang ?? 0)));
+}
+
+/** Số ngày có chấm công (không phải "Vắng mặt") của một nhân viên trong tháng — gợi ý ban đầu cho công thực tế. */
+export async function layNgayChamCongTrongThang(nam: number, thang: number) {
+  const tu = `${nam}-${String(thang).padStart(2, "0")}-01`;
+  const den = `${nam}-${String(thang).padStart(2, "0")}-${new Date(Date.UTC(nam, thang, 0)).getUTCDate()}`;
+  const { data, error } = await createAdminClient().from("cham_cong").select("nhan_vien_id, trang_thai").gte("ngay", tu).lte("ngay", den);
+  if (error) throw error;
+  const m = new Map<string, number>();
+  for (const c of data) if (c.trang_thai !== "Vắng mặt") m.set(c.nhan_vien_id, (m.get(c.nhan_vien_id) ?? 0) + 1);
+  return m;
 }

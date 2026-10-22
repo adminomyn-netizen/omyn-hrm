@@ -22,7 +22,7 @@ export function DongHoHCM({ canGiua }: { canGiua?: boolean }) {
     <div className={canGiua ? "text-center" : ""}>
       <div className="nhan-muc">Giờ Hồ Chí Minh</div>
       <div className="mt-1 text-[56px] font-medium leading-none tabular-nums text-muc">{now ? GIO.format(now) : "--:--:--"}</div>
-      <div className="chu-tieu-de mt-2 text-[28px] italic capitalize text-muc-2">{now ? NGAY.format(now) : " "}</div>
+      <div className="chu-tieu-de mt-2 text-[28px] capitalize text-muc-2">{now ? NGAY.format(now) : " "}</div>
     </div>
   );
 }

@@ -130,7 +130,7 @@
   --color-menu-hover: var(--menu-hover);
   --color-menu-vien: var(--menu-vien);
   --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-cormorant), "Times New Roman", serif;
+  --font-serif: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
   --radius-tag: 5px;   /* nhãn trạng thái */
   --radius-nho: 8px;   /* nút, ô nhập, mục menu */
   --radius-the: 10px;  /* thẻ, danh sách thả xuống */
@@ -182,12 +182,12 @@ body {
   color: transparent;
 }
 
-/* Tiêu đề hiển thị: chữ serif, chỉ dùng từ 28 px trở lên (tiếng Việt đủ dấu). */
+/* Tiêu đề hiển thị: cùng họ chữ không chân với phần còn lại (đã bỏ serif nghiêng — trông "AI"), đậm vừa, siết nhẹ khoảng chữ. */
 .chu-tieu-de {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: 0;
+  letter-spacing: -0.015em;
 }
 .nhan-muc {
   font-size: 12px;
@@ -221,7 +221,7 @@ body {
 .omyn-rbc .rbc-date-cell { padding: 6px 8px; text-align: right; font-variant-numeric: tabular-nums; }
 .omyn-rbc .rbc-date-cell.rbc-now { font-weight: 700; color: var(--nhan-dam); }
 .omyn-rbc .rbc-toolbar { margin-bottom: 14px; gap: 8px; }
-.omyn-rbc .rbc-toolbar .rbc-toolbar-label { font-family: var(--font-serif); font-size: 28px; font-weight: 600; color: var(--muc); }
+.omyn-rbc .rbc-toolbar .rbc-toolbar-label { font-family: var(--font-sans); font-size: 24px; font-weight: 600; letter-spacing: -0.015em; color: var(--muc); }
 .omyn-rbc .rbc-toolbar button { color: var(--muc-2); border: 1px solid var(--vien-dam); background: transparent; border-radius: 4px; padding: 6px 12px; font-size: 13px; }
 .omyn-rbc .rbc-toolbar button:hover { background: var(--giay-tram); color: var(--muc); }
 .omyn-rbc .rbc-toolbar button:active, .omyn-rbc .rbc-toolbar button.rbc-active { background: var(--giay-tram); box-shadow: none; color: var(--muc); }

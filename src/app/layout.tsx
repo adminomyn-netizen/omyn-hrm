@@ -1,19 +1,11 @@
 import type { Metadata, Viewport } from "next";
-import { Be_Vietnam_Pro, Cormorant_Garamond } from "next/font/google";
+import { Be_Vietnam_Pro } from "next/font/google";
 import "./globals.css";
 
 const beVietnam = Be_Vietnam_Pro({
   variable: "--font-be-vietnam",
   subsets: ["latin", "latin-ext", "vietnamese"],
   weight: ["400", "500", "600"],
-  display: "swap",
-});
-
-const cormorant = Cormorant_Garamond({
-  variable: "--font-cormorant",
-  subsets: ["latin", "latin-ext", "vietnamese"],
-  weight: ["500", "600"],
-  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -31,7 +23,7 @@ const KHOI_TAO_CHE_DO = `try{if(localStorage.getItem("omyn-hrm-che-do")==="toi")
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${cormorant.variable} h-full antialiased`}>
+    <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} h-full antialiased`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: KHOI_TAO_CHE_DO }} />
       </head>

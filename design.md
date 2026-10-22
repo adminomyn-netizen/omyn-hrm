@@ -77,7 +77,7 @@ Biểu đồ SVG và hộp hero tối dùng mã cố định vì luôn nằm tr�
 
 ## 4. Chữ
 
-- **Hiển thị: Cormorant Garamond** (500/600, nghiêng 500) — tiêu đề trang, lời chào, tiêu đề popup, câu trạng thái rỗng, nhãn tháng trên lịch. Chỉ dùng từ **28 px trở lên**. Không dùng cho số liệu (không có chữ số thẳng hàng).
+- **Hiển thị: cùng họ Be Vietnam Pro** (600, khoảng chữ −0,015 em, KHÔNG nghiêng) — tiêu đề trang, lời chào, tiêu đề popup, câu trạng thái rỗng, nhãn tháng trên lịch. Đã bỏ serif Cormorant và mọi chữ nghiêng (22/10, chủ app: trông "AI"). Chỉ logo OMYN còn dùng chữ Cormorant (đã chuyển thành đường, không tải font).
 - **Nội dung: Be Vietnam Pro** (400/500/600) — mọi chữ còn lại. Có tập con `vietnamese`. Số trong bảng/chỉ số dùng `tabular-nums`.
 - Tải qua `next/font/google` (tự host, `display: swap`) trong `src/app/layout.tsx`; biến `--font-serif`, `--font-sans`.
 
@@ -85,9 +85,9 @@ Thang cỡ chữ:
 
 | Vai trò | Cỡ / ghi chú |
 |---|---|
-| Tiêu đề trang (`TieuDeTrang`) | serif 36 px (điện thoại) / 44 px (máy tính), dòng 1,1 |
-| Lời chào Tổng quan | serif nghiêng 40 / 52 px |
-| Tiêu đề popup | serif 30 px |
+| Tiêu đề trang (`TieuDeTrang`) | sans 600, 36 px (điện thoại) / 44 px (máy tính), dòng 1,1 |
+| Lời chào Tổng quan | sans 600 (không nghiêng) 40 / 52 px |
+| Tiêu đề popup | sans 600 30 px |
 | Chỉ số lớn | sans 30–32 px, 500 |
 | Đồng hồ chấm công | sans 56 px, 500 |
 | Tiêu đề khu (`MucTrang`) | sans 15 px, 600 |
@@ -122,7 +122,7 @@ Tiếng Việt cần `line-height` ≥ 1,5 cho đoạn văn và ≥ 1,1 cho tiê
 - **Khung dùng chung** `src/app/(app)/layout.tsx`: dựng *một lần*, đứng yên khi đổi trang; chỉ phần nội dung đổi (kèm `loading.tsx`).
 - **Menu trái** (`Sidebar`): nền espresso cả khi giao diện sáng; nhóm có nhãn viết hoa nhỏ; mục đang mở nền ngà 9% + biểu tượng vàng; **số đếm** dải vàng cạnh mục (tài khoản chờ duyệt, đơn chờ duyệt, ứng viên mới — lấy từ `/api/thong-bao`, ghi qua `lib/dem-menu.ts`). Thu gọn còn 72 px (nhớ lựa chọn trong `localStorage`); rê chuột hiện tên + mô tả. Điện thoại: ngăn kéo `MobileNav` cùng kiểu + **thanh tab dưới cùng** (xem 7.9).
 - **Đầu trang** (`DauTrang`): cao 56 px. Trái: ô tìm (`⌘K`/`Ctrl+K`, `TimKiem`). Phải: nút sáng/tối, chuông thông báo, avatar + tên. Bấm avatar: **Chỉnh sửa thông tin** (đổi tên, đổi mật khẩu — cần mật khẩu hiện tại) và **Đăng xuất**. Không hiện nhãn vai trò.
-- **Đầu mỗi trang** (`TieuDeTrang`): tiêu đề serif + một dòng phụ (đếm), hành động chính bên phải (nút vàng + nút phụ).
+- **Đầu mỗi trang** (`TieuDeTrang`): tiêu đề sans + một dòng phụ (đếm), hành động chính bên phải (nút vàng + nút phụ).
 - **Hàng chỉ số** (`HangChiSo`/mục chỉ số ở Tổng quan): số lớn + nhãn nhỏ, ngăn bằng đường kẻ dọc 1 px, **không thẻ**. Có thể kèm `DuongXuHuong` (đường nhỏ 84×34).
 - **Khu** (`MucTrang`): tiêu đề nhỏ đậm + đường kẻ mảnh, hành động nhỏ bên phải ("Xem tất cả").
 - **Lưới trong trang**: dùng `grid` 12 cột (`lg:col-span-*`); **mọi con của grid có `min-w-0`** để nội dung nowrap/bảng không đẩy tràn ngang trên điện thoại (`MucTrang` đã có sẵn).
@@ -147,13 +147,13 @@ Tất cả ở `src/components/ui/` trừ khi ghi khác. Lớp CSS dùng chung �
 - Script quét thiết kế **chặn** `<select>` và `type="date"` mới.
 
 ### 7.3 Bảng (`Table.tsx`/bảng tự dựng)
-Tiêu đề chữ hoa nhỏ `--muc-3`; hàng cao 52–64 px; kẻ ngang `--vien`; hover `--giay-tram/60`; số căn phải + `tabular-nums`; cột hành động căn phải. Bảng rộng nằm trong `overflow-x-auto`. Trạng thái rỗng: một câu serif nghiêng cỡ 24 px + việc nên làm.
+Tiêu đề chữ hoa nhỏ `--muc-3`; hàng cao 52–64 px; kẻ ngang `--vien`; hover `--giay-tram/60`; số căn phải + `tabular-nums`; cột hành động căn phải. Bảng rộng nằm trong `overflow-x-auto`. Trạng thái rỗng: một câu sans cỡ 24 px + việc nên làm.
 
 ### 7.4 Nhãn trạng thái (`NhanTrangThai`)
 Chữ 12 px/500 trên nền nhạt cùng sắc, bo 5 px, không viền. Bốn kiểu: `tot` (nhan-nhat/nhan-dam), `cho` (canh-bao), `loi` (loi), `tram` (giay-tram/muc-2).
 
 ### 7.5 Popup (`Hop`)
-Rộng 576 px (hoặc `rong` 768 px), bo 14 px, tiêu đề serif 30 px trên nền gradient `nhan-nhat → trong suốt`, nội dung `px-7 py-6`. Đóng bằng Esc / bấm nền / nút X; giữ tiêu điểm trong hộp, trả về chỗ cũ khi đóng; khoá cuộn nền. **Thêm/sửa/xoá luôn là popup, không sang trang mới.**
+Rộng 576 px (hoặc `rong` 768 px), bo 14 px, tiêu đề sans 600 30 px trên nền gradient `nhan-nhat → trong suốt`, nội dung `px-7 py-6`. Đóng bằng Esc / bấm nền / nút X; giữ tiêu điểm trong hộp, trả về chỗ cũ khi đóng; khoá cuộn nền. **Thêm/sửa/xoá luôn là popup, không sang trang mới.**
 
 ### 7.6 Hộp tìm nhanh (`layout/TimKiem`)
 `⌘K`/`Ctrl+K` hoặc bấm ô tìm. Quản lý tìm nhân viên, ứng viên, tin tuyển dụng (gọi `/api/tim-kiem` sau 180 ms ngừng gõ) và nhảy tới trang; nhân viên chỉ nhảy trang. ↑↓ chọn, Enter đi, Esc đóng.
@@ -180,7 +180,7 @@ Các tab "Thông báo/Tôi/Menu" bắn sự kiện cửa sổ (`omyn-mo-thong-ba
 
 | Màn | Cấu trúc |
 |---|---|
-| **Đăng nhập / Đăng ký** | Trái (≥1024 px): mảng `nen-toi` có hoa văn 4 vòng tròn mảnh, câu serif nghiêng 52 px có dòng `chu-vang`. Phải: tiêu đề serif 44 px, ô có biểu tượng vàng (`OTaiKhoan`), mật khẩu có nút hiện/ẩn, nút vàng 50 px. Điện thoại: chỉ cột phải. |
+| **Đăng nhập / Đăng ký** | Trái (≥1024 px): mảng `nen-toi` có hoa văn 4 vòng tròn mảnh, câu sans 52 px có dòng `chu-vang`. Phải: tiêu đề sans 44 px, ô có biểu tượng vàng (`OTaiKhoan`), mật khẩu có nút hiện/ẩn, nút vàng 50 px. Điện thoại: chỉ cột phải. |
 | **Tổng quan** | Lời chào theo giờ → hộp hero tối (vòng chấm công 5/7 + số đúng giờ/đi muộn/chưa chấm + biểu đồ cột nửa giờ) bên trái, "Việc cần bạn" bên phải → hàng 4 chỉ số kèm đường xu hướng → "Nhân sự theo khối" và "Đang tuyển" (thanh tiến độ 6 bước). Có khu "Tài khoản chờ duyệt" lên đầu khi có. |
 | **Hồ sơ nhân sự** | `TieuDeTrang` + tab lọc có đếm + ô tìm → bảng có avatar chữ cái → popup thêm/sửa/xoá. Mở sẵn popup bằng `?them=1`, điền sẵn tìm bằng `?q=`. |
 | **Tuyển dụng** | Chọn tin (nút dạng viên) → phễu mảnh → **bảng 7 cột theo bước, kéo thẻ sang cột khác để đổi bước** (lạc quan), bấm thẻ để sửa/xoá (điện thoại: bấm thẻ rồi chọn bước). `?tin=` chọn tin, `?dang=1` mở popup đăng tuyển. |
@@ -249,3 +249,11 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 
 - 22/10/2026 — Thêm thanh tab dưới cùng cho điện thoại; xoá toàn bộ dữ liệu mẫu (chỉ còn 5 khối theo sơ đồ OMYN, 2 tài khoản đăng nhập, vai trò/quyền).
 - 22/10/2026 — Chốt hệ thiết kế vàng champagne + espresso, gradient vàng, chế độ tối; áp toàn bộ trang theo bản thiết kế Claude Design (menu tối, ô tìm ⌘K, hộp hero, bảng kéo thả tuyển dụng, đăng nhập mới); `Chon`/`NgayChon` qua portal.
+
+
+## 9. Bổ sung 22/10/2026 — khối, lương, đồng hồ, lịch chấm công
+- **Lời chào + đồng hồ HCM** (`LoiChaoDongHo`): giờ thật theo Asia/Ho_Chi_Minh, nhảy từng giây. Mốc chào: 05–11 giờ sáng, 11–13 giờ trưa, 13–18 giờ chiều, còn lại buổi tối.
+- **Khối** (`/khoi`, `DanhSachKhoi`): thêm/sửa/xoá bằng popup; không xoá được khi khối còn nhân viên hoặc tin tuyển dụng.
+- **Lương** (`/luong`, chỉ Quản trị; nhân viên chỉ thấy phiếu của mình đã duyệt/đã chi): 3 tab Bảng lương · Thỏa thuận lương · Tham số. Kỳ đi Mở → Đã lập → Đã kiểm → Đã duyệt → Đã chi; từ Đã kiểm trở đi khoá sửa. Duyệt kỳ chỉ được khi mọi tham số pháp lý đã được Quản trị xác nhận. Thành phần: `BangLuongKy`, `ChiTietDongLuong` (xem kết quả tức thì), `ThoaThuanLuong`, `ThamSoLuong`, `PhieuLuongCuaToi`, ô nhập `OTien`, công tắc `Gat`.
+- **Công tính lương theo ca đã định**, không theo giờ bấm: lịch hiển thị giờ bấm thực tế, nhưng công = số ngày đi làm (ca hành chính 08:30–17:30); đi muộn chỉ là nhãn trạng thái. Giờ tăng ca nhập tay ở dòng lương.
+- **Lịch chấm công** (`BoLocThoiGian`): chọn thẳng tháng/năm bằng ô chọn, nút tháng trước/sau, "Tháng này", hoặc tab "Tuỳ chỉnh khoảng ngày" (tối đa 93 ngày, hiện bảng Ngày · Nhân viên · Bộ phận · Giờ vào · Giờ ra · Trạng thái). Ô sự kiện trên lịch: dòng 1 "Tên - Bộ phận", dòng 2 "08:20 – 17:35"; quá chỗ thì "+N người nữa".

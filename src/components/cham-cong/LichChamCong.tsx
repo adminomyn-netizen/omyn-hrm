@@ -19,6 +19,7 @@ export type SuKienChamCong = {
   id: string;
   ngay: string; // "YYYY-MM-DD"
   hoTen: string;
+  khoiTen: string;
   gioVao: string | null;
   gioRa: string | null;
   trangThai: string;
@@ -26,6 +27,9 @@ export type SuKienChamCong = {
 
 type SuKienLich = {
   id: string;
+  hoTen: string;
+  khoiTen: string;
+  gio: string;
   title: string;
   start: Date;
   end: Date;
@@ -39,6 +43,10 @@ const MAU_THEO_TRANG_THAI: Record<string, { bg: string; border: string; chu: str
   "Vắng mặt": { bg: "var(--loi-nen)", border: "var(--loi)", chu: "var(--loi)" },
   "Nghỉ phép": { bg: "var(--giay-tram)", border: "var(--vien-dam)", chu: "var(--muc-2)" },
 };
+
+const hhmm = (g: string | null) => (g ? g.slice(0, 5) : null);
+/** "08:20 – 17:35"; chưa chấm ra thì "08:20 – …". */
+export const gioLam = (vao: string | null, ra: string | null) => (vao ? `${hhmm(vao)} – ${hhmm(ra) ?? "…"}` : "Chưa chấm vào");
 
 export function LichChamCong({
   suKien,
@@ -57,6 +65,9 @@ export function LichChamCong({
         const ngay = new Date(`${s.ngay}T00:00:00`);
         return {
           id: s.id,
+          hoTen: s.hoTen,
+          khoiTen: s.khoiTen,
+          gio: gioLam(s.gioVao, s.gioRa),
           title: `${s.hoTen} · ${s.trangThai}`,
           start: ngay,
           end: ngay,
@@ -72,7 +83,7 @@ export function LichChamCong({
     // overflow-x-auto khoanh vùng lịch này — lưới RBC có bề rộng cố định tối
     // thiểu, không bọc thì nó đẩy tràn ngang cả trang trên di động.
     <div className="overflow-x-auto">
-      <div className="omyn-rbc" style={{ height: 640, minWidth: 720 }}>
+      <div className="omyn-rbc" style={{ height: 760, minWidth: 720 }}>
         <Calendar
           localizer={localizer}
           culture="vi"
@@ -80,6 +91,8 @@ export function LichChamCong({
           defaultDate={ngayMacDinh}
           date={ngayMacDinh}
           view="month"
+          toolbar={false}
+          popup
           views={["month"]}
           onView={() => {}}
           onNavigate={(ngayMoi) => {
@@ -92,6 +105,7 @@ export function LichChamCong({
             previous: "Tháng trước",
             today: "Hôm nay",
             noEventsInRange: "Không có dữ liệu chấm công trong khoảng này.",
+            showMore: (n: number) => `+${n} người nữa`,
           }}
           eventPropGetter={(event: SuKienLich) => {
             const mau = MAU_THEO_TRANG_THAI[event.trangThai] ?? { bg: "var(--giay-tram)", border: "var(--vien-dam)", chu: "var(--muc-2)" };
@@ -106,7 +120,10 @@ export function LichChamCong({
           }}
           components={{
             event: ({ event }: EventProps<SuKienLich>) => (
-              <span className="truncate text-xs font-medium">{event.title}</span>
+              <span className="block leading-tight" title={`${event.hoTen} · ${event.trangThai}`}>
+                <span className="block truncate text-xs font-semibold">{event.hoTen}{event.khoiTen ? ` - ${event.khoiTen}` : ""}</span>
+                <span className="block truncate text-[11px] tabular-nums opacity-90">{event.gio}</span>
+              </span>
             ),
           }}
         />

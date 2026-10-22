@@ -1,63 +1,56 @@
 export const dynamic = "force-dynamic";
 
-import { HangChiSo } from "@/components/ui/HangChiSo";
+import { redirect } from "next/navigation";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
-import { MucTrang } from "@/components/ui/MucTrang";
-import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
-import { Bang, type Cot } from "@/components/ui/Table";
-import { layBangLuongKyGanNhat } from "@/lib/data";
-import { yeuCauVaiTro } from "@/lib/auth";
-import { tienVN, trieuVN } from "@/lib/dinh-dang";
-import { NUT_PHU } from "@/components/ui/dinh-dang";
+import { QuanLyLuong } from "@/components/luong/QuanLyLuong";
+import { PhieuLuongCuaToi, type PhieuView } from "@/components/luong/PhieuLuongCuaToi";
+import { layDongLuongCuaKy, layKyLuong, layNhanVienIdTheoUser, layPhieuLuongCuaToi, layThamSoLuong, layThoaThuanLuong } from "@/lib/data";
+import { layNguoiDungDaDuyet } from "@/lib/auth";
+import { THAM_SO_MAC_DINH, type ThamSo } from "@/lib/luong/tinh-luong";
+import type { DongLuongView } from "@/components/luong/ChiTietDongLuong";
 
-type DongLuong = NonNullable<Awaited<ReturnType<typeof layBangLuongKyGanNhat>>>["chiTiet"][number];
+export default async function TrangLuong({ searchParams }: { searchParams: Promise<{ ky?: string }> }) {
+  const nd = await layNguoiDungDaDuyet();
 
-const cot: Cot<DongLuong>[] = [
-  { nhan: "Nhân viên", hienThi: (d) => <span className="font-medium text-muc">{d.nhan_vien_ho_ten}</span> },
-  { nhan: "Khối", hienThi: (d) => d.khoi_ten },
-  { nhan: "Lương cơ bản", phai: true, hienThi: (d) => tienVN(d.luong_co_ban) },
-  { nhan: "Phụ cấp", phai: true, hienThi: (d) => tienVN(d.phu_cap) },
-  { nhan: "Thực lĩnh", phai: true, hienThi: (d) => <span className="font-semibold text-muc">{tienVN(d.thuc_linh)}</span> },
-];
-
-export default async function TrangLuong() {
-  await yeuCauVaiTro(["admin", "ky_thuat"]);
-  const luong = await layBangLuongKyGanNhat();
-
-  if (!luong) {
+  // Nhân viên: chỉ phiếu lương đã duyệt của chính mình.
+  if (nd.vaiTro === "nhan_vien") {
+    const nvId = await layNhanVienIdTheoUser(nd.id);
+    const ds = nvId ? await layPhieuLuongCuaToi(nvId) : [];
+    const phieu: PhieuView[] = ds.map((d) => ({
+      id: d.id, ten_ky: d.ky?.ten_ky ?? "", trang_thai: d.ky?.trang_thai ?? "", cong_chuan: Number(d.cong_chuan), cong_huong: Number(d.cong_huong),
+      luong_chuc_danh: Number(d.luong_chuc_danh), luong_kpi: Number(d.luong_kpi), phu_cap_thuc: Number(d.phu_cap_thuc), tien_an: Number(d.tien_an), tien_ot: Number(d.tien_ot),
+      hoa_hong: Number(d.hoa_hong), thuong_khac: Number(d.thuong_khac), tong_thu_nhap: Number(d.tong_thu_nhap), bh_xh: Number(d.bh_xh), bh_yt: Number(d.bh_yt), bh_tn: Number(d.bh_tn),
+      thue_tncn: Number(d.thue_tncn), khau_tru_khac: Number(d.khau_tru_khac), thuc_linh: Number(d.thuc_linh),
+    }));
     return (
-      <>
-        <TieuDeTrang tieuDe="Bảng lương" phu="Quỹ lương và chi tiết theo kỳ" />
-        <p className="chu-tieu-de py-20 text-center text-[28px] italic text-muc-3">
-          Chưa có kỳ lương nào. Khi có kỳ lương đầu tiên, bảng lương sẽ hiện ở đây.
-        </p>
-      </>
+      <div className="space-y-10">
+        <TieuDeTrang tieuDe="Phiếu lương" phu="Phiếu lương các kỳ đã duyệt của bạn" />
+        <PhieuLuongCuaToi ds={phieu} />
+      </div>
     );
   }
 
+  // Lương là dữ liệu nhạy cảm: chỉ Quản trị.
+  if (nd.vaiTro !== "admin") redirect("/dashboard");
+
+  const { ky: kyThamSo } = await searchParams;
+  const [ky, thoaThuan, thamSoDs] = await Promise.all([layKyLuong(), layThoaThuanLuong(), layThamSoLuong()]);
+  const chon = ky.find((k) => k.id === kyThamSo)?.id ?? ky[0]?.id ?? "";
+  const dongRaw = chon ? await layDongLuongCuaKy(chon) : [];
+  const thamSo: ThamSo = { ...THAM_SO_MAC_DINH };
+  for (const t of thamSoDs) thamSo[t.khoa] = t.gia_tri;
+  const dong = dongRaw.map((d) => ({
+    ...d,
+    luong_thoa_thuan: Number(d.luong_thoa_thuan), phu_cap: Number(d.phu_cap), cong_chuan: Number(d.cong_chuan), cong_huong: Number(d.cong_huong), ngay_lam: Number(d.ngay_lam),
+    gio_ot_thuong: Number(d.gio_ot_thuong), gio_ot_nghi_tuan: Number(d.gio_ot_nghi_tuan), gio_ot_le: Number(d.gio_ot_le), hoa_hong: Number(d.hoa_hong), thuong_khac: Number(d.thuong_khac), khau_tru_khac: Number(d.khau_tru_khac),
+    luong_chuc_danh: Number(d.luong_chuc_danh), luong_kpi: Number(d.luong_kpi), phu_cap_thuc: Number(d.phu_cap_thuc), tien_an: Number(d.tien_an), tien_ot: Number(d.tien_ot), tong_thu_nhap: Number(d.tong_thu_nhap),
+    bh_xh: Number(d.bh_xh), bh_yt: Number(d.bh_yt), bh_tn: Number(d.bh_tn), giam_tru: Number(d.giam_tru), thu_nhap_tinh_thue: Number(d.thu_nhap_tinh_thue), thue_tncn: Number(d.thue_tncn), thuc_linh: Number(d.thuc_linh), bh_cty: Number(d.bh_cty),
+  })) as DongLuongView[];
+
   return (
-    <div className="space-y-10">
-      <TieuDeTrang tieuDe="Bảng lương" phu="Quỹ lương và chi tiết theo kỳ" />
-      <HangChiSo
-        muc={[
-          { nhan: "Kỳ lương", so: luong.ky },
-          { nhan: "Tổng quỹ lương", so: trieuVN(luong.tongQuyLuong) },
-          { nhan: "Số người", so: String(luong.chiTiet.length) },
-        ]}
-      />
-      <MucTrang
-        tieuDe={`Chi tiết bảng lương · ${luong.ky}`}
-        phai={
-          <span className="flex items-center gap-4">
-            <NhanTrangThai kieu={luong.daThanhToan ? "tot" : "cho"}>{luong.daThanhToan ? "Đã thanh toán" : "Chưa thanh toán"}</NhanTrangThai>
-            <button type="button" disabled title="Tính năng xuất file chuyển khoản làm ở giai đoạn Lương" className={NUT_PHU}>
-              Xuất file chuyển khoản
-            </button>
-          </span>
-        }
-      >
-        <Bang cot={cot} duLieu={luong.chiTiet} khoa={(d) => d.nhan_vien_ho_ten} />
-      </MucTrang>
+    <div className="space-y-8">
+      <TieuDeTrang tieuDe="Lương" phu="Kỳ lương, thỏa thuận lương và tham số tính lương" />
+      <QuanLyLuong ky={ky} chon={chon} dong={dong} thamSo={thamSo} thoaThuan={thoaThuan} thamSoDs={thamSoDs} />
     </div>
   );
 }
