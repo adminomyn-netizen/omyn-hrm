@@ -26,9 +26,15 @@ export const viewport: Viewport = {
   themeColor: "#f7f3ec",
 };
 
+// Chạy trước khi vẽ trang để khỏi nháy sáng→tối: chỉ bật tối khi người dùng đã tự chọn trước đó.
+const KHOI_TAO_CHE_DO = `try{if(localStorage.getItem("omyn-hrm-che-do")==="toi")document.documentElement.classList.add("dark")}catch(e){}`;
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="vi" className={`${beVietnam.variable} ${cormorant.variable} h-full antialiased`}>
+    <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${cormorant.variable} h-full antialiased`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: KHOI_TAO_CHE_DO }} />
+      </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">{children}</body>
     </html>
   );

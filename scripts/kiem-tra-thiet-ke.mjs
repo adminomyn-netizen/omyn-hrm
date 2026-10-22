@@ -11,7 +11,6 @@ const QUY_TAC = [
   { ma: "phong-cam", re: /\b(Inter|Roboto|Arial|Poppins)\b/, vi: "phông mặc định bị cấm" },
   { ma: "tim-xanh", re: /\b(from|via|to)-(violet|purple|indigo|fuchsia|blue|sky|cyan|teal|emerald|green|lime|pink|rose)-/, vi: "dải màu ngoài tông vàng (tím/xanh/lục)" },
   { ma: "van-phong", re: /Chào mừng bạn đến với|Oops|Lorem ipsum|John Doe|Acme|Đã xảy ra lỗi!?["'`<]/, vi: "văn phong cấm (E.7)" },
-  { ma: "dark", re: /\bdark:/, vi: "lớp dark: (không có chế độ tối)" },
 ];
 
 function duyet(thuMuc, ra = []) {

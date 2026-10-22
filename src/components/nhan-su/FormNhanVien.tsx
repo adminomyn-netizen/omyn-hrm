@@ -1,12 +1,12 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { themNhanVien, suaNhanVien } from "@/lib/actions";
+import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 
-type Khoi = { id: string; ten: string };
+export type Khoi = { id: string; ten: string };
 
-type NhanVienCoSan = {
+export type NhanVienCoSan = {
   id: string;
   ma_nhan_vien: string | null;
   ho_ten: string;
@@ -17,88 +17,70 @@ type NhanVienCoSan = {
   trang_thai: string;
 };
 
-const o = "w-full rounded-lg border border-omyn-border px-3 py-2 text-sm outline-none focus:border-omyn-primary";
-const nhan = "mb-1 block text-sm font-medium text-slate-700";
-
-/** Dùng chung cho cả form thêm và sửa nhân viên — truyền `coSan` để vào chế độ sửa. */
-export function FormNhanVien({ khoi, coSan }: { khoi: Khoi[]; coSan?: NhanVienCoSan }) {
+/** Biểu mẫu thêm/sửa nhân viên, đặt trong hộp thoại. `coSan` = chế độ sửa.
+ * <form> chỉ để gom ô nhập; KHÔNG submit thật — nút là type="button" gọi action qua onClick
+ * (lý do ở src/lib/actions.ts: submit thật làm Server Action bị huỷ trên Next 16 này). */
+export function FormNhanVien({
+  khoi,
+  coSan,
+  xong,
+  huy,
+}: {
+  khoi: Khoi[];
+  coSan?: NhanVienCoSan;
+  xong: () => void;
+  huy: () => void;
+}) {
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
-  // QUAN TRỌNG: thẻ <form> ở đây KHÔNG BAO GIỜ được submit thật (nút bấm là
-  // type="button", không phải type="submit") — chỉ dùng <form> làm nơi gom
-  // field để new FormData(formRef.current) đọc tiện. Đã xác minh thật qua
-  // trình duyệt: hễ form này NỔ RA một sự kiện submit thật (dù có
-  // preventDefault() hay gắn action={serverAction}), request Server Action
-  // ngay sau đó bị Next.js/React âm thầm huỷ — không chạy tới thân hàm, và
-  // trang bật về /dang-nhap như mất đăng nhập. Gọi action thẳng từ onClick
-  // của nút (không qua sự kiện submit) thì chạy đúng, y như nút Duyệt/Xóa.
   const gui = () => {
-    if (!formRef.current) return;
-    // Không có sự kiện submit thật thì trình duyệt không tự kiểm required —
-    // gọi tay để vẫn báo lỗi field trống như form bình thường.
-    if (!formRef.current.reportValidity()) return;
+    if (!formRef.current || !formRef.current.reportValidity()) return;
     const fd = new FormData(formRef.current);
     startXuLy(async () => {
       const ket = coSan ? await suaNhanVien(fd) : await themNhanVien(fd);
-      if (ket?.loi) {
-        setLoi(ket.loi);
-      } else {
-        setLoi(undefined);
-        router.push("/nhan-su");
-      }
+      if (ket?.loi) setLoi(ket.loi);
+      else xong();
     });
   };
 
   return (
-    <form ref={formRef} className="space-y-4">
+    <form ref={formRef} className="space-y-4" onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}>
       {coSan && <input type="hidden" name="id" value={coSan.id} />}
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
         <div>
-          <label className={nhan}>Mã nhân viên</label>
-          <input name="ma_nhan_vien" placeholder="NV009" defaultValue={coSan?.ma_nhan_vien ?? ""} className={o} />
+          <label htmlFor="nv-ho-ten" className={NHAN_O}>Họ và tên *</label>
+          <input id="nv-ho-ten" name="ho_ten" required defaultValue={coSan?.ho_ten ?? ""} className={O_NHAP} />
         </div>
         <div>
-          <label className={nhan}>
-            Họ tên <span className="text-rose-500">*</span>
-          </label>
-          <input name="ho_ten" required defaultValue={coSan?.ho_ten ?? ""} className={o} />
+          <label htmlFor="nv-ma" className={NHAN_O}>Mã nhân viên</label>
+          <input id="nv-ma" name="ma_nhan_vien" placeholder="NV009" defaultValue={coSan?.ma_nhan_vien ?? ""} className={O_NHAP} />
         </div>
         <div>
-          <label className={nhan}>Chức danh</label>
-          <input name="chuc_danh" defaultValue={coSan?.chuc_danh ?? ""} className={o} />
+          <label htmlFor="nv-chuc-danh" className={NHAN_O}>Chức danh</label>
+          <input id="nv-chuc-danh" name="chuc_danh" defaultValue={coSan?.chuc_danh ?? ""} className={O_NHAP} />
         </div>
         <div>
-          <label className={nhan}>
-            Khối <span className="text-rose-500">*</span>
-          </label>
-          <select name="khoi_id" required defaultValue={coSan?.khoi_id ?? ""} className={o}>
-            <option value="" disabled>
-              -- Chọn khối --
-            </option>
+          <label htmlFor="nv-khoi" className={NHAN_O}>Khối *</label>
+          <select id="nv-khoi" name="khoi_id" required defaultValue={coSan?.khoi_id ?? ""} className={O_NHAP}>
+            <option value="" disabled>Chọn khối</option>
             {khoi.map((k) => (
-              <option key={k.id} value={k.id}>
-                {k.ten}
-              </option>
+              <option key={k.id} value={k.id}>{k.ten}</option>
             ))}
           </select>
         </div>
         <div>
-          <label className={nhan}>Email</label>
-          <input name="email" type="email" defaultValue={coSan?.email ?? ""} className={o} />
+          <label htmlFor="nv-email" className={NHAN_O}>Email</label>
+          <input id="nv-email" name="email" type="email" defaultValue={coSan?.email ?? ""} className={O_NHAP} />
         </div>
         <div>
-          <label className={nhan}>
-            Ngày vào làm <span className="text-rose-500">*</span>
-          </label>
-          <input name="ngay_vao_lam" type="date" required defaultValue={coSan?.ngay_vao_lam ?? ""} className={o} />
+          <label htmlFor="nv-ngay" className={NHAN_O}>Ngày vào làm *</label>
+          <input id="nv-ngay" name="ngay_vao_lam" type="date" required defaultValue={coSan?.ngay_vao_lam ?? ""} className={O_NHAP} />
         </div>
-        <div>
-          <label className={nhan}>Trạng thái</label>
-          <select name="trang_thai" defaultValue={coSan?.trang_thai ?? "Đang làm"} className={o}>
+        <div className="sm:col-span-2">
+          <label htmlFor="nv-tt" className={NHAN_O}>Trạng thái</label>
+          <select id="nv-tt" name="trang_thai" defaultValue={coSan?.trang_thai ?? "Đang làm"} className={O_NHAP}>
             <option value="Đang làm">Đang làm</option>
             <option value="Thử việc">Thử việc</option>
             <option value="Đã nghỉ">Đã nghỉ</option>
@@ -107,17 +89,13 @@ export function FormNhanVien({ khoi, coSan }: { khoi: Khoi[]; coSan?: NhanVienCo
       </div>
 
       {loi && (
-        <div className="rounded-md bg-rose-50 px-3 py-2 text-sm text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:ring-rose-500/30">{loi}</div>
+        <div role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</div>
       )}
 
-      <div className="flex justify-end gap-2 pt-2">
-        <button
-          type="button"
-          disabled={dangXuLy}
-          onClick={gui}
-          className="rounded-lg bg-omyn-primary px-5 py-2 text-sm font-medium text-white hover:bg-omyn-primary-dark disabled:opacity-60"
-        >
-          {dangXuLy ? "Đang lưu..." : coSan ? "Lưu thay đổi" : "Lưu nhân viên"}
+      <div className="flex justify-end gap-2 border-t border-vien pt-4">
+        <button type="button" onClick={huy} disabled={dangXuLy} className={NUT_PHU}>Huỷ</button>
+        <button type="button" onClick={gui} disabled={dangXuLy} className={NUT_CHINH}>
+          {dangXuLy ? "Đang lưu" : coSan ? "Lưu thay đổi" : "Thêm nhân viên"}
         </button>
       </div>
     </form>

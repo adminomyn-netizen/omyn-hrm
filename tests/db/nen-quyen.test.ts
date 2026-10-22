@@ -272,13 +272,31 @@ describe("Nền phân quyền 0004 (K-G1)", () => {
     });
   });
 
+  // ── Tuyển dụng mở rộng (0005) ──
+  describe("tuyển dụng mở rộng", () => {
+    it("HCNS aal2 thêm ứng viên với trường mới; bước không hợp lệ bị từ chối", async () => {
+      const tin = await q(aal2(U.hcns), `insert into public.tin_tuyen_dung (vi_tri, mo_ta, han_nop) values ('Kho','mô tả','2026-12-31') returning id`);
+      const id = tin.rows[0].id;
+      const ok = await q(aal2(U.hcns), `insert into public.ung_vien (tin_tuyen_dung_id, ho_ten, nguon, link_cv, ghi_chu, nam_sinh) values ('${id}','Ứng Viên A','TopCV','https://x.vn/cv','ghi',1999) returning trang_thai, ngay_nhan_ho_so is not null as co_ngay`);
+      expect(ok.rows).toEqual([{ trang_thai: "Mới nộp", co_ngay: true }]);
+      await expect(q(aal2(U.hcns), `update public.ung_vien set trang_thai='Tùy ý' where ho_ten='Ứng Viên A'`)).rejects.toThrow(/check constraint|violates/);
+      const up = await q(aal2(U.hcns), `update public.ung_vien set trang_thai='Hẹn phỏng vấn', ngay_phong_van='2026-11-10' where ho_ten='Ứng Viên A' returning id`);
+      expect(up.rows).toHaveLength(1);
+    });
+
+    it("nhân viên thường không đọc/ghi được ứng viên; không đổi được ngày nhận hồ sơ sau khi tạo", async () => {
+      expect(await dem(aal1(U.content), "select 1 from public.ung_vien")).toBe(0);
+      await expect(q(aal2(U.hcns), `update public.ung_vien set ngay_nhan_ho_so='2020-01-01'`)).rejects.toThrow(/permission denied/);
+    });
+  });
+
   // ── Tuyển dụng (module không gắn nhân viên) ──
   describe("tuyển dụng", () => {
     it("nhân viên thường không thấy; HCNS aal2 tạo/xoá được; aal1 thì không", async () => {
       await db.exec(`insert into public.tin_tuyen_dung (vi_tri) values ('Host live')`);
       expect(await dem(aal1(U.content), "select 1 from public.tin_tuyen_dung")).toBe(0);
       expect(await dem(aal1(U.hcns), "select 1 from public.tin_tuyen_dung")).toBe(0);
-      expect(await dem(aal2(U.hcns), "select 1 from public.tin_tuyen_dung")).toBe(1);
+      expect(await dem(aal2(U.hcns), "select 1 from public.tin_tuyen_dung")).toBeGreaterThanOrEqual(1);
       const r = await q(aal2(U.hcns), `insert into public.tin_tuyen_dung (vi_tri) values ('Streamer') returning id`);
       expect(r.rows).toHaveLength(1);
     });

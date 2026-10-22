@@ -9,14 +9,10 @@ const CAO: Record<KichThuocLogo, number> = { sm: 20, md: 28, lg: 40 };
 export function LogoMark({ size = "md", className }: { size?: KichThuocLogo; className?: string }) {
   const h = CAO[size];
   return (
-    <Image
-      src="/brand/bieu-tuong.svg"
-      alt="OMYN"
-      width={h}
-      height={h}
-      unoptimized
-      className={className}
-    />
+    <>
+      <Image src="/brand/bieu-tuong.svg" alt="OMYN" width={h} height={h} unoptimized className={`dark:hidden ${className ?? ""}`} />
+      <Image src="/brand/bieu-tuong-sang.svg" alt="OMYN" width={h} height={h} unoptimized className={`hidden dark:block ${className ?? ""}`} />
+    </>
   );
 }
 
@@ -32,14 +28,14 @@ export function Logo({
   className?: string;
 }) {
   const h = CAO[size];
+  const w = Math.round(h * 4.3);
+  if (nenToi) {
+    return <Image src="/brand/logo-tren-nen-toi.svg" alt="OMYN" width={w} height={h} unoptimized className={className} />;
+  }
   return (
-    <Image
-      src={nenToi ? "/brand/logo-tren-nen-toi.svg" : "/brand/logo-ngang.svg"}
-      alt="OMYN"
-      width={Math.round(h * 4.3)}
-      height={h}
-      unoptimized
-      className={className}
-    />
+    <>
+      <Image src="/brand/logo-ngang.svg" alt="OMYN" width={w} height={h} unoptimized className={`dark:hidden ${className ?? ""}`} />
+      <Image src="/brand/logo-tren-nen-toi.svg" alt="OMYN" width={w} height={h} unoptimized className={`hidden dark:block ${className ?? ""}`} />
+    </>
   );
 }

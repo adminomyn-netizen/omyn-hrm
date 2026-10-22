@@ -61,18 +61,6 @@
   ],
   "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
  },
- "src/app/nhan-su/page.tsx": {
-  "ma": [
-   "dark"
-  ],
-  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
- },
- "src/app/tuyen-dung/page.tsx": {
-  "ma": [
-   "dark"
-  ],
-  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
- },
  "src/components/cham-cong/DongHoHCM.tsx": {
   "ma": [],
   "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
@@ -84,18 +72,6 @@
   "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
  },
  "src/components/don-tu/HanhDongDonTu.tsx": {
-  "ma": [
-   "dark"
-  ],
-  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
- },
- "src/components/nhan-su/FormNhanVien.tsx": {
-  "ma": [
-   "dark"
-  ],
-  "ly_do": "Trang cũ chưa làm lại theo thiết kế mới; làm lại ở giai đoạn có module đó, rồi gỡ khỏi danh sách"
- },
- "src/components/nhan-su/HanhDongNhanVien.tsx": {
   "ma": [
    "dark"
   ],
