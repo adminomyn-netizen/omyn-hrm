@@ -26,8 +26,8 @@ export async function dangKy(_truoc: { loi?: string } | undefined, formData: For
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 120) {
     return { loi: "Email chưa đúng định dạng." };
   }
-  if (matKhau.length < 10) {
-    return { loi: "Mật khẩu cần ít nhất 10 ký tự." };
+  if (matKhau.length < 8 || !/[A-Z]/.test(matKhau) || !/[^A-Za-z0-9]/.test(matKhau)) {
+    return { loi: "Mật khẩu cần ít nhất 8 ký tự, có chữ in hoa và ký tự đặc biệt (ví dụ ! @ # $)." };
   }
   if (matKhau !== xacNhan) {
     return { loi: "Hai mật khẩu chưa khớp nhau." };

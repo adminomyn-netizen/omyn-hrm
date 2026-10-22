@@ -42,14 +42,14 @@ export default function TrangDangKy() {
         </div>
         <div>
           <label htmlFor="mat_khau" className={nhan}>
-            Mật khẩu (ít nhất 10 ký tự)
+            Mật khẩu (8 ký tự trở lên, có chữ in hoa và ký tự đặc biệt)
           </label>
           <input
             id="mat_khau"
             name="mat_khau"
             type="password"
             required
-            minLength={10}
+            minLength={8}
             autoComplete="new-password"
             className={o}
           />
@@ -63,7 +63,7 @@ export default function TrangDangKy() {
             name="xac_nhan_mat_khau"
             type="password"
             required
-            minLength={10}
+            minLength={8}
             autoComplete="new-password"
             className={o}
           />
