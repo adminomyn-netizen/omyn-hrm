@@ -21,6 +21,7 @@
   --nhan: #8f6c20;
   --nhan-dam: #6e5119;
   --nhan-nhat: #f5ebcf;
+  --chu-tren-vang: #2a2218; /* chữ trên nền vàng: luôn nâu đậm, cả chế độ tối */
   --vang-sang: #e8cf8a;
   --vang: #c9a24b;
   --vang-tram: #b8923a;
@@ -37,6 +38,11 @@
   --gradient-nen: linear-gradient(180deg, #fffdf8 0%, #fbf7ee 55%, #f3ebd9 100%);
   --gradient-dau-trang: linear-gradient(90deg, #f7ecd0 0%, #fbf7ee 60%, #fbf7ee 100%);
 
+  /* Thang "slate" của Tailwind được đổi sang tông be ấm để các trang cũ chưa làm lại không bị ánh xanh lạnh. */
+  --color-slate-50: #fbf7ee; --color-slate-100: #f3ebd9; --color-slate-200: #e8dec8; --color-slate-300: #d3c6a9;
+  --color-slate-400: #a99b7c; --color-slate-500: #75684f; --color-slate-600: #5d5142; --color-slate-700: #4a4034;
+  --color-slate-800: #3a3228; --color-slate-900: #2a2218; --color-slate-950: #1c160e;
+
   --background: var(--giay);
   --foreground: var(--muc);
   --omyn-primary: var(--nhan);
@@ -45,6 +51,34 @@
   --omyn-accent: var(--vang);
   --omyn-surface: var(--giay-sang);
   --omyn-border: var(--vien);
+}
+
+/* Chế độ tối: nâu espresso + vàng champagne. Bật bằng class .dark trên <html> (nút ở đầu trang,
+ * nhớ lựa chọn trong localStorage; mặc định luôn là sáng). */
+.dark {
+  color-scheme: dark;
+  --giay: #17120c;
+  --giay-sang: #1f1a12;
+  --giay-tram: #2a2318;
+  --muc: #f3ead8;
+  --muc-2: #cdbfa3;
+  --muc-3: #a89a7c;
+  --vien: #3a3123;
+  --vien-dam: #7c6f56;
+  --nhan: #d9b45c;
+  --nhan-dam: #e8cf8a;
+  --nhan-nhat: #3a2f17;
+  --loi: #f0a091;
+  --loi-nen: #3b1f1a;
+  --canh-bao: #e8a77a;
+  --canh-bao-nen: #3a2618;
+
+  --gradient-nen: linear-gradient(180deg, #1f1a12 0%, #17120c 55%, #120e08 100%);
+  --gradient-dau-trang: linear-gradient(90deg, #2a2112 0%, #1c160d 60%, #17120c 100%);
+
+  --color-slate-50: #1f1a12; --color-slate-100: #2a2318; --color-slate-200: #3a3123; --color-slate-300: #52472f;
+  --color-slate-400: #8a7d62; --color-slate-500: #a89a7c; --color-slate-600: #bfb297; --color-slate-700: #d4c8ae;
+  --color-slate-800: #e6dcc4; --color-slate-900: #f3ead8; --color-slate-950: #faf3e4;
 }
 
 @theme inline {
@@ -97,7 +131,7 @@ body {
 /* Nút vàng: dải vàng champagne, chữ nâu đậm (tương phản ≥ 7:1). */
 .nut-vang {
   background: var(--gradient-vang);
-  color: var(--muc);
+  color: var(--chu-tren-vang);
   font-weight: 600;
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(143 108 32 / 0.25);
   transition: filter 150ms ease-out, box-shadow 150ms ease-out;

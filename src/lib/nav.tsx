@@ -1,9 +1,25 @@
+import {
+  Activity,
+  BarChart3,
+  Clock,
+  FileBarChart,
+  Inbox,
+  LayoutDashboard,
+  Settings,
+  UserPlus,
+  Users,
+  Wallet,
+  type LucideIcon,
+} from "lucide-react";
 import type { VaiTro } from "@/lib/auth";
 
 export type MucMenu = {
   ten: string;
   duong_dan: string;
   nhom: string;
+  icon: LucideIcon;
+  /** Một câu nói rõ mục này dùng để làm gì — hiện ở menu người dùng để ai vào cũng hiểu mình làm được gì. */
+  moTa: string;
   // không khai = mọi vai trò đều thấy
   chiVaiTro?: VaiTro[];
 };
@@ -11,16 +27,16 @@ export type MucMenu = {
 const CHI_QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
 
 export const menuChinh: MucMenu[] = [
-  { ten: "Tổng quan", duong_dan: "/dashboard", nhom: "Chung", chiVaiTro: CHI_QUAN_LY },
-  { ten: "Hồ sơ nhân sự", duong_dan: "/nhan-su", nhom: "Con người", chiVaiTro: CHI_QUAN_LY },
-  { ten: "Chấm công", duong_dan: "/cham-cong", nhom: "Hằng ngày" },
-  { ten: "Đơn từ và phê duyệt", duong_dan: "/don-tu", nhom: "Hằng ngày" },
-  { ten: "Bảng lương", duong_dan: "/luong", nhom: "Tiền lương", chiVaiTro: CHI_QUAN_LY },
-  { ten: "Tuyển dụng", duong_dan: "/tuyen-dung", nhom: "Con người", chiVaiTro: CHI_QUAN_LY },
-  { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia", nhom: "Con người", chiVaiTro: CHI_QUAN_LY },
-  { ten: "Báo cáo và biểu mẫu", duong_dan: "/bao-cao", nhom: "Quản trị", chiVaiTro: CHI_QUAN_LY },
-  { ten: "Kỹ thuật", duong_dan: "/ky-thuat", nhom: "Quản trị", chiVaiTro: ["ky_thuat", "admin"] },
-  { ten: "Cài đặt và phân quyền", duong_dan: "/cai-dat", nhom: "Quản trị", chiVaiTro: ["admin"] },
+  { ten: "Tổng quan", duong_dan: "/dashboard", nhom: "Chung", icon: LayoutDashboard, chiVaiTro: CHI_QUAN_LY, moTa: "Số liệu nhân sự trong ngày và duyệt tài khoản mới đăng ký." },
+  { ten: "Hồ sơ nhân sự", duong_dan: "/nhan-su", nhom: "Con người", icon: Users, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa hồ sơ nhân viên; cho nghỉ việc." },
+  { ten: "Tuyển dụng", duong_dan: "/tuyen-dung", nhom: "Con người", icon: UserPlus, chiVaiTro: CHI_QUAN_LY, moTa: "Đăng tin, nhận hồ sơ, theo dõi ứng viên qua từng vòng." },
+  { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia", nhom: "Con người", icon: BarChart3, chiVaiTro: CHI_QUAN_LY, moTa: "Điểm và xếp loại hiệu suất theo kỳ." },
+  { ten: "Chấm công", duong_dan: "/cham-cong", nhom: "Hằng ngày", icon: Clock, moTa: "Chấm công vào/ra và xem lịch công của bạn." },
+  { ten: "Đơn từ và phê duyệt", duong_dan: "/don-tu", nhom: "Hằng ngày", icon: Inbox, moTa: "Nộp đơn nghỉ, công tác, tạm ứng và theo dõi kết quả duyệt." },
+  { ten: "Bảng lương", duong_dan: "/luong", nhom: "Tiền lương", icon: Wallet, chiVaiTro: CHI_QUAN_LY, moTa: "Quỹ lương và bảng lương theo kỳ." },
+  { ten: "Báo cáo và biểu mẫu", duong_dan: "/bao-cao", nhom: "Quản trị", icon: FileBarChart, chiVaiTro: CHI_QUAN_LY, moTa: "Báo cáo tổng hợp và biểu mẫu." },
+  { ten: "Kỹ thuật", duong_dan: "/ky-thuat", nhom: "Quản trị", icon: Activity, chiVaiTro: ["ky_thuat", "admin"], moTa: "Tình trạng hệ thống và số dòng dữ liệu." },
+  { ten: "Cài đặt và phân quyền", duong_dan: "/cai-dat", nhom: "Quản trị", icon: Settings, chiVaiTro: ["admin"], moTa: "Vai trò, quyền và thiết lập chung." },
 ];
 
 export function locMenuTheoVaiTro(vaiTro: VaiTro | null): MucMenu[] {
@@ -37,3 +53,10 @@ export function gomTheoNhom(menu: MucMenu[]): { nhom: string; muc: MucMenu[] }[]
   }
   return ra;
 }
+
+export const NHAN_VAI_TRO: Record<VaiTro, string> = {
+  admin: "Quản trị",
+  ky_thuat: "Kỹ thuật",
+  nhan_vien: "Nhân viên",
+  cho_duyet: "Chờ duyệt",
+};

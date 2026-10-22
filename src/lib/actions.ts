@@ -98,15 +98,39 @@ export async function suaNhanVien(formData: FormData): Promise<KetQuaNhanVien> {
   return { ok: true };
 }
 
-export async function xoaNhanVien(formData: FormData) {
-  if (!(await coVaiTro(QUAN_LY))) throw new Error(KHONG_DU_QUYEN);
+/** Xoá hẳn CHỈ khi nhân viên chưa có dữ liệu chấm công/đơn từ/lương/đánh giá (xoá sẽ kéo theo
+ * xoá các dữ liệu đó). Đã có dữ liệu thì phải chuyển "Đã nghỉ". */
+export async function xoaNhanVien(formData: FormData): Promise<KetQuaNhanVien> {
+  if (!(await coVaiTro(QUAN_LY))) return { loi: KHONG_DU_QUYEN };
   const id = String(formData.get("id") || "");
-  if (!id) return;
+  if (!id) return { loi: "Thiếu mã nhân viên." };
 
   const supabase = createAdminClient();
+  const dem = await Promise.all(
+    (["cham_cong", "don_tu", "bang_luong", "danh_gia_hieu_suat"] as const).map((b) =>
+      supabase.from(b).select("id", { count: "exact", head: true }).eq("nhan_vien_id", id),
+    ),
+  );
+  if (dem.some((d) => (d.count ?? 0) > 0)) {
+    return { loi: "Nhân viên này đã có dữ liệu chấm công, đơn từ hoặc lương nên không xoá hẳn được. Hãy chuyển sang \"Đã nghỉ\"." };
+  }
   const { error } = await supabase.from("nhan_vien").delete().eq("id", id);
-  if (error) throw error;
+  if (error) return { loi: thongBaoLoiNhanVien(error) };
 
   revalidatePath("/nhan-su");
   revalidatePath("/dashboard");
+  return { ok: true };
+}
+
+/** Cho nghỉ việc: đổi trạng thái sang "Đã nghỉ", giữ nguyên mọi dữ liệu. */
+export async function choNghiViec(formData: FormData): Promise<KetQuaNhanVien> {
+  if (!(await coVaiTro(QUAN_LY))) return { loi: KHONG_DU_QUYEN };
+  const id = String(formData.get("id") || "");
+  if (!id) return { loi: "Thiếu mã nhân viên." };
+  const supabase = createAdminClient();
+  const { error } = await supabase.from("nhan_vien").update({ trang_thai: "Đã nghỉ" }).eq("id", id);
+  if (error) return { loi: thongBaoLoiNhanVien(error) };
+  revalidatePath("/nhan-su");
+  revalidatePath("/dashboard");
+  return { ok: true };
 }

@@ -129,6 +129,7 @@ const tep = {
   "logo-don-sac-trang.svg": ngangSvg(trang),
   "logo-tren-nen-toi.svg": ngangSvg(nenToi),
   // Ở 16 px chấm hạt gây rối ⇒ favicon bỏ chấm (ghi lý do trong nhật ký giai đoạn).
+  "bieu-tuong-sang.svg": bieuTuongSvg({ mauO: "#F6EBD0", mauHat: "#E2BE66" }),
   "favicon.svg": bieuTuongSvg({ mauO: MUC, mauHat: NHAN, coHat: false, vien: 6, nen: "#FBF7EE" }),
 };
 for (const [ten, nd] of Object.entries(tep)) {

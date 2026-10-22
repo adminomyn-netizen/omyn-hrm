@@ -49,7 +49,7 @@ export async function layDanhSachNhanVien() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("nhan_vien")
-    .select("id, ma_nhan_vien, ho_ten, chuc_danh, email, ngay_vao_lam, trang_thai, khoi(ten)")
+    .select("id, ma_nhan_vien, ho_ten, chuc_danh, khoi_id, email, ngay_vao_lam, trang_thai, khoi(ten)")
     .order("ngay_vao_lam");
   if (error) throw error;
   return data.map((n) => ({ ...n, khoi_ten: n.khoi?.ten ?? "" }));
@@ -309,4 +309,128 @@ export async function layHoSoChuaGanTaiKhoan() {
     .order("ho_ten");
   if (error) throw error;
   return data;
+}
+
+/** Tin tuyển dụng + toàn bộ ứng viên (dữ liệu nhỏ, để màn tuyển dụng lọc ở trình duyệt). */
+export async function layTuyenDungDayDu() {
+  const supabase = createAdminClient();
+  const [tin, uv] = await Promise.all([
+    supabase
+      .from("tin_tuyen_dung")
+      .select("id, vi_tri, khoi_id, so_luong_can, trang_thai, mo_ta, han_nop, created_at, khoi(ten)")
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("ung_vien")
+      .select("id, tin_tuyen_dung_id, ho_ten, email, dien_thoai, trang_thai, nam_sinh, nguon, link_cv, ghi_chu, ngay_phong_van, ngay_nhan_ho_so")
+      .order("ngay_nhan_ho_so", { ascending: false }),
+  ]);
+  if (tin.error) throw tin.error;
+  if (uv.error) throw uv.error;
+  return {
+    tin: tin.data.map((t) => ({ ...t, khoi_ten: t.khoi?.ten ?? "" })),
+    ungVien: uv.data,
+  };
+}
+
+export type ThongBao = {
+  id: string; // ổn định theo sự việc — dùng để nhớ "đã đọc" ở trình duyệt
+  loai: "tai_khoan" | "don_tu" | "ung_vien" | "tin" | "cham_cong" | "he_thong";
+  tieuDe: string;
+  noiDung: string;
+  thoiDiem: string; // ISO
+  href: string;
+};
+
+const ngayVN = (d: string) => d.split("-").reverse().join("/");
+
+/** Thông báo THẬT, suy ra từ dữ liệu hiện có (không có bảng thông báo riêng):
+ *  - quản lý (admin/kỹ thuật): tài khoản chờ duyệt, đơn chờ duyệt, ứng viên mới 7 ngày, tin sắp/đã hết hạn nộp;
+ *  - nhân viên: kết quả duyệt đơn của mình (14 ngày), nhắc chưa chấm công, chưa gắn hồ sơ. */
+export async function layThongBao(
+  nguoiDung: { id: string; vaiTro: "admin" | "ky_thuat" | "nhan_vien" },
+): Promise<ThongBao[]> {
+  const db = createAdminClient();
+  const ra: ThongBao[] = [];
+  const bayNgayTruoc = new Date(Date.now() - 7 * 86400_000).toISOString();
+  const muoiBonNgayTruoc = new Date(Date.now() - 14 * 86400_000).toISOString();
+
+  if (nguoiDung.vaiTro === "admin" || nguoiDung.vaiTro === "ky_thuat") {
+    const [tk, don, uv, tin] = await Promise.all([
+      layTaiKhoanChoDuyet(),
+      db
+        .from("don_tu")
+        .select("id, loai, tu_ngay, den_ngay, created_at, nhan_vien:nhan_vien_id(ho_ten)")
+        .eq("trang_thai", "Chờ duyệt")
+        .order("created_at", { ascending: false })
+        .limit(10),
+      db
+        .from("ung_vien")
+        .select("id, ho_ten, tin_tuyen_dung_id, ngay_nhan_ho_so, tin:tin_tuyen_dung_id(vi_tri)")
+        .gte("ngay_nhan_ho_so", bayNgayTruoc.slice(0, 10))
+        .order("ngay_nhan_ho_so", { ascending: false })
+        .limit(10),
+      db.from("tin_tuyen_dung").select("id, vi_tri, han_nop, trang_thai").neq("trang_thai", "Đã đóng").not("han_nop", "is", null),
+    ]);
+    for (const t of tk.slice(0, 10)) {
+      ra.push({ id: `tk-${t.id}`, loai: "tai_khoan", tieuDe: "Tài khoản mới chờ duyệt", noiDung: `${t.hoTen} (${t.email}) vừa đăng ký.`, thoiDiem: t.taoLuc, href: "/dashboard" });
+    }
+    for (const d of don.data ?? []) {
+      const ten = (d.nhan_vien as { ho_ten?: string } | null)?.ho_ten ?? "Nhân viên";
+      ra.push({
+        id: `don-${d.id}`,
+        loai: "don_tu",
+        tieuDe: "Đơn chờ duyệt",
+        noiDung: `${ten} xin ${d.loai.toLowerCase()} (${ngayVN(d.tu_ngay)}${d.den_ngay !== d.tu_ngay ? " – " + ngayVN(d.den_ngay) : ""}).`,
+        thoiDiem: d.created_at,
+        href: "/don-tu",
+      });
+    }
+    for (const u of uv.data ?? []) {
+      const viTri = (u.tin as { vi_tri?: string } | null)?.vi_tri ?? "một vị trí";
+      ra.push({ id: `uv-${u.id}`, loai: "ung_vien", tieuDe: "Ứng viên mới", noiDung: `${u.ho_ten} nộp hồ sơ vị trí ${viTri}.`, thoiDiem: `${u.ngay_nhan_ho_so}T08:00:00+07:00`, href: "/tuyen-dung" });
+    }
+    const homNay = ngayHomNayHCM();
+    const baNgay = new Date(Date.now() + 3 * 86400_000).toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
+    for (const t of tin.data ?? []) {
+      if (!t.han_nop) continue;
+      if (t.han_nop < homNay) {
+        ra.push({ id: `tin-het-${t.id}-${t.han_nop}`, loai: "tin", tieuDe: "Tin đã quá hạn nộp", noiDung: `Tin "${t.vi_tri}" quá hạn nộp hồ sơ ngày ${ngayVN(t.han_nop)} nhưng chưa đóng.`, thoiDiem: `${t.han_nop}T17:00:00+07:00`, href: "/tuyen-dung" });
+      } else if (t.han_nop <= baNgay) {
+        ra.push({ id: `tin-sap-${t.id}-${t.han_nop}`, loai: "tin", tieuDe: "Tin sắp hết hạn nộp", noiDung: `Tin "${t.vi_tri}" hết hạn nộp hồ sơ ngày ${ngayVN(t.han_nop)}.`, thoiDiem: new Date().toISOString(), href: "/tuyen-dung" });
+      }
+    }
+  } else {
+    const nvId = await layNhanVienIdTheoUser(nguoiDung.id);
+    if (!nvId) {
+      ra.push({ id: "chua-gan-ho-so", loai: "he_thong", tieuDe: "Chưa gắn hồ sơ nhân sự", noiDung: "Tài khoản của bạn chưa gắn với hồ sơ nhân sự, nên chưa chấm công được. Báo bộ phận Nhân sự.", thoiDiem: new Date().toISOString(), href: "/cham-cong" });
+    } else {
+      const [don, cc] = await Promise.all([
+        db
+          .from("don_tu")
+          .select("id, loai, tu_ngay, trang_thai, created_at")
+          .eq("nhan_vien_id", nvId)
+          .neq("trang_thai", "Chờ duyệt")
+          .gte("created_at", muoiBonNgayTruoc)
+          .order("created_at", { ascending: false })
+          .limit(10),
+        layChamCongHomNayCuaToi(nvId),
+      ]);
+      for (const d of don.data ?? []) {
+        ra.push({
+          id: `don-kq-${d.id}-${d.trang_thai}`,
+          loai: "don_tu",
+          tieuDe: d.trang_thai === "Đã duyệt" ? "Đơn đã được duyệt" : "Đơn bị từ chối",
+          noiDung: `Đơn ${d.loai.toLowerCase()} ngày ${ngayVN(d.tu_ngay)} ${d.trang_thai === "Đã duyệt" ? "đã được duyệt" : "bị từ chối"}.`,
+          thoiDiem: d.created_at,
+          href: "/don-tu",
+        });
+      }
+      const gio = gioHienTaiHCM();
+      if (!cc?.gio_vao && gio >= "08:30:00") {
+        ra.push({ id: `chua-cham-cong-${ngayHomNayHCM()}`, loai: "cham_cong", tieuDe: "Bạn chưa chấm công hôm nay", noiDung: "Hôm nay chưa có giờ vào. Vào trang Chấm công để chấm công.", thoiDiem: new Date().toISOString(), href: "/cham-cong" });
+      }
+    }
+  }
+
+  return ra.sort((a, b) => b.thoiDiem.localeCompare(a.thoiDiem)).slice(0, 25);
 }
