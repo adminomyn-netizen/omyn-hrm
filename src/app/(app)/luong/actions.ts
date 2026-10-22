@@ -7,7 +7,7 @@ import { congChuanTheoKy, tinhLuong, type DauVaoLuong, type ThamSo } from "@/lib
 import { layNgayChamCongTrongThang } from "@/lib/data";
 
 export type KetQuaLuong = { loi?: string; ok?: boolean; thongBao?: string };
-const KHONG_QUYEN: KetQuaLuong = { loi: "Chỉ Quản trị mới được xem và sửa lương." };
+const KHONG_QUYEN: KetQuaLuong = { loi: "Chỉ Quản trị và Kỹ thuật mới được xem và sửa lương." };
 const THU_TU = ["mo", "da_lap", "da_kiem", "da_duyet", "da_chi"] as const;
 type TrangThaiKy = (typeof THU_TU)[number];
 
@@ -32,7 +32,7 @@ const lamMoi = () => {
 
 async function chiQuanTri() {
   const nd = await layNguoiDungHienTai();
-  return nd && nd.vaiTro === "admin" ? nd : null;
+  return nd && (nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat") ? nd : null;
 }
 
 async function docThamSo(): Promise<{ p: ThamSo; chuaXacNhan: number }> {

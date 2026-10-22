@@ -260,3 +260,5 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 - **Đăng ký chọn phòng ban** (22/10, chốt lại): form chỉ có ô Phòng ban (danh sách khối), không có ô vị trí và không có ghi chú phụ. Lựa chọn chỉ là YÊU CẦU (`app_metadata.yeu_cau_khoi_id`), không cấp quyền. Bảng chờ duyệt hiện "Phòng ban: …", ô hồ sơ mặc định "Tạo hồ sơ mới theo đăng ký"; phòng ban **Hành chính nhân sự** có quyền Quản trị nên ô vai trò mặc định là Quản trị (người duyệt vẫn bấm xác nhận).
 - **Phân quyền tài khoản do Kỹ thuật làm** (và Quản trị): duyệt tài khoản gán được mọi vai trò; trang Cài đặt và phân quyền cho đổi vai trò từng tài khoản (không tự đổi mình, không hạ Quản trị cuối cùng).
 - **Menu avatar** (bấm ảnh đại diện): họ và tên đầy đủ, vị trí (chức danh · phòng ban · vai trò Quản trị/Kỹ thuật nếu có), email.
+
+- **Kỹ thuật = quyền cao nhất** (22/10): làm mọi thứ và xem mọi số liệu, kể cả Lương (kỳ, thỏa thuận, tham số, xác nhận tham số). Không thể hạ tài khoản Kỹ thuật/Quản trị cuối cùng.
