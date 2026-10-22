@@ -5,17 +5,17 @@ import { Chon } from "@/components/ui/Chon";
 import { useState, useTransition } from "react";
 import { duyetTaiKhoan, tuChoiTaiKhoan } from "@/app/(app)/dashboard/actions";
 import type { VaiTro } from "@/lib/auth";
-import { laChucDanhNhayCam } from "@/lib/chuc-danh";
-import { nhanViTri } from "@/lib/vi-tri-dang-ky";
+import { KHOI_QUYEN_QUAN_TRI } from "@/lib/chuc-danh";
 
 type HoSo = { id: string; ho_ten: string; chuc_danh: string | null; email: string | null };
-type TaiKhoan = { id: string; email: string; hoTen: string; taoLuc: string; yeuCau: { viTri: string; khoiId: string; khoiTen: string } | null };
+type TaiKhoan = { id: string; email: string; hoTen: string; taoLuc: string; yeuCau: { khoiId: string; khoiTen: string } | null };
 const TAO_MOI = "__moi__";
 
 /** Một dòng tài khoản chờ duyệt. Nút type="button" gọi action qua onClick — KHÔNG
  * dùng <form> submit (xem ghi chú ở src/lib/actions.ts). */
-function Dong({ tk, hoSo, nguoiGoi }: { tk: TaiKhoan; hoSo: HoSo[]; nguoiGoi: VaiTro }) {
-  const [vaiTro, setVaiTro] = useState("nhan_vien");
+function Dong({ tk, hoSo }: { tk: TaiKhoan; hoSo: HoSo[] }) {
+  // Phòng ban Hành chính nhân sự có quyền Quản trị: gợi ý sẵn, người duyệt vẫn bấm xác nhận.
+  const [vaiTro, setVaiTro] = useState(tk.yeuCau?.khoiTen === KHOI_QUYEN_QUAN_TRI ? "admin" : "nhan_vien");
   const [hoSoId, setHoSoId] = useState(() => hoSo.find((h) => h.email?.toLowerCase() === tk.email.toLowerCase())?.id ?? (tk.yeuCau ? TAO_MOI : ""));
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
@@ -40,7 +40,7 @@ function Dong({ tk, hoSo, nguoiGoi }: { tk: TaiKhoan; hoSo: HoSo[]; nguoiGoi: Va
         <div className="text-[13px] text-muc-3">{tk.email}</div>
         {tk.yeuCau && (
           <div className="mt-1 inline-block rounded-tag bg-nhan-nhat px-2 py-0.5 text-[12px] font-medium text-nhan-dam">
-            Xin vào: {nhanViTri(tk.yeuCau.viTri) || "—"}{tk.yeuCau.khoiTen ? ` · ${tk.yeuCau.khoiTen}` : ""}
+            Phòng ban: {tk.yeuCau.khoiTen || "—"}
           </div>
         )}
         <div className="text-[12px] text-muc-3">
@@ -48,10 +48,10 @@ function Dong({ tk, hoSo, nguoiGoi }: { tk: TaiKhoan; hoSo: HoSo[]; nguoiGoi: Va
         </div>
       </td>
       <td className="py-3 pr-4">
-        <Chon nho ariaLabel="Vai trò" giaTri={vaiTro} onDoi={setVaiTro} className="w-36" luaChon={[{ gia_tri: "nhan_vien", nhan: "Nhân viên" }, ...(nguoiGoi === "admin" ? [{ gia_tri: "ky_thuat", nhan: "Kỹ thuật" }, { gia_tri: "admin", nhan: "Quản trị" }] : [])]} />
+        <Chon nho ariaLabel="Vai trò" giaTri={vaiTro} onDoi={setVaiTro} className="w-36" luaChon={[{ gia_tri: "nhan_vien", nhan: "Nhân viên" }, { gia_tri: "ky_thuat", nhan: "Kỹ thuật" }, { gia_tri: "admin", nhan: "Quản trị" }]} />
       </td>
       <td className="py-3 pr-4">
-        <Chon nho ariaLabel="Hồ sơ nhân sự" giaTri={hoSoId} onDoi={setHoSoId} className="w-60" luaChon={[{ gia_tri: "", nhan: vaiTro === "nhan_vien" ? "Chọn hồ sơ nhân sự" : "Không gắn hồ sơ" }, ...(tk.yeuCau && vaiTro === "nhan_vien" ? [{ gia_tri: TAO_MOI, nhan: "Tạo hồ sơ mới theo đăng ký" }] : []), ...hoSo.filter((h) => nguoiGoi === "admin" || !laChucDanhNhayCam(h.chuc_danh)).map((h) => ({ gia_tri: h.id, nhan: `${h.ho_ten}${h.chuc_danh ? " · " + h.chuc_danh : ""}` }))]} />
+        <Chon nho ariaLabel="Hồ sơ nhân sự" giaTri={hoSoId} onDoi={setHoSoId} className="w-60" luaChon={[{ gia_tri: "", nhan: vaiTro === "nhan_vien" ? "Chọn hồ sơ nhân sự" : "Không gắn hồ sơ" }, ...(tk.yeuCau && vaiTro === "nhan_vien" ? [{ gia_tri: TAO_MOI, nhan: "Tạo hồ sơ mới theo đăng ký" }] : []), ...hoSo.map((h) => ({ gia_tri: h.id, nhan: `${h.ho_ten}${h.chuc_danh ? " · " + h.chuc_danh : ""}` }))]} />
         {loi && <div className="mt-1 text-[12px] text-loi">{loi}</div>}
       </td>
       <td className="py-3 text-right">
@@ -100,7 +100,7 @@ export function DuyetTaiKhoan({ taiKhoan, hoSo, nguoiGoi }: { taiKhoan: TaiKhoan
           </thead>
           <tbody>
             {taiKhoan.map((tk) => (
-              <Dong key={tk.id} tk={tk} hoSo={hoSo} nguoiGoi={nguoiGoi} />
+              <Dong key={tk.id} tk={tk} hoSo={hoSo} />
             ))}
           </tbody>
         </table>

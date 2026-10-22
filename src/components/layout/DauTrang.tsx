@@ -242,7 +242,7 @@ function FormCaNhan({ hoTen, xong, huy }: { hoTen: string; xong: () => void; huy
   );
 }
 
-function MenuAvatar({ hoTen, email }: { hoTen: string; email: string }) {
+function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viTri: string }) {
   const router = useRouter();
   const [mo, setMo] = useState(false);
   const [suaHoSo, setSuaHoSo] = useState(false);
@@ -271,10 +271,11 @@ function MenuAvatar({ hoTen, email }: { hoTen: string; email: string }) {
         <ChevronDown strokeWidth={1.5} className="hidden h-4 w-4 text-muc-3 sm:block" />
       </button>
       {mo && (
-        <div className="absolute right-0 top-full z-40 mt-2 w-60 rounded-vua border border-vien bg-giay-sang py-1 shadow-[0_8px_24px_rgba(42,34,24,0.12)]">
+        <div className="absolute right-0 top-full z-40 mt-2 w-64 rounded-vua border border-vien bg-giay-sang py-1 shadow-[0_8px_24px_rgba(42,34,24,0.12)]">
           <div className="border-b border-vien px-4 py-3">
-            <div className="truncate text-[14px] font-semibold text-muc">{hoTen}</div>
-            <div className="truncate text-[12px] text-muc-3">{email}</div>
+            <div className="text-[14px] font-semibold text-muc">{hoTen}</div>
+            <div className="mt-0.5 text-[13px] text-nhan-dam">{viTri}</div>
+            <div className="mt-0.5 truncate text-[12px] text-muc-3">{email}</div>
           </div>
           <button
             type="button"
@@ -304,7 +305,7 @@ function MenuAvatar({ hoTen, email }: { hoTen: string; email: string }) {
 }
 
 /** Đầu trang mỏng 56 px: tiêu đề trang bên trái; bên phải: sáng/tối, thông báo, avatar + tên (bấm vào để sửa thông tin / đăng xuất). */
-export function DauTrang({ hoTen, email, vaiTro }: { hoTen: string; email: string; vaiTro: VaiTro }) {
+export function DauTrang({ hoTen, email, vaiTro, viTri }: { hoTen: string; email: string; vaiTro: VaiTro; viTri: string }) {
   const pathname = usePathname();
   const tieuDe = menuChinh.find((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"))?.ten ?? "OMYN";
   return (
@@ -324,7 +325,7 @@ export function DauTrang({ hoTen, email, vaiTro }: { hoTen: string; email: strin
       <div className="flex shrink-0 items-center gap-1">
         <ChuyenCheDo />
         <Chuong />
-        <MenuAvatar hoTen={hoTen} email={email} />
+        <MenuAvatar hoTen={hoTen} email={email} viTri={viTri} />
       </div>
     </header>
   );
