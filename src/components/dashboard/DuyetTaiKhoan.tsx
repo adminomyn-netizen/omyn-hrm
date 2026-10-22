@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { duyetTaiKhoan, tuChoiTaiKhoan } from "@/app/dashboard/actions";
 import type { VaiTro } from "@/lib/auth";
+import { laChucDanhNhayCam } from "@/lib/chuc-danh";
 
 type HoSo = { id: string; ho_ten: string; chuc_danh: string | null; email: string | null };
 type TaiKhoan = { id: string; email: string; hoTen: string; taoLuc: string };
@@ -50,7 +51,9 @@ function Dong({ tk, hoSo, nguoiGoi }: { tk: TaiKhoan; hoSo: HoSo[]; nguoiGoi: Va
       <td className="py-3 pr-4">
         <select value={hoSoId} onChange={(e) => setHoSoId(e.target.value)} className={`${chon} max-w-[240px]`} aria-label="Hồ sơ nhân sự">
           <option value="">{vaiTro === "nhan_vien" ? "Chọn hồ sơ nhân sự" : "Không gắn hồ sơ"}</option>
-          {hoSo.map((h) => (
+          {hoSo
+            .filter((h) => nguoiGoi === "admin" || !laChucDanhNhayCam(h.chuc_danh))
+            .map((h) => (
             <option key={h.id} value={h.id}>
               {h.ho_ten}
               {h.chuc_danh ? ` · ${h.chuc_danh}` : ""}
@@ -91,7 +94,7 @@ export function DuyetTaiKhoan({ taiKhoan, hoSo, nguoiGoi }: { taiKhoan: TaiKhoan
         <h2 id="tk-cho-duyet" className="text-[16px] font-semibold text-muc">
           Tài khoản chờ duyệt <span className="font-normal text-muc-3">({taiKhoan.length})</span>
         </h2>
-        <span className="text-[12px] text-muc-3">Tài khoản mới chưa thấy dữ liệu nào cho tới khi được duyệt.</span>
+        <span className="text-[12px] text-muc-3">Email do người đăng ký tự nhập, CHƯA xác minh: đối chiếu với người thật trước khi duyệt.</span>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-left">

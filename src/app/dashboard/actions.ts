@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { laChucDanhNhayCam } from "@/lib/chuc-danh";
 
 export type KetQuaTaiKhoan = { loi?: string; ok?: boolean };
 
@@ -36,22 +37,35 @@ export async function duyetTaiKhoan(formData: FormData): Promise<KetQuaTaiKhoan>
   if (loiLay || !tk.user) return { loi: "Không tìm thấy tài khoản." };
   if (tk.user.app_metadata?.vai_tro) return { loi: "Tài khoản này đã được duyệt trước đó." };
 
+  // Gắn hồ sơ NGUYÊN TỬ: chỉ gắn khi hồ sơ còn trống (user_id is null) — hai người duyệt
+  // cùng lúc thì một người thắng; nếu gán vai trò thất bại thì hoàn tác phần gắn.
   if (hoSoId) {
     const { data: hoSo } = await supabase
       .from("nhan_vien")
-      .select("id, user_id")
+      .select("id, chuc_danh")
       .eq("id", hoSoId)
       .maybeSingle();
     if (!hoSo) return { loi: "Không tìm thấy hồ sơ nhân sự." };
-    if (hoSo.user_id) return { loi: "Hồ sơ này đã gắn với một tài khoản khác." };
-    const { error: loiGan } = await supabase.from("nhan_vien").update({ user_id: userId }).eq("id", hoSoId);
+    if (laChucDanhNhayCam(hoSo.chuc_danh) && nguoiGoi.vaiTro !== "admin") {
+      return { loi: "Hồ sơ chức danh nhạy cảm chỉ Quản trị mới gắn được tài khoản." };
+    }
+    const { data: daGan, error: loiGan } = await supabase
+      .from("nhan_vien")
+      .update({ user_id: userId })
+      .eq("id", hoSoId)
+      .is("user_id", null)
+      .select("id");
     if (loiGan) return { loi: "Không gắn được hồ sơ nhân sự." };
+    if (!daGan || daGan.length === 0) return { loi: "Hồ sơ này vừa được gắn với tài khoản khác." };
   }
 
   const { error } = await supabase.auth.admin.updateUserById(userId, {
     app_metadata: { ...tk.user.app_metadata, vai_tro: vaiTro, cho_duyet: false },
   });
-  if (error) return { loi: "Không gán được vai trò. Thử lại sau." };
+  if (error) {
+    if (hoSoId) await supabase.from("nhan_vien").update({ user_id: null }).eq("id", hoSoId).eq("user_id", userId);
+    return { loi: "Không gán được vai trò. Thử lại sau." };
+  }
 
   revalidatePath("/dashboard");
   return { ok: true };

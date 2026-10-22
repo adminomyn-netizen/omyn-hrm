@@ -12,7 +12,7 @@ import {
   layNhanVienIdTheoUser,
   thangHienTaiHCM,
 } from "@/lib/data";
-import { layNguoiDungHienTai } from "@/lib/auth";
+import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { DongHoHCM } from "@/components/cham-cong/DongHoHCM";
 import { LichChamCong } from "@/components/cham-cong/LichChamCong";
 import { NutChamCong } from "@/components/cham-cong/NutChamCong";
@@ -44,12 +44,12 @@ export default async function TrangChamCong({
   const nam = Number(namThamSo) || macDinh.nam;
   const thang = Number(thangThamSo) || macDinh.thang;
 
-  const nguoiDung = await layNguoiDungHienTai();
-  const nhanVienId = nguoiDung ? await layNhanVienIdTheoUser(nguoiDung.id) : null;
+  const nguoiDung = await layNguoiDungDaDuyet();
+  const nhanVienId = await layNhanVienIdTheoUser(nguoiDung.id);
 
   // Vai trò nhân viên chỉ được thấy chấm công/lịch của chính mình, không
   // được thấy của người khác (chị Lâm chốt 12/10/2026).
-  if (nguoiDung?.vaiTro === "nhan_vien") {
+  if (nguoiDung.vaiTro === "nhan_vien") {
     const [homNayCuaToi, suKienThang] = await Promise.all([
       nhanVienId ? layChamCongHomNayCuaToi(nhanVienId) : null,
       nhanVienId ? layChamCongThang(nam, thang, nhanVienId) : Promise.resolve([]),
