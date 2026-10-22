@@ -17,7 +17,10 @@ import {
 } from "lucide-react";
 import { ChuyenCheDo } from "./ChuyenCheDo";
 import { TimKiem } from "./TimKiem";
-import { datDemMenu } from "@/lib/dem-menu";
+import { datChuaDoc, datDemMenu } from "@/lib/dem-menu";
+
+export const SU_KIEN_MO_THONG_BAO = "omyn-mo-thong-bao";
+export const SU_KIEN_MO_TAI_KHOAN = "omyn-mo-tai-khoan";
 import { SU_KIEN_MO_MENU } from "./MobileNav";
 import { Hop } from "@/components/ui/Hop";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
@@ -118,6 +121,15 @@ function Chuong() {
     }
   }, [raw]);
   const chuaDoc = thongBao.filter((t) => !daDoc.has(t.id)).length;
+
+  useEffect(() => {
+    datChuaDoc(chuaDoc);
+  }, [chuaDoc]);
+  useEffect(() => {
+    const moChuong = () => setMo(true);
+    window.addEventListener(SU_KIEN_MO_THONG_BAO, moChuong);
+    return () => window.removeEventListener(SU_KIEN_MO_THONG_BAO, moChuong);
+  }, []);
 
   const danhDau = (ids: string[]) => ghi(JSON.stringify([...new Set([...daDoc, ...ids])].slice(-300)));
 
@@ -236,6 +248,11 @@ function MenuAvatar({ hoTen, email }: { hoTen: string; email: string }) {
   const [suaHoSo, setSuaHoSo] = useState(false);
   const [dangXuatXong, startXuat] = useTransition();
   const ref = useDongKhiBamNgoai(mo, () => setMo(false));
+  useEffect(() => {
+    const moMenu = () => setMo(true);
+    window.addEventListener(SU_KIEN_MO_TAI_KHOAN, moMenu);
+    return () => window.removeEventListener(SU_KIEN_MO_TAI_KHOAN, moMenu);
+  }, []);
   const chuDau = (hoTen.trim().split(/\s+/).pop() ?? "?").charAt(0).toUpperCase();
 
   return (

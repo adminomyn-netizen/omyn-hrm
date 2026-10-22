@@ -120,7 +120,7 @@ Tiếng Việt cần `line-height` ≥ 1,5 cho đoạn văn và ≥ 1,1 cho tiê
 ```
 
 - **Khung dùng chung** `src/app/(app)/layout.tsx`: dựng *một lần*, đứng yên khi đổi trang; chỉ phần nội dung đổi (kèm `loading.tsx`).
-- **Menu trái** (`Sidebar`): nền espresso cả khi giao diện sáng; nhóm có nhãn viết hoa nhỏ; mục đang mở nền ngà 9% + biểu tượng vàng; **số đếm** dải vàng cạnh mục (tài khoản chờ duyệt, đơn chờ duyệt, ứng viên mới — lấy từ `/api/thong-bao`, ghi qua `lib/dem-menu.ts`). Thu gọn còn 72 px (nhớ lựa chọn trong `localStorage`); rê chuột hiện tên + mô tả. Điện thoại: ngăn kéo `MobileNav` cùng kiểu.
+- **Menu trái** (`Sidebar`): nền espresso cả khi giao diện sáng; nhóm có nhãn viết hoa nhỏ; mục đang mở nền ngà 9% + biểu tượng vàng; **số đếm** dải vàng cạnh mục (tài khoản chờ duyệt, đơn chờ duyệt, ứng viên mới — lấy từ `/api/thong-bao`, ghi qua `lib/dem-menu.ts`). Thu gọn còn 72 px (nhớ lựa chọn trong `localStorage`); rê chuột hiện tên + mô tả. Điện thoại: ngăn kéo `MobileNav` cùng kiểu + **thanh tab dưới cùng** (xem 7.9).
 - **Đầu trang** (`DauTrang`): cao 56 px. Trái: ô tìm (`⌘K`/`Ctrl+K`, `TimKiem`). Phải: nút sáng/tối, chuông thông báo, avatar + tên. Bấm avatar: **Chỉnh sửa thông tin** (đổi tên, đổi mật khẩu — cần mật khẩu hiện tại) và **Đăng xuất**. Không hiện nhãn vai trò.
 - **Đầu mỗi trang** (`TieuDeTrang`): tiêu đề serif + một dòng phụ (đếm), hành động chính bên phải (nút vàng + nút phụ).
 - **Hàng chỉ số** (`HangChiSo`/mục chỉ số ở Tổng quan): số lớn + nhãn nhỏ, ngăn bằng đường kẻ dọc 1 px, **không thẻ**. Có thể kèm `DuongXuHuong` (đường nhỏ 84×34).
@@ -161,7 +161,13 @@ Rộng 576 px (hoặc `rong` 768 px), bo 14 px, tiêu đề serif 30 px trên n�
 ### 7.7 Chuông thông báo (`layout/DauTrang`)
 Thông báo **thật** suy ra từ dữ liệu (không có bảng riêng): quản lý thấy tài khoản chờ duyệt, đơn chờ duyệt, ứng viên mới 7 ngày, tin sắp/đã hết hạn nộp; nhân viên thấy kết quả duyệt đơn và nhắc chưa chấm công. Tải *sau khi trang hiện* (`/api/thong-bao`), làm mới khi quay lại tab và mỗi 90 giây. "Đã đọc" nhớ theo trình duyệt.
 
-### 7.8 Khác
+### 7.8 Thanh tab dưới cùng cho điện thoại (`layout/ThanhTabDuoi`)
+Hiện dưới 1024 px, cố định ở đáy, cao 62 px + vùng an toàn của máy; tab đang mở có gạch vàng mảnh trên đầu, chữ `--nhan-dam`; số đếm là huy hiệu vàng nhỏ. Nội dung trang chừa đáy `5,5 rem` để không bị che.
+- **Nhân viên:** Hôm nay (chấm công) · Đơn từ · Thông báo (mở chuông, kèm số chưa đọc) · Tôi (mở menu avatar: sửa thông tin, đăng xuất).
+- **Quản lý:** Tổng quan · Nhân sự · Tuyển dụng · Đơn từ · Menu (mở ngăn kéo đủ mọi mục).
+Các tab "Thông báo/Tôi/Menu" bắn sự kiện cửa sổ (`omyn-mo-thong-bao`, `omyn-mo-tai-khoan`, `omyn-mo-menu`) để mở đúng hộp ở đầu trang; số đếm lấy từ `lib/dem-menu.ts`.
+
+### 7.9 Khác
 - `ThanhTyLe`: nhãn + số, thanh mảnh 6 px dải vàng.
 - `VongChamCong`: vòng tiến độ SVG nét dải vàng (`dashboard/`).
 - `DuongXuHuong`: đường xu hướng nhỏ.
@@ -241,4 +247,5 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 
 ## 14. Lịch sử
 
+- 22/10/2026 — Thêm thanh tab dưới cùng cho điện thoại; xoá toàn bộ dữ liệu mẫu (chỉ còn 5 khối theo sơ đồ OMYN, 2 tài khoản đăng nhập, vai trò/quyền).
 - 22/10/2026 — Chốt hệ thiết kế vàng champagne + espresso, gradient vàng, chế độ tối; áp toàn bộ trang theo bản thiết kế Claude Design (menu tối, ô tìm ⌘K, hộp hero, bảng kéo thả tuyển dụng, đăng nhập mới); `Chon`/`NgayChon` qua portal.

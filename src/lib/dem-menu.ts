@@ -24,3 +24,22 @@ export function useDemMenu(): DemMenu {
     () => RONG,
   );
 }
+
+/** Số thông báo chưa đọc (chuông ghi, thanh tab dưới cùng đọc). */
+let chuaDoc = 0;
+const ngheChuaDoc = new Set<() => void>();
+export function datChuaDoc(n: number) {
+  if (n === chuaDoc) return;
+  chuaDoc = n;
+  ngheChuaDoc.forEach((f) => f());
+}
+export function useChuaDoc(): number {
+  return useSyncExternalStore(
+    (cb) => {
+      ngheChuaDoc.add(cb);
+      return () => ngheChuaDoc.delete(cb);
+    },
+    () => chuaDoc,
+    () => 0,
+  );
+}
