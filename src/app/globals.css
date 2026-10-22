@@ -197,9 +197,12 @@ body {
   color: var(--muc-3);
 }
 
-:focus-visible {
-  outline: 2px solid var(--nhan);
-  outline-offset: 2px;
+/* Trong @layer base để lớp tiện ích (outline-none của ô nhập có khung riêng) thắng được; ngoài layer nó đè mất và ô nhập hiện khung vuông thừa bên trong. */
+@layer base {
+  :focus-visible {
+    outline: 2px solid var(--nhan);
+    outline-offset: 2px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
