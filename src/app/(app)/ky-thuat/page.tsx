@@ -26,7 +26,7 @@ const HA_TANG = [
 ];
 
 export default async function TrangKyThuat() {
-  await yeuCauVaiTro(["admin", "ky_thuat"]);
+  await yeuCauVaiTro(["ky_thuat"]);
   const he = await layThongKeHeThong();
   const tongDong = he.bang.reduce((t, b) => t + b.soDong, 0);
 

@@ -7,11 +7,11 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export type KetQuaVaiTro = { loi?: string; ok?: boolean };
 const VAI_TRO = ["admin", "ky_thuat", "nhan_vien"] as const;
 
-/** Đổi vai trò của tài khoản ĐÃ duyệt. Quản trị và Kỹ thuật cùng làm được (chủ app chốt 22/10/2026).
+/** Đổi vai trò của tài khoản ĐÃ duyệt. Chỉ Kỹ thuật làm được (chủ app chốt 22/10/2026).
  * Không tự đổi vai trò của chính mình; không để hệ thống hết tài khoản Kỹ thuật/Quản trị. */
 export async function doiVaiTro(fd: FormData): Promise<KetQuaVaiTro> {
   const nguoiGoi = await layNguoiDungHienTai();
-  if (!nguoiGoi || (nguoiGoi.vaiTro !== "admin" && nguoiGoi.vaiTro !== "ky_thuat")) return { loi: "Bạn không có quyền phân quyền tài khoản." };
+  if (!nguoiGoi || nguoiGoi.vaiTro !== "ky_thuat") return { loi: "Chỉ tài khoản Kỹ thuật mới phân quyền được." };
   const userId = String(fd.get("user_id") || "");
   const vaiTro = String(fd.get("vai_tro") || "");
   if (!userId || !(VAI_TRO as readonly string[]).includes(vaiTro)) return { loi: "Tài khoản hoặc vai trò không hợp lệ." };

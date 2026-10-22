@@ -4,11 +4,12 @@ import Link from "next/link";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Hop } from "@/components/ui/Hop";
+import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { NHAN_O, NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import { luuKhoi, xoaKhoi } from "@/app/(app)/khoi/actions";
 
-export type DongKhoi = { id: string; ten: string; mo_ta: string | null; soNhanVien: number; soTinMo: number };
+export type DongKhoi = { id: string; ten: string; mo_ta: string | null; viTri: string[]; soNhanVien: number; soTinMo: number };
 
 /** Quản lý khối (phòng ban): thêm/sửa/xoá bằng popup. Khối là danh mục dùng khi thêm nhân viên và đăng tuyển. */
 export function DanhSachKhoi({ khoi }: { khoi: DongKhoi[] }) {
@@ -59,7 +60,7 @@ export function DanhSachKhoi({ khoi }: { khoi: DongKhoi[] }) {
           <thead>
             <tr className="nhan-muc border-b border-vien">
               <th className="py-3 pr-4 font-medium">Khối</th>
-              <th className="py-3 pr-4 font-medium">Mô tả</th>
+              <th className="py-3 pr-4 font-medium">Vị trí</th>
               <th className="py-3 pr-4 text-right font-medium">Nhân viên</th>
               <th className="py-3 pr-4 text-right font-medium">Tin đang mở</th>
               <th className="py-3" />
@@ -69,7 +70,14 @@ export function DanhSachKhoi({ khoi }: { khoi: DongKhoi[] }) {
             {khoi.map((k) => (
               <tr key={k.id} className="h-[60px] border-b border-vien hover:bg-giay-tram/60">
                 <td className="py-2 pr-4 font-medium text-muc">{k.ten}</td>
-                <td className="max-w-[360px] truncate py-2 pr-4 text-muc-2" title={k.mo_ta ?? undefined}>{k.mo_ta}</td>
+                <td className="max-w-[420px] py-2 pr-4" title={k.viTri.join(", ")}>
+                  {k.viTri.length === 0 ? <span className="text-muc-3">Chưa có vị trí</span> : (
+                    <div className="flex flex-wrap gap-1.5">
+                      {k.viTri.slice(0, 4).map((v) => <NhanTrangThai key={v}>{v}</NhanTrangThai>)}
+                      {k.viTri.length > 4 && <span className="self-center text-[12px] text-muc-3">+{k.viTri.length - 4} vị trí</span>}
+                    </div>
+                  )}
+                </td>
                 <td className="py-2 pr-4 text-right tabular-nums">
                   {k.soNhanVien > 0 ? <Link href={`/nhan-su?q=${encodeURIComponent(k.ten)}`} className="font-medium text-nhan-dam underline-offset-4 hover:underline">{k.soNhanVien}</Link> : <span className="text-muc-3">0</span>}
                 </td>
@@ -96,8 +104,9 @@ export function DanhSachKhoi({ khoi }: { khoi: DongKhoi[] }) {
               <input id="k-ten" name="ten" required defaultValue={hop.khoi?.ten ?? ""} placeholder="Ví dụ: Marketing & Ecom" className={O_NHAP} />
             </div>
             <div>
-              <label htmlFor="k-mo-ta" className={NHAN_O}>Mô tả</label>
-              <textarea id="k-mo-ta" name="mo_ta" defaultValue={hop.khoi?.mo_ta ?? ""} placeholder="Khối này gồm những chức danh nào" className={O_NHIEU_DONG} />
+              <label htmlFor="k-mo-ta" className={NHAN_O}>Vị trí</label>
+              <textarea id="k-mo-ta" name="mo_ta" defaultValue={hop.khoi?.mo_ta ?? ""} placeholder="Ví dụ: Trưởng phòng, Chuyên viên, Nhân viên" className={O_NHIEU_DONG} />
+              <div className="mt-1 text-[12px] text-muc-3">Các vị trí thuộc khối, cách nhau bằng dấu phẩy. Vị trí của nhân viên đang làm trong khối cũng tự được thêm vào, và hiện sẵn trong ô Chức vụ khi chọn khối này.</div>
             </div>
             {loi && <div role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</div>}
             <div className="flex justify-end gap-2 border-t border-vien pt-4">

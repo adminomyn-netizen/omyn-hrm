@@ -266,3 +266,6 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 - **Chức vụ chọn dropdown** (22/10): biểu mẫu nhân viên dùng ô chọn Chức vụ (Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc, Trưởng bộ phận, Leader, Chuyên viên, Nhân viên, Thực tập sinh); giá trị cũ ngoài danh sách vẫn giữ làm một lựa chọn. Danh sách ở `src/lib/chuc-vu.ts`.
 
 - **Lãnh đạo = như Hành chính nhân sự** (22/10): hồ sơ có chức vụ Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc, hoặc phòng ban Hành chính nhân sự, thì ô vai trò khi duyệt tài khoản gợi ý Quản trị (người duyệt vẫn bấm xác nhận; hệ thống KHÔNG tự nâng quyền khi lưu chức vụ). Hàm `nenLaQuanTri` ở `src/lib/chuc-danh.ts`.
+
+- **Khối có cột Vị trí** (22/10): thay cột Mô tả; vị trí khai báo ở khối + chức vụ của nhân viên đang làm trong khối tự được gộp vào. Ô Chức vụ trong biểu mẫu nhân viên tự hiện vị trí của khối đang chọn trước, rồi các cấp chuẩn.
+- **Chỉ tài khoản Kỹ thuật** xem được mục Kỹ thuật và Cài đặt và phân quyền (kể cả đổi vai trò); Quản trị và Nhân viên không thấy menu, gõ thẳng đường dẫn thì bị đưa về Chấm công.

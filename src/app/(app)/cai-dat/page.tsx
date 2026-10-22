@@ -25,7 +25,7 @@ const cot: Cot<TaiKhoan>[] = [
 ];
 
 export default async function TrangCaiDat() {
-  const nguoiDung = await yeuCauVaiTro(["admin", "ky_thuat"]);
+  const nguoiDung = await yeuCauVaiTro(["ky_thuat"]);
   const taiKhoan = await layDanhSachTaiKhoan();
   const cotDayDu = [cot[0], cotVaiTro(nguoiDung.id), ...cot.slice(1)];
 
