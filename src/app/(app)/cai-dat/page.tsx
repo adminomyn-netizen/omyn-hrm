@@ -12,8 +12,8 @@ type TaiKhoan = Awaited<ReturnType<typeof layDanhSachTaiKhoan>>[number];
 const cotVaiTro = (idToi: string): Cot<TaiKhoan> => ({ nhan: "Vai trò", hienThi: (t) => <VaiTroTaiKhoan key={t.id + t.vaiTro} userId={t.id} vaiTro={t.vaiTro} laToi={t.id === idToi} /> });
 
 const VAI_TRO = [
-  { ten: "Quản trị", quyen: "Mọi chức năng, kể cả lương. Phòng ban Hành chính nhân sự có quyền Quản trị." },
-  { ten: "Kỹ thuật", quyen: "Hồ sơ nhân sự, tuyển dụng, đơn từ, báo cáo; duyệt tài khoản mới và phân quyền mọi tài khoản." },
+  { ten: "Kỹ thuật", quyen: "Quyền cao nhất: làm được mọi thứ và xem mọi số liệu, kể cả lương; duyệt tài khoản và phân quyền mọi tài khoản." },
+  { ten: "Quản trị", quyen: "Mọi chức năng nhân sự, kể cả lương. Phòng ban Hành chính nhân sự có quyền Quản trị." },
   { ten: "Nhân viên", quyen: "Chấm công của mình và nộp, theo dõi đơn từ của mình." },
   { ten: "Chờ duyệt", quyen: "Tài khoản vừa đăng ký, chưa thấy dữ liệu nào cho tới khi được duyệt ở trang Tổng quan." },
 ];

@@ -30,8 +30,8 @@ export default async function TrangLuong({ searchParams }: { searchParams: Promi
     );
   }
 
-  // Lương là dữ liệu nhạy cảm: chỉ Quản trị.
-  if (nd.vaiTro !== "admin") redirect("/dashboard");
+  // Lương là dữ liệu nhạy cảm: chỉ Quản trị và Kỹ thuật (quyền cao nhất).
+  if (nd.vaiTro !== "admin" && nd.vaiTro !== "ky_thuat") redirect("/dashboard");
 
   const { ky: kyThamSo } = await searchParams;
   const [ky, thoaThuan, thamSoDs] = await Promise.all([layKyLuong(), layThoaThuanLuong(), layThamSoLuong()]);

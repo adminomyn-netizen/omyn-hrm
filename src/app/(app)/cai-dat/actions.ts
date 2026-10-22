@@ -8,7 +8,7 @@ export type KetQuaVaiTro = { loi?: string; ok?: boolean };
 const VAI_TRO = ["admin", "ky_thuat", "nhan_vien"] as const;
 
 /** Đổi vai trò của tài khoản ĐÃ duyệt. Quản trị và Kỹ thuật cùng làm được (chủ app chốt 22/10/2026).
- * Không tự đổi vai trò của chính mình; không để hệ thống hết Quản trị. */
+ * Không tự đổi vai trò của chính mình; không để hệ thống hết tài khoản Kỹ thuật/Quản trị. */
 export async function doiVaiTro(fd: FormData): Promise<KetQuaVaiTro> {
   const nguoiGoi = await layNguoiDungHienTai();
   if (!nguoiGoi || (nguoiGoi.vaiTro !== "admin" && nguoiGoi.vaiTro !== "ky_thuat")) return { loi: "Bạn không có quyền phân quyền tài khoản." };
@@ -24,8 +24,9 @@ export async function doiVaiTro(fd: FormData): Promise<KetQuaVaiTro> {
   if (!muc) return { loi: "Không tìm thấy tài khoản." };
   if (!muc.app_metadata?.vai_tro) return { loi: "Tài khoản này đang chờ duyệt: duyệt ở trang Tổng quan." };
   if (muc.app_metadata.vai_tro === vaiTro) return { ok: true };
-  const soQuanTri = ds.users.filter((u) => u.app_metadata?.vai_tro === "admin").length;
-  if (muc.app_metadata.vai_tro === "admin" && vaiTro !== "admin" && soQuanTri <= 1) return { loi: "Đây là Quản trị cuối cùng, không hạ vai trò được." };
+  const caoCap = (v: unknown) => v === "admin" || v === "ky_thuat";
+  const soCaoCap = ds.users.filter((u) => caoCap(u.app_metadata?.vai_tro)).length;
+  if (caoCap(muc.app_metadata.vai_tro) && !caoCap(vaiTro) && soCaoCap <= 1) return { loi: "Đây là tài khoản Kỹ thuật/Quản trị cuối cùng, không hạ vai trò được." };
 
   const { error: loi } = await db.auth.admin.updateUserById(userId, { app_metadata: { ...muc.app_metadata, vai_tro: vaiTro } });
   if (loi) return { loi: "Chưa đổi được vai trò. Thử lại sau." };

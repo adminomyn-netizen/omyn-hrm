@@ -35,7 +35,7 @@ export const menuChinh: MucMenu[] = [
   { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia", nhom: "Con người", icon: BarChart3, chiVaiTro: CHI_QUAN_LY, moTa: "Điểm và xếp loại hiệu suất theo kỳ." },
   { ten: "Chấm công", duong_dan: "/cham-cong", nhom: "Hằng ngày", icon: Clock, moTa: "Chấm công vào/ra và xem lịch công của bạn." },
   { ten: "Đơn từ và phê duyệt", duong_dan: "/don-tu", nhom: "Hằng ngày", icon: Inbox, moTa: "Nộp đơn nghỉ, công tác, tạm ứng và theo dõi kết quả duyệt." },
-  { ten: "Bảng lương", duong_dan: "/luong", nhom: "Tiền lương", icon: Wallet, chiVaiTro: ["admin", "nhan_vien"], moTa: "Quản trị: kỳ lương, thỏa thuận lương, tham số. Nhân viên: phiếu lương của mình." },
+  { ten: "Bảng lương", duong_dan: "/luong", nhom: "Tiền lương", icon: Wallet, chiVaiTro: ["admin", "ky_thuat", "nhan_vien"], moTa: "Quản trị và Kỹ thuật: kỳ lương, thỏa thuận lương, tham số. Nhân viên: phiếu lương của mình." },
   { ten: "Báo cáo và biểu mẫu", duong_dan: "/bao-cao", nhom: "Quản trị", icon: FileBarChart, chiVaiTro: CHI_QUAN_LY, moTa: "Báo cáo tổng hợp và biểu mẫu." },
   { ten: "Kỹ thuật", duong_dan: "/ky-thuat", nhom: "Quản trị", icon: Activity, chiVaiTro: ["ky_thuat", "admin"], moTa: "Tình trạng hệ thống và số dòng dữ liệu." },
   { ten: "Cài đặt và phân quyền", duong_dan: "/cai-dat", nhom: "Quản trị", icon: Settings, chiVaiTro: ["admin", "ky_thuat"], moTa: "Vai trò, quyền và thiết lập chung." },
