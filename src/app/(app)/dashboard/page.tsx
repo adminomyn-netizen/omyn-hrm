@@ -20,7 +20,7 @@ export default async function TrangTongQuan() {
   const nguoiGoi = await yeuCauVaiTro(["admin", "ky_thuat"]);
   const [d, taiKhoanChoDuyet, hoSoTrong] = await Promise.all([layDuLieuTongQuan(), layTaiKhoanChoDuyet(), layHoSoChuaGanTaiKhoan()]);
 
-  const ten = nguoiGoi.hoTen.trim().split(/\s+/).pop();
+  const ten = nguoiGoi.hoTen.trim().replace(/\s+/g, " ");
   const soViec = d.viec.length;
   const cc = d.chamCong;
   const lonNhat = Math.max(1, ...cc.o);

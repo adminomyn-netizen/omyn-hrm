@@ -86,7 +86,7 @@ Thang cỡ chữ:
 | Vai trò | Cỡ / ghi chú |
 |---|---|
 | Tiêu đề trang (`TieuDeTrang`) | sans 600, 36 px (điện thoại) / 44 px (máy tính), dòng 1,1 |
-| Lời chào Tổng quan | sans 600 (không nghiêng) 40 / 52 px |
+| Lời chào Tổng quan (gọi họ tên đầy đủ) | sans 600 (không nghiêng) 40 / 52 px |
 | Tiêu đề popup | sans 600 30 px |
 | Chỉ số lớn | sans 30–32 px, 500 |
 | Đồng hồ chấm công | sans 56 px, 500 |
