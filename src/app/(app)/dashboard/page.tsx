@@ -9,7 +9,8 @@ import { DuyetTaiKhoan } from "@/components/dashboard/DuyetTaiKhoan";
 import { VongChamCong } from "@/components/dashboard/VongChamCong";
 import { DuongXuHuong } from "@/components/dashboard/DuongXuHuong";
 import { layDuLieuTongQuan, layHoSoChuaGanTaiKhoan, layTaiKhoanChoDuyet } from "@/lib/data";
-import { yeuCauVaiTro } from "@/lib/auth";
+import { layNguoiDungDaDuyet } from "@/lib/auth";
+import { TongQuanCuaToi } from "@/components/dashboard/TongQuanCuaToi";
 import { gioMayChu, ngayVN, trieuVN } from "@/lib/dinh-dang";
 import { LoiChaoDongHo } from "@/components/dashboard/LoiChaoDongHo";
 import { NUT_CHINH, NUT_PHU } from "@/components/ui/dinh-dang";
@@ -17,8 +18,12 @@ import { NUT_CHINH, NUT_PHU } from "@/components/ui/dinh-dang";
 const IC = { tk: Check, don: Inbox, pv: CalendarClock } as const;
 
 export default async function TrangTongQuan() {
-  const nguoiGoi = await yeuCauVaiTro(["admin", "ky_thuat"]);
-  const [d, taiKhoanChoDuyet, hoSoTrong] = await Promise.all([layDuLieuTongQuan(), layTaiKhoanChoDuyet(), layHoSoChuaGanTaiKhoan()]);
+  // Ai cũng vào được Tổng quan; nội dung theo từng tài khoản: nhân viên chỉ thấy việc của mình.
+  const nguoiGoi = await layNguoiDungDaDuyet();
+  if (nguoiGoi.vaiTro !== "admin" && nguoiGoi.vaiTro !== "ky_thuat") return <TongQuanCuaToi userId={nguoiGoi.id} hoTen={nguoiGoi.hoTen} />;
+  const laKyThuat = nguoiGoi.vaiTro === "ky_thuat";
+  // Duyệt tài khoản chỉ Kỹ thuật làm: người khác không đọc danh sách chờ duyệt.
+  const [d, taiKhoanChoDuyet, hoSoTrong] = await Promise.all([layDuLieuTongQuan(nguoiGoi.vaiTro), laKyThuat ? layTaiKhoanChoDuyet() : Promise.resolve([]), laKyThuat ? layHoSoChuaGanTaiKhoan() : Promise.resolve([])]);
 
   const ten = nguoiGoi.hoTen.trim().replace(/\s+/g, " ");
   const soViec = d.viec.length;

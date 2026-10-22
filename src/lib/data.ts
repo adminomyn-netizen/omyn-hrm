@@ -390,6 +390,8 @@ export async function layThongBao(
       db.from("don_tu").select("id", { count: "exact", head: true }).eq("trang_thai", "Chờ duyệt"),
       db.from("ung_vien").select("id", { count: "exact", head: true }).eq("trang_thai", "Mới nộp"),
     ]);
+    // Duyệt tài khoản chỉ Kỹ thuật làm: chỉ Kỹ thuật được báo và đếm.
+    if (nguoiDung.vaiTro !== "ky_thuat") tk.length = 0;
     dem["/dashboard"] = tk.length;
     dem["/don-tu"] = demDon.count ?? 0;
     dem["/tuyen-dung"] = demUv.count ?? 0;
@@ -483,7 +485,7 @@ const BUOC_PHAU = ["Mới nộp", "Hẹn phỏng vấn", "Vòng 1", "Vòng 2", "
 const cong = (iso: string, soNgay: number) => new Date(new Date(`${iso}T00:00:00+07:00`).getTime() + soNgay * 86400_000).toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" });
 
 /** Toàn bộ số liệu cho trang Tổng quan (đều từ dữ liệu thật; dải xu hướng tính từ ngày tạo/ngày vào làm). */
-export async function layDuLieuTongQuan() {
+export async function layDuLieuTongQuan(vaiTro?: "admin" | "ky_thuat" | "nhan_vien") {
   const db = createAdminClient();
   const homNay = ngayHomNayHCM();
   const [nv, cc, don, uv, tin, luong, tk] = await Promise.all([
@@ -496,6 +498,7 @@ export async function layDuLieuTongQuan() {
     layTaiKhoanChoDuyet(),
   ]);
   for (const r of [nv, cc, don, uv, tin]) if (r.error) throw r.error;
+  if (vaiTro !== "ky_thuat") tk.length = 0; // việc duyệt tài khoản chỉ Kỹ thuật thấy
 
   const nhanVien = nv.data!;
   const dangLamDs = nhanVien.filter((n) => n.trang_thai !== "Đã nghỉ");
@@ -674,4 +677,32 @@ export async function layNgayChamCongTrongThang(nam: number, thang: number) {
   const m = new Map<string, number>();
   for (const c of data) if (c.trang_thai !== "Vắng mặt") m.set(c.nhan_vien_id, (m.get(c.nhan_vien_id) ?? 0) + 1);
   return m;
+}
+
+/** Tổng quan cho NHÂN VIÊN: chỉ dữ liệu của chính mình (hồ sơ, chấm công hôm nay + tháng này, đơn từ, phiếu lương đã duyệt). */
+export async function layTongQuanCuaToi(userId: string) {
+  const db = createAdminClient();
+  const { data: hs, error } = await db.from("nhan_vien").select("id, ho_ten, chuc_danh, ngay_vao_lam, khoi(ten)").eq("user_id", userId).maybeSingle();
+  if (error) throw error;
+  if (!hs) return null;
+  const { nam, thang } = thangHienTaiHCM();
+  const t2 = String(thang).padStart(2, "0");
+  const tu = `${nam}-${t2}-01`;
+  const den = `${nam}-${t2}-${String(new Date(nam, thang, 0).getDate()).padStart(2, "0")}`;
+  const [homNay, congThang, don, donCho, phieu] = await Promise.all([
+    layChamCongHomNayCuaToi(hs.id),
+    db.from("cham_cong").select("trang_thai").eq("nhan_vien_id", hs.id).gte("ngay", tu).lte("ngay", den),
+    db.from("don_tu").select("id, loai, tu_ngay, den_ngay, trang_thai").eq("nhan_vien_id", hs.id).order("created_at", { ascending: false }).limit(5),
+    db.from("don_tu").select("id", { count: "exact", head: true }).eq("nhan_vien_id", hs.id).eq("trang_thai", "Chờ duyệt"),
+    layPhieuLuongCuaToi(hs.id),
+  ]);
+  const cc = congThang.data ?? [];
+  return {
+    hoSo: { hoTen: hs.ho_ten, chucDanh: hs.chuc_danh ?? "", khoi: hs.khoi?.ten ?? "", ngayVaoLam: hs.ngay_vao_lam as string },
+    homNay,
+    thang: { nam, thang, ngayCong: cc.filter((c) => c.trang_thai !== "Vắng mặt").length, diMuon: cc.filter((c) => c.trang_thai === "Đi muộn").length },
+    don: don.data ?? [],
+    donCho: donCho.count ?? 0,
+    phieuMoiNhat: phieu[0] ? { tenKy: phieu[0].ky?.ten_ky ?? "", daChi: phieu[0].ky?.trang_thai === "da_chi" } : null,
+  };
 }

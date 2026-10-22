@@ -28,7 +28,7 @@ export type MucMenu = {
 const CHI_QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
 
 export const menuChinh: MucMenu[] = [
-  { ten: "Tổng quan", duong_dan: "/dashboard", nhom: "Chung", icon: LayoutDashboard, chiVaiTro: CHI_QUAN_LY, moTa: "Số liệu nhân sự trong ngày và duyệt tài khoản mới đăng ký." },
+  { ten: "Tổng quan", duong_dan: "/dashboard", nhom: "Chung", icon: LayoutDashboard, moTa: "Ai cũng thấy; nội dung theo từng tài khoản: nhân viên xem việc của mình, quản lý xem số liệu công ty." },
   { ten: "Hồ sơ nhân sự", duong_dan: "/nhan-su", nhom: "Con người", icon: Users, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa hồ sơ nhân viên; cho nghỉ việc." },
   { ten: "Khối và phòng ban", duong_dan: "/khoi", nhom: "Con người", icon: Building2, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa, xoá khối; xem mỗi khối có bao nhiêu người." },
   { ten: "Tuyển dụng", duong_dan: "/tuyen-dung", nhom: "Con người", icon: UserPlus, chiVaiTro: CHI_QUAN_LY, moTa: "Đăng tin, nhận hồ sơ, theo dõi ứng viên qua từng vòng." },
