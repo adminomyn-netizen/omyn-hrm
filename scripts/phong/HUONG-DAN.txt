@@ -1,0 +1,4 @@
+Phông để dựng logo (scripts/dung-logo.mjs), giấy phép SIL OFL:
+1) Tải CormorantGaramond[wght].ttf từ github.com/google/fonts/tree/main/ofl/cormorantgaramond
+2) Tạo bản tĩnh đậm 600:  fonttools varLib.instancer CormorantGaramond-var.ttf wght=600 -o CormorantGaramond-600.ttf
+3) node scripts/dung-logo.mjs

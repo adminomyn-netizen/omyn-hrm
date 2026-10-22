@@ -11,7 +11,7 @@ export async function dangNhap(_truoc: { loi?: string } | undefined, formData: F
   const { error } = await supabase.auth.signInWithPassword({ email, password: matKhau });
 
   if (error) {
-    return { loi: "Sai email hoặc mật khẩu." };
+    return { loi: "Email hoặc mật khẩu chưa đúng. Bạn kiểm tra lại, hoặc nhờ Nhân sự đặt lại mật khẩu." };
   }
 
   redirect("/dashboard");

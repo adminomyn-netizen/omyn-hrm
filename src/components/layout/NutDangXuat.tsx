@@ -1,7 +1,6 @@
 "use client";
 
 import { useTransition } from "react";
-import { LogOut } from "lucide-react";
 import { dangXuat } from "@/lib/actions";
 
 /** Nút type="button" gọi action thẳng qua onClick — KHÔNG đặt trong một
@@ -14,10 +13,9 @@ export function NutDangXuat() {
       type="button"
       disabled={dangXuLy}
       onClick={() => startXuLy(() => dangXuat())}
-      title="Đăng xuất"
-      className="rounded-full p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-600 disabled:opacity-50 dark:hover:bg-slate-800"
+      className="text-[13px] font-medium text-muc-2 underline-offset-4 hover:text-muc hover:underline disabled:opacity-50"
     >
-      <LogOut className="h-4 w-4" />
+      Đăng xuất
     </button>
   );
 }

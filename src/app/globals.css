@@ -1,50 +1,106 @@
 @import "tailwindcss";
 
-/* Chế độ tối bật bằng class .dark trên <html> (đặt tay qua nút bấm, không
- * theo prefers-color-scheme của hệ thống) — mặc định luôn là sáng. */
+/* Không có chế độ tối: giữ biến thể dark gắn với class .dark (không bao giờ bật)
+ * để các lớp dark: còn sót ở trang cũ không bị kích hoạt theo hệ điều hành. */
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Bộ nhận diện OMYN (Phụ lục E của plan): giấy ấm + mực + MỘT màu nhấn rêu.
+ * Giao diện chỉ có bản sáng. Các tên --omyn-* giữ lại để các trang cũ chưa
+ * làm lại vẫn chạy; giá trị trỏ về bảng màu mới. */
 :root {
-  --background: #f8fafc;
-  --foreground: #0f172a;
+  --giay: #f7f3ec;
+  --giay-sang: #fcfaf6;
+  --giay-tram: #eee8dd;
+  --muc: #221e1a;
+  --muc-2: #5a5148;
+  --muc-3: #6f665b;
+  --vien: #e2d9cb;
+  --vien-dam: #867c6d;
+  --nhan: #2f4538;
+  --nhan-dam: #223228;
+  --nhan-nhat: #e6ece6;
+  --loi: #9e3426;
+  --loi-nen: #f4e3df;
+  --canh-bao: #8a5a12;
+  --canh-bao-nen: #f3e8d2;
 
-  /* Màu thương hiệu Omyn — TẠM, đổi ở đây khi có bộ nhận diện thật */
-  --omyn-primary: #0f766e;
-  --omyn-primary-dark: #0b5a54;
-  --omyn-primary-light: #ccfbf1;
-  --omyn-accent: #f59e0b;
-  --omyn-surface: #ffffff;
-  --omyn-border: #e2e8f0;
-}
-
-.dark {
-  --background: #0b1120;
-  --foreground: #e2e8f0;
-
-  --omyn-primary: #2dd4bf;
-  --omyn-primary-dark: #14b8a6;
-  --omyn-primary-light: #0f3f3a;
-  --omyn-accent: #fbbf24;
-  --omyn-surface: #0f172a;
-  --omyn-border: #1e293b;
+  --background: var(--giay);
+  --foreground: var(--muc);
+  --omyn-primary: var(--nhan);
+  --omyn-primary-dark: var(--nhan-dam);
+  --omyn-primary-light: var(--nhan-nhat);
+  --omyn-accent: var(--canh-bao);
+  --omyn-surface: var(--giay-sang);
+  --omyn-border: var(--vien);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-giay: var(--giay);
+  --color-giay-sang: var(--giay-sang);
+  --color-giay-tram: var(--giay-tram);
+  --color-muc: var(--muc);
+  --color-muc-2: var(--muc-2);
+  --color-muc-3: var(--muc-3);
+  --color-vien: var(--vien);
+  --color-vien-dam: var(--vien-dam);
+  --color-nhan: var(--nhan);
+  --color-nhan-dam: var(--nhan-dam);
+  --color-nhan-nhat: var(--nhan-nhat);
+  --color-loi: var(--loi);
+  --color-loi-nen: var(--loi-nen);
+  --color-canh-bao: var(--canh-bao);
+  --color-canh-bao-nen: var(--canh-bao-nen);
   --color-omyn-primary: var(--omyn-primary);
   --color-omyn-primary-dark: var(--omyn-primary-dark);
   --color-omyn-primary-light: var(--omyn-primary-light);
   --color-omyn-accent: var(--omyn-accent);
   --color-omyn-surface: var(--omyn-surface);
   --color-omyn-border: var(--omyn-border);
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-be-vietnam), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-cormorant), "Times New Roman", serif;
+  --radius-nho: 4px;
+  --radius-vua: 6px;
+}
+
+html {
+  font-size: 15px;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--font-sans);
+  line-height: 1.55;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Tiêu đề hiển thị: chữ serif, chỉ dùng từ 28 px trở lên (tiếng Việt đủ dấu). */
+.chu-tieu-de {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+.nhan-muc {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muc-3);
+}
+
+:focus-visible {
+  outline: 2px solid var(--nhan);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
 
 /* Lớp giao diện cho react-big-calendar (lưới lịch chấm công) — khoác lại theo
