@@ -14,7 +14,7 @@ export type DongDon = { id: string; loai: string; tu_ngay: string; den_ngay: str
 const kieu = (t: string) => (t === "Đã duyệt" ? "tot" : t === "Từ chối" ? "loi" : "cho");
 
 /** Danh sách đơn. Duyệt/từ chối đổi trạng thái NGAY trên màn hình rồi mới gửi lên máy chủ; lỗi thì tự hoàn lại. */
-export type ThongTinNop = { loaiChoPhep: string[]; phepNam: { daDung: number; moiNam: number; nam: number } };
+export type ThongTinNop = { loaiChoPhep: string[]; phepNam: { daDung: number; moiNam: number; nam: number }; nhanVienChon?: { gia_tri: string; nhan: string }[]; macDinhNopCho?: string };
 
 export function DanhSachDonTu({ che, don, nopDon: thongTinNop }: { che: "quan-ly" | "ca-nhan"; don: DongDon[]; nopDon?: ThongTinNop }) {
   const router = useRouter();
@@ -114,7 +114,7 @@ export function DanhSachDonTu({ che, don, nopDon: thongTinNop }: { che: "quan-ly
       </div>
 
       <Hop mo={nop} dong={() => setNop(false)} tieuDe="Nộp đơn mới" moTa="Đơn sẽ gửi tới người duyệt. Bạn theo dõi kết quả ngay tại đây.">
-        {nop && thongTinNop && <FormDonTu loaiChoPhep={thongTinNop.loaiChoPhep} phepNam={thongTinNop.phepNam} huy={() => setNop(false)} xong={() => { setNop(false); router.refresh(); }} />}
+        {nop && thongTinNop && <FormDonTu loaiChoPhep={thongTinNop.loaiChoPhep} phepNam={thongTinNop.phepNam} nhanVienChon={thongTinNop.nhanVienChon} macDinhNopCho={thongTinNop.macDinhNopCho} huy={() => setNop(false)} xong={() => { setNop(false); router.refresh(); }} />}
       </Hop>
     </>
   );

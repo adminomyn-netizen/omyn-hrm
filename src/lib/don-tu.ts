@@ -29,3 +29,19 @@ export function demNgayPhep(tu: string, den: string) {
 
 /** Các loại đơn một người được nộp. */
 export const loaiDonChoPhep = (canChamCong: boolean) => LOAI_DON.filter((l) => canChamCong || !LOAI_DON_CHAM_CONG.includes(l));
+
+/** Ca hành chính đã quy định: giải trình công được duyệt thì giờ chấm công của ngày đó trở về đúng ca này. */
+export const CA_VAO = "08:30:00";
+export const CA_RA = "17:30:00";
+/** Một đơn giải trình công chỉ trải tối đa chừng này ngày (tránh sửa hàng loạt ngoài ý muốn). */
+export const GIAI_TRINH_TOI_DA_NGAY = 31;
+
+/** Các ngày làm việc (bỏ Chủ nhật) từ `tu` đến `den`, không quá `toiDa` (hôm nay HCM). */
+export function ngayLamViec(tu: string, den: string, toiDa: string) {
+  const ra: string[] = [];
+  for (let t = Date.parse(`${tu}T00:00:00Z`); t <= Date.parse(`${den}T00:00:00Z`); t += 864e5) {
+    const iso = new Date(t).toISOString().slice(0, 10);
+    if (new Date(t).getUTCDay() !== 0 && iso <= toiDa) ra.push(iso);
+  }
+  return ra;
+}

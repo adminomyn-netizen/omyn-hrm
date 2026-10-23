@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { DanhSachDonTu, type ThongTinNop } from "@/components/don-tu/DanhSachDonTu";
-import { layDonTu, layDonTuCuaToi, layHoSoChamCong, layPhepNamDaDung, thangHienTaiHCM } from "@/lib/data";
+import { layDanhSachNhanVien, layDonTu, layDonTuCuaToi, layHoSoChamCong, layPhepNamDaDung, thangHienTaiHCM } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { PHEP_NAM_MOI_NAM, loaiDonChoPhep } from "@/lib/don-tu";
 
@@ -10,9 +10,18 @@ export default async function TrangDonTu() {
   const { nhanVienId, canChamCong } = await layHoSoChamCong(nguoiDung.id, nguoiDung.vaiTro);
   const { nam } = thangHienTaiHCM();
   // Ai có hồ sơ nhân sự cũng nộp được đơn cho chính mình — kể cả Quản trị/Hành chính nhân sự.
-  const nopDon: ThongTinNop | undefined = nhanVienId
-    ? { loaiChoPhep: [...loaiDonChoPhep(canChamCong)], phepNam: { daDung: await layPhepNamDaDung(nhanVienId, nam), moiNam: PHEP_NAM_MOI_NAM, nam } }
-    : undefined;
+  // Kỹ thuật thì luôn nộp được MỌI loại đơn và có thể nộp thay cho bất kỳ nhân viên nào đang làm.
+  const laKyThuat = nguoiDung.vaiTro === "ky_thuat";
+  const nhanVienChon = laKyThuat ? (await layDanhSachNhanVien()).filter((n) => n.trang_thai !== "Đã nghỉ").map((n) => ({ gia_tri: n.id, nhan: `${n.ho_ten}${n.chuc_danh ? " · " + n.chuc_danh : ""}` })) : undefined;
+  const nopDon: ThongTinNop | undefined =
+    nhanVienId || laKyThuat
+      ? {
+          loaiChoPhep: [...(laKyThuat ? loaiDonChoPhep(true) : loaiDonChoPhep(canChamCong))],
+          phepNam: { daDung: nhanVienId ? await layPhepNamDaDung(nhanVienId, nam) : 0, moiNam: PHEP_NAM_MOI_NAM, nam },
+          nhanVienChon,
+          macDinhNopCho: nhanVienId ?? "",
+        }
+      : undefined;
 
   if (nguoiDung.vaiTro === "nhan_vien") {
     const don = nhanVienId ? await layDonTuCuaToi(nhanVienId) : [];
