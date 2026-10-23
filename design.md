@@ -258,7 +258,7 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 - **Công tính lương theo ca đã định**, không theo giờ bấm: lịch hiển thị giờ bấm thực tế, nhưng công = số ngày đi làm (ca hành chính 08:30–17:30); đi muộn chỉ là nhãn trạng thái. Giờ tăng ca nhập tay ở dòng lương.
 - **Lịch chấm công** (`BoLocThoiGian`): chọn thẳng tháng/năm bằng ô chọn, nút tháng trước/sau, "Tháng này", hoặc tab "Tuỳ chỉnh khoảng ngày" (tối đa 93 ngày, hiện bảng Ngày · Nhân viên · Bộ phận · Giờ vào · Giờ ra · Trạng thái). Ô sự kiện trên lịch: dòng 1 "Tên - Bộ phận", dòng 2 "08:20 – 17:35"; quá chỗ thì "+N người nữa".
 - **Đăng ký chọn phòng ban** (22/10, chốt lại): form chỉ có ô Phòng ban (danh sách khối), không có ô vị trí và không có ghi chú phụ. Lựa chọn chỉ là YÊU CẦU (`app_metadata.yeu_cau_khoi_id`), không cấp quyền. Bảng chờ duyệt hiện "Phòng ban: …", ô hồ sơ mặc định "Tạo hồ sơ mới theo đăng ký"; phòng ban **Hành chính nhân sự** có quyền Quản trị nên ô vai trò mặc định là Quản trị (người duyệt vẫn bấm xác nhận).
-- **Phân quyền tài khoản do Kỹ thuật làm** (và Quản trị): duyệt tài khoản gán được mọi vai trò; trang Cài đặt và phân quyền cho đổi vai trò từng tài khoản (không tự đổi mình, không hạ Quản trị cuối cùng).
+- **Quyền Quản trị đặt cứng theo vị trí** (23/10/2026): khối Hành chính nhân sự và chức vụ Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc tự có quyền Quản trị; không còn trang Cài đặt và phân quyền. Duyệt tài khoản chỉ Kỹ thuật làm (ô vai trò: Theo vị trí hoặc Kỹ thuật). Chỉ Kỹ thuật được đưa hồ sơ vào các vị trí này.
 - **Menu avatar** (bấm ảnh đại diện): họ và tên đầy đủ, vị trí (chức danh · phòng ban · vai trò Quản trị/Kỹ thuật nếu có), email.
 
 - **Kỹ thuật = quyền cao nhất** (22/10): làm mọi thứ và xem mọi số liệu, kể cả Lương (kỳ, thỏa thuận, tham số, xác nhận tham số). Không thể hạ tài khoản Kỹ thuật/Quản trị cuối cùng.
@@ -268,6 +268,6 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 - **Lãnh đạo = như Hành chính nhân sự** (22/10): hồ sơ có chức vụ Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc, hoặc phòng ban Hành chính nhân sự, thì ô vai trò khi duyệt tài khoản gợi ý Quản trị (người duyệt vẫn bấm xác nhận; hệ thống KHÔNG tự nâng quyền khi lưu chức vụ). Hàm `nenLaQuanTri` ở `src/lib/chuc-danh.ts`.
 
 - **Khối có cột Vị trí** (22/10): thay cột Mô tả; vị trí khai báo ở khối + chức vụ của nhân viên đang làm trong khối tự được gộp vào. Ô Chức vụ trong biểu mẫu nhân viên tự hiện vị trí của khối đang chọn trước, rồi các cấp chuẩn.
-- **Chỉ tài khoản Kỹ thuật** xem được mục Kỹ thuật và Cài đặt và phân quyền (kể cả đổi vai trò); Quản trị và Nhân viên không thấy menu, gõ thẳng đường dẫn thì bị đưa về Chấm công.
+- **Chỉ tài khoản Kỹ thuật** xem được mục Kỹ thuật và mục "Toàn cảnh số liệu" ở Tổng quan; Quản trị và Nhân viên không thấy menu, gõ thẳng đường dẫn thì bị đưa về Chấm công.
 
 - **Tổng quan ai cũng thấy, nội dung theo tài khoản** (22/10): Nhân viên thấy việc của chính mình (chấm công hôm nay, công tháng, đơn của tôi, hồ sơ, phiếu lương mới nhất); Quản trị thấy số liệu công ty; Kỹ thuật thấy thêm danh sách tài khoản chờ duyệt. Duyệt/từ chối tài khoản CHỈ Kỹ thuật (thông báo và đếm cũng chỉ Kỹ thuật). Đăng nhập xong ai cũng vào Tổng quan.
