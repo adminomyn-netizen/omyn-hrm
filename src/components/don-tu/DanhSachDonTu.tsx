@@ -10,11 +10,15 @@ import { duyetDonTu } from "@/app/(app)/don-tu/actions";
 import { FormDonTu } from "./FormDonTu";
 import { ngayVN } from "@/lib/dinh-dang";
 
-export type DongDon = { id: string; loai: string; tu_ngay: string; den_ngay: string; ly_do: string | null; trang_thai: string; nhan_vien_ho_ten?: string };
+export type DongDon = { id: string; loai: string; tu_ngay: string; den_ngay: string; gio_tu?: string | null; gio_den?: string | null; gio_vao_dung?: string | null; gio_ra_dung?: string | null; ly_do: string | null; trang_thai: string; nhan_vien_ho_ten?: string };
+const gio5 = (g?: string | null) => (g ? g.slice(0, 5) : "");
+/** Dòng phụ dưới ngày: khoảng giờ nghỉ, hoặc giờ đúng cần sửa chấm công về. */
+const chiTietGio = (d: DongDon) =>
+  d.gio_tu && d.gio_den ? `${gio5(d.gio_tu)} – ${gio5(d.gio_den)}` : [d.gio_vao_dung && `vào về ${gio5(d.gio_vao_dung)}`, d.gio_ra_dung && `ra về ${gio5(d.gio_ra_dung)}`].filter(Boolean).join(", ");
 const kieu = (t: string) => (t === "Đã duyệt" ? "tot" : t === "Từ chối" ? "loi" : "cho");
 
 /** Danh sách đơn. Duyệt/từ chối đổi trạng thái NGAY trên màn hình rồi mới gửi lên máy chủ; lỗi thì tự hoàn lại. */
-export type ThongTinNop = { loaiChoPhep: string[]; phepNam: { daDung: number; moiNam: number; nam: number }; nhanVienChon?: { gia_tri: string; nhan: string }[]; macDinhNopCho?: string };
+export type ThongTinNop = { loaiChoPhep: string[]; phepNam: { daDung: number; moiNam: number; nam: number }; nhanVienChon?: { gia_tri: string; nhan: string }[]; macDinhNopCho?: string; tenNguoiNop?: string };
 
 export function DanhSachDonTu({ che, don, nopDon: thongTinNop }: { che: "quan-ly" | "ca-nhan"; don: DongDon[]; nopDon?: ThongTinNop }) {
   const router = useRouter();
@@ -89,6 +93,7 @@ export function DanhSachDonTu({ che, don, nopDon: thongTinNop }: { che: "quan-ly
                 <td className="py-2 pr-4 tabular-nums text-muc-2">
                   {ngayVN(d.tu_ngay)}
                   {d.den_ngay !== d.tu_ngay ? ` – ${ngayVN(d.den_ngay)}` : ""}
+                  {chiTietGio(d) && <div className="text-[12px] text-muc-3">{chiTietGio(d)}</div>}
                 </td>
                 <td className="max-w-[260px] truncate py-2 pr-4 text-muc-2" title={d.ly_do ?? undefined}>{d.ly_do}</td>
                 <td className="py-2 pr-4"><NhanTrangThai kieu={kieu(d.trang_thai)}>{d.trang_thai}</NhanTrangThai></td>
@@ -114,7 +119,7 @@ export function DanhSachDonTu({ che, don, nopDon: thongTinNop }: { che: "quan-ly
       </div>
 
       <Hop mo={nop} dong={() => setNop(false)} tieuDe="Nộp đơn mới" moTa="Đơn sẽ gửi tới người duyệt. Bạn theo dõi kết quả ngay tại đây.">
-        {nop && thongTinNop && <FormDonTu loaiChoPhep={thongTinNop.loaiChoPhep} phepNam={thongTinNop.phepNam} nhanVienChon={thongTinNop.nhanVienChon} macDinhNopCho={thongTinNop.macDinhNopCho} huy={() => setNop(false)} xong={() => { setNop(false); router.refresh(); }} />}
+        {nop && thongTinNop && <FormDonTu loaiChoPhep={thongTinNop.loaiChoPhep} phepNam={thongTinNop.phepNam} nhanVienChon={thongTinNop.nhanVienChon} macDinhNopCho={thongTinNop.macDinhNopCho} tenNguoiNop={thongTinNop.tenNguoiNop} huy={() => setNop(false)} xong={() => { setNop(false); router.refresh(); }} />}
       </Hop>
     </>
   );

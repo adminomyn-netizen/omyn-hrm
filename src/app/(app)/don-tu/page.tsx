@@ -7,7 +7,7 @@ import { PHEP_NAM_MOI_NAM, loaiDonChoPhep } from "@/lib/don-tu";
 
 export default async function TrangDonTu() {
   const nguoiDung = await layNguoiDungDaDuyet();
-  const { nhanVienId, canChamCong } = await layHoSoChamCong(nguoiDung.id, nguoiDung.vaiTro);
+  const { nhanVienId, canChamCong, hoTen, chucDanh } = await layHoSoChamCong(nguoiDung.id, nguoiDung.vaiTro);
   const { nam } = thangHienTaiHCM();
   // Ai có hồ sơ nhân sự cũng nộp được đơn cho chính mình — kể cả Quản trị/Hành chính nhân sự.
   // Kỹ thuật thì luôn nộp được MỌI loại đơn và có thể nộp thay cho bất kỳ nhân viên nào đang làm.
@@ -20,6 +20,8 @@ export default async function TrangDonTu() {
           phepNam: { daDung: nhanVienId ? await layPhepNamDaDung(nhanVienId, nam) : 0, moiNam: PHEP_NAM_MOI_NAM, nam },
           nhanVienChon,
           macDinhNopCho: nhanVienId ?? "",
+          // Không phải Kỹ thuật thì đơn luôn mang tên chính người đăng nhập, hiện cố định để không nộp nhầm người.
+          tenNguoiNop: laKyThuat ? undefined : `${hoTen ?? ""}${chucDanh ? " · " + chucDanh : ""}`,
         }
       : undefined;
 
@@ -29,5 +31,5 @@ export default async function TrangDonTu() {
   }
 
   const don = await layDonTu();
-  return <DanhSachDonTu che="quan-ly" don={don.map((d) => ({ id: d.id, loai: d.loai, tu_ngay: d.tu_ngay, den_ngay: d.den_ngay, ly_do: d.ly_do, trang_thai: d.trang_thai, nhan_vien_ho_ten: d.nhan_vien_ho_ten }))} nopDon={nopDon} />;
+  return <DanhSachDonTu che="quan-ly" don={don.map((d) => ({ id: d.id, loai: d.loai, tu_ngay: d.tu_ngay, den_ngay: d.den_ngay, gio_tu: d.gio_tu, gio_den: d.gio_den, gio_vao_dung: d.gio_vao_dung, gio_ra_dung: d.gio_ra_dung, ly_do: d.ly_do, trang_thai: d.trang_thai, nhan_vien_ho_ten: d.nhan_vien_ho_ten }))} nopDon={nopDon} />;
 }
