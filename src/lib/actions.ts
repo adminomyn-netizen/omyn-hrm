@@ -4,7 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { coVaiTro } from "@/lib/auth";
+import { coVaiTro, layNguoiDungHienTai } from "@/lib/auth";
+import { nenLaQuanTri } from "@/lib/chuc-danh";
 
 const QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
 const KHONG_DU_QUYEN = "Bạn không có quyền thực hiện thao tác này.";
@@ -44,12 +45,27 @@ function thongBaoLoiNhanVien(error: { message: string }) {
 // KHÔNG bao giờ submit — nút bấm luôn type="button" (xem FormNhanVien/FormDonTu).
 export type KetQuaNhanVien = { loi?: string; ok?: boolean };
 
+/** Quyền Quản trị đặt cứng theo vị trí, nên chỉ Kỹ thuật được đưa một hồ sơ VÀO vị trí đó (Hành chính nhân sự, lãnh đạo);
+ * người đã ở vị trí đó thì Quản trị vẫn sửa thông tin khác của họ bình thường. Chặn Quản trị tự nâng quyền cho người khác. */
+async function chanNangQuyen(khoiId: string, chucDanh: string, hoSoCu?: { khoi_id: string | null; chuc_danh: string | null }) {
+  const nguoiGoi = await layNguoiDungHienTai();
+  if (nguoiGoi?.vaiTro === "ky_thuat") return null;
+  const db = createAdminClient();
+  const tenKhoi = async (id: string | null) => (id ? (await db.from("khoi").select("ten").eq("id", id).maybeSingle()).data?.ten : null);
+  if (!nenLaQuanTri(chucDanh, await tenKhoi(khoiId))) return null;
+  if (hoSoCu && nenLaQuanTri(hoSoCu.chuc_danh, await tenKhoi(hoSoCu.khoi_id))) return null;
+  return "Vị trí này (Hành chính nhân sự, Tổng giám đốc, Giám đốc…) tự có quyền Quản trị nên chỉ tài khoản Kỹ thuật được gán.";
+}
+
 export async function themNhanVien(formData: FormData): Promise<KetQuaNhanVien> {
   if (!(await coVaiTro(QUAN_LY))) return { loi: KHONG_DU_QUYEN };
   const d = docFormNhanVien(formData);
   if (!d.hoTen || !d.khoiId || !d.ngayVaoLam) {
     return { loi: "Thiếu họ tên, khối hoặc ngày vào làm." };
   }
+
+  const chan = await chanNangQuyen(d.khoiId, d.chucDanh);
+  if (chan) return { loi: chan };
 
   const supabase = createAdminClient();
   const { error } = await supabase.from("nhan_vien").insert({
@@ -78,6 +94,9 @@ export async function suaNhanVien(formData: FormData): Promise<KetQuaNhanVien> {
   }
 
   const supabase = createAdminClient();
+  const { data: cu } = await supabase.from("nhan_vien").select("khoi_id, chuc_danh").eq("id", id).maybeSingle();
+  const chan = await chanNangQuyen(d.khoiId, d.chucDanh, cu ?? undefined);
+  if (chan) return { loi: chan };
   const { error } = await supabase
     .from("nhan_vien")
     .update({

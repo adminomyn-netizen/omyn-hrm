@@ -2,6 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { nenLaQuanTri } from "@/lib/chuc-danh";
 
 export type VaiTro = "admin" | "ky_thuat" | "nhan_vien" | "cho_duyet";
 
@@ -12,6 +14,12 @@ function chuanHoaVaiTro(v: unknown): VaiTro {
   return (VAI_TRO_DA_DUYET as readonly unknown[]).includes(v) ? (v as VaiTro) : "cho_duyet";
 }
 
+/** Hồ sơ nhân sự của tài khoản có đang ở vị trí mặc định là Quản trị không. */
+async function laViTriQuanTri(userId: string) {
+  const { data } = await createAdminClient().from("nhan_vien").select("chuc_danh, trang_thai, khoi(ten)").eq("user_id", userId).maybeSingle();
+  return !!data && data.trang_thai !== "Đã nghỉ" && nenLaQuanTri(data.chuc_danh, data.khoi?.ten);
+}
+
 /** Mỗi yêu cầu chỉ hỏi Supabase Auth MỘT lần (React cache): layout, trang và hàm bảo vệ dùng chung kết quả. */
 export const layNguoiDungHienTai = cache(async () => {
   const supabase = await createClient();
@@ -20,13 +28,15 @@ export const layNguoiDungHienTai = cache(async () => {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
+  const luu = chuanHoaVaiTro(user.app_metadata?.vai_tro);
   return {
     id: user.id,
     email: user.email ?? "",
     hoTen: (user.app_metadata?.ho_ten as string) || (user.email ?? ""),
-    // Thiếu vai trò = "cho_duyet": tài khoản tự đăng ký chưa được Nhân sự duyệt,
-    // không có quyền gì. app_metadata chỉ máy chủ sửa được (người dùng thì không).
-    vaiTro: chuanHoaVaiTro(user.app_metadata?.vai_tro),
+    // Thiếu vai trò = "cho_duyet": tài khoản tự đăng ký chưa được Kỹ thuật duyệt, không có quyền gì.
+    // app_metadata chỉ máy chủ sửa được (người dùng thì không). Quyền Quản trị đặt CỨNG theo vị trí:
+    // phòng ban Hành chính nhân sự hoặc chức vụ Tổng giám đốc/Phó tổng giám đốc/Giám đốc/Phó giám đốc (xem chuc-danh.ts).
+    vaiTro: luu === "nhan_vien" && (await laViTriQuanTri(user.id)) ? ("admin" as VaiTro) : luu,
   };
 });
 

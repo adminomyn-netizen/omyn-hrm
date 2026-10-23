@@ -7,23 +7,21 @@ import { duyetTaiKhoan, tuChoiTaiKhoan } from "@/app/(app)/dashboard/actions";
 import type { VaiTro } from "@/lib/auth";
 import { nenLaQuanTri } from "@/lib/chuc-danh";
 
-type HoSo = { id: string; ho_ten: string; chuc_danh: string | null; email: string | null };
+type HoSo = { id: string; ho_ten: string; chuc_danh: string | null; email: string | null; khoi_ten: string | null };
 type TaiKhoan = { id: string; email: string; hoTen: string; taoLuc: string; yeuCau: { khoiId: string; khoiTen: string } | null };
 const TAO_MOI = "__moi__";
 
 /** Một dòng tài khoản chờ duyệt. Nút type="button" gọi action qua onClick — KHÔNG
  * dùng <form> submit (xem ghi chú ở src/lib/actions.ts). */
 function Dong({ tk, hoSo }: { tk: TaiKhoan; hoSo: HoSo[] }) {
-  // Phòng ban Hành chính nhân sự có quyền Quản trị: gợi ý sẵn, người duyệt vẫn bấm xác nhận.
-  // Chức vụ lãnh đạo (Tổng giám đốc, Giám đốc…) cũng gợi ý Quản trị như Hành chính nhân sự.
+  // Quyền Quản trị đặt cứng theo vị trí (Hành chính nhân sự, lãnh đạo) — không chọn tay ở đây.
   const hoSoKhop = hoSo.find((h) => h.email?.toLowerCase() === tk.email.toLowerCase());
-  const [vaiTro, setVaiTro] = useState(nenLaQuanTri(hoSoKhop?.chuc_danh, tk.yeuCau?.khoiTen) ? "admin" : "nhan_vien");
+  const [kyThuat, setKyThuat] = useState(false);
   const [hoSoId, setHoSoId] = useState(() => hoSoKhop?.id ?? (tk.yeuCau ? TAO_MOI : ""));
-  const chonHoSo = (id: string) => {
-    setHoSoId(id);
-    const h = hoSo.find((x) => x.id === id);
-    if (h && nenLaQuanTri(h.chuc_danh, null)) setVaiTro("admin");
-  };
+  const hoSoDangChon = hoSo.find((h) => h.id === hoSoId);
+  const seLaQuanTri = !kyThuat && (hoSoDangChon ? nenLaQuanTri(hoSoDangChon.chuc_danh, hoSoDangChon.khoi_ten) : hoSoId === TAO_MOI && nenLaQuanTri(null, tk.yeuCau?.khoiTen));
+  const vaiTro = kyThuat ? "ky_thuat" : "nhan_vien";
+  const chonHoSo = (id: string) => setHoSoId(id);
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
 
@@ -55,10 +53,11 @@ function Dong({ tk, hoSo }: { tk: TaiKhoan; hoSo: HoSo[] }) {
         </div>
       </td>
       <td className="py-3 pr-4">
-        <Chon nho ariaLabel="Vai trò" giaTri={vaiTro} onDoi={setVaiTro} className="w-36" luaChon={[{ gia_tri: "nhan_vien", nhan: "Nhân viên" }, { gia_tri: "ky_thuat", nhan: "Kỹ thuật" }, { gia_tri: "admin", nhan: "Quản trị" }]} />
+        <Chon nho ariaLabel="Vai trò" giaTri={vaiTro} onDoi={(v) => setKyThuat(v === "ky_thuat")} className="w-44" luaChon={[{ gia_tri: "nhan_vien", nhan: "Theo vị trí" }, { gia_tri: "ky_thuat", nhan: "Kỹ thuật" }]} />
+        <div className="mt-1 text-[12px] text-muc-3">{kyThuat ? "Quyền cao nhất" : seLaQuanTri ? "Sẽ có quyền Quản trị theo vị trí" : "Nhân viên"}</div>
       </td>
       <td className="py-3 pr-4">
-        <Chon nho ariaLabel="Hồ sơ nhân sự" giaTri={hoSoId} onDoi={chonHoSo} className="w-60" luaChon={[{ gia_tri: "", nhan: vaiTro === "nhan_vien" ? "Chọn hồ sơ nhân sự" : "Không gắn hồ sơ" }, ...(tk.yeuCau ? [{ gia_tri: TAO_MOI, nhan: "Tạo hồ sơ mới theo đăng ký" }] : []), ...hoSo.map((h) => ({ gia_tri: h.id, nhan: `${h.ho_ten}${h.chuc_danh ? " · " + h.chuc_danh : ""}` }))]} />
+        <Chon nho ariaLabel="Hồ sơ nhân sự" giaTri={hoSoId} onDoi={chonHoSo} className="w-60" luaChon={[{ gia_tri: "", nhan: !kyThuat ? "Chọn hồ sơ nhân sự" : "Không gắn hồ sơ" }, ...(tk.yeuCau ? [{ gia_tri: TAO_MOI, nhan: "Tạo hồ sơ mới theo đăng ký" }] : []), ...hoSo.map((h) => ({ gia_tri: h.id, nhan: `${h.ho_ten}${h.chuc_danh ? " · " + h.chuc_danh : ""}` }))]} />
         {loi && <div className="mt-1 text-[12px] text-loi">{loi}</div>}
       </td>
       <td className="py-3 text-right">

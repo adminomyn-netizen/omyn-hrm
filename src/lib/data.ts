@@ -351,12 +351,12 @@ export async function layHoSoChuaGanTaiKhoan() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("nhan_vien")
-    .select("id, ho_ten, chuc_danh, email")
+    .select("id, ho_ten, chuc_danh, email, khoi(ten)")
     .is("user_id", null)
     .neq("trang_thai", "Đã nghỉ")
     .order("ho_ten");
   if (error) throw error;
-  return data;
+  return data.map((h) => ({ id: h.id, ho_ten: h.ho_ten, chuc_danh: h.chuc_danh, email: h.email, khoi_ten: h.khoi?.ten ?? null }));
 }
 
 /** Tin tuyển dụng + toàn bộ ứng viên (dữ liệu nhỏ, để màn tuyển dụng lọc ở trình duyệt). */
