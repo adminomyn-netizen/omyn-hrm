@@ -239,6 +239,10 @@ export type Database = {
         Row: {
           created_at: string
           den_ngay: string
+          gio_den: string | null
+          gio_ra_dung: string | null
+          gio_tu: string | null
+          gio_vao_dung: string | null
           id: string
           loai: string
           ly_do: string | null
@@ -250,6 +254,10 @@ export type Database = {
         Insert: {
           created_at?: string
           den_ngay: string
+          gio_den?: string | null
+          gio_ra_dung?: string | null
+          gio_tu?: string | null
+          gio_vao_dung?: string | null
           id?: string
           loai: string
           ly_do?: string | null
@@ -261,6 +269,10 @@ export type Database = {
         Update: {
           created_at?: string
           den_ngay?: string
+          gio_den?: string | null
+          gio_ra_dung?: string | null
+          gio_tu?: string | null
+          gio_vao_dung?: string | null
           id?: string
           loai?: string
           ly_do?: string | null

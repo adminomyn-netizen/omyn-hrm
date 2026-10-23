@@ -4,8 +4,8 @@ import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
 import { layHoSoChamCong, ngayHomNayHCM, gioHienTaiHCM } from "@/lib/data";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { GIO_COI_LA_DI_MUON } from "@/lib/don-tu";
 
-const GIO_COI_LA_DI_MUON = "08:15:00";
 
 const KHONG_CAN = "Chức vụ của bạn không phải chấm công.";
 

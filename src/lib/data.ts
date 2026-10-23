@@ -1,6 +1,6 @@
 import { hopViTri, tachViTri } from "@/lib/chuc-vu";
 import { khongCanChamCong } from "@/lib/chuc-danh";
-import { demNgayPhep } from "@/lib/don-tu";
+import { soNgayNghi } from "@/lib/don-tu";
 import "server-only";
 import { createAdminClient } from "./supabase/admin";
 
@@ -49,23 +49,23 @@ export async function layNhanVienIdTheoUser(userId: string): Promise<string | nu
 
 /** Hồ sơ của tài khoản + có phải chấm công không (Tổng giám đốc, Giám đốc, Kỹ thuật thì không). */
 export async function layHoSoChamCong(userId: string, vaiTro: string) {
-  const { data, error } = await createAdminClient().from("nhan_vien").select("id, chuc_danh").eq("user_id", userId).maybeSingle();
+  const { data, error } = await createAdminClient().from("nhan_vien").select("id, ho_ten, chuc_danh").eq("user_id", userId).maybeSingle();
   if (error) throw error;
-  return { nhanVienId: data?.id ?? null, canChamCong: !khongCanChamCong(vaiTro, data?.chuc_danh) };
+  return { nhanVienId: data?.id ?? null, hoTen: data?.ho_ten ?? null, chucDanh: data?.chuc_danh ?? null, canChamCong: !khongCanChamCong(vaiTro, data?.chuc_danh) };
 }
 
 /** Số ngày phép năm đã dùng + đang chờ duyệt của một người trong năm dương lịch `nam` (đơn bị từ chối không tính). */
 export async function layPhepNamDaDung(nhanVienId: string, nam: number) {
   const { data, error } = await createAdminClient()
     .from("don_tu")
-    .select("tu_ngay, den_ngay")
+    .select("tu_ngay, den_ngay, gio_tu, gio_den")
     .eq("nhan_vien_id", nhanVienId)
     .eq("loai", "Nghỉ phép năm")
     .in("trang_thai", ["Chờ duyệt", "Đã duyệt"])
     .gte("tu_ngay", `${nam}-01-01`)
     .lte("tu_ngay", `${nam}-12-31`);
   if (error) throw error;
-  return (data ?? []).reduce((t, d) => t + demNgayPhep(d.tu_ngay as string, d.den_ngay as string), 0);
+  return (data ?? []).reduce((t, d) => t + soNgayNghi(d.tu_ngay as string, d.den_ngay as string, d.gio_tu, d.gio_den), 0);
 }
 
 export async function layDanhSachKhoi() {
@@ -195,7 +195,7 @@ export async function layDonTu() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("don_tu")
-    .select("id, loai, tu_ngay, den_ngay, ly_do, trang_thai, nhan_vien:nhan_vien_id(ho_ten)")
+    .select("id, loai, tu_ngay, den_ngay, gio_tu, gio_den, gio_vao_dung, gio_ra_dung, ly_do, trang_thai, nhan_vien:nhan_vien_id(ho_ten)")
     .order("tu_ngay", { ascending: false });
   if (error) throw error;
   return data.map((d) => ({ ...d, nhan_vien_ho_ten: d.nhan_vien?.ho_ten ?? "" }));
@@ -207,7 +207,7 @@ export async function layDonTuCuaToi(nhanVienId: string) {
   const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("don_tu")
-    .select("id, loai, tu_ngay, den_ngay, ly_do, trang_thai")
+    .select("id, loai, tu_ngay, den_ngay, gio_tu, gio_den, gio_vao_dung, gio_ra_dung, ly_do, trang_thai")
     .eq("nhan_vien_id", nhanVienId)
     .order("tu_ngay", { ascending: false });
   if (error) throw error;
