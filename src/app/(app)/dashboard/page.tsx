@@ -10,6 +10,7 @@ import { VongChamCong } from "@/components/dashboard/VongChamCong";
 import { DuongXuHuong } from "@/components/dashboard/DuongXuHuong";
 import { layDuLieuTongQuan, layHoSoChuaGanTaiKhoan, layTaiKhoanChoDuyet } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
+import { ToanCanhKyThuat } from "@/components/dashboard/ToanCanhKyThuat";
 import { TongQuanCuaToi } from "@/components/dashboard/TongQuanCuaToi";
 import { gioMayChu, ngayVN, trieuVN } from "@/lib/dinh-dang";
 import { LoiChaoDongHo } from "@/components/dashboard/LoiChaoDongHo";
@@ -182,6 +183,8 @@ export default async function TrangTongQuan() {
           </MucTrang>
         </div>
       </section>
+
+      {laKyThuat && <ToanCanhKyThuat />}
     </div>
   );
 }

@@ -20,7 +20,8 @@ export async function duyetTaiKhoan(formData: FormData): Promise<KetQuaTaiKhoan>
   }
 
   const userId = String(formData.get("user_id") || "");
-  const vaiTro = String(formData.get("vai_tro") || "") as VaiTroGan;
+  // Quản trị KHÔNG gán tay: tự có theo vị trí (Hành chính nhân sự, lãnh đạo). Ở đây chỉ chọn Nhân viên (mặc định) hoặc Kỹ thuật.
+  const vaiTro = (String(formData.get("vai_tro") || "") === "ky_thuat" ? "ky_thuat" : "nhan_vien") as VaiTroGan;
   const yeuTaoMoi = String(formData.get("nhan_vien_id") || "") === "__moi__";
   let hoSoId = yeuTaoMoi ? "" : String(formData.get("nhan_vien_id") || "");
 
