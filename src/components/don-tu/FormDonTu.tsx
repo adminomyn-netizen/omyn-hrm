@@ -16,7 +16,7 @@ const GOI_Y_LY_DO: Record<string, string> = {
 };
 
 /** Biểu mẫu nộp đơn trong hộp thoại. Nút type="button" gọi action qua onClick (lý do ở src/lib/actions.ts). */
-export function FormDonTu({ xong, huy, loaiChoPhep, phepNam }: { xong: () => void; huy: () => void; loaiChoPhep: string[]; phepNam: { daDung: number; moiNam: number; nam: number } }) {
+export function FormDonTu({ xong, huy, loaiChoPhep, phepNam, nhanVienChon, macDinhNopCho }: { xong: () => void; huy: () => void; loaiChoPhep: string[]; phepNam: { daDung: number; moiNam: number; nam: number }; nhanVienChon?: { gia_tri: string; nhan: string }[]; macDinhNopCho?: string }) {
   const [loaiDangChon, setLoaiDangChon] = useState("");
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
@@ -34,10 +34,16 @@ export function FormDonTu({ xong, huy, loaiChoPhep, phepNam }: { xong: () => voi
 
   return (
     <form ref={formRef} className="space-y-4" onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA" && e.preventDefault()}>
+      {nhanVienChon && (
+        <div>
+          <label htmlFor="d-nop-cho" className={NHAN_O}>Nộp cho *</label>
+          <Chon id="d-nop-cho" ten="nop_cho" batBuoc trong="Chọn nhân viên" giaTriMacDinh={macDinhNopCho ?? ""} luaChon={nhanVienChon} />
+        </div>
+      )}
       <div>
         <label htmlFor="d-loai" className={NHAN_O}>Loại đơn *</label>
         <Chon id="d-loai" ten="loai" batBuoc trong="Chọn loại đơn" giaTri={loaiDangChon} onDoi={setLoaiDangChon} luaChon={loaiChoPhep.map((l) => ({ gia_tri: l, nhan: l }))} />
-        {loaiDangChon === "Nghỉ phép năm" && (
+        {loaiDangChon === "Nghỉ phép năm" && !nhanVienChon && (
           <p className="mt-1.5 text-[13px] text-muc-3">
             Năm {phepNam.nam}: đã dùng hoặc đang chờ duyệt {phepNam.daDung}/{phepNam.moiNam} ngày, còn {Math.max(0, phepNam.moiNam - phepNam.daDung)} ngày. Chủ nhật không tính.
           </p>
