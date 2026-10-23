@@ -2,20 +2,27 @@
 
 import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
-import { layNhanVienIdTheoUser, ngayHomNayHCM, gioHienTaiHCM } from "@/lib/data";
+import { layHoSoChamCong, ngayHomNayHCM, gioHienTaiHCM } from "@/lib/data";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 const GIO_COI_LA_DI_MUON = "08:15:00";
 
-async function nhanVienIdCuaToi() {
+const KHONG_CAN = "Chức vụ của bạn không phải chấm công.";
+
+/** Mã hồ sơ của người đang đăng nhập; `loi` khi chưa gắn hồ sơ hoặc thuộc nhóm không phải chấm công. */
+async function nhanVienIdCuaToi(): Promise<{ id: string } | { loi: string }> {
   const nguoiDung = await layNguoiDungHienTai();
-  if (!nguoiDung) return null;
-  return layNhanVienIdTheoUser(nguoiDung.id);
+  if (!nguoiDung) return { loi: "Bạn chưa đăng nhập." };
+  const hs = await layHoSoChamCong(nguoiDung.id, nguoiDung.vaiTro);
+  if (!hs.canChamCong) return { loi: KHONG_CAN };
+  if (!hs.nhanVienId) return { loi: "Tài khoản của bạn chưa gắn với hồ sơ nhân sự nào." };
+  return { id: hs.nhanVienId };
 }
 
 export async function chamCongVao() {
-  const nhanVienId = await nhanVienIdCuaToi();
-  if (!nhanVienId) return { loi: "Tài khoản của bạn chưa gắn với hồ sơ nhân sự nào." };
+  const ket = await nhanVienIdCuaToi();
+  if ("loi" in ket) return { loi: ket.loi };
+  const nhanVienId = ket.id;
 
   const gio = gioHienTaiHCM();
   const supabase = createAdminClient();
@@ -35,8 +42,9 @@ export async function chamCongVao() {
 }
 
 export async function chamCongRa() {
-  const nhanVienId = await nhanVienIdCuaToi();
-  if (!nhanVienId) return { loi: "Tài khoản của bạn chưa gắn với hồ sơ nhân sự nào." };
+  const ket = await nhanVienIdCuaToi();
+  if ("loi" in ket) return { loi: ket.loi };
+  const nhanVienId = ket.id;
 
   const supabase = createAdminClient();
   const homNay = ngayHomNayHCM();

@@ -10,7 +10,7 @@ import {
   layChamCongHomNayCuaToi,
   layChamCongThang,
   layChamCongKhoang,
-  layNhanVienIdTheoUser,
+  layHoSoChamCong,
   thangHienTaiHCM,
 } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
@@ -97,21 +97,25 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
   const thang = Number(thangThamSo) || macDinh.thang;
 
   const nguoiDung = await layNguoiDungDaDuyet();
-  const nhanVienId = await layNhanVienIdTheoUser(nguoiDung.id);
+  const { nhanVienId, canChamCong } = await layHoSoChamCong(nguoiDung.id, nguoiDung.vaiTro);
 
   // Nhân viên chỉ thấy chấm công/lịch của CHÍNH MÌNH (chị Lâm chốt 12/10/2026).
   if (nguoiDung.vaiTro === "nhan_vien") {
     const [homNay, suKien] = await Promise.all([
-      nhanVienId ? layChamCongHomNayCuaToi(nhanVienId) : null,
+      nhanVienId && canChamCong ? layChamCongHomNayCuaToi(nhanVienId) : null,
       nhanVienId ? (khoang ? layChamCongKhoang(tu!, den!, nhanVienId) : layChamCongThang(nam, thang, nhanVienId)) : Promise.resolve([]),
     ]);
     return (
       <div className="space-y-10">
-        <TieuDeTrang tieuDe="Chấm công" phu="Chấm công vào, ra và xem lịch công của bạn" />
-        <section className="grid items-start gap-x-16 gap-y-10 lg:grid-cols-2">
-          <DongHoHCM canGiua />
-          <NutChamCong gioVao={homNay?.gio_vao ?? null} gioRa={homNay?.gio_ra ?? null} trangThai={homNay?.trang_thai ?? null} />
-        </section>
+        <TieuDeTrang tieuDe="Chấm công" phu={canChamCong ? "Chấm công vào, ra và xem lịch công của bạn" : "Xem lịch công của bạn"} />
+        {canChamCong ? (
+          <section className="grid items-start gap-x-16 gap-y-10 lg:grid-cols-2">
+            <DongHoHCM canGiua />
+            <NutChamCong gioVao={homNay?.gio_vao ?? null} gioRa={homNay?.gio_ra ?? null} trangThai={homNay?.trang_thai ?? null} />
+          </section>
+        ) : (
+          <p className="text-[14px] text-muc-3">Chức vụ của bạn không phải chấm công.</p>
+        )}
         <TuanNay suKien={suKien} />
         {!nhanVienId && (
           <div role="status" className="rounded-nho bg-canh-bao-nen px-4 py-3 text-[14px] text-canh-bao">
@@ -123,12 +127,29 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
     );
   }
 
-  const [chamCong, suKien] = await Promise.all([layChamCongHomNay(), khoang ? layChamCongKhoang(tu!, den!) : layChamCongThang(nam, thang)]);
+  // Quản trị (kể cả Hành chính nhân sự) có hồ sơ và không thuộc nhóm miễn chấm công thì cũng phải chấm công như mọi người.
+  const chamCuaMinh = canChamCong && !!nhanVienId;
+  const [chamCong, suKien, homNayCuaToi, suKienCuaToi] = await Promise.all([
+    layChamCongHomNay(),
+    khoang ? layChamCongKhoang(tu!, den!) : layChamCongThang(nam, thang),
+    chamCuaMinh ? layChamCongHomNayCuaToi(nhanVienId!) : null,
+    chamCuaMinh ? layChamCongThang(macDinh.nam, macDinh.thang, nhanVienId!) : Promise.resolve([]),
+  ]);
 
   return (
     <div className="space-y-10">
-      <TieuDeTrang tieuDe="Chấm công" phu="Theo dõi chấm công của cả công ty trong ngày và trong tháng" />
-      <DongHoHCM />
+      <TieuDeTrang tieuDe="Chấm công" phu={chamCuaMinh ? "Chấm công của bạn và theo dõi chấm công cả công ty" : "Theo dõi chấm công của cả công ty trong ngày và trong tháng"} />
+      {chamCuaMinh ? (
+        <>
+          <section className="grid items-start gap-x-16 gap-y-10 lg:grid-cols-2">
+            <DongHoHCM canGiua />
+            <NutChamCong gioVao={homNayCuaToi?.gio_vao ?? null} gioRa={homNayCuaToi?.gio_ra ?? null} trangThai={homNayCuaToi?.trang_thai ?? null} />
+          </section>
+          <TuanNay suKien={suKienCuaToi} />
+        </>
+      ) : (
+        <DongHoHCM />
+      )}
       <HangChiSo
         muc={[
           { nhan: "Đã chấm công hôm nay", so: `${chamCong.daChamCong}/${chamCong.tongNhanVien}` },

@@ -14,7 +14,9 @@ export type DongDon = { id: string; loai: string; tu_ngay: string; den_ngay: str
 const kieu = (t: string) => (t === "Đã duyệt" ? "tot" : t === "Từ chối" ? "loi" : "cho");
 
 /** Danh sách đơn. Duyệt/từ chối đổi trạng thái NGAY trên màn hình rồi mới gửi lên máy chủ; lỗi thì tự hoàn lại. */
-export function DanhSachDonTu({ che, don }: { che: "quan-ly" | "ca-nhan"; don: DongDon[] }) {
+export type ThongTinNop = { loaiChoPhep: string[]; phepNam: { daDung: number; moiNam: number; nam: number } };
+
+export function DanhSachDonTu({ che, don, nopDon: thongTinNop }: { che: "quan-ly" | "ca-nhan"; don: DongDon[]; nopDon?: ThongTinNop }) {
   const router = useRouter();
   const [loc, setLoc] = useState<"cho" | "tat-ca">(che === "quan-ly" ? "cho" : "tat-ca");
   const [ghiDe, setGhiDe] = useState<Record<string, string>>({});
@@ -49,7 +51,7 @@ export function DanhSachDonTu({ che, don }: { che: "quan-ly" | "ca-nhan"; don: D
   return (
     <>
       <TieuDeTrang tieuDe="Đơn từ và phê duyệt" phu={che === "quan-ly" ? `${soCho} đơn chờ duyệt · ${hien.length} đơn tất cả` : `${hien.length} đơn của bạn`}>
-        {che === "ca-nhan" && <button type="button" className={NUT_CHINH} onClick={() => setNop(true)}>Nộp đơn mới</button>}
+        {thongTinNop && <button type="button" className={NUT_CHINH} onClick={() => setNop(true)}>Nộp đơn mới</button>}
       </TieuDeTrang>
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-vien">
         {che === "quan-ly" ? (
@@ -112,7 +114,7 @@ export function DanhSachDonTu({ che, don }: { che: "quan-ly" | "ca-nhan"; don: D
       </div>
 
       <Hop mo={nop} dong={() => setNop(false)} tieuDe="Nộp đơn mới" moTa="Đơn sẽ gửi tới người duyệt. Bạn theo dõi kết quả ngay tại đây.">
-        {nop && <FormDonTu huy={() => setNop(false)} xong={() => { setNop(false); router.refresh(); }} />}
+        {nop && thongTinNop && <FormDonTu loaiChoPhep={thongTinNop.loaiChoPhep} phepNam={thongTinNop.phepNam} huy={() => setNop(false)} xong={() => { setNop(false); router.refresh(); }} />}
       </Hop>
     </>
   );
