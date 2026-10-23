@@ -15,3 +15,10 @@ export const CHUC_VU_QUYEN_QUAN_TRI = ["tổng giám đốc", "phó tổng giám
 export function nenLaQuanTri(chucVu: string | null | undefined, tenKhoi: string | null | undefined) {
   return tenKhoi === KHOI_QUYEN_QUAN_TRI || CHUC_VU_QUYEN_QUAN_TRI.includes((chucVu ?? "").trim().toLowerCase());
 }
+
+/** Chức vụ không phải chấm công (chủ app chốt 22/10/2026): Tổng giám đốc, Giám đốc và tài khoản Kỹ thuật.
+ * Mọi người còn lại — kể cả Quản trị/Hành chính nhân sự — đều phải chấm công. Phó giám đốc vẫn chấm công. */
+export const CHUC_VU_KHONG_CHAM_CONG = ["tổng giám đốc", "giám đốc"];
+export function khongCanChamCong(vaiTro: string | null | undefined, chucDanh: string | null | undefined) {
+  return vaiTro === "ky_thuat" || CHUC_VU_KHONG_CHAM_CONG.includes((chucDanh ?? "").trim().toLowerCase());
+}

@@ -6,10 +6,18 @@ import { Chon } from "@/components/ui/Chon";
 import { NgayChon } from "@/components/ui/NgayChon";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 
-const LOAI_DON = ["Nghỉ phép năm", "Nghỉ ốm", "Tạm ứng lương", "Công tác"];
+const GOI_Y_LY_DO: Record<string, string> = {
+  "Nghỉ chế độ": "Ghi rõ loại chế độ: thai sản, ...",
+  "Giải trình công": "Ngày nào, giờ vào/ra thực tế, vì sao chưa đúng với dữ liệu chấm công",
+  "Chấm công ngoài công ty": "Làm việc ở đâu, với ai, giờ bắt đầu và kết thúc",
+  "Làm remote": "Làm remote những việc gì",
+  "Đi trễ": "Đến lúc mấy giờ và lý do",
+  "Về sớm": "Về lúc mấy giờ và lý do",
+};
 
 /** Biểu mẫu nộp đơn trong hộp thoại. Nút type="button" gọi action qua onClick (lý do ở src/lib/actions.ts). */
-export function FormDonTu({ xong, huy }: { xong: () => void; huy: () => void }) {
+export function FormDonTu({ xong, huy, loaiChoPhep, phepNam }: { xong: () => void; huy: () => void; loaiChoPhep: string[]; phepNam: { daDung: number; moiNam: number; nam: number } }) {
+  const [loaiDangChon, setLoaiDangChon] = useState("");
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
@@ -28,7 +36,12 @@ export function FormDonTu({ xong, huy }: { xong: () => void; huy: () => void }) 
     <form ref={formRef} className="space-y-4" onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA" && e.preventDefault()}>
       <div>
         <label htmlFor="d-loai" className={NHAN_O}>Loại đơn *</label>
-        <Chon id="d-loai" ten="loai" batBuoc trong="Chọn loại đơn" luaChon={LOAI_DON.map((l) => ({ gia_tri: l, nhan: l }))} />
+        <Chon id="d-loai" ten="loai" batBuoc trong="Chọn loại đơn" giaTri={loaiDangChon} onDoi={setLoaiDangChon} luaChon={loaiChoPhep.map((l) => ({ gia_tri: l, nhan: l }))} />
+        {loaiDangChon === "Nghỉ phép năm" && (
+          <p className="mt-1.5 text-[13px] text-muc-3">
+            Năm {phepNam.nam}: đã dùng hoặc đang chờ duyệt {phepNam.daDung}/{phepNam.moiNam} ngày, còn {Math.max(0, phepNam.moiNam - phepNam.daDung)} ngày. Chủ nhật không tính.
+          </p>
+        )}
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div>
@@ -42,7 +55,7 @@ export function FormDonTu({ xong, huy }: { xong: () => void; huy: () => void }) 
       </div>
       <div>
         <label htmlFor="d-ly-do" className={NHAN_O}>Lý do</label>
-        <textarea id="d-ly-do" name="ly_do" placeholder="Mô tả ngắn lý do nghỉ, tạm ứng hoặc công tác" className={O_NHIEU_DONG} />
+        <textarea id="d-ly-do" name="ly_do" placeholder={GOI_Y_LY_DO[loaiDangChon] ?? "Mô tả ngắn lý do"} className={O_NHIEU_DONG} />
       </div>
       {loi && <div role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</div>}
       <div className="flex justify-end gap-2 border-t border-vien pt-4">

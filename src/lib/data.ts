@@ -1,4 +1,6 @@
 import { hopViTri, tachViTri } from "@/lib/chuc-vu";
+import { khongCanChamCong } from "@/lib/chuc-danh";
+import { demNgayPhep } from "@/lib/don-tu";
 import "server-only";
 import { createAdminClient } from "./supabase/admin";
 
@@ -45,6 +47,27 @@ export async function layNhanVienIdTheoUser(userId: string): Promise<string | nu
   return data?.id ?? null;
 }
 
+/** Hồ sơ của tài khoản + có phải chấm công không (Tổng giám đốc, Giám đốc, Kỹ thuật thì không). */
+export async function layHoSoChamCong(userId: string, vaiTro: string) {
+  const { data, error } = await createAdminClient().from("nhan_vien").select("id, chuc_danh").eq("user_id", userId).maybeSingle();
+  if (error) throw error;
+  return { nhanVienId: data?.id ?? null, canChamCong: !khongCanChamCong(vaiTro, data?.chuc_danh) };
+}
+
+/** Số ngày phép năm đã dùng + đang chờ duyệt của một người trong năm dương lịch `nam` (đơn bị từ chối không tính). */
+export async function layPhepNamDaDung(nhanVienId: string, nam: number) {
+  const { data, error } = await createAdminClient()
+    .from("don_tu")
+    .select("tu_ngay, den_ngay")
+    .eq("nhan_vien_id", nhanVienId)
+    .eq("loai", "Nghỉ phép năm")
+    .in("trang_thai", ["Chờ duyệt", "Đã duyệt"])
+    .gte("tu_ngay", `${nam}-01-01`)
+    .lte("tu_ngay", `${nam}-12-31`);
+  if (error) throw error;
+  return (data ?? []).reduce((t, d) => t + demNgayPhep(d.tu_ngay as string, d.den_ngay as string), 0);
+}
+
 export async function layDanhSachKhoi() {
   const supabase = createAdminClient();
   const { data, error } = await supabase
@@ -76,13 +99,20 @@ export async function layNhanVienTheoId(id: string) {
   return data;
 }
 
+/** Mã tài khoản có vai trò Kỹ thuật — dùng để loại họ khỏi số người phải chấm công. */
+async function layUserIdKyThuat() {
+  const { data, error } = await createAdminClient().auth.admin.listUsers({ page: 1, perPage: 200 });
+  if (error) throw error;
+  return new Set(data.users.filter((u) => u.app_metadata?.vai_tro === "ky_thuat").map((u) => u.id));
+}
+
 export async function layChamCongHomNay() {
   const supabase = createAdminClient();
   const homNay = ngayHomNayHCM();
 
   const [{ data: nhanVienDangLam, error: loi1 }, { data: chamCong, error: loi2 }] =
     await Promise.all([
-      supabase.from("nhan_vien").select("id").neq("trang_thai", "Đã nghỉ"),
+      supabase.from("nhan_vien").select("id, chuc_danh, user_id").neq("trang_thai", "Đã nghỉ"),
       supabase
         .from("cham_cong")
         .select("gio_vao, gio_ra, trang_thai, nhan_vien(ho_ten, khoi(ten))")
@@ -90,9 +120,11 @@ export async function layChamCongHomNay() {
     ]);
   if (loi1) throw loi1;
   if (loi2) throw loi2;
+  const kyThuat = await layUserIdKyThuat();
+  const canChamCong = nhanVienDangLam.filter((n) => !khongCanChamCong(n.user_id && kyThuat.has(n.user_id) ? "ky_thuat" : null, n.chuc_danh));
 
   return {
-    tongNhanVien: nhanVienDangLam.length,
+    tongNhanVien: canChamCong.length,
     daChamCong: chamCong.length,
     diMuon: chamCong.filter((c) => c.trang_thai === "Đi muộn").length,
     vangMat: chamCong.filter((c) => c.trang_thai === "Vắng mặt").length,
