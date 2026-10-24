@@ -8,50 +8,50 @@
  * Giao diện chỉ có bản sáng. Các tên --omyn-* giữ lại để các trang cũ chưa
  * làm lại vẫn chạy; giá trị trỏ về bảng màu mới. */
 :root {
-  /* Vàng champagne + nâu espresso (chủ dự án chốt 22/10: tông vàng sang trọng,
-   * không dùng xanh; có dải màu gradient vàng cho nút và mảng nhấn). */
-  --giay: #fbf7ee;
-  --giay-sang: #fffdf8;
-  --giay-tram: #f3ebd9;
-  --muc: #2a2218;
-  --muc-2: #5d5142;
-  --muc-3: #75684f;
-  --vien: #e8dec8;
-  --vien-dam: #8d7f60;
-  --nhan: #8f6c20;
-  --nhan-dam: #6e5119;
-  --nhan-nhat: #f5ebcf;
-  --chu-tren-vang: #2a2218; /* chữ trên nền vàng: luôn nâu đậm, cả chế độ tối */
-  --vang-sang: #e8cf8a;
-  --vang: #c9a24b;
-  --vang-tram: #b8923a;
-  --espresso: #2a2218;
-  --espresso-sau: #17110a;
-  --loi: #9e3426;
-  --loi-nen: #f4e3df;
-  --canh-bao: #a0522d;
-  --canh-bao-nen: #f6e6dc;
+  /* Xanh lục đậm + teal (chủ dự án chốt 24/10: đổi giao diện theo phần mềm chấm công mẫu — menu lục đậm, nút teal, nền sáng lạnh).
+   * Tên token giữ nguyên (vang = màu nhấn chính, nay là teal) để không phải sửa từng thành phần. */
+  --giay: #f4f7f7;
+  --giay-sang: #ffffff;
+  --giay-tram: #e8f0f0;
+  --muc: #12302d;
+  --muc-2: #3f5653;
+  --muc-3: #566b68;
+  --vien: #d7e3e1;
+  --vien-dam: #7a908d;
+  --nhan: #0f766e;
+  --nhan-dam: #0b5a54;
+  --nhan-nhat: #d6f2e8;
+  --chu-tren-vang: #ffffff; /* chữ trên nền teal: luôn trắng, cả chế độ tối */
+  --vang-sang: #0e8074;
+  --vang: #0f766e;
+  --vang-tram: #0b5f58;
+  --espresso: #07332e;
+  --espresso-sau: #04201c;
+  --loi: #b42318;
+  --loi-nen: #fdecea;
+  --canh-bao: #a8520c;
+  --canh-bao-nen: #fef1de;
 
-  /* Menu trái luôn nền espresso (cả khi giao diện sáng) — điểm tựa của bố cục. */
-  --menu: #1c160e;
-  --menu-chu: #cdbfa3;
-  --menu-chu-phu: #a89a7c;
-  --menu-sang: #f6ebd0;
-  --menu-nhan: #e2be66;
-  --menu-chon: rgba(246, 235, 208, 0.09);
-  --menu-hover: rgba(246, 235, 208, 0.06);
-  --menu-vien: rgba(246, 235, 208, 0.1);
+  /* Menu trái luôn nền lục đậm (cả khi giao diện sáng) — điểm tựa của bố cục. */
+  --menu: #00453d;
+  --menu-chu: #cfe5e1;
+  --menu-chu-phu: #93bab3;
+  --menu-sang: #ffffff;
+  --menu-nhan: #fbbf24;
+  --menu-chon: rgba(255, 255, 255, 0.13);
+  --menu-hover: rgba(255, 255, 255, 0.07);
+  --menu-vien: rgba(255, 255, 255, 0.12);
 
-  --gradient-vang: linear-gradient(135deg, #f0d896 0%, #d4ae5a 48%, #b8923a 100%);
-  --gradient-vang-hover: linear-gradient(135deg, #f5e2a8 0%, #dcb766 48%, #c29b43 100%);
-  --gradient-toi: linear-gradient(155deg, #3a2e1f 0%, #2a2218 45%, #17110a 100%);
-  --gradient-nen: linear-gradient(180deg, #fffdf8 0%, #fbf7ee 55%, #f3ebd9 100%);
-  --gradient-dau-trang: linear-gradient(90deg, #f7ecd0 0%, #fbf7ee 60%, #fbf7ee 100%);
+  --gradient-vang: linear-gradient(135deg, #0e8074 0%, #0f766e 48%, #0b5f58 100%);
+  --gradient-vang-hover: linear-gradient(135deg, #12917f 0%, #108178 48%, #0d6c64 100%);
+  --gradient-toi: linear-gradient(155deg, #0b5a50 0%, #00453d 45%, #002b26 100%);
+  --gradient-nen: linear-gradient(180deg, #ffffff 0%, #f4f7f7 55%, #e8f0f0 100%);
+  --gradient-dau-trang: linear-gradient(90deg, #e3f1ee 0%, #f4f7f7 60%, #f4f7f7 100%);
 
-  /* Thang "slate" của Tailwind được đổi sang tông be ấm để các trang cũ chưa làm lại không bị ánh xanh lạnh. */
-  --color-slate-50: #fbf7ee; --color-slate-100: #f3ebd9; --color-slate-200: #e8dec8; --color-slate-300: #d3c6a9;
-  --color-slate-400: #a99b7c; --color-slate-500: #75684f; --color-slate-600: #5d5142; --color-slate-700: #4a4034;
-  --color-slate-800: #3a3228; --color-slate-900: #2a2218; --color-slate-950: #1c160e;
+  /* Thang "slate" của Tailwind cho các trang cũ chưa làm lại: tông xám lục đồng bộ với bảng màu. */
+  --color-slate-50: #f4f7f7; --color-slate-100: #e8f0f0; --color-slate-200: #d7e3e1; --color-slate-300: #b7c9c6;
+  --color-slate-400: #8aa09d; --color-slate-500: #566b68; --color-slate-600: #3f5653; --color-slate-700: #2f4543;
+  --color-slate-800: #1f3331; --color-slate-900: #12302d; --color-slate-950: #0a1f1d;
 
   --background: var(--giay);
   --foreground: var(--muc);
@@ -63,33 +63,33 @@
   --omyn-border: var(--vien);
 }
 
-/* Chế độ tối: nâu espresso + vàng champagne. Bật bằng class .dark trên <html> (nút ở đầu trang,
+/* Chế độ tối: lục rất đậm + teal sáng. Bật bằng class .dark trên <html> (nút ở đầu trang,
  * nhớ lựa chọn trong localStorage; mặc định luôn là sáng). */
 .dark {
   color-scheme: dark;
-  --giay: #17120c;
-  --giay-sang: #1f1a12;
-  --giay-tram: #2a2318;
-  --muc: #f3ead8;
-  --muc-2: #cdbfa3;
-  --muc-3: #a89a7c;
-  --vien: #3a3123;
-  --vien-dam: #7c6f56;
-  --nhan: #d9b45c;
-  --nhan-dam: #e8cf8a;
-  --nhan-nhat: #3a2f17;
-  --menu: #100c07;
-  --loi: #f0a091;
-  --loi-nen: #3b1f1a;
-  --canh-bao: #e8a77a;
-  --canh-bao-nen: #3a2618;
+  --giay: #0a1716;
+  --giay-sang: #102321;
+  --giay-tram: #17302d;
+  --muc: #e3f2ef;
+  --muc-2: #b5cdc9;
+  --muc-3: #8fada8;
+  --vien: #1f3a36;
+  --vien-dam: #5f8b84;
+  --nhan: #4cc2b1;
+  --nhan-dam: #7fdccf;
+  --nhan-nhat: #123b36;
+  --menu: #03211d;
+  --loi: #f5a097;
+  --loi-nen: #3b1c19;
+  --canh-bao: #f0b36a;
+  --canh-bao-nen: #3a2a14;
 
-  --gradient-nen: linear-gradient(180deg, #1f1a12 0%, #17120c 55%, #120e08 100%);
-  --gradient-dau-trang: linear-gradient(90deg, #2a2112 0%, #1c160d 60%, #17120c 100%);
+  --gradient-nen: linear-gradient(180deg, #102321 0%, #0a1716 55%, #071210 100%);
+  --gradient-dau-trang: linear-gradient(90deg, #12302c 0%, #0d1f1d 60%, #0a1716 100%);
 
-  --color-slate-50: #1f1a12; --color-slate-100: #2a2318; --color-slate-200: #3a3123; --color-slate-300: #52472f;
-  --color-slate-400: #8a7d62; --color-slate-500: #a89a7c; --color-slate-600: #bfb297; --color-slate-700: #d4c8ae;
-  --color-slate-800: #e6dcc4; --color-slate-900: #f3ead8; --color-slate-950: #faf3e4;
+  --color-slate-50: #102321; --color-slate-100: #17302d; --color-slate-200: #1f3a36; --color-slate-300: #34584f;
+  --color-slate-400: #6b918a; --color-slate-500: #8fada8; --color-slate-600: #a9c4bf; --color-slate-700: #c4dad6;
+  --color-slate-800: #d8e8e5; --color-slate-900: #e3f2ef; --color-slate-950: #f1faf8;
 }
 
 @theme inline {
@@ -150,22 +150,22 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Nút vàng: dải vàng champagne, chữ nâu đậm (tương phản ≥ 7:1). */
+/* Nút chính: dải teal, chữ trắng (tương phản ≥ 4,5:1). */
 .nut-vang {
   background: var(--gradient-vang);
   color: var(--chu-tren-vang);
   font-weight: 600;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(143 108 32 / 0.25);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(15 118 110 / 0.28);
   transition: filter 150ms ease-out, box-shadow 150ms ease-out;
 }
 .nut-vang:hover:not(:disabled) {
   background: var(--gradient-vang-hover);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 2px 8px rgb(143 108 32 / 0.3);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 2px 8px rgb(15 118 110 / 0.34);
 }
-/* Mảng tối espresso có ánh vàng, dùng cho panel thương hiệu. */
+/* Mảng lục đậm có ánh teal, dùng cho panel thương hiệu. */
 .nen-toi {
   background:
-    radial-gradient(120% 80% at 100% 0%, rgb(201 162 75 / 0.28) 0%, transparent 55%),
+    radial-gradient(120% 80% at 100% 0%, rgb(45 190 170 / 0.22) 0%, transparent 55%),
     var(--gradient-toi);
 }
 .nen-trang {
@@ -174,9 +174,9 @@ body {
 .dau-trang-vang {
   background: var(--gradient-dau-trang);
 }
-/* Chữ vàng ánh kim cho dòng nhấn trên nền tối. */
+/* Chữ gradient mint cho dòng nhấn trên nền tối. */
 .chu-vang {
-  background: linear-gradient(135deg, #f3dd9c 0%, #d9b45c 60%, #c29b43 100%);
+  background: linear-gradient(135deg, #b9f2e4 0%, #5fd0bd 60%, #2aa898 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -222,7 +222,7 @@ body {
 .omyn-rbc .rbc-calendar .rbc-day-bg + .rbc-day-bg { border-left: 1px solid var(--duong-ke); }
 .omyn-rbc .rbc-calendar .rbc-month-view, .omyn-rbc .rbc-calendar .rbc-month-row, .omyn-rbc .rbc-calendar .rbc-row-bg { border-color: var(--duong-ke); }
 .omyn-rbc .rbc-calendar .rbc-month-view { border: 1px solid var(--duong-ke); }
-.omyn-rbc .rbc-calendar .rbc-overlay { background: var(--giay-sang); border: 1px solid var(--vien-dam); box-shadow: 0 10px 28px rgba(0, 0, 0, 0.18); color: var(--muc); }
+.omyn-rbc .rbc-calendar .rbc-overlay { background: var(--giay-sang); border: 1px solid var(--vien-dam); box-shadow: 0 10px 28px rgba(5, 40, 36, 0.18); color: var(--muc); }
 .omyn-rbc .rbc-calendar .rbc-overlay-header { border-bottom: 1px solid var(--duong-ke); }
 .omyn-rbc .rbc-day-bg.rbc-today { background: var(--nhan-nhat); }
 .omyn-rbc .rbc-off-range-bg { background: var(--giay-tram); }

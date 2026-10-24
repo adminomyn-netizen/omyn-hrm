@@ -31,44 +31,44 @@ Tài liệu này là **nguồn chuẩn duy nhất** cho giao diện OMYN HRM. Ai
 
 Định nghĩa trong `src/app/globals.css` (`:root` cho sáng, `.dark` cho tối). **Luôn dùng token (lớp `bg-giay`, `text-muc-2`, `border-vien`…), không gõ mã màu thô** trong thành phần, trừ ô hero tối và biểu đồ SVG dùng mã vàng/ngà cố định (mục 3.3).
 
-### 3.1 Bảng token
+### 3.1 Bảng token (đổi 24/10/2026: lục đậm + teal theo phần mềm chấm công mẫu — thay bảng vàng–espresso cũ)
 
 | Token | Sáng | Tối | Dùng cho |
 |---|---|---|---|
-| `--giay` | `#FBF7EE` | `#17120C` | nền trang |
-| `--giay-sang` | `#FFFDF8` | `#1F1A12` | bề mặt: ô nhập, popup, thanh đầu trang |
-| `--giay-tram` | `#F3EBD9` | `#2A2318` | vùng lõm, hover hàng, cột kanban |
-| `--muc` | `#2A2218` | `#F3EAD8` | chữ chính |
-| `--muc-2` | `#5D5142` | `#CDBFA3` | chữ phụ |
-| `--muc-3` | `#75684F` | `#A89A7C` | chữ gợi ý, nhãn nhỏ |
-| `--vien` | `#E8DEC8` | `#3A3123` | đường kẻ mảnh (trang trí) |
-| `--vien-dam` | `#8D7F60` | `#7C6F56` | viền ô nhập, nút phụ (≥ 3:1) |
-| `--nhan` | `#8F6C20` | `#D9B45C` | liên kết, focus, biểu tượng nhấn |
-| `--nhan-dam` | `#6E5119` | `#E8CF8A` | chữ vàng trên nền be/nhãn |
-| `--nhan-nhat` | `#F5EBCF` | `#3A2F17` | nền nhãn "tốt", avatar, mục chọn |
-| `--loi` / `--loi-nen` | `#9E3426` / `#F4E3DF` | `#F0A091` / `#3B1F1A` | lỗi, từ chối |
-| `--canh-bao` / `--canh-bao-nen` | `#A0522D` / `#F6E6DC` | `#E8A77A` / `#3A2618` | chờ duyệt, cảnh báo |
-| `--chu-tren-vang` | `#2A2218` | `#2A2218` | chữ trên nút/ô nền vàng (**luôn nâu đậm**, cả chế độ tối) |
-| `--menu` | `#1C160E` | `#100C07` | nền menu trái (**luôn tối**) |
-| `--menu-chu`, `--menu-chu-phu`, `--menu-sang`, `--menu-nhan` | `#CDBFA3`, `#A89A7C`, `#F6EBD0`, `#E2BE66` | (giữ) | chữ/biểu tượng trên menu |
-| `--menu-chon`, `--menu-hover`, `--menu-vien` | ngà 9% / 6% / 10% | (giữ) | nền mục chọn, hover, đường kẻ menu |
+| `--giay` | `#F4F7F7` | `#0A1716` | nền trang |
+| `--giay-sang` | `#FFFFFF` | `#102321` | bề mặt: ô nhập, popup, thanh đầu trang |
+| `--giay-tram` | `#E8F0F0` | `#17302D` | vùng lõm, hover hàng, cột kanban |
+| `--muc` | `#12302D` | `#E3F2EF` | chữ chính |
+| `--muc-2` | `#3F5653` | `#B5CDC9` | chữ phụ |
+| `--muc-3` | `#566B68` | `#8FADA8` | chữ gợi ý, nhãn nhỏ |
+| `--vien` | `#D7E3E1` | `#1F3A36` | đường kẻ mảnh (trang trí) |
+| `--vien-dam` | `#7A908D` | `#5F8B84` | viền ô nhập, nút phụ (≥ 3:1) |
+| `--nhan` | `#0F766E` | `#4CC2B1` | liên kết, focus, biểu tượng nhấn |
+| `--nhan-dam` | `#0B5A54` | `#7FDCCF` | chữ teal trên nền nhạt/nhãn |
+| `--nhan-nhat` | `#D6F2E8` | `#123B36` | nền nhãn "tốt", avatar, mục chọn |
+| `--loi` / `--loi-nen` | `#B42318` / `#FDECEA` | `#F5A097` / `#3B1C19` | lỗi, từ chối |
+| `--canh-bao` / `--canh-bao-nen` | `#A8520C` / `#FEF1DE` | `#F0B36A` / `#3A2A14` | chờ duyệt, cảnh báo |
+| `--chu-tren-vang` | `#FFFFFF` | `#FFFFFF` | chữ trên nút/ô nền teal (**luôn trắng**, cả chế độ tối) |
+| `--menu` | `#00453D` | `#03211D` | nền menu trái (**luôn lục đậm**) |
+| `--menu-chu`, `--menu-chu-phu`, `--menu-sang`, `--menu-nhan` | `#CFE5E1`, `#93BAB3`, `#FFFFFF`, `#FBBF24` | (giữ) | chữ/biểu tượng trên menu (nhấn hổ phách) |
+| `--menu-chon`, `--menu-hover`, `--menu-vien` | trắng 13% / 7% / 12% | (giữ) | nền mục chọn, hover, đường kẻ menu |
 
-Thang `slate` của Tailwind được **đổi sang be ấm** (`--color-slate-*`) để không còn ánh xanh lạnh; trong `.dark` thang này đảo chiều.
+Tên token cũ (`vang`, `espresso`, `nut-vang`…) được giữ để không phải sửa từng thành phần: nay `vang` = màu nhấn teal. Thang `slate` của Tailwind được đổi sang xám lục (`--color-slate-*`); trong `.dark` thang này đảo chiều.
 
-### 3.2 Gradient (chỉ dải vàng/espresso)
+### 3.2 Gradient (dải teal / lục đậm)
 
 | Token | Giá trị | Dùng |
 |---|---|---|
-| `--gradient-vang` | `135deg #F0D896 → #D4AE5A → #B8923A` | nút chính, avatar, ngày/tháng đang chọn, thanh tiến độ, huy hiệu số đếm |
+| `--gradient-vang` | `135deg #0E8074 → #0F766E → #0B5F58` | nút chính, avatar, ngày/tháng đang chọn, thanh tiến độ, huy hiệu số đếm |
 | `--gradient-vang-hover` | sáng hơn ~6% | nút chính khi rê chuột |
-| `--gradient-toi` + `.nen-toi` | `155deg #3A2E1F → #2A2218 → #17120C` + quầng vàng góc phải trên | hộp hero (chấm công hôm nay), panel đăng nhập |
-| `--gradient-nen` + `.nen-trang` | ngà sáng → be nhạt (dọc) | nền trang, thanh bên đăng nhập |
-| `.chu-vang` | chữ gradient vàng ánh kim | dòng nhấn trên nền tối |
+| `--gradient-toi` + `.nen-toi` | `155deg #0B5A50 → #00453D → #002B26` + quầng teal góc phải trên | hộp hero (chấm công hôm nay), panel đăng nhập |
+| `--gradient-nen` + `.nen-trang` | trắng → xám lục nhạt (dọc) | nền trang, thanh bên đăng nhập |
+| `.chu-vang` | chữ gradient mint | dòng nhấn trên nền tối |
 
-**Cấm** mọi gradient có sắc tím/xanh lam/xanh lục (script `kiem-tra-thiet-ke` chặn).
+**Cấm** gradient có sắc tím/xanh lam/hồng (script `kiem-tra-thiet-ke` chặn); lục–teal là tông chính.
 
 ### 3.3 Mã cố định được phép
-Biểu đồ SVG và hộp hero tối dùng mã cố định vì luôn nằm trên nền espresso: vàng `#F0D896`, `#B8923A`; ngà `#F3EAD8`; chữ phụ `#CDBFA3`, `#A89A7C`.
+Biểu đồ SVG và hộp hero tối dùng mã cố định vì luôn nằm trên nền lục đậm: mint `#7FE3D2`, teal `#14938A`; chữ `#E3F2EF`, phụ `#B5CDC9`, `#8FB5AE`.
 
 ### 3.4 Tương phản
 `npm run doi-chieu` kiểm các cặp chữ/nền ở **cả hai chế độ** (≥ 4,5 : 1, viền ô nhập ≥ 3 : 1). Cặp bị trượt làm `npm run kiem-tra` đỏ. Quy tắc nhớ: chữ vàng trên nền be/nhãn dùng `--nhan-dam`, không dùng `--nhan`; chữ trên nền vàng dùng `--chu-tren-vang`.

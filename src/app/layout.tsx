@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#f7f3ec",
+  themeColor: "#f4f7f7",
 };
 
 // Chạy trước khi vẽ trang để khỏi nháy sáng→tối: chỉ bật tối khi người dùng đã tự chọn trước đó.

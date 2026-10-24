@@ -15,7 +15,7 @@ import { ngayVN } from "@/lib/dinh-dang";
 export type Tin = TinCoSan & { khoi_ten: string };
 
 const DANG_PV = ["Hẹn phỏng vấn", "Vòng 1", "Vòng 2", "Đề nghị"];
-const MAU_PHAU = ["#E8DEC8", "#E8CF8A", "#D9B45C", "#C9A24B", "#B8923A", "#8F6C20", "#B0A58C"];
+const MAU_PHAU = ["#D7E3E1", "#A7E3D6", "#5FD0BD", "#2AA898", "#14938A", "#0F766E", "#8AA09D"];
 const kieuTin = (t: string) => (t === "Đang tuyển" ? "tot" : t === "Đang phỏng vấn" ? "cho" : "tram");
 
 type Hop =
