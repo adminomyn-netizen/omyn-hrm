@@ -32,6 +32,13 @@
   --canh-bao: #a8520c;
   --canh-bao-nen: #fef1de;
 
+  /* Năm sắc nhấn cho số liệu nhiều màu (Toàn cảnh số liệu): chữ (-sac, ≥ 4,5:1 trên nền -nen), nền nhạt, màu đặc cho thanh/vòng, hai đầu dải màu (chữ trắng ≥ 4,5:1). */
+  --sac-luc: #0b5a54; --sac-luc-nen: #d6f2e8; --sac-luc-mau: #14a394; --sac-luc-1: #0e8074; --sac-luc-2: #0b5f58;
+  --sac-xanh: #1d4ed8; --sac-xanh-nen: #e3edff; --sac-xanh-mau: #3b82f6; --sac-xanh-1: #2563eb; --sac-xanh-2: #1d4ed8;
+  --sac-tim: #6d28d9; --sac-tim-nen: #efe7ff; --sac-tim-mau: #8b5cf6; --sac-tim-1: #7c3aed; --sac-tim-2: #5b21b6;
+  --sac-cam: #a24a05; --sac-cam-nen: #fff0d4; --sac-cam-mau: #f59e0b; --sac-cam-1: #b45309; --sac-cam-2: #92400e;
+  --sac-hong: #be123c; --sac-hong-nen: #ffe3ea; --sac-hong-mau: #f43f5e; --sac-hong-1: #e11d48; --sac-hong-2: #be123c;
+
   /* Menu trái luôn nền lục đậm (cả khi giao diện sáng) — điểm tựa của bố cục. */
   --menu: #00453d;
   --menu-chu: #cfe5e1;
@@ -83,6 +90,12 @@
   --loi-nen: #3b1c19;
   --canh-bao: #f0b36a;
   --canh-bao-nen: #3a2a14;
+
+  --sac-luc: #7fe0d2; --sac-luc-nen: #123b36;
+  --sac-xanh: #a9c8ff; --sac-xanh-nen: #14264d;
+  --sac-tim: #cdbcff; --sac-tim-nen: #26184d;
+  --sac-cam: #fdc982; --sac-cam-nen: #3d2a0e;
+  --sac-hong: #ffadc0; --sac-hong-nen: #44131f;
 
   --gradient-nen: linear-gradient(180deg, #102321 0%, #0a1716 55%, #071210 100%);
   --gradient-dau-trang: linear-gradient(90deg, #12302c 0%, #0d1f1d 60%, #0a1716 100%);
