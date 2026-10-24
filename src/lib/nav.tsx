@@ -1,7 +1,9 @@
 import {
   Activity,
+  BookOpen,
   Building2,
   BarChart3,
+  CalendarDays,
   Clock,
   FileBarChart,
   Inbox,
@@ -28,11 +30,13 @@ const CHI_QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
 
 export const menuChinh: MucMenu[] = [
   { ten: "Tổng quan", duong_dan: "/dashboard", nhom: "Chung", icon: LayoutDashboard, moTa: "Ai cũng thấy; nội dung theo từng tài khoản: nhân viên xem việc của mình, quản lý xem số liệu công ty." },
+  { ten: "Hướng dẫn", duong_dan: "/huong-dan", nhom: "Chung", icon: BookOpen, moTa: "Cách chấm công, nộp đơn, xem phiếu lương; Quản trị có thêm hướng dẫn duyệt đơn, bảng công và lập lương." },
   { ten: "Hồ sơ nhân sự", duong_dan: "/nhan-su", nhom: "Con người", icon: Users, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa hồ sơ nhân viên; cho nghỉ việc." },
   { ten: "Khối và phòng ban", duong_dan: "/khoi", nhom: "Con người", icon: Building2, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa, xoá khối; xem mỗi khối có bao nhiêu người." },
   { ten: "Tuyển dụng", duong_dan: "/tuyen-dung", nhom: "Con người", icon: UserPlus, chiVaiTro: CHI_QUAN_LY, moTa: "Đăng tin, nhận hồ sơ, theo dõi ứng viên qua từng vòng." },
   { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia", nhom: "Con người", icon: BarChart3, chiVaiTro: CHI_QUAN_LY, moTa: "Điểm và xếp loại hiệu suất theo kỳ." },
   { ten: "Chấm công", duong_dan: "/cham-cong", nhom: "Hằng ngày", icon: Clock, moTa: "Chấm công vào/ra và xem lịch công của bạn." },
+  { ten: "Bảng công tháng", duong_dan: "/bang-cong", nhom: "Hằng ngày", icon: CalendarDays, chiVaiTro: CHI_QUAN_LY, moTa: "Bảng chấm công cả tháng theo mã công (X, N, CT, P, L…) và ngày nghỉ lễ." },
   { ten: "Đơn từ và phê duyệt", duong_dan: "/don-tu", nhom: "Hằng ngày", icon: Inbox, moTa: "Nộp đơn nghỉ, công tác, tạm ứng và theo dõi kết quả duyệt." },
   { ten: "Bảng lương", duong_dan: "/luong", nhom: "Tiền lương", icon: Wallet, chiVaiTro: ["admin", "ky_thuat", "nhan_vien"], moTa: "Quản trị và Kỹ thuật: kỳ lương, thỏa thuận lương, tham số. Nhân viên: phiếu lương của mình." },
   { ten: "Báo cáo và biểu mẫu", duong_dan: "/bao-cao", nhom: "Quản trị", icon: FileBarChart, chiVaiTro: CHI_QUAN_LY, moTa: "Báo cáo tổng hợp và biểu mẫu." },
