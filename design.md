@@ -280,3 +280,7 @@ Cấm: gradient tím/lam/hồng, thẻ bo tròn lớn đồng loạt (`rounded-2
 - **Ngày lễ** (bảng `ngay_le`, nút "Ngày lễ" ở Bảng công tháng): gieo sẵn ngày lễ dương lịch cố định 2026–2027; Tết Nguyên đán, Giỗ Tổ, ngày nghỉ bù do HCNS nhập. Hộp thoại đặt biểu mẫu thêm LÊN TRÊN danh sách để focus mặc định không rơi vào nút Xoá.
 - **Hướng dẫn** (`/huong-dan`, mọi vai trò): nội dung theo vai trò (nhân viên · Quản trị/HCNS · Kỹ thuật), viết cho người không rành kỹ thuật, theo thứ tự việc hằng ngày → cuối tháng → lương.
 - **`Hop`**: hiệu ứng focus chỉ chạy khi hộp mở/đóng (giữ `dong` trong ref). Trước đó mỗi lần ô nhập có state đổi là focus bị kéo đi, phím cách có thể bấm nhầm nút khác.
+
+## 11. Bổ sung 24/10/2026 — xuất Excel, in phiếu lương
+- **Xuất Excel** (`exceljs`, `src/lib/xuat-excel.ts`): `/api/xuat/bang-cong?nam&thang` (nút "Xuất Excel" ở Bảng công tháng) và `/api/xuat/bang-luong?ky` (nút chữ "Xuất Excel" ở Bảng lương). Kiểm quyền Quản trị/Kỹ thuật NGAY trong route handler (nhân viên nhận 403), không cache. Tiêu đề lục đậm, cột đóng băng, dòng tổng ở bảng lương.
+- **In phiếu lương** (`/phieu-luong/[id]`, ngoài khung menu): Quản trị/Kỹ thuật in được mọi phiếu; nhân viên chỉ phiếu CỦA MÌNH và chỉ khi kỳ Đã duyệt/Đã chi (còn lại 404). Nút "In phiếu / Lưu PDF" gọi hộp thoại in của trình duyệt; CSS `@media print` ẩn nút, ép bảng màu sáng kể cả đang bật chế độ tối.

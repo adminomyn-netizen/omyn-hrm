@@ -85,6 +85,7 @@ export function BangCongThang({ nam, thang, hienTai, dong, ngayLe, soNgay, homNa
   return (
     <div className="space-y-6">
       <TieuDeTrang tieuDe="Bảng công tháng" phu={`Tháng ${thang}/${nam} · ${dong.length} nhân viên · mã công từng ngày và công hưởng lương`}>
+        <a href={`/api/xuat/bang-cong?nam=${nam}&thang=${thang}`} download className={`${NUT_PHU} inline-flex items-center`}>Xuất Excel</a>
         <button type="button" className={NUT_PHU} onClick={() => setHop(true)}>Ngày lễ</button>
       </TieuDeTrang>
 

@@ -114,6 +114,7 @@ export function ChiTietDongLuong({ dong, thamSo, suaDuoc, xong, huy }: { dong: D
 
       {loi && <div role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</div>}
       <div className="flex justify-end gap-2 border-t border-vien pt-4">
+        <a href={`/phieu-luong/${dong.id}`} target="_blank" rel="noopener" className={`${NUT_PHU} inline-flex items-center`}>In phiếu</a>
         <button type="button" className={NUT_PHU} onClick={huy} disabled={dangXuLy}>{suaDuoc ? "Huỷ" : "Đóng"}</button>
         {suaDuoc && <button type="button" className={NUT_CHINH} onClick={gui} disabled={dangXuLy}>{dangXuLy ? "Đang lưu" : "Lưu dòng lương"}</button>}
       </div>
