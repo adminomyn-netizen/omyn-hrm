@@ -22,7 +22,10 @@ export function PhieuLuongCuaToi({ ds }: { ds: PhieuView[] }) {
           <section key={p.id} className="max-w-xl">
             <div className="mb-3 flex items-center justify-between gap-3">
               <h2 className="text-[17px] font-semibold text-muc">{p.ten_ky}</h2>
-              <NhanTrangThai kieu={p.trang_thai === "da_chi" ? "tot" : "cho"}>{p.trang_thai === "da_chi" ? "Đã chi" : "Đã duyệt"}</NhanTrangThai>
+              <div className="flex items-center gap-3">
+                <a href={`/phieu-luong/${p.id}`} target="_blank" rel="noopener" className="text-[13px] font-medium text-nhan-dam underline-offset-4 hover:underline">In phiếu</a>
+                <NhanTrangThai kieu={p.trang_thai === "da_chi" ? "tot" : "cho"}>{p.trang_thai === "da_chi" ? "Đã chi" : "Đã duyệt"}</NhanTrangThai>
+              </div>
             </div>
             <div className="mb-2 text-[13px] text-muc-3">Công hưởng {p.cong_huong}/{p.cong_chuan}</div>
             <dl className="divide-y divide-vien border-y border-vien">

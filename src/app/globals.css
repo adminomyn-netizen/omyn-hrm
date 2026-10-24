@@ -237,3 +237,12 @@ body {
 .omyn-rbc .rbc-event { padding: 2px 6px; }
 .omyn-rbc .rbc-event:focus { outline: 2px solid var(--nhan); }
 .omyn-rbc .rbc-show-more { color: var(--nhan-dam); font-weight: 500; }
+
+/* In phiếu lương: bỏ nút, nền trắng, lề A4. */
+@media print {
+  .khong-in { display: none !important; }
+  body { background: #fff !important; }
+  /* In luôn bằng bảng màu sáng, kể cả khi đang bật chế độ tối. */
+  .dark { --giay-sang: #fff; --muc: #12302d; --muc-2: #3f5653; --muc-3: #566b68; --vien: #d7e3e1; }
+  @page { size: A4; margin: 16mm; }
+}

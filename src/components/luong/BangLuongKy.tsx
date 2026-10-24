@@ -123,6 +123,7 @@ export function BangLuongKy({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-[15px] font-semibold text-muc">Chi tiết · {kyChon.ten_ky}</h2>
             <div className="flex flex-wrap items-center gap-3">
+              {dong.length > 0 && <a href={`/api/xuat/bang-luong?ky=${kyChon.id}`} className={NUT_CHU} download>Xuất Excel</a>}
               {suaDuoc && kyChon.trang_thai === "da_lap" && (
                 <>
                   <button type="button" className={NUT_CHU} disabled={dangXuLy} onClick={() => chayKy(lapBangLuong)}>Lập thêm cho người mới</button>
