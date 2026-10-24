@@ -40,6 +40,9 @@ export default async function TrangKyThuat() {
           { nhan: "Cơ sở dữ liệu", so: "Singapore", ghiChu: "Supabase · ap-southeast-1" },
         ]}
       />
+      <MucTrang tieuDe="Sao lưu dữ liệu" phai={<a href="/api/xuat/sao-luu" download className="font-medium text-nhan-dam underline-offset-4 hover:underline">Tải bản sao lưu (JSON)</a>}>
+        <p className="max-w-2xl text-[14px] text-muc-2">Tải về toàn bộ dữ liệu nhân sự, chấm công, đơn từ, lương và tuyển dụng (không gồm tài khoản đăng nhập) để lưu ở nơi an toàn, ví dụ ổ cứng riêng hoặc Google Drive nội bộ. Tệp chứa dữ liệu cá nhân và lương nên chỉ tài khoản Kỹ thuật tải được. Ứng dụng chỉ tải về, chưa có chức năng khôi phục từ tệp.</p>
+      </MucTrang>
       <div className="grid gap-x-14 gap-y-10 lg:grid-cols-[1.35fr_1fr]">
         <MucTrang tieuDe="Số dòng theo bảng">
           <ThanhTyLe donVi="dòng" dong={he.bang.map((b) => ({ nhan: TEN_BANG[b.bang] ?? b.bang, so: b.soDong }))} />

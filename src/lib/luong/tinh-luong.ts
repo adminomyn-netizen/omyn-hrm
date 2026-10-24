@@ -69,6 +69,24 @@ function thueLuyTien(thuNhap: number, p: ThamSo): number {
   return thue;
 }
 
+/** Thuế lũy tiến tách theo từng bậc (cùng phép chia tròn với `thueLuyTien`) để hiển thị: bậc nào chịu bao nhiêu thu nhập và bao nhiêu thuế. Chỉ trả các bậc có phát sinh. */
+export type BacThue = { bac: number; tu: number; den: number | null; phan: number; suat: number; thue: number };
+export function chiTietBacThue(thuNhap: number, p: ThamSo): BacThue[] {
+  const bac = [p.thue_bac_1_den, p.thue_bac_2_den, p.thue_bac_3_den, p.thue_bac_4_den];
+  const suat = [p.thue_ty_le_1, p.thue_ty_le_2, p.thue_ty_le_3, p.thue_ty_le_4, p.thue_ty_le_5];
+  const ra: BacThue[] = [];
+  let con = thuNhap;
+  let truoc = 0;
+  for (let i = 0; i < 5 && con > 0; i++) {
+    const tran = i < 4 ? bac[i] - truoc : con;
+    const phan = Math.min(con, tran);
+    ra.push({ bac: i + 1, tu: truoc, den: i < 4 ? bac[i] : null, phan, suat: suat[i], thue: chiaTron(phan, bp(suat[i]), 10000) });
+    con -= phan;
+    truoc = i < 4 ? bac[i] : truoc;
+  }
+  return ra;
+}
+
 export function tinhLuong(v: DauVaoLuong, p: ThamSo): KetQuaLuong {
   const nuaChuan = Math.max(1, nua(v.congChuan));
   const nuaHuong = Math.min(Math.max(0, nua(v.congHuong)), nuaChuan); // trần 100%

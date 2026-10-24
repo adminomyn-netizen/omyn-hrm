@@ -2,12 +2,13 @@
 
 import { useState } from "react";
 import { BangLuongKy, type KyView } from "./BangLuongKy";
+import { ThueBaoHiem } from "./ThueBaoHiem";
 import { ThoaThuanLuong, type ThoaThuanView } from "./ThoaThuanLuong";
 import { ThamSoLuong, type ThamSoView } from "./ThamSoLuong";
 import type { DongLuongView } from "./ChiTietDongLuong";
 import type { ThamSo } from "@/lib/luong/tinh-luong";
 
-const TAB = [["bang", "Bảng lương"], ["thoa-thuan", "Thỏa thuận lương"], ["tham-so", "Tham số"]] as const;
+const TAB = [["bang", "Bảng lương"], ["thue-bh", "Thuế và bảo hiểm"], ["thoa-thuan", "Thỏa thuận lương"], ["tham-so", "Tham số"]] as const;
 
 export function QuanLyLuong({ ky, chon, dong, thamSo, thoaThuan, thamSoDs }: { ky: KyView[]; chon: string; dong: DongLuongView[]; thamSo: ThamSo; thoaThuan: ThoaThuanView[]; thamSoDs: ThamSoView[] }) {
   const [tab, setTab] = useState<(typeof TAB)[number][0]>("bang");
@@ -22,6 +23,7 @@ export function QuanLyLuong({ ky, chon, dong, thamSo, thoaThuan, thamSoDs }: { k
         ))}
       </div>
       {tab === "bang" && <BangLuongKy ky={ky} chon={chon} dong={dong} thamSo={thamSo} />}
+      {tab === "thue-bh" && <ThueBaoHiem ky={ky} chon={chon} dong={dong} thamSo={thamSo} />}
       {tab === "thoa-thuan" && <ThoaThuanLuong ds={thoaThuan} />}
       {tab === "tham-so" && <ThamSoLuong ds={thamSoDs} />}
     </div>

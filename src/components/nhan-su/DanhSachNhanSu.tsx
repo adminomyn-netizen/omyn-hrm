@@ -7,6 +7,7 @@ import { Hop } from "@/components/ui/Hop";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
+import { NhapExcelNhanVien } from "./NhapExcelNhanVien";
 import { FormNhanVien, type Khoi, type NhanVienCoSan } from "./FormNhanVien";
 import { choNghiViec, xoaNhanVien } from "@/lib/actions";
 
@@ -60,6 +61,7 @@ export function DanhSachNhanSu({ nhanVien, khoi, moBanDau, timBanDau = "" }: { n
   return (
     <>
       <TieuDeTrang tieuDe="Hồ sơ nhân sự" phu={`${nhanVien.length} người · ${dem["Đang làm"] ?? 0} đang làm · ${dem["Thử việc"] ?? 0} thử việc`}>
+        <NhapExcelNhanVien />
         <button type="button" onClick={() => setHop({ kieu: "them" })} className={NUT_CHINH}>
           + Thêm nhân viên
         </button>
