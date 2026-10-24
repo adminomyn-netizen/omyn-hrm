@@ -6,7 +6,7 @@ import { useNoi } from "./noi";
 import { CalendarDays, ChevronLeft, ChevronRight, ChevronDown } from "lucide-react";
 
 const THU = ["T2", "T3", "T4", "T5", "T6", "T7", "CN"];
-const BONG = "shadow-[0_18px_40px_rgba(42,34,24,0.22)]";
+const BONG = "shadow-[0_18px_40px_rgba(5,40,36,0.22)]";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 const iso = (y: number, m: number, d: number) => `${y}-${pad(m + 1)}-${pad(d)}`;

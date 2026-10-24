@@ -40,8 +40,8 @@ export function NutChamCong({ gioVao, gioRa, trangThai }: { gioVao: string | nul
             className="relative flex h-[184px] w-[184px] flex-col items-center justify-center gap-1.5 text-[18px] font-semibold text-[var(--chu-tren-vang)] disabled:cursor-default"
             style={{
               borderRadius: 9999,
-              background: vao ? "linear-gradient(135deg,#E8DEC8,#C9B98E)" : "var(--gradient-vang)",
-              boxShadow: "inset 0 2px 0 rgba(255,255,255,.5), 0 14px 30px rgba(143,108,32,.38)",
+              background: vao ? "linear-gradient(135deg,#d7e3e1,#a9c1bd)" : "var(--gradient-vang)",
+              boxShadow: "inset 0 2px 0 rgba(255,255,255,.5), 0 14px 30px rgba(15,118,110,.38)",
               opacity: xong ? 0.8 : 1,
             }}
           >

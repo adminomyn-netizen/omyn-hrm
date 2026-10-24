@@ -7,7 +7,7 @@ import { Check, ChevronDown } from "lucide-react";
 
 export type LuaChon = { gia_tri: string; nhan: string };
 
-const BONG = "shadow-[0_14px_32px_rgba(42,34,24,0.18)]";
+const BONG = "shadow-[0_14px_32px_rgba(5,40,36,0.18)]";
 
 /** Ô chọn (dropdown) theo bộ nhận diện, thay cho <select> mặc định của trình duyệt.
  * - Dùng trong biểu mẫu: có <input hidden name=…> nên FormData lấy được giá trị; `batBuoc` vẫn báo lỗi bằng hộp thoại của trình duyệt.

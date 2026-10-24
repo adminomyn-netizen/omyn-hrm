@@ -67,10 +67,10 @@ export default async function TrangTongQuan() {
 
       {/* hàng chính */}
       <section className="grid gap-5 lg:grid-cols-12">
-        <div className="nen-toi flex min-h-[250px] flex-wrap items-center gap-7 min-w-0 rounded-[14px] px-7 py-7 text-[#F3EAD8] lg:col-span-7">
+        <div className="nen-toi flex min-h-[250px] flex-wrap items-center gap-7 min-w-0 rounded-[14px] px-7 py-7 text-[#E3F2EF] lg:col-span-7">
           <VongChamCong da={cc.da} tong={cc.tong} />
           <div className="min-w-0 flex-1 basis-56">
-            <div className="text-[12px] font-medium uppercase tracking-[0.12em] text-[#CDBFA3]">Chấm công hôm nay</div>
+            <div className="text-[12px] font-medium uppercase tracking-[0.12em] text-[#B5CDC9]">Chấm công hôm nay</div>
             <div className="mt-3.5 flex flex-wrap gap-7">
               {[
                 [cc.dungGio, "Đúng giờ"],
@@ -79,7 +79,7 @@ export default async function TrangTongQuan() {
               ].map(([so, nhan]) => (
                 <div key={nhan}>
                   <div className="text-[28px] font-medium leading-none tabular-nums">{so}</div>
-                  <div className="mt-1 text-[12px] text-[#CDBFA3]">{nhan}</div>
+                  <div className="mt-1 text-[12px] text-[#B5CDC9]">{nhan}</div>
                 </div>
               ))}
             </div>
@@ -91,12 +91,12 @@ export default async function TrangTongQuan() {
                   style={{
                     height: Math.max(4, Math.round((so / lonNhat) * 46)),
                     borderRadius: 3,
-                    background: so === lonNhat && so > 0 ? "linear-gradient(180deg,#F0D896,#B8923A)" : "rgba(243,234,216,.22)",
+                    background: so === lonNhat && so > 0 ? "linear-gradient(180deg,#7FE3D2,#14938A)" : "rgba(227,242,239,.22)",
                   }}
                 />
               ))}
             </div>
-            <div className="mt-1 flex justify-between text-[10px] text-[#A89A7C]">
+            <div className="mt-1 flex justify-between text-[10px] text-[#8FB5AE]">
               <span>07:00</span>
               <span>09:30</span>
               <span>12:00</span>
@@ -173,7 +173,7 @@ export default async function TrangTongQuan() {
                     </div>
                     <div className="mt-2.5 flex gap-1" aria-hidden>
                       {Array.from({ length: 6 }, (_, i) => (
-                        <span key={i} className="h-1 flex-1" style={{ borderRadius: 2, background: i < t.buoc ? "linear-gradient(90deg,#F0D896,#B8923A)" : "var(--giay-tram)" }} />
+                        <span key={i} className="h-1 flex-1" style={{ borderRadius: 2, background: i < t.buoc ? "linear-gradient(90deg,#7FE3D2,#14938A)" : "var(--giay-tram)" }} />
                       ))}
                     </div>
                   </li>
