@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chiaTron, congChuanTheoKy, DAU_VAO_TRONG, THAM_SO_MAC_DINH as P, tinhLuong } from "@/lib/luong/tinh-luong";
+import { chiaTron, chiTietBacThue, congChuanTheoKy, DAU_VAO_TRONG, THAM_SO_MAC_DINH as P, tinhLuong } from "@/lib/luong/tinh-luong";
 
 // Các ví dụ dưới đây tính TAY từ Quy chế (plan Phụ lục D), không sinh từ chính hàm đang test.
 describe("chiaTron (nửa lên, số nguyên)", () => {
@@ -108,4 +108,30 @@ describe("congChuanTheoKy", () => {
   it("văn phòng = tham số", () => expect(congChuanTheoKy("van_phong", 2026, 11, 24)).toBe(24));
   it("vận hành T11/2026 = 30 ngày − 5 Chủ nhật = 25 (khớp plan)", () => expect(congChuanTheoKy("van_hanh", 2026, 11, 24)).toBe(25));
   it("vận hành T2/2026 = 28 ngày − 4 Chủ nhật = 24", () => expect(congChuanTheoKy("van_hanh", 2026, 2, 24)).toBe(24));
+});
+
+describe("chiTietBacThue (tách thuế 5 bậc để hiển thị)", () => {
+  it("34.000.000 đ: 10tr×5% + 20tr×10% + 4tr×20% = 500k + 2tr + 800k = 3.300.000", () => {
+    const b = chiTietBacThue(34_000_000, P);
+    expect(b.map((x) => [x.bac, x.phan, x.thue])).toEqual([[1, 10_000_000, 500_000], [2, 20_000_000, 2_000_000], [3, 4_000_000, 800_000]]);
+    expect(b.reduce((t, x) => t + x.thue, 0)).toBe(3_300_000);
+  });
+  it("thu nhập 0 hoặc dưới bậc 1 chỉ có bậc 1; 0 thì không có bậc nào", () => {
+    expect(chiTietBacThue(0, P)).toEqual([]);
+    expect(chiTietBacThue(4_000_000, P).map((x) => x.thue)).toEqual([200_000]);
+  });
+  it("vượt 100 triệu có đủ 5 bậc, bậc 5 không có trần", () => {
+    const b = chiTietBacThue(120_000_000, P);
+    expect(b).toHaveLength(5);
+    expect(b[4]).toMatchObject({ bac: 5, phan: 20_000_000, den: null, thue: 7_000_000 });
+  });
+});
+
+describe("tổng thuế theo bậc khớp tinhLuong", () => {
+  it("nhiều mức lương, kể cả có phụ thuộc", () => {
+    for (const luong of [8_000_000, 25_000_000, 48_000_000, 90_000_000, 150_000_000]) {
+      const kq = tinhLuong({ ...DAU_VAO_TRONG, luongThoaThuan: luong, congChuan: 24, congHuong: 24, ngayLam: 24, tyLeKpi: 10, tyLeHtKpi: 100, soNguoiPhuThuoc: 1 }, P);
+      expect(chiTietBacThue(kq.thuNhapTinhThue, P).reduce((t, x) => t + x.thue, 0)).toBe(kq.thueTncn);
+    }
+  });
 });
