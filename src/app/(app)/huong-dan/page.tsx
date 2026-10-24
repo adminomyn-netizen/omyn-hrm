@@ -1,59 +1,199 @@
 export const dynamic = "force-dynamic";
 
+import { BookOpen, ShieldCheck, Terminal, Users, type LucideIcon } from "lucide-react";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
-import { MucTrang } from "@/components/ui/MucTrang";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { CHU_THICH_CONG } from "@/lib/cong";
 
+type Sac = "luc" | "xanh" | "tim" | "cam" | "hong";
 type Buoc = { tieuDe: string; noiDung: React.ReactNode };
+type Phan = { tieuDe: string; sac: Sac; buoc: Buoc[] };
+type HuongDan = { vaiTro: string; loiNoi: string; sac: Sac; Icon: LucideIcon; phan: Phan[]; luuY: string[] };
 
-function DanhSachBuoc({ buoc }: { buoc: Buoc[] }) {
-  return (
-    <ol className="space-y-4">
-      {buoc.map((b, i) => (
-        <li key={b.tieuDe} className="flex gap-4">
-          <span className="nut-vang mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center text-[13px]" style={{ borderRadius: 9999 }}>{i + 1}</span>
-          <div className="min-w-0">
-            <div className="text-[15px] font-semibold text-muc">{b.tieuDe}</div>
-            <div className="mt-1 space-y-1.5 text-[14px] leading-relaxed text-muc-2">{b.noiDung}</div>
-          </div>
-        </li>
-      ))}
-    </ol>
-  );
-}
+const v = (k: Sac, h: "" | "-nen" | "-mau" | "-1" | "-2") => `var(--sac-${k}${h})`;
+const dai = (k: Sac) => `linear-gradient(135deg, ${v(k, "-1")} 0%, ${v(k, "-2")} 100%)`;
 
-const CHUNG: Buoc[] = [
-  { tieuDe: "Chấm công vào và ra", noiDung: <p>Vào mục <b>Chấm công</b>, bấm nút tròn lớn khi đến làm và bấm lần nữa khi về. Giờ lấy theo giờ Hồ Chí Minh. Ca hành chính là 08:00 – 17:00; vào sau 08:15 máy ghi nhãn &quot;Đi muộn&quot;. Công và lương tính theo ca, không tính theo giờ bấm. Tổng giám đốc, Giám đốc và tài khoản Kỹ thuật không phải chấm công.</p> },
-  { tieuDe: "Nộp đơn", noiDung: <><p>Vào <b>Đơn từ và phê duyệt</b> → <b>Nộp đơn mới</b>. Tên người nộp là tên của bạn, không đổi được. Có 11 loại: đi trễ, về sớm, nghỉ phép năm, nghỉ không lương, nghỉ ốm, nghỉ chế độ (thai sản…), giải trình công, làm remote, công tác, chấm công ngoài công ty, tạm ứng lương.</p><p>Phép năm là 12 ngày mỗi năm. Muốn nghỉ một buổi thì chọn &quot;Một buổi / theo giờ&quot; rồi chọn giờ bắt đầu, giờ kết thúc (≤ 4 tiếng tính nửa ngày).</p></> },
-  { tieuDe: "Giải trình công", noiDung: <p>Chỉ nộp được cho một ngày <b>đã có sai phạm chấm công</b> (vào trễ, về sớm, ra muộn quá 1 tiếng, quên chấm ra). Chọn ngày, máy tự hiện giờ vào/ra thật của bạn; bạn ghi giờ đúng và lý do. Khi đơn được duyệt, chấm công ngày đó tự sửa về giờ đúng.</p> },
-  { tieuDe: "Xem phiếu lương", noiDung: <p>Vào <b>Bảng lương</b> để xem phiếu của các kỳ đã được duyệt. Chỉ bạn xem được phiếu của bạn.</p> },
-];
+/** Ba bản hướng dẫn RIÊNG cho ba vai trò: mỗi người chỉ thấy việc của chính vai trò mình, không gộp chung. */
+const NHAN_VIEN: HuongDan = {
+  vaiTro: "Nhân viên",
+  loiNoi: "Chấm công đúng giờ, nộp đơn khi cần nghỉ hoặc đi làm khác thường, và xem phiếu lương của chính bạn.",
+  sac: "luc",
+  Icon: Users,
+  phan: [
+    {
+      tieuDe: "Mỗi ngày",
+      sac: "luc",
+      buoc: [
+        { tieuDe: "Chấm công vào và ra", noiDung: <p>Vào mục <b>Chấm công</b>, bấm nút tròn lớn khi đến làm và bấm lần nữa khi về. Ca hành chính là 08:00 – 17:00; vào sau 08:15 máy ghi nhãn &quot;Đi muộn&quot;. Công và lương tính theo ca, không tính theo giờ bấm. Đừng quên bấm khi ra về: ngày quên chấm ra sẽ phải giải trình.</p> },
+        { tieuDe: "Xem lịch công của bạn", noiDung: <p>Cũng ở <b>Chấm công</b>: dải &quot;Tuần này&quot; cho thấy ngày nào đã chấm, bên dưới là lịch cả tháng với giờ vào, giờ ra thật của bạn.</p> },
+      ],
+    },
+    {
+      tieuDe: "Khi cần nghỉ hoặc làm khác thường",
+      sac: "xanh",
+      buoc: [
+        { tieuDe: "Nộp đơn", noiDung: <><p>Vào <b>Đơn từ và phê duyệt</b> → <b>Nộp đơn mới</b>. Tên người nộp là tên của bạn và không đổi được. Chọn loại đơn: nghỉ phép năm, nghỉ không lương, nghỉ ốm, nghỉ chế độ (thai sản…), làm remote, công tác, chấm công ngoài công ty, tạm ứng lương, đi trễ, về sớm.</p><p>Phép năm là 12 ngày mỗi năm; số ngày còn lại hiện ngay trong form.</p></> },
+        { tieuDe: "Nghỉ một buổi hoặc vài tiếng", noiDung: <p>Với nghỉ phép năm, không lương, ốm: chọn &quot;Một buổi / theo giờ&quot;, chọn ngày rồi giờ bắt đầu – kết thúc. Nghỉ không quá 4 tiếng tính nửa ngày, lâu hơn tính một ngày.</p> },
+        { tieuDe: "Theo dõi kết quả", noiDung: <p>Đơn được duyệt hay bị từ chối đều báo ở biểu tượng chuông phía trên. Đơn cũng hiện trong danh sách của bạn ở mục Đơn từ.</p> },
+      ],
+    },
+    {
+      tieuDe: "Khi chấm công bị sai",
+      sac: "cam",
+      buoc: [
+        { tieuDe: "Giải trình công", noiDung: <p>Chỉ nộp được cho đúng <b>một ngày đã có sai phạm</b>: vào trễ, về sớm, ra muộn quá 1 tiếng hoặc quên chấm ra. Chọn ngày, máy tự hiện giờ vào/ra thật của bạn. Bạn ghi giờ đúng và lý do. Khi đơn được duyệt, chấm công ngày đó tự sửa về giờ đúng. Ngày không có sai phạm thì nút Nộp bị khoá.</p> },
+      ],
+    },
+    {
+      tieuDe: "Cuối tháng",
+      sac: "hong",
+      buoc: [
+        { tieuDe: "Xem và in phiếu lương", noiDung: <p>Vào <b>Bảng lương</b>: các kỳ đã được duyệt hiện thành từng phiếu (thu nhập, bảo hiểm, thuế, thực lĩnh). Bấm &quot;In phiếu&quot; để in hoặc lưu thành PDF. Chỉ bạn xem được phiếu của bạn.</p> },
+      ],
+    },
+  ],
+  luuY: [
+    "Không tự duyệt đơn của mình, và không sửa được chấm công của người khác.",
+    "Thấy chấm công hoặc phiếu lương có gì sai, báo bộ phận Hành chính nhân sự.",
+  ],
+};
 
-const QUAN_TRI: Buoc[] = [
-  { tieuDe: "Hằng ngày: theo dõi chấm công", noiDung: <p>Mục <b>Chấm công</b> cho thấy ai đã chấm công hôm nay, ai đi muộn, ai vắng, kèm lịch cả công ty. Mục <b>Tổng quan</b> tóm tắt số người, đơn chờ duyệt, ứng viên mới.</p> },
-  { tieuDe: "Hằng ngày: duyệt đơn", noiDung: <p>Vào <b>Đơn từ và phê duyệt</b>, mở đơn chờ duyệt rồi bấm Duyệt hoặc Từ chối. Không tự duyệt đơn của chính mình. Duyệt đơn <b>Giải trình công</b> thì chấm công ngày đó tự sửa về giờ người nộp ghi. Đơn Đi trễ, Về sớm, Chấm công ngoài công ty khi duyệt chỉ đổi trạng thái đơn, chưa tự sửa chấm công.</p> },
-  { tieuDe: "Đầu năm và khi có thông báo: nhập ngày nghỉ lễ", noiDung: <p>Vào <b>Bảng công tháng</b> → <b>Ngày lễ</b>. Hệ thống đã có sẵn các ngày lễ dương lịch cố định (1/1, 30/4, 1/5, 2/9). <b>Tết Nguyên đán, Giỗ Tổ Hùng Vương và ngày nghỉ bù</b> do Hành chính nhân sự nhập theo thông báo của Nhà nước. Ngày lễ ghi mã L và được tính đủ công.</p> },
-  { tieuDe: "Cuối tháng: kiểm Bảng công tháng", noiDung: <><p>Vào <b>Bảng công tháng</b>, chọn tháng. Mỗi ô là một mã công: </p><ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2">{CHU_THICH_CONG.map((c) => <li key={c.ma}><b className="text-muc">{c.ma}</b> — {c.ten}</li>)}</ul><p>Ô <b>V</b> là ngày vắng không có đơn: hỏi người đó, nếu họ có lý do thì nhờ họ nộp đơn (nghỉ, giải trình) rồi duyệt; bảng tự cập nhật. Cột <b>Công hưởng</b> là số công sẽ vào bảng lương.</p></> },
-  { tieuDe: "Cuối tháng: chuẩn bị lương", noiDung: <><p>Vào <b>Bảng lương</b>. Làm lần lượt:</p><ol className="list-decimal space-y-1 pl-5"><li>Tab <b>Tham số</b>: kiểm các mức bảo hiểm, giảm trừ, biểu thuế; sau đó bấm <b>Xác nhận tất cả</b> (cần xác nhận trước khi duyệt kỳ thật).</li><li>Tab <b>Thỏa thuận lương</b>: nhập cho từng người lương thỏa thuận, % KPI, phụ cấp, ăn ca, có đóng bảo hiểm không, số người phụ thuộc.</li><li>Tab <b>Bảng lương</b> → <b>Tạo kỳ lương</b> (chọn tháng/năm) → <b>Lập bảng lương</b>: công lấy tự động từ Bảng công tháng.</li><li>Mở từng dòng để nhập giờ tăng ca, hoa hồng, thưởng, khấu trừ khác; sửa công nếu cần.</li><li>Chuyển kỳ qua <b>Đã kiểm → Đã duyệt → Đã chi</b>. Từ bước Đã kiểm trở đi không sửa được dòng.</li></ol></> },
-  { tieuDe: "Thêm nhân viên và tài khoản", noiDung: <p>Mục <b>Hồ sơ nhân sự</b> để thêm, sửa hồ sơ, cho nghỉ việc; <b>Khối và phòng ban</b> để quản lý khối. Quyền Quản trị tự có theo vị trí (khối Hành chính nhân sự, Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc). Duyệt tài khoản mới đăng ký do tài khoản Kỹ thuật làm.</p> },
-];
+const QUAN_TRI: HuongDan = {
+  vaiTro: "Quản trị · Hành chính nhân sự",
+  loiNoi: "Giữ hồ sơ, theo dõi công, duyệt đơn và chốt lương mỗi tháng. Quyền Quản trị tự có theo vị trí (khối Hành chính nhân sự, Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc).",
+  sac: "xanh",
+  Icon: ShieldCheck,
+  phan: [
+    {
+      tieuDe: "Mỗi ngày",
+      sac: "xanh",
+      buoc: [
+        { tieuDe: "Nắm tình hình ở Tổng quan và Chấm công", noiDung: <p><b>Tổng quan</b> tóm tắt số người, đơn chờ duyệt, ứng viên mới và quỹ lương. <b>Chấm công</b> cho thấy ai đã chấm hôm nay, ai đi muộn, ai vắng, kèm lịch cả công ty. Tổng giám đốc và Giám đốc không phải chấm công; người còn lại trong nhóm Quản trị vẫn tự chấm công như mọi người.</p> },
+        { tieuDe: "Duyệt đơn", noiDung: <p>Vào <b>Đơn từ và phê duyệt</b>, mở đơn chờ duyệt rồi bấm Duyệt hoặc Từ chối. Không duyệt được đơn của chính mình. Duyệt đơn <b>Giải trình công</b> thì chấm công ngày đó tự sửa về giờ người nộp ghi. Đơn Đi trễ, Về sớm, Chấm công ngoài công ty khi duyệt chỉ đổi trạng thái đơn, chưa tự sửa chấm công.</p> },
+      ],
+    },
+    {
+      tieuDe: "Khi có người mới hoặc thay đổi nhân sự",
+      sac: "luc",
+      buoc: [
+        { tieuDe: "Hồ sơ nhân sự", noiDung: <p>Mục <b>Hồ sơ nhân sự</b>: thêm, sửa hồ sơ, cho nghỉ việc. Có nhiều người cùng lúc thì bấm <b>Nhập từ Excel</b>: tải tệp mẫu, điền, bấm Kiểm tra để xem dòng nào lỗi, sửa hết lỗi rồi mới bấm Nhập. Tên Khối trong tệp phải đúng với danh mục.</p> },
+        { tieuDe: "Khối, tuyển dụng, đánh giá", noiDung: <p><b>Khối và phòng ban</b> để thêm sửa khối và vị trí; <b>Tuyển dụng</b> để đăng tin và theo dõi ứng viên qua từng vòng; <b>Đánh giá hiệu suất</b> để ghi điểm và xếp loại theo kỳ.</p> },
+        { tieuDe: "Lưu ý về quyền", noiDung: <p>Bạn không đưa được ai vào vị trí tự có quyền Quản trị (Hành chính nhân sự, lãnh đạo): việc đó do tài khoản Kỹ thuật làm. Duyệt tài khoản mới đăng ký cũng do Kỹ thuật làm.</p> },
+      ],
+    },
+    {
+      tieuDe: "Đầu năm và khi có thông báo nghỉ lễ",
+      sac: "cam",
+      buoc: [
+        { tieuDe: "Nhập ngày nghỉ lễ", noiDung: <p>Vào <b>Bảng công tháng</b> → <b>Ngày lễ</b>. Hệ thống đã có sẵn các ngày lễ dương lịch cố định (1/1, 30/4, 1/5, 2/9). <b>Tết Nguyên đán, Giỗ Tổ Hùng Vương và ngày nghỉ bù</b> bạn tự nhập theo thông báo của Nhà nước. Ngày lễ ghi mã L và được tính đủ công.</p> },
+      ],
+    },
+    {
+      tieuDe: "Cuối tháng: chốt công",
+      sac: "tim",
+      buoc: [
+        { tieuDe: "Kiểm Bảng công tháng", noiDung: <><p>Vào <b>Bảng công tháng</b>, chọn tháng. Mỗi ô là một mã công:</p><ul className="grid gap-x-6 gap-y-1 sm:grid-cols-2">{CHU_THICH_CONG.map((c) => <li key={c.ma}><b className="text-muc">{c.ma}</b> — {c.ten}</li>)}</ul><p>Ô <b>V</b> là ngày vắng không có đơn: hỏi người đó, nếu có lý do thì nhờ họ nộp đơn rồi duyệt; bảng tự cập nhật. Cột <b>Công hưởng</b> là số công sẽ vào bảng lương. Bấm <b>Xuất Excel</b> để lưu bảng công.</p></> },
+      ],
+    },
+    {
+      tieuDe: "Cuối tháng: lương",
+      sac: "hong",
+      buoc: [
+        { tieuDe: "Kiểm tham số và thỏa thuận lương", noiDung: <p>Vào <b>Bảng lương</b>. Tab <b>Tham số</b>: kiểm mức bảo hiểm, giảm trừ, biểu thuế rồi bấm <b>Xác nhận tất cả</b> (cần xác nhận trước khi duyệt kỳ thật). Tab <b>Thỏa thuận lương</b>: nhập cho từng người lương thỏa thuận, % KPI, phụ cấp, ăn ca, có đóng bảo hiểm không, số người phụ thuộc.</p> },
+        { tieuDe: "Tạo kỳ và lập bảng lương", noiDung: <p>Tab <b>Bảng lương</b> → <b>Tạo kỳ lương</b> (chọn tháng, năm) → <b>Lập bảng lương</b>. Công lấy tự động từ Bảng công tháng. Mở từng dòng để nhập giờ tăng ca, hoa hồng, thưởng, khấu trừ khác; sửa công nếu cần.</p> },
+        { tieuDe: "Đối chiếu thuế, bảo hiểm rồi chốt", noiDung: <p>Tab <b>Thuế và bảo hiểm</b> cho thấy cách ra từng số (bảo hiểm, giảm trừ, 5 bậc thuế). Chuyển kỳ qua <b>Đã kiểm → Đã duyệt → Đã chi</b>; từ bước Đã kiểm trở đi không sửa được dòng. Bấm <b>Xuất Excel</b> để lưu bảng lương, hoặc mở dòng của từng người bấm <b>In phiếu</b>.</p> },
+      ],
+    },
+  ],
+  luuY: [
+    "Lương là dữ liệu nhạy cảm: chỉ Quản trị và Kỹ thuật xem được, đừng gửi tệp Excel lương qua kênh chung.",
+    "Chưa xác nhận hết tham số thì chưa duyệt kỳ lương thật.",
+  ],
+};
 
-const KY_THUAT: Buoc[] = [
-  { tieuDe: "Duyệt tài khoản đăng ký", noiDung: <p>Ở <b>Tổng quan</b>, mục &quot;Tài khoản chờ duyệt&quot;: đối chiếu email với người thật, chọn hồ sơ nhân sự rồi bấm Duyệt. Chọn vai trò &quot;Theo vị trí&quot; (Quản trị tự có theo vị trí) hoặc &quot;Kỹ thuật&quot;.</p> },
-  { tieuDe: "Nộp đơn thay mọi người", noiDung: <p>Khi nộp đơn, Kỹ thuật có ô <b>Nộp cho</b> để chọn bất kỳ nhân viên nào; mọi loại đơn đều nộp được.</p> },
-  { tieuDe: "Theo dõi hệ thống", noiDung: <p>Mục <b>Kỹ thuật</b> và &quot;Toàn cảnh số liệu&quot; ở Tổng quan cho thấy tình trạng hệ thống, số dòng dữ liệu và các chỉ số toàn công ty.</p> },
-];
+const KY_THUAT: HuongDan = {
+  vaiTro: "Kỹ thuật",
+  loiNoi: "Quyền cao nhất: thấy mọi số liệu kể cả lương, duyệt tài khoản, gán vị trí Quản trị và giữ hệ thống ổn định. Tài khoản Kỹ thuật không phải chấm công.",
+  sac: "tim",
+  Icon: Terminal,
+  phan: [
+    {
+      tieuDe: "Mỗi ngày",
+      sac: "tim",
+      buoc: [
+        { tieuDe: "Duyệt tài khoản mới đăng ký", noiDung: <p>Ở <b>Tổng quan</b>, mục &quot;Tài khoản chờ duyệt&quot; (chỉ bạn thấy). Email do người đăng ký tự nhập và chưa xác minh, nên đối chiếu với người thật. Chọn hồ sơ nhân sự (hoặc &quot;Tạo hồ sơ mới theo đăng ký&quot;), chọn vai trò &quot;Theo vị trí&quot; (Quản trị tự có theo vị trí) hoặc &quot;Kỹ thuật&quot;, rồi bấm Duyệt.</p> },
+        { tieuDe: "Đọc Toàn cảnh số liệu", noiDung: <p>Cuối <b>Tổng quan</b> là mục Toàn cảnh số liệu (chỉ Kỹ thuật thấy): nhân sự, tài khoản và đăng nhập, chấm công, đơn từ, tuyển dụng, lương, đánh giá, hệ thống. Thẻ chuyển cam hoặc hồng khi có việc cần chú ý (đơn chờ duyệt, đi muộn, tham số chưa xác nhận…).</p> },
+      ],
+    },
+    {
+      tieuDe: "Quyền chỉ riêng bạn có",
+      sac: "xanh",
+      buoc: [
+        { tieuDe: "Đưa người vào vị trí Quản trị", noiDung: <p>Khi thêm hoặc sửa hồ sơ, chỉ bạn được đặt người vào khối Hành chính nhân sự hoặc chức vụ Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc (các vị trí tự có quyền Quản trị). Quản trị làm việc này sẽ bị chặn.</p> },
+        { tieuDe: "Nộp đơn thay mọi người", noiDung: <p>Khi nộp đơn, ô <b>Nộp cho</b> cho phép chọn bất kỳ nhân viên nào; mọi loại đơn đều nộp được. Dùng để hỗ trợ nhập hộ khi người đó chưa tự làm được.</p> },
+        { tieuDe: "Xem mọi thứ, kể cả lương", noiDung: <p>Bạn làm được mọi việc của Quản trị: Hồ sơ, Khối, Tuyển dụng, Bảng công tháng, Bảng lương (kỳ, thỏa thuận, tham số, thuế và bảo hiểm), xuất Excel và in phiếu. Hướng dẫn chi tiết các việc này nằm ở bản dành cho Quản trị.</p> },
+      ],
+    },
+    {
+      tieuDe: "Giữ hệ thống ổn định",
+      sac: "cam",
+      buoc: [
+        { tieuDe: "Mục Kỹ thuật", noiDung: <p>Mục <b>Kỹ thuật</b> cho thấy tình trạng hệ thống: tổng số dòng dữ liệu, số dòng theo từng bảng, hạ tầng đang chạy.</p> },
+        { tieuDe: "Tải bản sao lưu", noiDung: <p>Cũng ở mục Kỹ thuật, bấm <b>Tải bản sao lưu (JSON)</b> để lưu toàn bộ dữ liệu nghiệp vụ (không gồm tài khoản đăng nhập) ra nơi an toàn. Nên tải đều đặn, nhất là trước khi nhập hàng loạt hoặc đổi cấu trúc. Tệp chứa dữ liệu cá nhân và lương, đừng chia sẻ. Hiện ứng dụng chỉ tải về, chưa có chức năng khôi phục từ tệp.</p> },
+      ],
+    },
+  ],
+  luuY: [
+    "Không có gì xoá hay khôi phục hàng loạt trong ứng dụng: việc phá huỷ dữ liệu thật chỉ làm khi có lệnh rõ của chủ dự án.",
+    "Lương là dữ liệu nhạy cảm: tải bản sao lưu hoặc Excel lương thì cất ở nơi riêng.",
+  ],
+};
 
 export default async function TrangHuongDan() {
   const nd = await layNguoiDungDaDuyet();
-  const quanLy = nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat";
+  const hd = nd.vaiTro === "ky_thuat" ? KY_THUAT : nd.vaiTro === "admin" ? QUAN_TRI : NHAN_VIEN;
   return (
     <div className="space-y-10">
-      <TieuDeTrang tieuDe="Hướng dẫn sử dụng" phu={quanLy ? "Việc hằng ngày, cuối tháng và lương, theo thứ tự nên làm" : "Chấm công, nộp đơn và xem phiếu lương"} />
-      <MucTrang tieuDe="Việc của mọi nhân viên"><DanhSachBuoc buoc={CHUNG} /></MucTrang>
-      {quanLy && <MucTrang tieuDe="Việc của Quản trị và Hành chính nhân sự"><DanhSachBuoc buoc={QUAN_TRI} /></MucTrang>}
-      {nd.vaiTro === "ky_thuat" && <MucTrang tieuDe="Việc riêng của tài khoản Kỹ thuật"><DanhSachBuoc buoc={KY_THUAT} /></MucTrang>}
+      <TieuDeTrang tieuDe="Hướng dẫn sử dụng" phu={`Dành riêng cho vai trò ${hd.vaiTro}`} />
+
+      <div className="relative overflow-hidden p-6 text-[var(--chu-tren-vang)]" style={{ background: dai(hd.sac), borderRadius: 14 }}>
+        <span aria-hidden className="absolute -right-8 -top-8 h-36 w-36" style={{ background: "rgba(255,255,255,0.12)", borderRadius: 9999 }} />
+        <div className="relative flex items-start gap-4">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center" style={{ background: "rgba(255,255,255,0.2)", borderRadius: 12 }}><hd.Icon className="h-6 w-6" strokeWidth={1.7} /></span>
+          <div className="min-w-0">
+            <div className="flex items-center gap-2 text-[13px] font-medium uppercase tracking-[0.12em] opacity-90"><BookOpen className="h-4 w-4" strokeWidth={1.8} /> Hướng dẫn cho {hd.vaiTro}</div>
+            <p className="mt-2 max-w-3xl text-[16px] leading-relaxed">{hd.loiNoi}</p>
+          </div>
+        </div>
+      </div>
+
+      {hd.phan.map((p) => (
+        <section key={p.tieuDe} aria-label={p.tieuDe} className="space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="h-6 w-1.5" style={{ background: v(p.sac, "-mau"), borderRadius: 3 }} />
+            <h2 className="text-[17px] font-semibold text-muc">{p.tieuDe}</h2>
+            <span className="h-px flex-1" style={{ background: `linear-gradient(90deg, color-mix(in srgb, ${v(p.sac, "-mau")} 45%, transparent), transparent)` }} />
+          </div>
+          <ol className="space-y-3">
+            {p.buoc.map((b, i) => (
+              <li key={b.tieuDe} className="flex gap-4 p-4" style={{ background: v(p.sac, "-nen"), borderRadius: 12, border: `1px solid color-mix(in srgb, ${v(p.sac, "-mau")} 26%, transparent)` }}>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center text-[14px] font-semibold text-[var(--chu-tren-vang)]" style={{ background: dai(p.sac), borderRadius: 9999 }}>{i + 1}</span>
+                <div className="min-w-0">
+                  <div className="text-[15px] font-semibold text-muc">{b.tieuDe}</div>
+                  <div className="mt-1 space-y-1.5 text-[14px] leading-relaxed text-muc-2">{b.noiDung}</div>
+                </div>
+              </li>
+            ))}
+          </ol>
+        </section>
+      ))}
+
+      {hd.luuY.length > 0 && (
+        <aside className="p-5" style={{ background: v("cam", "-nen"), borderRadius: 12, border: `1px solid color-mix(in srgb, ${v("cam", "-mau")} 30%, transparent)` }}>
+          <div className="text-[14px] font-semibold" style={{ color: v("cam", "") }}>Lưu ý</div>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-[14px] text-muc-2">{hd.luuY.map((l) => <li key={l}>{l}</li>)}</ul>
+        </aside>
+      )}
     </div>
   );
 }

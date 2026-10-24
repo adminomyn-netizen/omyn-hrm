@@ -5,7 +5,8 @@ import { LOAI_DON, PHEP_NAM_MOI_NAM, demNgayPhep } from "./don-tu";
 import { ngayHomNayHCM } from "./data";
 import { tienVN } from "./dinh-dang";
 
-export type ChiSo = { nhan: string; so: string; phu?: string };
+/** `tyLe` (0–100) = chỉ số dạng tỷ lệ, hiển thị bằng vòng tròn tiến độ. */
+export type ChiSo = { nhan: string; so: string; phu?: string; tyLe?: number };
 export type PhanBo = { nhan: string; so: number }[];
 export type ToanCanh = {
   nhom: { ten: string; chiSo: ChiSo[] }[];
@@ -15,6 +16,7 @@ export type ToanCanh = {
 
 const so = (n: number) => n.toLocaleString("vi-VN");
 const tyLe = (a: number, b: number) => (b > 0 ? `${Math.round((a / b) * 100)}%` : "—");
+const phanTram = (a: number, b: number) => (b > 0 ? Math.min(100, Math.round((a / b) * 100)) : 0);
 const dem = <T,>(ds: T[], kho: (x: T) => string): PhanBo => {
   const m = new Map<string, number>();
   for (const x of ds) m.set(kho(x), (m.get(kho(x)) ?? 0) + 1);
@@ -154,7 +156,7 @@ export async function layToanCanhKyThuat(): Promise<ToanCanh> {
         chiSo: [
           { nhan: "Tổng tài khoản", so: so(taiKhoan.length) },
           ...["Kỹ thuật", "Quản trị", "Nhân viên", "Chờ duyệt"].map((v) => ({ nhan: v, so: so(theoVaiTro.find((x) => x.nhan === v)?.so ?? 0) })),
-          { nhan: "Đăng nhập 7 ngày qua", so: so(dangNhap7), phu: tyLe(dangNhap7, taiKhoan.length) + " tài khoản" },
+          { nhan: "Đăng nhập 7 ngày qua", so: so(dangNhap7), phu: tyLe(dangNhap7, taiKhoan.length) + " tài khoản", tyLe: phanTram(dangNhap7, taiKhoan.length) },
           { nhan: "Chưa từng đăng nhập", so: so(chuaTungDangNhap) },
         ],
       },
@@ -162,11 +164,11 @@ export async function layToanCanhKyThuat(): Promise<ToanCanh> {
         ten: "Chấm công",
         chiSo: [
           { nhan: "Phải chấm công", so: so(phaiChamCong.length), phu: "Trừ Giám đốc, Tổng giám đốc, Kỹ thuật" },
-          { nhan: "Đã chấm công hôm nay", so: `${ccHomNay.filter((c) => phaiChamCongIds.has(c.nhan_vien_id)).length}/${phaiChamCong.length}` },
+          { nhan: "Đã chấm công hôm nay", so: `${ccHomNay.filter((c) => phaiChamCongIds.has(c.nhan_vien_id)).length}/${phaiChamCong.length}`, tyLe: phanTram(ccHomNay.filter((c) => phaiChamCongIds.has(c.nhan_vien_id)).length, phaiChamCong.length) },
           { nhan: "Đi muộn hôm nay", so: so(muonHomNay) },
           { nhan: "Vào nhưng chưa ra", so: so(chuaRa) },
           { nhan: "Lượt chấm công tháng này", so: so(cc.length), phu: `${so(nguoiCoCong)} người có mặt` },
-          { nhan: "Đi muộn tháng này", so: so(muonThang), phu: `${tyLe(muonThang, cc.length)} lượt` },
+          { nhan: "Đi muộn tháng này", so: so(muonThang), phu: `${tyLe(muonThang, cc.length)} lượt`, tyLe: phanTram(muonThang, cc.length) },
           { nhan: "Vắng mặt tháng này", so: so(vangThang) },
           { nhan: "Giờ vào trung bình", so: gio(gioVaoTb) },
         ],
@@ -190,7 +192,7 @@ export async function layToanCanhKyThuat(): Promise<ToanCanh> {
           { nhan: "Tổng ứng viên", so: so(uvDs.length) },
           { nhan: "Ứng viên mới 30 ngày", so: so(uv30) },
           { nhan: "Lịch phỏng vấn sắp tới", so: so(sapPv) },
-          { nhan: "Đã nhận việc", so: so(phePhao[5].so), phu: tyLe(phePhao[5].so, uvDs.length) + " tổng ứng viên" },
+          { nhan: "Đã nhận việc", so: so(phePhao[5].so), phu: tyLe(phePhao[5].so, uvDs.length) + " tổng ứng viên", tyLe: phanTram(phePhao[5].so, uvDs.length) },
         ],
       },
       {
@@ -206,7 +208,7 @@ export async function layToanCanhKyThuat(): Promise<ToanCanh> {
           { nhan: "Tiền làm thêm", so: tienVN(cong("tien_ot")) },
           { nhan: "Có thỏa thuận lương", so: so(thoa.data!.length), phu: `${so(chuaThoaThuan)} người đang làm chưa có` },
           { nhan: "Lương thỏa thuận trung bình", so: tienVN(luongThoaThuanTb) },
-          { nhan: "Tham số lương chưa xác nhận", so: `${so(thamChuaXacNhan)}/${so(tham.data!.length)}`, phu: thamChuaXacNhan ? "Cần xác nhận trước khi duyệt kỳ thật" : "Đã xác nhận hết" },
+          { nhan: "Tham số lương chưa xác nhận", so: `${so(thamChuaXacNhan)}/${so(tham.data!.length)}`, phu: thamChuaXacNhan ? "Cần xác nhận trước khi duyệt kỳ thật" : "Đã xác nhận hết", tyLe: phanTram(tham.data!.length - thamChuaXacNhan, tham.data!.length) },
         ],
       },
       {

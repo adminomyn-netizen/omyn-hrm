@@ -30,7 +30,7 @@ const CHI_QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
 
 export const menuChinh: MucMenu[] = [
   { ten: "Tổng quan", duong_dan: "/dashboard", nhom: "Chung", icon: LayoutDashboard, moTa: "Ai cũng thấy; nội dung theo từng tài khoản: nhân viên xem việc của mình, quản lý xem số liệu công ty." },
-  { ten: "Hướng dẫn", duong_dan: "/huong-dan", nhom: "Chung", icon: BookOpen, moTa: "Cách chấm công, nộp đơn, xem phiếu lương; Quản trị có thêm hướng dẫn duyệt đơn, bảng công và lập lương." },
+  { ten: "Hướng dẫn", duong_dan: "/huong-dan", nhom: "Chung", icon: BookOpen, moTa: "Hướng dẫn riêng cho vai trò của bạn: nhân viên, Quản trị/Hành chính nhân sự hoặc Kỹ thuật." },
   { ten: "Hồ sơ nhân sự", duong_dan: "/nhan-su", nhom: "Con người", icon: Users, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa hồ sơ nhân viên; cho nghỉ việc." },
   { ten: "Khối và phòng ban", duong_dan: "/khoi", nhom: "Con người", icon: Building2, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa, xoá khối; xem mỗi khối có bao nhiêu người." },
   { ten: "Tuyển dụng", duong_dan: "/tuyen-dung", nhom: "Con người", icon: UserPlus, chiVaiTro: CHI_QUAN_LY, moTa: "Đăng tin, nhận hồ sơ, theo dõi ứng viên qua từng vòng." },

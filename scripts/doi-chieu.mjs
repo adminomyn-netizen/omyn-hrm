@@ -34,6 +34,13 @@ const CAP = [
   ["loi", "loi-nen", 4.5, "lỗi"],
   ["canh-bao", "canh-bao-nen", 4.5, "cảnh báo"],
   ["vien-dam", "giay", 3, "viền ô nhập (≥ 3:1)"],
+  ...["luc", "xanh", "tim", "cam", "hong"].flatMap((k) => [
+    [`sac-${k}`, `sac-${k}-nen`, 4.5, `số liệu sắc ${k}`],
+    ["muc-2", `sac-${k}-nen`, 4.5, `chữ phụ trên nền sắc ${k}`],
+    ["muc-3", `sac-${k}-nen`, 4.5, `chữ gợi ý trên nền sắc ${k}`],
+    ["chu-tren-vang", `sac-${k}-1`, 4.5, `chữ trắng trên dải sắc ${k} (đầu)`],
+    ["chu-tren-vang", `sac-${k}-2`, 4.5, `chữ trắng trên dải sắc ${k} (cuối)`],
+  ]),
 ];
 
 let hong = 0;
