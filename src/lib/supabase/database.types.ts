@@ -466,6 +466,24 @@ export type Database = {
           },
         ]
       }
+      ngay_le: {
+        Row: {
+          ngay: string
+          tao_luc: string
+          ten: string
+        }
+        Insert: {
+          ngay: string
+          tao_luc?: string
+          ten: string
+        }
+        Update: {
+          ngay?: string
+          tao_luc?: string
+          ten?: string
+        }
+        Relationships: []
+      }
       nhan_vien: {
         Row: {
           chuc_danh: string | null

@@ -22,6 +22,12 @@ export function Hop({
 }) {
   const hopRef = useRef<HTMLDivElement>(null);
   const truocDo = useRef<Element | null>(null);
+  // `dong` thường là hàm mới mỗi lần render: giữ trong ref để hiệu ứng focus chỉ chạy khi hộp mở/đóng,
+  // không chạy lại mỗi lần gõ phím (trước đây focus bị kéo khỏi ô nhập về nút khác giữa lúc gõ).
+  const dongRef = useRef(dong);
+  useEffect(() => {
+    dongRef.current = dong;
+  });
 
   useEffect(() => {
     if (!mo) return;
@@ -31,7 +37,7 @@ export function Hop({
     const khoaCuon = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const bam = (e: KeyboardEvent) => {
-      if (e.key === "Escape") dong();
+      if (e.key === "Escape") dongRef.current();
       if (e.key !== "Tab" || !hopRef.current) return;
       const ds = hopRef.current.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])',
@@ -53,7 +59,7 @@ export function Hop({
       document.body.style.overflow = khoaCuon;
       (truocDo.current as HTMLElement | null)?.focus?.();
     };
-  }, [mo, dong]);
+  }, [mo]);
 
   if (!mo) return null;
 

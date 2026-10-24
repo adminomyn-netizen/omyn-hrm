@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { congChuanTheoKy, tinhLuong, type DauVaoLuong, type ThamSo } from "@/lib/luong/tinh-luong";
-import { layNgayChamCongTrongThang } from "@/lib/data";
+import { layBangCongThang } from "@/lib/bang-cong";
 
 export type KetQuaLuong = { loi?: string; ok?: boolean; thongBao?: string };
 const KHONG_QUYEN: KetQuaLuong = { loi: "Chỉ Quản trị và Kỹ thuật mới được xem và sửa lương." };
@@ -140,8 +140,9 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
     db.from("nhan_vien").select("id, ho_ten, trang_thai, ngay_vao_lam").neq("trang_thai", "Đã nghỉ"),
     db.from("luong_thoa_thuan").select("*"),
     db.from("bang_luong").select("nhan_vien_id").eq("ky_luong_id", kyId),
-    layNgayChamCongTrongThang(ky.nam, ky.thang),
+    layBangCongThang(ky.nam, ky.thang),
   ]);
+  const congTheoNguoi = new Map(cc.dong.map((d) => [d.nhanVienId, d.tong]));
   const ttMap = new Map((tt.data ?? []).map((t) => [t.nhan_vien_id, t]));
   const daCo = new Set((co.data ?? []).map((c) => c.nhan_vien_id));
   const thieu: string[] = [];
@@ -154,9 +155,12 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
       continue;
     }
     const congChuan = congChuanTheoKy(t.kieu_cong as "van_phong" | "van_hanh", ky.nam, ky.thang, p.cong_chuan_van_phong);
-    const ngayCham = Math.min(co2(cc.get(n.id) ?? 0), congChuan);
+    // Công hưởng và ngày làm lấy từ bảng công tháng (X, N, CT, P, L…): cùng một hàm với bảng chấm công nên không lệch nhau.
+    const tong = congTheoNguoi.get(n.id);
+    const congHuong = Math.min(tong?.congHuong ?? 0, congChuan);
+    const ngayCham = Math.min(tong?.congLam ?? 0, congChuan);
     const dong: Dong = {
-      luong_thoa_thuan: Number(t.luong_thoa_thuan), ty_le_kpi: t.ty_le_kpi, thu_viec: n.trang_thai === "Thử việc", cong_chuan: congChuan, cong_huong: ngayCham, ngay_lam: ngayCham,
+      luong_thoa_thuan: Number(t.luong_thoa_thuan), ty_le_kpi: t.ty_le_kpi, thu_viec: n.trang_thai === "Thử việc", cong_chuan: congChuan, cong_huong: congHuong, ngay_lam: ngayCham,
       ty_le_ht_kpi: 100, phu_cap: Number(t.phu_cap), phu_cap_mien_thue: t.phu_cap_mien_thue, an_ca: t.an_ca, dong_bh: t.dong_bh, so_nguoi_phu_thuoc: t.so_nguoi_phu_thuoc,
       gio_ot_thuong: 0, gio_ot_nghi_tuan: 0, gio_ot_le: 0, hoa_hong: 0, thuong_khac: 0, khau_tru_khac: 0,
     };
@@ -171,7 +175,6 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
   const tb = `Đã lập ${moi.length} dòng lương.` + (thieu.length ? ` ${thieu.length} người chưa có thỏa thuận lương nên chưa có dòng: ${thieu.slice(0, 5).join(", ")}${thieu.length > 5 ? "…" : ""}.` : "");
   return { ok: true, thongBao: tb };
 }
-const co2 = (n: number) => n; // ngày chấm công (số nguyên) làm gợi ý ban đầu cho công thực tế, sửa tay được
 
 export async function luuDongLuong(fd: FormData): Promise<KetQuaLuong> {
   if (!(await chiQuanTri())) return KHONG_QUYEN;

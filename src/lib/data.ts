@@ -100,7 +100,7 @@ export async function layNhanVienTheoId(id: string) {
 }
 
 /** Mã tài khoản có vai trò Kỹ thuật — dùng để loại họ khỏi số người phải chấm công. */
-async function layUserIdKyThuat() {
+export async function layUserIdKyThuat() {
   const { data, error } = await createAdminClient().auth.admin.listUsers({ page: 1, perPage: 200 });
   if (error) throw error;
   return new Set(data.users.filter((u) => u.app_metadata?.vai_tro === "ky_thuat").map((u) => u.id));

@@ -3,18 +3,18 @@
 Tài liệu này là **nguồn chuẩn duy nhất** cho giao diện OMYN HRM. Ai thêm trang, thành phần hay sửa giao diện đều đọc và làm theo đây. Mọi con số dưới đây lấy từ mã thật (`src/app/globals.css`, `src/components/**`); nếu mã và tài liệu lệch nhau thì sửa cho khớp, không để hai bên khác nhau.
 
 - Bản thiết kế gốc (Claude Design): https://claude.ai/artifact/2GmrJHfvPPQWEXRtHAa1pn (riêng tư) và 7 ảnh xuất ở `hrm-omyn/thiet-ke-moi/` (mở `xem-truoc-tat-ca.html`).
-- Chủ dự án chốt hướng này ngày 22/10/2026: tông **vàng champagne + nâu espresso**, có **gradient vàng**, **không dùng xanh**, có **chế độ tối**.
+- Chủ dự án chốt hướng này ngày 22/10/2026: tông **lục đậm + teal** (đổi 24/10/2026 theo phần mềm chấm công mẫu; trước đó là vàng champagne + espresso, không dùng xanh), có **chế độ tối**.
 
 ---
 
 ## 1. Nguyên tắc
 
-1. **Sang nhưng gọn.** Giấy ngà, mực nâu, một dải vàng ánh kim làm điểm nhấn. Mỗi trang có **một** điểm nhấn chính (hộp tối ánh vàng, hoặc nút vàng).
+1. **Sang nhưng gọn.** Nền sáng lạnh, mực lục đậm, một dải teal làm điểm nhấn. Mỗi trang có **một** điểm nhấn chính (hộp lục đậm ánh teal, hoặc nút teal).
 2. **Thân thiện với người không rành công nghệ.** Chữ tiếng Việt tự nhiên, câu ngắn, xưng "bạn", nói rõ việc cần làm kế tiếp. Trạng thái rỗng và lỗi luôn chỉ cách xử lý.
 3. **Bấm là ăn.** Mọi thao tác phải có phản hồi trong ~100 ms: khung chờ hiện ngay, thao tác đổi trên màn hình trước rồi mới đồng bộ máy chủ (mục 10).
 4. **Dữ liệu dày thì xếp thành bảng/hàng, không xếp thành lưới thẻ giống nhau.** Thẻ chỉ dùng khi nó là một *vật thể kéo được* (ứng viên) hoặc một *điểm nhấn* (hộp chấm công).
 5. **Mọi thứ đều dùng được trên điện thoại 390 px, không cuộn ngang trang.**
-6. **Không "AI hoá"** (mục 12): không tím–xanh, không emoji làm biểu tượng, không bóng nặng, không bo tròn đồng loạt.
+6. **Không "AI hoá"** (mục 12): không tím–lam–hồng, không emoji làm biểu tượng, không bóng nặng, không bo tròn đồng loạt.
 
 ---
 
@@ -120,9 +120,9 @@ Tiếng Việt cần `line-height` ≥ 1,5 cho đoạn văn và ≥ 1,1 cho tiê
 ```
 
 - **Khung dùng chung** `src/app/(app)/layout.tsx`: dựng *một lần*, đứng yên khi đổi trang; chỉ phần nội dung đổi (kèm `loading.tsx`).
-- **Menu trái** (`Sidebar`): nền espresso cả khi giao diện sáng; nhóm có nhãn viết hoa nhỏ; mục đang mở nền ngà 9% + biểu tượng vàng; **số đếm** dải vàng cạnh mục (tài khoản chờ duyệt, đơn chờ duyệt, ứng viên mới — lấy từ `/api/thong-bao`, ghi qua `lib/dem-menu.ts`). Thu gọn còn 72 px (nhớ lựa chọn trong `localStorage`); rê chuột hiện tên + mô tả. Điện thoại: ngăn kéo `MobileNav` cùng kiểu + **thanh tab dưới cùng** (xem 7.9).
+- **Menu trái** (`Sidebar`): nền lục đậm cả khi giao diện sáng; nhóm có nhãn viết hoa nhỏ; mục đang mở nền trắng 13% + biểu tượng hổ phách; **số đếm** dải teal cạnh mục (tài khoản chờ duyệt, đơn chờ duyệt, ứng viên mới — lấy từ `/api/thong-bao`, ghi qua `lib/dem-menu.ts`). Thu gọn còn 72 px (nhớ lựa chọn trong `localStorage`); rê chuột hiện tên + mô tả. Điện thoại: ngăn kéo `MobileNav` cùng kiểu + **thanh tab dưới cùng** (xem 7.9).
 - **Đầu trang** (`DauTrang`): cao 56 px. Trái: ô tìm (`⌘K`/`Ctrl+K`, `TimKiem`). Phải: nút sáng/tối, chuông thông báo, avatar + tên. Bấm avatar: **Chỉnh sửa thông tin** (đổi tên, đổi mật khẩu — cần mật khẩu hiện tại) và **Đăng xuất**. Không hiện nhãn vai trò.
-- **Đầu mỗi trang** (`TieuDeTrang`): tiêu đề sans + một dòng phụ (đếm), hành động chính bên phải (nút vàng + nút phụ).
+- **Đầu mỗi trang** (`TieuDeTrang`): tiêu đề sans + một dòng phụ (đếm), hành động chính bên phải (nút teal + nút phụ).
 - **Hàng chỉ số** (`HangChiSo`/mục chỉ số ở Tổng quan): số lớn + nhãn nhỏ, ngăn bằng đường kẻ dọc 1 px, **không thẻ**. Có thể kèm `DuongXuHuong` (đường nhỏ 84×34).
 - **Khu** (`MucTrang`): tiêu đề nhỏ đậm + đường kẻ mảnh, hành động nhỏ bên phải ("Xem tất cả").
 - **Lưới trong trang**: dùng `grid` 12 cột (`lg:col-span-*`); **mọi con của grid có `min-w-0`** để nội dung nowrap/bảng không đẩy tràn ngang trên điện thoại (`MucTrang` đã có sẵn).
@@ -134,9 +134,9 @@ Tiếng Việt cần `line-height` ≥ 1,5 cho đoạn văn và ≥ 1,1 cho tiê
 Tất cả ở `src/components/ui/` trừ khi ghi khác. Lớp CSS dùng chung ở `ui/dinh-dang.ts`.
 
 ### 7.1 Nút
-- **Chính** (`NUT_CHINH` = `.nut-vang`): dải vàng, chữ `--chu-tren-vang`, cao 40–50 px. Mỗi màn tối đa **một** nút chính.
+- **Chính** (`NUT_CHINH` = `.nut-vang`): dải teal, chữ trắng `--chu-tren-vang`, cao 40–50 px. Mỗi màn tối đa **một** nút chính.
 - **Phụ** (`NUT_PHU`): viền `--vien-dam`, nền trong, hover `--giay-tram`.
-- **Chữ** (`NUT_CHU`, `NUT_CHU_NGUY`): chữ vàng/đỏ gạch chân khi hover, dùng trong bảng ("Sửa", "Xoá").
+- **Chữ** (`NUT_CHU`, `NUT_CHU_NGUY`): chữ teal/đỏ gạch chân khi hover, dùng trong bảng ("Sửa", "Xoá").
 - **Nguy hiểm**: nền `--loi`, chữ trắng (xoá hẳn).
 - Nút gọi Server Action dùng `type="button"` + `onClick` (Next 16 ở đây huỷ action khi `<form>` nổ submit thật; ngoại lệ đã kiểm: nút chấm công và đăng nhập/đăng ký).
 
@@ -184,7 +184,7 @@ Các tab "Thông báo/Tôi/Menu" bắn sự kiện cửa sổ (`omyn-mo-thong-ba
 | **Tổng quan** | Lời chào theo giờ → hộp hero tối (vòng chấm công 5/7 + số đúng giờ/đi muộn/chưa chấm + biểu đồ cột nửa giờ) bên trái, "Việc cần bạn" bên phải → hàng 4 chỉ số kèm đường xu hướng → "Nhân sự theo khối" và "Đang tuyển" (thanh tiến độ 6 bước). Có khu "Tài khoản chờ duyệt" lên đầu khi có. |
 | **Hồ sơ nhân sự** | `TieuDeTrang` + tab lọc có đếm + ô tìm → bảng có avatar chữ cái → popup thêm/sửa/xoá. Mở sẵn popup bằng `?them=1`, điền sẵn tìm bằng `?q=`. |
 | **Tuyển dụng** | Chọn tin (nút dạng viên) → phễu mảnh → **bảng 7 cột theo bước, kéo thẻ sang cột khác để đổi bước** (lạc quan), bấm thẻ để sửa/xoá (điện thoại: bấm thẻ rồi chọn bước). `?tin=` chọn tin, `?dang=1` mở popup đăng tuyển. |
-| **Chấm công (nhân viên)** | Đồng hồ lớn giữa trang, nút tròn vàng 184 px có hai vòng mảnh (đổi sang xám ngà khi đã vào, "Đã xong hôm nay" khi đã ra), giờ vào/ra, dải 7 ngày của tuần. |
+| **Chấm công (nhân viên)** | Đồng hồ lớn giữa trang, nút tròn teal 184 px có hai vòng mảnh (đổi sang xám ngà khi đã vào, "Đã xong hôm nay" khi đã ra), giờ vào/ra, dải 7 ngày của tuần. |
 | **Chấm công (quản lý)** | Đồng hồ + hàng chỉ số + lịch tháng + bảng hôm nay. |
 | **Đơn từ** | Tab "Chờ duyệt / Tất cả" (quản lý) hoặc "Nộp đơn mới" (nhân viên, popup). Duyệt/Từ chối đổi ngay trên dòng. |
 | **Lương, Đánh giá, Báo cáo, Kỹ thuật, Cài đặt** | `TieuDeTrang` + `HangChiSo` + `MucTrang` + bảng/danh sách. Nút chưa làm xong để `disabled` có chú thích ("Sắp có"), không làm nút giả. |
@@ -225,7 +225,7 @@ Chủ dự án yêu cầu "bấm là ăn liền, không khựng". Cách làm (đ
 
 ## 12. Tránh "AI hoá" — và máy canh giúp
 
-Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl|full`), bóng nặng (`shadow-lg|xl|2xl`), mờ kính (`backdrop-blur`), bố cục 3 thẻ giống nhau, emoji làm biểu tượng, chữ mẫu ("Lorem ipsum", "John Doe"), phông Inter/Roboto/Arial/Poppins, `<select>`/`type="date"` mặc định.
+Cấm: gradient tím/lam/hồng, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl|full`), bóng nặng (`shadow-lg|xl|2xl`), mờ kính (`backdrop-blur`), bố cục 3 thẻ giống nhau, emoji làm biểu tượng, chữ mẫu ("Lorem ipsum", "John Doe"), phông Inter/Roboto/Arial/Poppins, `<select>`/`type="date"` mặc định.
 
 `npm run kiem-tra` chạy **eslint + tsc + vitest + quét thiết kế + đối chiếu tương phản**; build đỏ nếu vi phạm. Ngoại lệ (nếu thật sự cần) ghi ở `.kiem-tra-thiet-ke-cho-phep.json` kèm lý do, theo từng tệp và từng luật. Hiện: 0 ngoại lệ.
 
@@ -248,6 +248,7 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 ## 14. Lịch sử
 
 - 22/10/2026 — Thêm thanh tab dưới cùng cho điện thoại; xoá toàn bộ dữ liệu mẫu (chỉ còn 5 khối theo sơ đồ OMYN, 2 tài khoản đăng nhập, vai trò/quyền).
+- 24/10/2026 — Đổi bảng màu sang lục đậm + teal (mục 3); các dòng "vàng/espresso" còn lại ở mục 7–9 hiểu là màu nhấn teal/lục đậm tương ứng (tên token giữ nguyên).
 - 22/10/2026 — Chốt hệ thiết kế vàng champagne + espresso, gradient vàng, chế độ tối; áp toàn bộ trang theo bản thiết kế Claude Design (menu tối, ô tìm ⌘K, hộp hero, bảng kéo thả tuyển dụng, đăng nhập mới); `Chon`/`NgayChon` qua portal.
 
 
@@ -271,3 +272,11 @@ Cấm: gradient tím/xanh, thẻ bo tròn lớn đồng loạt (`rounded-2xl|3xl
 - **Chỉ tài khoản Kỹ thuật** xem được mục Kỹ thuật và mục "Toàn cảnh số liệu" ở Tổng quan; Quản trị và Nhân viên không thấy menu, gõ thẳng đường dẫn thì bị đưa về Chấm công.
 
 - **Tổng quan ai cũng thấy, nội dung theo tài khoản** (22/10): Nhân viên thấy việc của chính mình (chấm công hôm nay, công tháng, đơn của tôi, hồ sơ, phiếu lương mới nhất); Quản trị thấy số liệu công ty; Kỹ thuật thấy thêm danh sách tài khoản chờ duyệt. Duyệt/từ chối tài khoản CHỈ Kỹ thuật (thông báo và đếm cũng chỉ Kỹ thuật). Đăng nhập xong ai cũng vào Tổng quan.
+
+## 10. Bổ sung 24/10/2026 — bảng công tháng, ngày lễ, hướng dẫn
+- **Bảng công tháng** (`/bang-cong`, chỉ Quản trị và Kỹ thuật, menu "Hằng ngày"): mỗi nhân viên một dòng, mỗi ngày một ô mã công **X** đủ công · **N** nửa ngày · **CT** công tác · **P** phép năm · **L** nghỉ lễ · **O** nghỉ ốm · **KP** không lương · **CĐ** nghỉ chế độ · **V** vắng không đơn; cột tổng từng mã và **Công hưởng** (dính phải khi cuộn). Màu ô chỉ phụ trợ (X/CT teal nhạt, N/P hổ phách nhạt, L/O/KP/CĐ đỏ nhạt, V viền đỏ); chữ mã là dấu hiệu chính.
+- **Một hàm tính công duy nhất** `congMotNgay` (`src/lib/cong.ts`, có test): bảng công và `lapBangLuong` cùng dùng nên không lệch nhau. Thứ tự: Chủ nhật/chưa vào làm → nghỉ lễ → nghỉ chế độ → nghỉ cả ngày → nghỉ nửa ngày → công tác → remote/ngoài công ty → có chấm công → vắng. Hôm nay chưa chấm công thì chưa tính vắng. Miễn chấm công (Tổng giám đốc, Giám đốc) mặc định X các ngày làm việc đã qua.
+- **Quy ước có lương (cần chủ dự án xác nhận)**: có lương = X, CT, L, P; N = 0,5 làm + 0,5 phép năm nếu nghỉ phép; không lương = O, KP, CĐ, V (ốm và chế độ do BHXH chi trả nếu đủ điều kiện).
+- **Ngày lễ** (bảng `ngay_le`, nút "Ngày lễ" ở Bảng công tháng): gieo sẵn ngày lễ dương lịch cố định 2026–2027; Tết Nguyên đán, Giỗ Tổ, ngày nghỉ bù do HCNS nhập. Hộp thoại đặt biểu mẫu thêm LÊN TRÊN danh sách để focus mặc định không rơi vào nút Xoá.
+- **Hướng dẫn** (`/huong-dan`, mọi vai trò): nội dung theo vai trò (nhân viên · Quản trị/HCNS · Kỹ thuật), viết cho người không rành kỹ thuật, theo thứ tự việc hằng ngày → cuối tháng → lương.
+- **`Hop`**: hiệu ứng focus chỉ chạy khi hộp mở/đóng (giữ `dong` trong ref). Trước đó mỗi lần ô nhập có state đổi là focus bị kéo đi, phím cách có thể bấm nhầm nút khác.
