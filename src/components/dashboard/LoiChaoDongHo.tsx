@@ -33,7 +33,7 @@ export function LoiChaoDongHo({ ten, batDau, phu, children }: { ten: string; bat
     <section className="flex flex-wrap items-end justify-between gap-x-8 gap-y-5">
       <div className="min-w-0">
         <div className="nhan-muc capitalize">{NGAY.format(now)}</div>
-        <h1 className="chu-tieu-de mt-1.5 text-[40px] leading-[1.1] text-muc lg:text-[52px]">
+        <h1 className="chu-tieu-de mt-1.5 text-[32px] leading-[1.1] text-muc [overflow-wrap:anywhere] sm:text-[40px] lg:text-[52px]">
           {loiChaoTheoGio(gio)}, {ten}.
         </h1>
         <p className="mt-2 text-[15px] text-muc-2">{phu}</p>
@@ -45,7 +45,7 @@ export function LoiChaoDongHo({ ten, batDau, phu, children }: { ten: string; bat
             {GIO.format(now)}
           </time>
         </div>
-        <div className="flex gap-2.5">{children}</div>
+        <div className="flex flex-wrap gap-2.5">{children}</div>
       </div>
     </section>
   );
