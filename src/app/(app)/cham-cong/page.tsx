@@ -41,7 +41,7 @@ function KhuVucLich({ tieuDe, nam, thang, tu, den, suKien, homNay }: { tieuDe: s
     <MucTrang tieuDe={khoang ? `${tieuDe} · ${dMY(tu!)} – ${dMY(den!)}` : `${tieuDe} · Tháng ${thang}/${nam}`}>
       <BoLocThoiGian nam={nam} thang={thang} tu={khoang ? tu : undefined} den={khoang ? den : undefined} homNay={homNay} />
       {khoang ? <Bang cot={cotKhoang} duLieu={suKien} khoa={(d) => d.id} trong="Không có dữ liệu chấm công trong khoảng này." /> : <LichChamCongTre suKien={suKien} nam={nam} thang={thang} />}
-      <p className="mt-4 text-[13px] text-muc-3">Giờ hiển thị là giờ bấm chấm công thực tế. Công và lương vẫn tính theo ca đã định (ca hành chính 08:30 – 17:30), không tính theo giờ bấm.</p>
+      <p className="mt-4 text-[13px] text-muc-3">Giờ hiển thị là giờ bấm chấm công thực tế. Công và lương vẫn tính theo ca đã định (ca hành chính 08:00 – 17:00), không tính theo giờ bấm.</p>
     </MucTrang>
   );
 }

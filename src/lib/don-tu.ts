@@ -31,8 +31,8 @@ export function demNgayPhep(tu: string, den: string) {
 export const loaiDonChoPhep = (canChamCong: boolean) => LOAI_DON.filter((l) => canChamCong || !LOAI_DON_CHAM_CONG.includes(l));
 
 /** Ca hành chính đã quy định: giải trình công được duyệt thì giờ chấm công của ngày đó trở về đúng ca này. */
-export const CA_VAO = "08:30:00";
-export const CA_RA = "17:30:00";
+export const CA_VAO = "08:00:00";
+export const CA_RA = "17:00:00";
 /** Một đơn giải trình công chỉ trải tối đa chừng này ngày (tránh sửa hàng loạt ngoài ý muốn). */
 export const GIAI_TRINH_TOI_DA_NGAY = 31;
 
@@ -49,7 +49,7 @@ export function ngayLamViec(tu: string, den: string, toiDa: string) {
 /** Giờ vào sau mốc này bị ghi "Đi muộn" khi chấm công (cùng mốc ở Chấm công). */
 export const GIO_COI_LA_DI_MUON = "08:15:00";
 /** Giờ ra sau mốc này (quá cuối ca 1 tiếng) là check out muộn cần giải trình. */
-export const NGUONG_RA_MUON = "18:30:00";
+export const NGUONG_RA_MUON = "18:00:00";
 
 export type SaiPham = { ma: "vao_tre" | "ra_som" | "ra_muon" | "chua_ra"; nhan: string };
 const hhmmss = (g: string | null | undefined) => (g ? (g.length === 5 ? `${g}:00` : g.slice(0, 8)) : null);
