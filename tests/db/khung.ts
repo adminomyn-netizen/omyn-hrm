@@ -58,6 +58,8 @@ export async function taoDbVoiMigration(denMigration = "9999") {
   const db = await taoDb();
   await db.exec(`
     create table auth.users (id uuid primary key default gen_random_uuid(), email text);
+    create schema storage;
+    create table storage.buckets (id text primary key, name text, public boolean default false, file_size_limit bigint, allowed_mime_types text[]);
     alter default privileges in schema public grant all on tables to anon, authenticated, service_role;
     alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
     alter default privileges in schema public grant execute on functions to anon, authenticated, service_role;

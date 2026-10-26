@@ -2,6 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Search } from "lucide-react";
 import { Hop } from "@/components/ui/Hop";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
@@ -17,7 +18,9 @@ const LOC = ["Tất cả", "Đang làm", "Thử việc", "Đã nghỉ"] as const
 const kieu = (t: string) => (t === "Đang làm" ? "tot" : t === "Thử việc" ? "cho" : "tram");
 const ngayVN = (d: string | null) => (d ? d.split("-").reverse().join("/") : "");
 
-export function DanhSachNhanSu({ nhanVien, khoi, moBanDau, timBanDau = "" }: { nhanVien: DongNhanVien[]; khoi: Khoi[]; moBanDau?: boolean; timBanDau?: string }) {
+export type TomTatHoSo = Record<string, { tyLe: number; thieu: number; choXacNhan: number }>;
+
+export function DanhSachNhanSu({ nhanVien, khoi, moBanDau, timBanDau = "", tomTat = {} }: { nhanVien: DongNhanVien[]; khoi: Khoi[]; moBanDau?: boolean; timBanDau?: string; tomTat?: TomTatHoSo }) {
   const router = useRouter();
   const [loc, setLoc] = useState<(typeof LOC)[number]>("Tất cả");
   const [tim, setTim] = useState(timBanDau);
@@ -106,6 +109,7 @@ export function DanhSachNhanSu({ nhanVien, khoi, moBanDau, timBanDau = "" }: { n
               <th className="py-3 pr-4 font-medium">Khối</th>
               <th className="py-3 pr-4 font-medium">Ngày vào làm</th>
               <th className="py-3 pr-4 font-medium">Trạng thái</th>
+              <th className="py-3 pr-4 font-medium">Hồ sơ</th>
               <th className="py-3" />
             </tr>
           </thead>
@@ -127,8 +131,18 @@ export function DanhSachNhanSu({ nhanVien, khoi, moBanDau, timBanDau = "" }: { n
                 <td className="py-2 pr-4 text-muc-2">{n.khoi_ten}</td>
                 <td className="py-2 pr-4 tabular-nums text-muc-2">{ngayVN(n.ngay_vao_lam)}</td>
                 <td className="py-2 pr-4"><NhanTrangThai kieu={kieu(n.trang_thai)}>{n.trang_thai}</NhanTrangThai></td>
+                <td className="py-2 pr-4 text-[13px] text-muc-2">
+                  {tomTat[n.id] ? (
+                    <Link href={`/nhan-su/${n.id}`} className="hover:underline">
+                      <span className="tabular-nums">{tomTat[n.id].tyLe}%</span>
+                      {tomTat[n.id].thieu > 0 ? <span className="text-canh-bao"> · thiếu {tomTat[n.id].thieu} giấy tờ</span> : <span className="text-nhan-dam"> · đủ giấy tờ</span>}
+                      {tomTat[n.id].choXacNhan > 0 && <span className="text-muc-3"> · {tomTat[n.id].choXacNhan} chờ xác nhận</span>}
+                    </Link>
+                  ) : <Link href={`/nhan-su/${n.id}`} className="text-muc-3 hover:underline">Mở hồ sơ</Link>}
+                </td>
                 <td className="py-2 text-right">
                   <div className="flex justify-end gap-4">
+                    <Link href={`/nhan-su/${n.id}`} className={NUT_CHU}>Hồ sơ</Link>
                     <button type="button" className={NUT_CHU} onClick={() => setHop({ kieu: "sua", nv: n })}>Sửa</button>
                     <button type="button" className={NUT_CHU_NGUY} onClick={() => setHop({ kieu: "xoa", nv: n })}>Xoá</button>
                   </div>

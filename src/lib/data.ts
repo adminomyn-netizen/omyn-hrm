@@ -366,11 +366,11 @@ export async function layTuyenDungDayDu() {
   const [tin, uv] = await Promise.all([
     supabase
       .from("tin_tuyen_dung")
-      .select("id, vi_tri, khoi_id, so_luong_can, trang_thai, mo_ta, han_nop, created_at, khoi(ten)")
+      .select("id, vi_tri, khoi_id, so_luong_can, trang_thai, mo_ta, han_nop, yeu_cau_id, created_at, khoi(ten)")
       .order("created_at", { ascending: false }),
     supabase
       .from("ung_vien")
-      .select("id, tin_tuyen_dung_id, ho_ten, email, dien_thoai, trang_thai, nam_sinh, nguon, link_cv, ghi_chu, ngay_phong_van, ngay_nhan_ho_so")
+      .select("id, tin_tuyen_dung_id, ho_ten, email, dien_thoai, trang_thai, nam_sinh, nguon, link_cv, ghi_chu, ngay_phong_van, ngay_nhan_ho_so, ngay_nhan_viec")
       .order("ngay_nhan_ho_so", { ascending: false }),
   ]);
   if (tin.error) throw tin.error;
@@ -427,7 +427,9 @@ export async function layThongBao(
     if (nguoiDung.vaiTro !== "ky_thuat") tk.length = 0;
     dem["/dashboard"] = tk.length;
     dem["/don-tu"] = demDon.count ?? 0;
-    dem["/tuyen-dung"] = demUv.count ?? 0;
+    const { count: ycCho } = await db.from("yeu_cau_tuyen_dung").select("id", { count: "exact", head: true }).eq("trang_thai", "Chờ tiếp nhận");
+    dem["/tuyen-dung"] = (demUv.count ?? 0) + (ycCho ?? 0);
+    if ((ycCho ?? 0) > 0) ra.push({ id: `yc-cho-${ycCho}`, loai: "tin", tieuDe: "Yêu cầu tuyển dụng chờ tiếp nhận", noiDung: `Có ${ycCho} yêu cầu tuyển dụng mới cần HCNS tiếp nhận.`, thoiDiem: new Date().toISOString(), href: "/tuyen-dung?tab=yeu-cau" });
     for (const t of tk.slice(0, 10)) {
       ra.push({ id: `tk-${t.id}`, loai: "tai_khoan", tieuDe: "Tài khoản mới chờ duyệt", noiDung: `${t.hoTen} (${t.email}) vừa đăng ký.`, thoiDiem: t.taoLuc, href: "/dashboard" });
     }

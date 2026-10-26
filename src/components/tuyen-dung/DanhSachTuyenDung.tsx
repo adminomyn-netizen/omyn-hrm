@@ -8,6 +8,8 @@ import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU } from "@/components/ui/dinh-dang";
 import { FormTin, type KhoiLuaChon, type TinCoSan } from "./FormTin";
 import { FormUngVien, type UngVien } from "./FormUngVien";
+import { KenhDangTin } from "./KenhDangTin";
+import type { KenhDang } from "@/lib/data-tuyen-dung";
 import { doiBuocUngVien, xoaTin, xoaUngVien } from "@/app/(app)/tuyen-dung/actions";
 import { BUOC_UNG_VIEN } from "@/lib/tuyen-dung";
 import { ngayVN } from "@/lib/dinh-dang";
@@ -27,12 +29,14 @@ type Hop =
 export function DanhSachTuyenDung({
   tin,
   ungVien,
+  kenh,
   khoi,
   tinBanDau,
   moDangTuyen,
 }: {
   tin: Tin[];
   ungVien: UngVien[];
+  kenh: KenhDang[];
   khoi: KhoiLuaChon[];
   tinBanDau?: string;
   moDangTuyen?: boolean;
@@ -109,7 +113,13 @@ export function DanhSachTuyenDung({
       </TieuDeTrang>
 
       {tin.length === 0 ? (
-        <p className="chu-tieu-de py-20 text-center text-[28px] text-muc-3">Chưa có tin tuyển dụng nào. Đăng tin đầu tiên để nhận hồ sơ.</p>
+        <div className="mx-auto max-w-[620px] py-16 text-center">
+          <p className="chu-tieu-de text-[28px] text-muc-3">Chưa có tin tuyển dụng nào.</p>
+          <p className="mt-3 text-[14px] leading-relaxed text-muc-3">
+            Tin được tạo từ một yêu cầu tuyển dụng đã tiếp nhận (tab &ldquo;Yêu cầu&rdquo;), hoặc bấm &ldquo;Đăng tuyển&rdquo; để tạo tin trực tiếp.
+            Ứng viên không tự nộp vào app này: HCNS nhận CV từ TopCV, Facebook, Zalo… rồi bấm &ldquo;+ Thêm ứng viên&rdquo; để theo dõi từng bước.
+          </p>
+        </div>
       ) : (
         <div className="space-y-5">
           {/* chọn tin */}
@@ -148,6 +158,14 @@ export function DanhSachTuyenDung({
                 <button type="button" className={NUT_CHU_NGUY} onClick={() => setHop({ k: "xoa-tin", tin: tinChon })}>Xoá tin</button>
               </span>
             </div>
+          )}
+
+          {tinChon && (
+            <KenhDangTin
+              key={tinChon.id}
+              tin={{ id: tinChon.id, vi_tri: tinChon.vi_tri, so_luong_can: tinChon.so_luong_can, khoi_ten: tinChon.khoi_ten, han_nop: tinChon.han_nop, mo_ta: tinChon.mo_ta }}
+              kenh={kenh.filter((k) => k.tin_tuyen_dung_id === tinChon.id)}
+            />
           )}
 
           {/* phễu */}
