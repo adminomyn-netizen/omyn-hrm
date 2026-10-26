@@ -108,6 +108,12 @@ export async function luuUngVien(fd: FormData): Promise<KetQua> {
     ? await db.from("ung_vien").update(du).eq("id", id)
     : await db.from("ung_vien").insert({ ...du, tin_tuyen_dung_id: tinId, ...(ngayNhan ? { ngay_nhan_ho_so: ngayNhan } : {}) });
   if (error) return { loi: "Chưa lưu được ứng viên. Thử lại sau." };
+  if (id) {
+    // Ngày nhận việc: đặt khi chuyển sang "Nhận việc" (không ghi đè nếu đã có), xoá khi rời khỏi bước đó.
+    const hom = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10);
+    if (buoc === "Nhận việc") await db.from("ung_vien").update({ ngay_nhan_viec: hom }).eq("id", id).is("ngay_nhan_viec", null);
+    else await db.from("ung_vien").update({ ngay_nhan_viec: null }).eq("id", id);
+  }
   xong();
   return { ok: true };
 }
@@ -116,8 +122,16 @@ export async function doiBuocUngVien(fd: FormData): Promise<KetQua> {
   if (!(await cho())) return KHONG_QUYEN;
   const id = chuoi(fd, "id", 40);
   const buoc = chuoi(fd, "trang_thai", 30);
+  const lyDo = chuoi(fd, "ly_do", 300);
   if (!uuid(id) || !(BUOC_UNG_VIEN as readonly string[]).includes(buoc)) return { loi: "Dữ liệu không hợp lệ." };
-  const { error } = await createAdminClient().from("ung_vien").update({ trang_thai: buoc }).eq("id", id);
+  // Nhận việc ghi ngày để tính thời gian tuyển; rời khỏi "Nhận việc" thì xoá ngày; "Không đạt" ghi lý do nếu có.
+  const hom = new Date(Date.now() + 7 * 3600_000).toISOString().slice(0, 10);
+  const du: { trang_thai: string; ngay_nhan_viec?: string | null; ly_do_khong_dat?: string | null } = { trang_thai: buoc };
+  if (buoc === "Nhận việc") du.ngay_nhan_viec = hom;
+  else du.ngay_nhan_viec = null;
+  if (buoc === "Không đạt") du.ly_do_khong_dat = lyDo || null;
+  else du.ly_do_khong_dat = null;
+  const { error } = await createAdminClient().from("ung_vien").update(du).eq("id", id);
   if (error) return { loi: "Chưa đổi được bước. Thử lại sau." };
   xong();
   return { ok: true };

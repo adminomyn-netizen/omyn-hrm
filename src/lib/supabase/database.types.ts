@@ -158,30 +158,30 @@ export type Database = {
       cham_cong: {
         Row: {
           gio_ra: string | null
-          khoang_cach_ra_m: number | null
-          khoang_cach_vao_m: number | null
           gio_vao: string | null
           id: string
+          khoang_cach_ra_m: number | null
+          khoang_cach_vao_m: number | null
           ngay: string
           nhan_vien_id: string
           trang_thai: string
         }
         Insert: {
           gio_ra?: string | null
-          khoang_cach_ra_m?: number | null
-          khoang_cach_vao_m?: number | null
           gio_vao?: string | null
           id?: string
+          khoang_cach_ra_m?: number | null
+          khoang_cach_vao_m?: number | null
           ngay: string
           nhan_vien_id: string
           trang_thai?: string
         }
         Update: {
           gio_ra?: string | null
-          khoang_cach_ra_m?: number | null
-          khoang_cach_vao_m?: number | null
           gio_vao?: string | null
           id?: string
+          khoang_cach_ra_m?: number | null
+          khoang_cach_vao_m?: number | null
           ngay?: string
           nhan_vien_id?: string
           trang_thai?: string
@@ -192,6 +192,60 @@ export type Database = {
             columns: ["nhan_vien_id"]
             isOneToOne: false
             referencedRelation: "nhan_vien"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dang_tin_kenh: {
+        Row: {
+          chi_phi: number
+          ghi_chu: string | null
+          id: string
+          kenh: string
+          link_bai: string | null
+          ngay_dang: string
+          nguoi_dang_id: string | null
+          tao_luc: string
+          tin_tuyen_dung_id: string
+          trang_thai: string
+        }
+        Insert: {
+          chi_phi?: number
+          ghi_chu?: string | null
+          id?: string
+          kenh: string
+          link_bai?: string | null
+          ngay_dang?: string
+          nguoi_dang_id?: string | null
+          tao_luc?: string
+          tin_tuyen_dung_id: string
+          trang_thai?: string
+        }
+        Update: {
+          chi_phi?: number
+          ghi_chu?: string | null
+          id?: string
+          kenh?: string
+          link_bai?: string | null
+          ngay_dang?: string
+          nguoi_dang_id?: string | null
+          tao_luc?: string
+          tin_tuyen_dung_id?: string
+          trang_thai?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dang_tin_kenh_nguoi_dang_id_fkey"
+            columns: ["nguoi_dang_id"]
+            isOneToOne: false
+            referencedRelation: "nhan_vien"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "dang_tin_kenh_tin_tuyen_dung_id_fkey"
+            columns: ["tin_tuyen_dung_id"]
+            isOneToOne: false
+            referencedRelation: "tin_tuyen_dung"
             referencedColumns: ["id"]
           },
         ]
@@ -371,6 +425,98 @@ export type Database = {
           },
         ]
       }
+      ho_so_ca_nhan: {
+        Row: {
+          cap_nhat_boi: string | null
+          cap_nhat_luc: string
+          cccd: string | null
+          dan_toc: string | null
+          dia_chi_hien_tai: string | null
+          dia_chi_thuong_tru: string | null
+          dien_thoai: string | null
+          ghi_chu: string | null
+          gioi_tinh: string | null
+          ma_so_thue: string | null
+          ngan_hang: string | null
+          nganh: string | null
+          ngay_cap_cccd: string | null
+          ngay_sinh: string | null
+          nguoi_than_dien_thoai: string | null
+          nguoi_than_quan_he: string | null
+          nguoi_than_ten: string | null
+          nhan_vien_id: string
+          noi_cap_cccd: string | null
+          so_bhxh: string | null
+          so_tai_khoan: string | null
+          tinh_trang_hon_nhan: string | null
+          ton_giao: string | null
+          trinh_do: string | null
+          truong: string | null
+        }
+        Insert: {
+          cap_nhat_boi?: string | null
+          cap_nhat_luc?: string
+          cccd?: string | null
+          dan_toc?: string | null
+          dia_chi_hien_tai?: string | null
+          dia_chi_thuong_tru?: string | null
+          dien_thoai?: string | null
+          ghi_chu?: string | null
+          gioi_tinh?: string | null
+          ma_so_thue?: string | null
+          ngan_hang?: string | null
+          nganh?: string | null
+          ngay_cap_cccd?: string | null
+          ngay_sinh?: string | null
+          nguoi_than_dien_thoai?: string | null
+          nguoi_than_quan_he?: string | null
+          nguoi_than_ten?: string | null
+          nhan_vien_id: string
+          noi_cap_cccd?: string | null
+          so_bhxh?: string | null
+          so_tai_khoan?: string | null
+          tinh_trang_hon_nhan?: string | null
+          ton_giao?: string | null
+          trinh_do?: string | null
+          truong?: string | null
+        }
+        Update: {
+          cap_nhat_boi?: string | null
+          cap_nhat_luc?: string
+          cccd?: string | null
+          dan_toc?: string | null
+          dia_chi_hien_tai?: string | null
+          dia_chi_thuong_tru?: string | null
+          dien_thoai?: string | null
+          ghi_chu?: string | null
+          gioi_tinh?: string | null
+          ma_so_thue?: string | null
+          ngan_hang?: string | null
+          nganh?: string | null
+          ngay_cap_cccd?: string | null
+          ngay_sinh?: string | null
+          nguoi_than_dien_thoai?: string | null
+          nguoi_than_quan_he?: string | null
+          nguoi_than_ten?: string | null
+          nhan_vien_id?: string
+          noi_cap_cccd?: string | null
+          so_bhxh?: string | null
+          so_tai_khoan?: string | null
+          tinh_trang_hon_nhan?: string | null
+          ton_giao?: string | null
+          trinh_do?: string | null
+          truong?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ho_so_ca_nhan_nhan_vien_id_fkey"
+            columns: ["nhan_vien_id"]
+            isOneToOne: true
+            referencedRelation: "nhan_vien"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       khoi: {
         Row: {
           id: string
@@ -471,42 +617,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      vi_tri_cham_cong: {
-        Row: {
-          ban_kinh_m: number
-          cap_nhat_boi: string | null
-          cap_nhat_luc: string
-          da_xac_nhan: boolean
-          dia_chi: string
-          id: number
-          kinh_do: number
-          ten: string
-          vi_do: number
-        }
-        Insert: {
-          ban_kinh_m?: number
-          cap_nhat_boi?: string | null
-          cap_nhat_luc?: string
-          da_xac_nhan?: boolean
-          dia_chi: string
-          id?: number
-          kinh_do: number
-          ten: string
-          vi_do: number
-        }
-        Update: {
-          ban_kinh_m?: number
-          cap_nhat_boi?: string | null
-          cap_nhat_luc?: string
-          da_xac_nhan?: boolean
-          dia_chi?: string
-          id?: number
-          kinh_do?: number
-          ten?: string
-          vi_do?: number
-        }
-        Relationships: []
       }
       ngay_le: {
         Row: {
@@ -629,6 +739,35 @@ export type Database = {
         }
         Relationships: []
       }
+      nhat_ky_xem_tai_lieu: {
+        Row: {
+          id: number
+          luc: string
+          nguoi_id: string | null
+          tai_lieu_id: string
+        }
+        Insert: {
+          id?: never
+          luc?: string
+          nguoi_id?: string | null
+          tai_lieu_id: string
+        }
+        Update: {
+          id?: never
+          luc?: string
+          nguoi_id?: string | null
+          tai_lieu_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "nhat_ky_xem_tai_lieu_tai_lieu_id_fkey"
+            columns: ["tai_lieu_id"]
+            isOneToOne: false
+            referencedRelation: "tai_lieu_nhan_vien"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quyen_vai_tro: {
         Row: {
           hanh_dong: string
@@ -655,6 +794,68 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "vai_tro"
             referencedColumns: ["ma"]
+          },
+        ]
+      }
+      tai_lieu_nhan_vien: {
+        Row: {
+          da_go: boolean
+          duong_dan: string
+          ghi_chu: string | null
+          go_boi: string | null
+          go_luc: string | null
+          id: string
+          kich_thuoc: number
+          loai: string
+          ly_do_go: string | null
+          mime: string
+          nhan_vien_id: string
+          tai_boi: string | null
+          tao_luc: string
+          ten_tep: string
+          trang_thai: string
+        }
+        Insert: {
+          da_go?: boolean
+          duong_dan: string
+          ghi_chu?: string | null
+          go_boi?: string | null
+          go_luc?: string | null
+          id?: string
+          kich_thuoc: number
+          loai: string
+          ly_do_go?: string | null
+          mime: string
+          nhan_vien_id: string
+          tai_boi?: string | null
+          tao_luc?: string
+          ten_tep: string
+          trang_thai?: string
+        }
+        Update: {
+          da_go?: boolean
+          duong_dan?: string
+          ghi_chu?: string | null
+          go_boi?: string | null
+          go_luc?: string | null
+          id?: string
+          kich_thuoc?: number
+          loai?: string
+          ly_do_go?: string | null
+          mime?: string
+          nhan_vien_id?: string
+          tai_boi?: string | null
+          tao_luc?: string
+          ten_tep?: string
+          trang_thai?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tai_lieu_nhan_vien_nhan_vien_id_fkey"
+            columns: ["nhan_vien_id"]
+            isOneToOne: false
+            referencedRelation: "nhan_vien"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -691,6 +892,47 @@ export type Database = {
         }
         Relationships: []
       }
+      than_nhan: {
+        Row: {
+          cccd: string | null
+          ho_ten: string
+          id: string
+          ngay_sinh: string | null
+          nhan_vien_id: string
+          phu_thuoc: boolean
+          quan_he: string
+          tao_luc: string
+        }
+        Insert: {
+          cccd?: string | null
+          ho_ten: string
+          id?: string
+          ngay_sinh?: string | null
+          nhan_vien_id: string
+          phu_thuoc?: boolean
+          quan_he: string
+          tao_luc?: string
+        }
+        Update: {
+          cccd?: string | null
+          ho_ten?: string
+          id?: string
+          ngay_sinh?: string | null
+          nhan_vien_id?: string
+          phu_thuoc?: boolean
+          quan_he?: string
+          tao_luc?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "than_nhan_nhan_vien_id_fkey"
+            columns: ["nhan_vien_id"]
+            isOneToOne: false
+            referencedRelation: "nhan_vien"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tin_tuyen_dung: {
         Row: {
           created_at: string
@@ -701,6 +943,7 @@ export type Database = {
           so_luong_can: number
           trang_thai: string
           vi_tri: string
+          yeu_cau_id: string | null
         }
         Insert: {
           created_at?: string
@@ -711,6 +954,7 @@ export type Database = {
           so_luong_can?: number
           trang_thai?: string
           vi_tri: string
+          yeu_cau_id?: string | null
         }
         Update: {
           created_at?: string
@@ -721,6 +965,7 @@ export type Database = {
           so_luong_can?: number
           trang_thai?: string
           vi_tri?: string
+          yeu_cau_id?: string | null
         }
         Relationships: [
           {
@@ -728,6 +973,13 @@ export type Database = {
             columns: ["khoi_id"]
             isOneToOne: false
             referencedRelation: "khoi"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tin_tuyen_dung_yeu_cau_id_fkey"
+            columns: ["yeu_cau_id"]
+            isOneToOne: false
+            referencedRelation: "yeu_cau_tuyen_dung"
             referencedColumns: ["id"]
           },
         ]
@@ -740,8 +992,10 @@ export type Database = {
           ho_ten: string
           id: string
           link_cv: string | null
+          ly_do_khong_dat: string | null
           nam_sinh: number | null
           ngay_nhan_ho_so: string
+          ngay_nhan_viec: string | null
           ngay_phong_van: string | null
           nguon: string | null
           tin_tuyen_dung_id: string
@@ -754,8 +1008,10 @@ export type Database = {
           ho_ten: string
           id?: string
           link_cv?: string | null
+          ly_do_khong_dat?: string | null
           nam_sinh?: number | null
           ngay_nhan_ho_so?: string
+          ngay_nhan_viec?: string | null
           ngay_phong_van?: string | null
           nguon?: string | null
           tin_tuyen_dung_id: string
@@ -768,8 +1024,10 @@ export type Database = {
           ho_ten?: string
           id?: string
           link_cv?: string | null
+          ly_do_khong_dat?: string | null
           nam_sinh?: number | null
           ngay_nhan_ho_so?: string
+          ngay_nhan_viec?: string | null
           ngay_phong_van?: string | null
           nguon?: string | null
           tin_tuyen_dung_id?: string
@@ -805,6 +1063,133 @@ export type Database = {
           ten?: string
         }
         Relationships: []
+      }
+      vi_tri_cham_cong: {
+        Row: {
+          ban_kinh_m: number
+          cap_nhat_boi: string | null
+          cap_nhat_luc: string
+          da_xac_nhan: boolean
+          dia_chi: string
+          id: number
+          kinh_do: number
+          ten: string
+          vi_do: number
+        }
+        Insert: {
+          ban_kinh_m?: number
+          cap_nhat_boi?: string | null
+          cap_nhat_luc?: string
+          da_xac_nhan?: boolean
+          dia_chi: string
+          id?: number
+          kinh_do: number
+          ten: string
+          vi_do: number
+        }
+        Update: {
+          ban_kinh_m?: number
+          cap_nhat_boi?: string | null
+          cap_nhat_luc?: string
+          da_xac_nhan?: boolean
+          dia_chi?: string
+          id?: number
+          kinh_do?: number
+          ten?: string
+          vi_do?: number
+        }
+        Relationships: []
+      }
+      yeu_cau_tuyen_dung: {
+        Row: {
+          cap_nhat_luc: string
+          han_can_nhan_su: string | null
+          id: string
+          khoi_id: string | null
+          loai_tuyen: string
+          ly_do_tu_choi: string | null
+          ma: string
+          mo_ta_ngan: string | null
+          muc_luong: string | null
+          ngay_hoan_thanh: string | null
+          ngay_tiep_nhan: string | null
+          nguoi_tiep_nhan_id: string | null
+          nguoi_yeu_cau_id: string | null
+          nguoi_yeu_cau_ten: string
+          so_luong: number
+          tao_luc: string
+          thay_the_cho: string | null
+          trang_thai: string
+          vi_tri: string
+          yeu_cau_chinh: string | null
+        }
+        Insert: {
+          cap_nhat_luc?: string
+          han_can_nhan_su?: string | null
+          id?: string
+          khoi_id?: string | null
+          loai_tuyen?: string
+          ly_do_tu_choi?: string | null
+          ma?: string
+          mo_ta_ngan?: string | null
+          muc_luong?: string | null
+          ngay_hoan_thanh?: string | null
+          ngay_tiep_nhan?: string | null
+          nguoi_tiep_nhan_id?: string | null
+          nguoi_yeu_cau_id?: string | null
+          nguoi_yeu_cau_ten: string
+          so_luong?: number
+          tao_luc?: string
+          thay_the_cho?: string | null
+          trang_thai?: string
+          vi_tri: string
+          yeu_cau_chinh?: string | null
+        }
+        Update: {
+          cap_nhat_luc?: string
+          han_can_nhan_su?: string | null
+          id?: string
+          khoi_id?: string | null
+          loai_tuyen?: string
+          ly_do_tu_choi?: string | null
+          ma?: string
+          mo_ta_ngan?: string | null
+          muc_luong?: string | null
+          ngay_hoan_thanh?: string | null
+          ngay_tiep_nhan?: string | null
+          nguoi_tiep_nhan_id?: string | null
+          nguoi_yeu_cau_id?: string | null
+          nguoi_yeu_cau_ten?: string
+          so_luong?: number
+          tao_luc?: string
+          thay_the_cho?: string | null
+          trang_thai?: string
+          vi_tri?: string
+          yeu_cau_chinh?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "yeu_cau_tuyen_dung_khoi_id_fkey"
+            columns: ["khoi_id"]
+            isOneToOne: false
+            referencedRelation: "khoi"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "yeu_cau_tuyen_dung_nguoi_tiep_nhan_id_fkey"
+            columns: ["nguoi_tiep_nhan_id"]
+            isOneToOne: false
+            referencedRelation: "nhan_vien"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "yeu_cau_tuyen_dung_nguoi_yeu_cau_id_fkey"
+            columns: ["nguoi_yeu_cau_id"]
+            isOneToOne: false
+            referencedRelation: "nhan_vien"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
