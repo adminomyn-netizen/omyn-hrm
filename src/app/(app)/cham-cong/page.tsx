@@ -11,12 +11,14 @@ import {
   layChamCongThang,
   layChamCongKhoang,
   layHoSoChamCong,
+  layViTriChamCong,
   thangHienTaiHCM,
 } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { DongHoHCM } from "@/components/cham-cong/DongHoHCM";
 import { LichChamCongTre } from "@/components/cham-cong/LichChamCongTre";
 import { NutChamCong } from "@/components/cham-cong/NutChamCong";
+import { DatViTriVanPhong } from "@/components/cham-cong/DatViTriVanPhong";
 import { BoLocThoiGian } from "@/components/cham-cong/BoLocThoiGian";
 
 type SuKienCC = { id: string; ngay: string; hoTen: string; khoiTen: string; gioVao: string | null; gioRa: string | null; trangThai: string };
@@ -98,6 +100,7 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
 
   const nguoiDung = await layNguoiDungDaDuyet();
   const { nhanVienId, canChamCong } = await layHoSoChamCong(nguoiDung.id, nguoiDung.vaiTro);
+  const viTri = await layViTriChamCong();
 
   // Nhân viên chỉ thấy chấm công/lịch của CHÍNH MÌNH (chị Lâm chốt 12/10/2026).
   if (nguoiDung.vaiTro === "nhan_vien") {
@@ -111,7 +114,7 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
         {canChamCong ? (
           <section className="grid items-start gap-x-16 gap-y-10 lg:grid-cols-2">
             <DongHoHCM canGiua />
-            <NutChamCong gioVao={homNay?.gio_vao ?? null} gioRa={homNay?.gio_ra ?? null} trangThai={homNay?.trang_thai ?? null} />
+            <NutChamCong gioVao={homNay?.gio_vao ?? null} gioRa={homNay?.gio_ra ?? null} trangThai={homNay?.trang_thai ?? null} banKinhM={viTri.banKinhM} khoaViTri={viTri.daXacNhan} />
           </section>
         ) : (
           <p className="text-[14px] text-muc-3">Chức vụ của bạn không phải chấm công.</p>
@@ -143,7 +146,7 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
         <>
           <section className="grid items-start gap-x-16 gap-y-10 lg:grid-cols-2">
             <DongHoHCM canGiua />
-            <NutChamCong gioVao={homNayCuaToi?.gio_vao ?? null} gioRa={homNayCuaToi?.gio_ra ?? null} trangThai={homNayCuaToi?.trang_thai ?? null} />
+            <NutChamCong gioVao={homNayCuaToi?.gio_vao ?? null} gioRa={homNayCuaToi?.gio_ra ?? null} trangThai={homNayCuaToi?.trang_thai ?? null} banKinhM={viTri.banKinhM} khoaViTri={viTri.daXacNhan} />
           </section>
           <TuanNay suKien={suKienCuaToi} />
         </>
@@ -157,6 +160,9 @@ export default async function TrangChamCong({ searchParams }: { searchParams: Pr
           { nhan: "Vắng mặt", so: String(chamCong.vangMat) },
         ]}
       />
+      <MucTrang tieuDe="Vị trí chấm công">
+        <DatViTriVanPhong ten={viTri.ten} diaChi={viTri.diaChi} banKinhM={viTri.banKinhM} daXacNhan={viTri.daXacNhan} />
+      </MucTrang>
       <KhuVucLich tieuDe="Lịch chấm công" nam={nam} thang={thang} tu={tu} den={den} suKien={suKien} homNay={macDinh} />
       <MucTrang tieuDe="Chấm công hôm nay">
         <Bang cot={cot} duLieu={chamCong.chiTiet} khoa={(d) => d.nhan_vien_ho_ten} trong="Hôm nay chưa ai chấm công." />

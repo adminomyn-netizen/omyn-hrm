@@ -158,6 +158,8 @@ export type Database = {
       cham_cong: {
         Row: {
           gio_ra: string | null
+          khoang_cach_ra_m: number | null
+          khoang_cach_vao_m: number | null
           gio_vao: string | null
           id: string
           ngay: string
@@ -166,6 +168,8 @@ export type Database = {
         }
         Insert: {
           gio_ra?: string | null
+          khoang_cach_ra_m?: number | null
+          khoang_cach_vao_m?: number | null
           gio_vao?: string | null
           id?: string
           ngay: string
@@ -174,6 +178,8 @@ export type Database = {
         }
         Update: {
           gio_ra?: string | null
+          khoang_cach_ra_m?: number | null
+          khoang_cach_vao_m?: number | null
           gio_vao?: string | null
           id?: string
           ngay?: string
@@ -465,6 +471,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      vi_tri_cham_cong: {
+        Row: {
+          ban_kinh_m: number
+          cap_nhat_boi: string | null
+          cap_nhat_luc: string
+          da_xac_nhan: boolean
+          dia_chi: string
+          id: number
+          kinh_do: number
+          ten: string
+          vi_do: number
+        }
+        Insert: {
+          ban_kinh_m?: number
+          cap_nhat_boi?: string | null
+          cap_nhat_luc?: string
+          da_xac_nhan?: boolean
+          dia_chi: string
+          id?: number
+          kinh_do: number
+          ten: string
+          vi_do: number
+        }
+        Update: {
+          ban_kinh_m?: number
+          cap_nhat_boi?: string | null
+          cap_nhat_luc?: string
+          da_xac_nhan?: boolean
+          dia_chi?: string
+          id?: number
+          kinh_do?: number
+          ten?: string
+          vi_do?: number
+        }
+        Relationships: []
       }
       ngay_le: {
         Row: {
