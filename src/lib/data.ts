@@ -1,4 +1,5 @@
 import { hopViTri, tachViTri } from "@/lib/chuc-vu";
+import type { CauHinhViTri } from "@/lib/dinh-vi";
 import { khongCanChamCong } from "@/lib/chuc-danh";
 import { soNgayNghi } from "@/lib/don-tu";
 import "server-only";
@@ -737,4 +738,13 @@ export async function layTongQuanCuaToi(userId: string) {
     donCho: donCho.count ?? 0,
     phieuMoiNhat: phieu[0] ? { tenKy: phieu[0].ky?.ten_ky ?? "", daChi: phieu[0].ky?.trang_thai === "da_chi" } : null,
   };
+}
+
+/** Cấu hình vị trí chấm công (một dòng duy nhất). Đọc bằng khoá máy chủ; bảng chỉ cho phép đọc với người đã đăng nhập. */
+export async function layViTriChamCong(): Promise<CauHinhViTri> {
+  const { data, error } = await createAdminClient().from("vi_tri_cham_cong").select("ten, dia_chi, vi_do, kinh_do, ban_kinh_m, da_xac_nhan").eq("id", 1).maybeSingle();
+  // Bảng chưa được tạo (migration 0011 chưa áp lên DB) = chưa khoá vị trí, để chấm công không hỏng. Mọi lỗi khác vẫn ném ra.
+  if (error && !["42P01", "PGRST205"].includes(error.code)) throw error;
+  if (!data) return { ten: "Văn phòng", diaChi: "", viDo: 0, kinhDo: 0, banKinhM: 100, daXacNhan: false };
+  return { ten: data.ten, diaChi: data.dia_chi, viDo: data.vi_do, kinhDo: data.kinh_do, banKinhM: data.ban_kinh_m, daXacNhan: data.da_xac_nhan };
 }
