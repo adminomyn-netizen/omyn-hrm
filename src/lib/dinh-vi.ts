@@ -3,7 +3,7 @@
 export type ToaDo = { viDo: number; kinhDo: number; doChinhXac: number | null };
 export type CauHinhViTri = { ten: string; diaChi: string; viDo: number; kinhDo: number; banKinhM: number; daXacNhan: boolean };
 
-/** Độ chính xác GPS tối đa (mét) chấp nhận được; kém hơn thì không đủ tin để so với bán kính 100 m. */
+/** Độ chính xác GPS tối đa (mét) chấp nhận được; kém hơn thì không đủ tin để so với bán kính chấm công. */
 export const DO_CHINH_XAC_TOI_DA_M = 100;
 
 const R_TRAI_DAT_M = 6_371_008.8;

@@ -75,13 +75,13 @@ export async function chamCongRa(toaDo: unknown) {
   return {};
 }
 
-/** Chốt vị trí văn phòng = chỗ người bấm đang đứng (Quản trị/Kỹ thuật). Cần GPS đủ chính xác (≤ 50 m); chốt xong bán kính về đúng 100 m (toạ độ ước lượng ban đầu dùng 150 m cho rộng). */
+/** Chốt vị trí văn phòng = chỗ người bấm đang đứng (Quản trị/Kỹ thuật). Cần GPS đủ chính xác (≤ 50 m); chốt xong giữ nguyên bán kính đang cài (hiện 300 m). */
 export async function datViTriChamCong(toaDo: unknown): Promise<{ ok?: true; loi?: string }> {
   if (!(await coVaiTro(["admin", "ky_thuat"]))) return { loi: "Chỉ Quản trị và Kỹ thuật mới đặt được vị trí chấm công." };
   if (!toaDoHopLe(toaDo)) return { loi: "Chưa lấy được vị trí. Bật định vị (GPS) cho trình duyệt rồi thử lại." };
   if (toaDo.doChinhXac === null || toaDo.doChinhXac > 50) return { loi: `Định vị sai lệch ${toaDo.doChinhXac === null ? "chưa rõ" : `khoảng ${Math.round(toaDo.doChinhXac)} m`}, chưa đủ chính xác để chốt vị trí (cần ≤ 50 m). Ra chỗ thoáng hoặc bật "vị trí chính xác" rồi thử lại.` };
   const nguoi = await layNguoiDungHienTai();
-  const { error } = await createAdminClient().from("vi_tri_cham_cong").update({ vi_do: toaDo.viDo, kinh_do: toaDo.kinhDo, ban_kinh_m: 100, da_xac_nhan: true, cap_nhat_luc: new Date().toISOString(), cap_nhat_boi: nguoi?.id ?? null }).eq("id", 1);
+  const { error } = await createAdminClient().from("vi_tri_cham_cong").update({ vi_do: toaDo.viDo, kinh_do: toaDo.kinhDo, da_xac_nhan: true, cap_nhat_luc: new Date().toISOString(), cap_nhat_boi: nguoi?.id ?? null }).eq("id", 1);
   if (error) return { loi: "Chưa lưu được vị trí. Thử lại sau." };
   revalidatePath("/cham-cong");
   return { ok: true };
