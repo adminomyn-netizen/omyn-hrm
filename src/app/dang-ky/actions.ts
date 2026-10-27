@@ -2,13 +2,13 @@
 
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { ngayHomNayHCM } from "@/lib/data";
 
-/** Tự đăng ký (chủ dự án giữ mở, 22/10/2026) — nhưng tài khoản mới CHƯA có
- * quyền gì: không gán vai trò, không tạo hồ sơ nhân viên, không tự gắn theo
- * email (email chưa xác minh, ai cũng gõ được email của người khác). Nhân sự
- * duyệt thì mới gán vai trò và gắn vào hồ sơ. Trong lúc chờ, người đăng ký
- * chỉ thấy trang /cho-duyet. */
+/** Tự đăng ký (chủ dự án chốt 27/10/2026): đăng ký xong có tài khoản dùng được ngay, KHÔNG qua bước duyệt.
+ * Vai trò mặc định là Nhân viên, kèm hồ sơ nhân sự mới ở phòng ban đã chọn (chức danh "Nhân viên");
+ * Kỹ thuật chỉnh vị trí/vai trò sau. Vẫn KHÔNG tự gắn vào hồ sơ có sẵn theo email (email chưa xác minh,
+ * ai cũng gõ được email của người khác): luôn tạo hồ sơ mới, nhân sự gộp nếu trùng. Quyền Quản trị vẫn
+ * chỉ tự có theo vị trí (xem lib/auth.ts), đăng ký không bao giờ cấp được. */
 export async function dangKy(_truoc: { loi?: string } | undefined, formData: FormData) {
   // Ô bẫy máy: người thật không thấy ô này nên không bao giờ điền.
   if (String(formData.get("website") || "") !== "") {
@@ -33,22 +33,21 @@ export async function dangKy(_truoc: { loi?: string } | undefined, formData: For
     return { loi: "Hai mật khẩu chưa khớp nhau." };
   }
 
-  // Phòng ban chỉ là YÊU CẦU để người duyệt xem — không bao giờ dùng để cấp quyền.
+  // Phòng ban chỉ để xếp hồ sơ nhân sự — không bao giờ dùng để cấp quyền.
   const khoiId = String(formData.get("khoi_id") || "");
   const admin = createAdminClient();
   const { data: khoi } = khoiId ? await admin.from("khoi").select("id").eq("id", khoiId).maybeSingle() : { data: null };
   if (!khoi) return { loi: "Bạn chọn phòng ban của mình giúp mình." };
 
-  const { error } = await admin.auth.admin.createUser({
+  const { data: moi, error } = await admin.auth.admin.createUser({
     email,
     password: matKhau,
     email_confirm: true,
-    // KHÔNG có vai_tro: thiếu vai trò = "chờ duyệt", không thấy dữ liệu nào.
-    app_metadata: { ho_ten: hoTen, cho_duyet: true, yeu_cau_khoi_id: khoiId },
+    app_metadata: { ho_ten: hoTen, vai_tro: "nhan_vien", cho_duyet: false, yeu_cau_khoi_id: khoiId },
   });
 
-  if (error) {
-    const daCo = error.message?.toLowerCase().includes("already");
+  if (error || !moi.user) {
+    const daCo = error?.message?.toLowerCase().includes("already");
     return {
       loi: daCo
         ? "Email này đã có tài khoản. Bạn thử đăng nhập, hoặc nhờ Nhân sự đặt lại mật khẩu."
@@ -56,7 +55,14 @@ export async function dangKy(_truoc: { loi?: string } | undefined, formData: For
     };
   }
 
-  const supabase = await createClient();
-  const { error: loiDangNhap } = await supabase.auth.signInWithPassword({ email, password: matKhau });
-  redirect(loiDangNhap ? "/dang-nhap" : "/cho-duyet");
+  const { error: loiHoSo } = await admin
+    .from("nhan_vien")
+    .insert({ ho_ten: hoTen, email, chuc_danh: "Nhân viên", khoi_id: khoi.id, ngay_vao_lam: ngayHomNayHCM(), trang_thai: "Đang làm", user_id: moi.user.id });
+  if (loiHoSo) {
+    // Không để lại tài khoản không có hồ sơ: hoàn tác để người dùng đăng ký lại được.
+    await admin.auth.admin.deleteUser(moi.user.id);
+    return { loi: "Chưa tạo được hồ sơ nhân sự. Bạn thử lại sau ít phút." };
+  }
+
+  redirect("/dang-nhap?dk=1");
 }
