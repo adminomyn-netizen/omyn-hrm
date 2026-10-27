@@ -103,7 +103,7 @@ Tiếng Việt cần `line-height` ≥ 1,5 cho đoạn văn và ≥ 1,1 cho tiê
 
 - **Khoảng cách** thang 4 px (4/8/12/16/24/32/48). Lề trang: 16 px (điện thoại), 48 px (máy tính). Giữa các khu lớn `space-y-10` (40 px).
 - **Bo góc** (token trong `@theme`): `rounded-tag` 5 px (nhãn), `rounded-nho` 8 px (nút, ô nhập, mục menu), `rounded-the` 10 px (thẻ, danh sách thả xuống), `rounded-vua` 12 px (hộp nổi: thông báo, menu người dùng), `rounded-hop` 14 px (popup). Hộp hero tối 14 px. Avatar/chấm tròn dùng `borderRadius: 9999` inline.
-- **Bóng**: mặc định không bóng, tách bằng đường kẻ 1 px `--vien`. Chỉ hộp nổi và popup có bóng: `0 24px 60px rgba(0,0,0,.30)` (popup), `0 14px 32px rgba(42,34,24,.18)` (danh sách thả xuống), `0 18px 40px rgba(42,34,24,.22)` (lịch). Nút vàng có bóng trong nhẹ (`.nut-vang`).
+- **Chiều sâu** (chủ dự án yêu cầu 27/10/2026, theo AMIA OS): thẻ, khu nội dung, bảng dữ liệu, chỉ số, hộp thoại và danh sách thả xuống đều là **thẻ nổi** `.the-noi` — nền chuyển nhẹ, vệt teal mảnh 3 px ở mép trên, bóng nhiều lớp mềm (`--bong-1/2/3`) và vệt sáng viền trên (`--sang-vien`). `.the-noi-thap` cho thẻ tĩnh (bóng nhẹ), `.the-noi-nang` cho thẻ bấm được (nhấc 3 px khi rê chuột), `.the-noi-hop` cho hộp thoại, `.bang-nho` cho menu/danh sách thả xuống (hiện nhanh 140 ms). Bảng `<table>` trong `overflow-x-auto` tự vào thẻ nổi bằng CSS. Vẫn **cấm** `shadow-lg|xl|2xl`, mờ kính, bóng đen nặng.
 - **Biểu tượng**: `lucide-react`, `strokeWidth` 1,5–1,6, cỡ 16/18/19/20 px. Không để trong ô màu tròn làm trang trí. **Cấm emoji.**
 - **Chuyển động**: 150 ms `ease-out` cho màu/độ rộng; tôn trọng `prefers-reduced-motion` (đã có trong `globals.css`). Không hiệu ứng nảy.
 

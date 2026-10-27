@@ -218,7 +218,7 @@ export function DanhSachTuyenDung({
                           setDangKeo(null);
                           setCotDich(null);
                         }}
-                        className={`cursor-grab rounded-[10px] border border-vien bg-giay-sang p-3.5 active:cursor-grabbing ${dangKeo === u.id ? "opacity-40" : ""}`}
+                        className={`cursor-grab the-noi the-noi-thap p-3.5 active:cursor-grabbing ${dangKeo === u.id ? "opacity-40" : ""}`}
                       >
                         <button type="button" onClick={() => setHop({ k: "uv", man: { sua: u } })} className="flex w-full items-center gap-2.5 text-left">
                           <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-nhan-nhat text-[12px] font-semibold text-nhan-dam" style={{ borderRadius: 9999 }}>

@@ -142,7 +142,7 @@ export function HoSoNhanVien({ du, quanTri }: { du: HoSoDayDu; quanTri: boolean 
           <button type="button" className={NUT_PHU} onClick={() => setHop({ k: "than-nhan" })}>+ Thêm người thân</button>
         </div>
         {du.thanNhan.length === 0 ? <p className="text-[13px] text-muc-3">Chưa khai người thân nào. Người phụ thuộc cần khai để giảm trừ gia cảnh khi tính thuế TNCN.</p> : (
-          <ul className="divide-y divide-vien rounded-[10px] border border-vien bg-giay-sang">
+          <ul className="the-noi the-noi-thap divide-y divide-vien overflow-hidden">
             {du.thanNhan.map((t) => (
               <li key={t.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5 text-[13px]">
                 <span><strong className="font-semibold text-muc">{t.ho_ten}</strong> · {t.quan_he}{t.ngay_sinh ? ` · ${ngayVN(t.ngay_sinh)}` : ""} {t.phu_thuoc && <NhanTrangThai kieu="tot">Người phụ thuộc</NhanTrangThai>}</span>
@@ -159,13 +159,13 @@ export function HoSoNhanVien({ du, quanTri }: { du: HoSoDayDu; quanTri: boolean 
         <ul className="mb-5 flex flex-wrap gap-2">
           {GIAY_TO_BAT_BUOC.map((l) => <li key={l}><NhanTrangThai kieu={thieu.includes(l) ? "cho" : "tot"}>{thieu.includes(l) ? `Thiếu: ${l}` : `Có: ${l}`}</NhanTrangThai></li>)}
         </ul>
-        <div className="mb-5 flex flex-wrap items-end gap-3 rounded-[10px] border border-vien bg-giay-sang p-4">
+        <div className="mb-5 flex flex-wrap items-end gap-3 the-noi the-noi-thap p-4">
           <div className="min-w-[220px]"><label htmlFor="h-loai" className={NHAN_O}>Loại giấy tờ</label><Chon id="h-loai" giaTri={loaiTep} onDoi={setLoaiTep} luaChon={LOAI_TAI_LIEU.map((l) => ({ gia_tri: l, nhan: l }))} /></div>
           <div className="min-w-[220px] flex-1"><label htmlFor="h-tep" className={NHAN_O}>Tệp</label><input ref={inputTep} id="h-tep" type="file" accept={MIME_CHO_PHEP.join(",")} className="block h-11 w-full rounded-nho border border-vien-dam bg-giay-sang px-3 py-2 text-[14px] text-muc-2" /></div>
           <button type="button" className={NUT_CHINH} disabled={dangTai} onClick={taiLen}>{dangTai ? "Đang tải lên" : "Tải lên"}</button>
         </div>
         {du.taiLieu.length === 0 ? <p className="text-[13px] text-muc-3">Chưa có giấy tờ nào.</p> : (
-          <ul className="divide-y divide-vien rounded-[10px] border border-vien bg-giay-sang">
+          <ul className="the-noi the-noi-thap divide-y divide-vien overflow-hidden">
             {du.taiLieu.map((t) => (
               <li key={t.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-4 py-3 text-[13px]">
                 <span className="min-w-0">

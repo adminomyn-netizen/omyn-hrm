@@ -62,7 +62,7 @@ export function BangYeuCau({ yeuCau, khoi, quanTri, choGui, trong }: { yeuCau: Y
           {yeuCau.map((y) => {
             const tiep = quanTri ? buocTiepTheoYeuCau(y.trang_thai) : [];
             return (
-              <li key={y.id} className="rounded-[10px] border border-vien bg-giay-sang p-4">
+              <li key={y.id} className="the-noi the-noi-thap p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">

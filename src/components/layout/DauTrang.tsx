@@ -10,8 +10,10 @@ import {
   Clock,
   Inbox,
   Info,
+  LogOut,
   Menu,
   UserCheck,
+  UserCog,
   UserPlus,
   type LucideIcon,
 } from "lucide-react";
@@ -152,7 +154,7 @@ function Chuong() {
         )}
       </button>
       {mo && (
-        <div className="absolute right-0 top-full z-40 mt-2 w-[min(380px,calc(100vw-2rem))] rounded-vua border border-vien bg-giay-sang shadow-[0_8px_24px_rgba(42,34,24,0.12)]">
+        <div className="the-noi bang-nho absolute right-0 top-full z-40 mt-2.5 w-[min(380px,calc(100vw-2rem))] overflow-hidden">
           <div className="flex items-center justify-between border-b border-vien px-4 py-3">
             <span className="text-[14px] font-semibold text-muc">Thông báo</span>
             {chuaDoc > 0 && (
@@ -268,33 +270,45 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
           {chuDau}
         </span>
         <span className="hidden max-w-[160px] truncate text-[14px] font-medium text-muc sm:block">{hoTen}</span>
-        <ChevronDown strokeWidth={1.5} className="hidden h-4 w-4 text-muc-3 sm:block" />
+        <ChevronDown strokeWidth={1.8} className={`hidden h-4 w-4 text-muc-3 transition-transform sm:block ${mo ? "rotate-180" : ""}`} />
       </button>
       {mo && (
-        <div className="absolute right-0 top-full z-40 mt-2 w-64 rounded-vua border border-vien bg-giay-sang py-1 shadow-[0_8px_24px_rgba(42,34,24,0.12)]">
-          <div className="border-b border-vien px-4 py-3">
-            <div className="text-[14px] font-semibold text-muc">{hoTen}</div>
-            <div className="mt-0.5 text-[13px] text-nhan-dam">{viTri}</div>
-            <div className="mt-0.5 truncate text-[12px] text-muc-3">{email}</div>
+        <div role="menu" aria-label="Tài khoản" className="the-noi bang-nho absolute right-0 top-full z-40 mt-2.5 w-[300px] max-w-[calc(100vw-1.5rem)] overflow-hidden">
+          <div className="flex items-center gap-3.5 px-5 pb-4 pt-6">
+            <span className="nut-vang flex h-12 w-12 shrink-0 items-center justify-center text-[18px] font-semibold" style={{ borderRadius: 9999 }}>{chuDau}</span>
+            <div className="min-w-0">
+              <div className="truncate text-[15px] font-semibold text-muc">{hoTen}</div>
+              <div className="mt-0.5 text-[13px] text-nhan-dam">{viTri}</div>
+            </div>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              setMo(false);
-              setSuaHoSo(true);
-            }}
-            className="block w-full px-4 py-2.5 text-left text-[14px] text-muc-2 hover:bg-giay-tram hover:text-muc"
-          >
-            Chỉnh sửa thông tin
-          </button>
-          <button
-            type="button"
-            disabled={dangXuatXong}
-            onClick={() => startXuat(() => dangXuat())}
-            className="block w-full px-4 py-2.5 text-left text-[14px] text-muc-2 hover:bg-giay-tram hover:text-muc disabled:opacity-50"
-          >
-            Đăng xuất
-          </button>
+          <div className="border-t border-vien px-5 py-3">
+            <div className="nhan-muc">Email đăng nhập</div>
+            <div className="mt-0.5 break-all text-[13px] text-muc-2">{email}</div>
+          </div>
+          <div className="border-t border-vien p-2">
+            <button
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setMo(false);
+                setSuaHoSo(true);
+              }}
+              className="muc-bang-nho flex w-full items-center gap-3 rounded-nho px-3 py-2.5 text-left text-[14px] text-muc hover:bg-giay-tram"
+            >
+              <UserCog strokeWidth={1.6} className="h-[18px] w-[18px] text-muc-3" aria-hidden />Chỉnh sửa thông tin
+            </button>
+          </div>
+          <div className="border-t border-vien p-2">
+            <button
+              type="button"
+              role="menuitem"
+              disabled={dangXuatXong}
+              onClick={() => startXuat(() => dangXuat())}
+              className="muc-bang-nho flex w-full items-center gap-3 rounded-nho px-3 py-2.5 text-left text-[14px] text-loi hover:bg-loi-nen disabled:opacity-50"
+            >
+              <LogOut strokeWidth={1.6} className="h-[18px] w-[18px]" aria-hidden />Đăng xuất
+            </button>
+          </div>
         </div>
       )}
       <Hop mo={suaHoSo} dong={() => setSuaHoSo(false)} tieuDe="Thông tin của bạn" moTa={email}>
@@ -309,7 +323,7 @@ export function DauTrang({ hoTen, email, vaiTro, viTri }: { hoTen: string; email
   const pathname = usePathname();
   const tieuDe = menuChinh.find((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"))?.ten ?? "OMYN";
   return (
-    <header className="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between gap-3 border-b border-vien bg-giay-sang px-3 lg:px-8">
+    <header className="dau-trang-omyn sticky top-0 z-30 flex h-[60px] shrink-0 items-center justify-between gap-3 px-3 lg:px-8">
       <div className="flex min-w-0 items-center gap-1.5">
         <button
           type="button"

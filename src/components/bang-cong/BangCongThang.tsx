@@ -97,7 +97,7 @@ export function BangCongThang({ nam, thang, hienTai, dong, ngayLe, soNgay, homNa
         {(nam !== hienTai.nam || thang !== hienTai.thang) && <button type="button" className={NUT_PHU} onClick={() => sang(hienTai.nam, hienTai.thang)}>Tháng này</button>}
       </div>
 
-      <details className="rounded-the border border-vien bg-giay-sang px-4 py-3 text-[14px]">
+      <details className="the-noi the-noi-thap px-4 py-3 text-[14px]">
         <summary className="cursor-pointer font-medium text-muc">Chú thích mã công và cách tính lương</summary>
         <ul className="mt-3 grid gap-x-8 gap-y-2 sm:grid-cols-2">
           {CHU_THICH_CONG.map((c) => (
