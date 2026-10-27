@@ -36,7 +36,7 @@ export function KenhDangTin({ tin, kenh }: { tin: TinTom; kenh: KenhDang[] }) {
   const chep = async () => { try { await navigator.clipboard.writeText(bai); setDaChep(true); } catch { setLoi("Trình duyệt chưa cho sao chép. Bôi đen nội dung rồi nhấn Ctrl+C."); } };
 
   return (
-    <section aria-label="Đăng tin và chi phí" className="rounded-[10px] border border-vien bg-giay-sang p-4">
+    <section aria-label="Đăng tin và chi phí" className="the-noi the-noi-thap p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 className="text-[15px] font-semibold text-muc">Đăng tin và chi phí</h3>

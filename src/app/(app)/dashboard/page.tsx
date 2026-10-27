@@ -135,7 +135,7 @@ export default async function TrangTongQuan() {
       </section>
 
       {/* chỉ số + xu hướng */}
-      <section className="grid grid-cols-2 border-y border-vien lg:grid-cols-4">
+      <section className="the-noi the-noi-thap grid grid-cols-2 overflow-hidden lg:grid-cols-4">
         {chiSo.map((k, i) => (
           <div key={k.nhan} className={`px-5 py-5 lg:px-6 ${i % 2 === 1 ? "border-l border-vien" : ""} ${i >= 2 ? "border-t border-vien lg:border-t-0" : ""} ${i > 0 ? "lg:border-l lg:border-vien" : ""}`}>
             <div className="text-[13px] text-muc-3">{k.nhan}</div>

@@ -6,7 +6,7 @@ const MAU = ["#D7E3E1", "#A7E3D6", "#5FD0BD", "#2AA898", "#14938A", "#0F766E", "
 
 function The({ nhan, so, phu }: { nhan: string; so: string; phu?: string }) {
   return (
-    <div className="rounded-[10px] border border-vien bg-giay-sang p-4">
+    <div className="the-noi the-noi-thap p-4">
       <div className="nhan-muc">{nhan}</div>
       <div className="chu-tieu-de mt-1 text-[30px] leading-none text-muc tabular-nums">{so}</div>
       {phu && <div className="mt-1.5 text-[12px] text-muc-3">{phu}</div>}

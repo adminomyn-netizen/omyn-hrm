@@ -71,7 +71,7 @@ export function Hop({
         role="dialog"
         aria-modal="true"
         aria-label={tieuDe}
-        className={`relative w-full rounded-hop border border-vien bg-giay-sang shadow-[0_24px_60px_rgba(0,0,0,0.30)] ${
+        className={`the-noi the-noi-hop vao w-full ${
           rong === "rong" ? "max-w-3xl" : "max-w-xl"
         }`}
       >

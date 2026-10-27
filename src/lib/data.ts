@@ -33,7 +33,8 @@ const NHAN_VAI_TRO_NGAN = { admin: "Quản trị", ky_thuat: "Kỹ thuật", nha
 /** Dòng "vị trí" hiện trong menu avatar: chức danh · phòng ban (+ vai trò hệ thống nếu là Quản trị/Kỹ thuật). */
 export async function layViTriHienThi(userId: string, vaiTro: keyof typeof NHAN_VAI_TRO_NGAN) {
   const { data } = await createAdminClient().from("nhan_vien").select("chuc_danh, khoi(ten)").eq("user_id", userId).maybeSingle();
-  const phan = [data?.chuc_danh, data?.khoi?.ten, NHAN_VAI_TRO_NGAN[vaiTro]].filter(Boolean) as string[];
+  // Bỏ phần trùng chữ (vd chức danh "Kỹ thuật" trùng vai trò "Kỹ thuật").
+  const phan = [...new Set([data?.chuc_danh, data?.khoi?.ten, NHAN_VAI_TRO_NGAN[vaiTro]].filter(Boolean) as string[])];
   return phan.length ? phan.join(" · ") : "Chưa có hồ sơ nhân sự";
 }
 
