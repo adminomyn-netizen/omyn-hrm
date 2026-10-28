@@ -338,10 +338,6 @@ export function DauTrang({ hoTen, email, vaiTro, viTri }: { hoTen: string; email
           <Menu strokeWidth={1.5} className="h-5 w-5" />
         </button>
         <span className="truncate text-[15px] font-semibold text-muc lg:hidden">{tieuDe}</span>
-        <Link href="/dashboard" className="mr-4 hidden shrink-0 items-center gap-2 lg:flex" aria-label="OMYN, về Tổng quan">
-          <span className="chu-tieu-de text-[26px] leading-none tracking-[0.2em] text-muc">OMYN</span>
-          <span aria-hidden className="h-2 w-2" style={{ background: "var(--gradient-vang)", borderRadius: 9999 }} />
-        </Link>
         <TimKiem vaiTro={vaiTro} />
       </div>
       <div className="flex shrink-0 items-center gap-1">
