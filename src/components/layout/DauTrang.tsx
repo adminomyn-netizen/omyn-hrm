@@ -7,12 +7,12 @@ import {
   Bell,
   CalendarClock,
   ChevronDown,
+  ChevronLeft,
   Clock,
   CircleHelp,
   Inbox,
   Info,
   LogOut,
-  Menu,
   UserCheck,
   UserCog,
   UserPlus,
@@ -25,7 +25,6 @@ import { datChuaDoc, datDemMenu } from "@/lib/dem-menu";
 
 export const SU_KIEN_MO_THONG_BAO = "omyn-mo-thong-bao";
 export const SU_KIEN_MO_TAI_KHOAN = "omyn-mo-tai-khoan";
-import { SU_KIEN_MO_MENU } from "./MobileNav";
 import { Hop } from "@/components/ui/Hop";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 import { dangXuat } from "@/lib/actions";
@@ -325,19 +324,17 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
 /** Đầu trang mỏng 56 px: tiêu đề trang bên trái; bên phải: sáng/tối, thông báo, avatar + tên (bấm vào để sửa thông tin / đăng xuất). */
 export function DauTrang({ hoTen, email, vaiTro, viTri }: { hoTen: string; email: string; vaiTro: VaiTro; viTri: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const tieuDe = menuChinh.find((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"))?.ten ?? "OMYN";
   return (
     <header className="dau-trang-omyn sticky top-0 z-30 flex h-[60px] shrink-0 items-center justify-between gap-3 px-3 lg:h-[68px] lg:px-8">
       <div className="flex min-w-0 items-center gap-1.5">
-        <button
-          type="button"
-          onClick={() => window.dispatchEvent(new Event(SU_KIEN_MO_MENU))}
-          aria-label="Mở menu"
-          className="rounded-nho p-2 text-muc-2 hover:bg-giay-tram hover:text-muc lg:hidden"
-        >
-          <Menu strokeWidth={1.5} className="h-5 w-5" />
-        </button>
-        <span className="truncate text-[15px] font-semibold text-muc lg:hidden">{tieuDe}</span>
+        {pathname !== "/dashboard" && (
+          <button type="button" onClick={() => router.back()} aria-label="Quay lại" className="mr-1 flex h-10 w-10 shrink-0 items-center justify-center border border-vien bg-giay-sang text-muc-2 lg:hidden" style={{ borderRadius: 12 }}>
+            <ChevronLeft strokeWidth={1.8} className="h-5 w-5" aria-hidden />
+          </button>
+        )}
+        <Link href="/dashboard" className="truncate text-[16px] font-semibold text-muc lg:hidden">{tieuDe}</Link>
         <Link href="/dashboard" className="mr-6 hidden shrink-0 items-center gap-2 lg:flex" aria-label="OMYN, về Tổng quan">
           <span className="chu-tieu-de text-[28px] leading-none tracking-[0.2em] text-muc">OMYN</span>
           <span aria-hidden className="h-2 w-2" style={{ background: "var(--gradient-vang)", borderRadius: 9999 }} />
