@@ -1,8 +1,8 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// /api/cron/ không có phiên đăng nhập (do lịch Supabase gọi): mỗi trang tự kiểm mã bí mật, sai là 401.
-const DUONG_DAN_CONG_KHAI = ["/dang-nhap", "/dang-ky", "/api/cron/"];
+// /api/cron/ không có phiên đăng nhập (do lịch Supabase gọi): mỗi trang tự kiểm mã bí mật, sai là 401. /api/chat-agent/cong-cu tự kiểm mã thông hành của từng tin chat.
+const DUONG_DAN_CONG_KHAI = ["/dang-nhap", "/dang-ky", "/api/cron/", "/api/chat-agent/cong-cu"];
 
 export async function capNhatPhien(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });

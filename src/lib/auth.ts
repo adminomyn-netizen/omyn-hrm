@@ -20,6 +20,15 @@ async function laViTriQuanTri(userId: string) {
   return !!data && data.trang_thai !== "Đã nghỉ" && nenLaQuanTri(data.chuc_danh, data.khoi?.ten);
 }
 
+/** Vai trò thật của một tài khoản theo mã người dùng (dùng cho chat nổi, nơi không có phiên trình duyệt): cùng luật với layNguoiDungHienTai. */
+export async function vaiTroCuaNguoi(userId: string): Promise<{ vaiTro: VaiTro; hoTen: string } | null> {
+  const { data } = await createAdminClient().auth.admin.getUserById(userId);
+  const u = data?.user;
+  if (!u) return null;
+  const luu = chuanHoaVaiTro(u.app_metadata?.vai_tro);
+  return { vaiTro: luu === "nhan_vien" && (await laViTriQuanTri(u.id)) ? "admin" : luu, hoTen: (u.app_metadata?.ho_ten as string) || (u.email ?? "") };
+}
+
 /** Mỗi yêu cầu chỉ hỏi Supabase Auth MỘT lần (React cache): layout, trang và hàm bảo vệ dùng chung kết quả. */
 export const layNguoiDungHienTai = cache(async () => {
   const supabase = await createClient();

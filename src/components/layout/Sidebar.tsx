@@ -17,7 +17,7 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
   const [tg, ghiTg] = useLuuTru(KHOA_THU_GON, "0");
   const dem = useDemMenu();
   const thuGon = tg === "1";
-  const nhom = gomTheoNhom(locMenuTheoVaiTro(vaiTro));
+  const nhom = gomTheoNhom(locMenuTheoVaiTro(vaiTro, true));
 
   return (
     <aside
