@@ -21,6 +21,8 @@ import {
   type SaiPham,
 } from "@/lib/don-tu";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { guiChoNguoiDung } from "@/lib/push";
+import { layNguoiQuanLy } from "@/lib/nhac-cong";
 
 // Xem ghi chú đầy đủ trong src/lib/actions.ts: KHÔNG được gọi từ một <form>
 // có nổ sự kiện submit thật — chỉ gọi từ onClick của nút type="button".
@@ -142,6 +144,10 @@ export async function taoDonTu(formData: FormData): Promise<KetQuaDonTu> {
   });
   if (error) return { loi: error.message };
 
+  // Báo người duyệt có đơn mới (không ghi lý do/chi tiết trên màn hình khoá).
+  const [{ data: nguoiNop }, quanLy] = await Promise.all([supabase.from("nhan_vien").select("ho_ten, user_id").eq("id", nhanVienId).maybeSingle(), layNguoiQuanLy()]);
+  await guiChoNguoiDung(quanLy.filter((u) => u !== nguoiNop?.user_id), { tieuDe: "Đơn mới chờ duyệt", noiDung: `${nguoiNop?.ho_ten ?? "Một nhân viên"} vừa gửi đơn ${loai.toLowerCase()}.`, url: "/don-tu", tag: "don-moi" });
+
   revalidatePath("/don-tu");
   return { ok: true };
 }
@@ -185,6 +191,10 @@ export async function duyetDonTu(formData: FormData): Promise<KetQuaDonTu> {
     }
     revalidatePath("/cham-cong");
   }
+
+  // Báo kết quả cho người nộp đơn.
+  const { data: chu } = await supabase.from("nhan_vien").select("user_id").eq("id", don.nhan_vien_id).maybeSingle();
+  if (chu?.user_id) await guiChoNguoiDung([chu.user_id], { tieuDe: hanhDong === "duyet" ? "Đơn đã được duyệt" : "Đơn bị từ chối", noiDung: `Đơn ${don.loai.toLowerCase()} của bạn ${hanhDong === "duyet" ? "đã được duyệt" : "bị từ chối"}.`, url: "/don-tu", tag: `don-kq-${id}` });
 
   revalidatePath("/don-tu");
   revalidatePath("/dashboard");

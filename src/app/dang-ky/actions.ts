@@ -2,6 +2,9 @@
 
 import { redirect } from "next/navigation";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
+import { guiChoNguoiDung } from "@/lib/push";
+import { layNguoiQuanLy } from "@/lib/nhac-cong";
 import { ngayHomNayHCM } from "@/lib/data";
 
 /** Tự đăng ký (chủ dự án chốt 27/10/2026): đăng ký xong có tài khoản dùng được ngay, KHÔNG qua bước duyệt.
@@ -64,5 +67,10 @@ export async function dangKy(_truoc: { loi?: string } | undefined, formData: For
     return { loi: "Chưa tạo được hồ sơ nhân sự. Bạn thử lại sau ít phút." };
   }
 
-  redirect("/dang-nhap?dk=1");
+  // Báo Nhân sự/Kỹ thuật có người mới để bổ sung hồ sơ (vị trí, chức danh, ngày vào làm).
+  await guiChoNguoiDung(await layNguoiQuanLy(), { tieuDe: "Nhân viên mới đăng ký", noiDung: `${hoTen} vừa tự đăng ký. Vào Nhân sự bổ sung hồ sơ.`, url: "/nhan-su", tag: "dang-ky-moi" });
+
+  // Đăng ký xong vào luôn, không bắt gõ lại email/mật khẩu; nếu đăng nhập tự động trục trặc thì về trang đăng nhập như cũ.
+  const { error: loiVao } = await (await createClient()).auth.signInWithPassword({ email, password: matKhau });
+  redirect(loiVao ? "/dang-nhap?dk=1" : "/dashboard");
 }
