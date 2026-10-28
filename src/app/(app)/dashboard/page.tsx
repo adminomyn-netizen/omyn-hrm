@@ -135,19 +135,22 @@ export default async function TrangTongQuan() {
       </section>
 
       {/* chỉ số + xu hướng */}
-      <section className="the-noi the-noi-thap grid grid-cols-2 overflow-hidden lg:grid-cols-4">
-        {chiSo.map((k, i) => (
-          <div key={k.nhan} className={`px-5 py-5 lg:px-6 ${i % 2 === 1 ? "border-l border-vien" : ""} ${i >= 2 ? "border-t border-vien lg:border-t-0" : ""} ${i > 0 ? "lg:border-l lg:border-vien" : ""}`}>
-            <div className="text-[13px] text-muc-3">{k.nhan}</div>
-            <div className="mt-2 flex items-end justify-between gap-3">
-              <div>
-                <div className="text-[32px] font-medium leading-none tabular-nums text-muc">{k.so}</div>
-                <div className={`mt-1.5 text-[12px] ${k.mau}`}>{k.phu}</div>
+      <section className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+        {chiSo.map((k, i) => {
+          const mau = ["luc", "cam", "tim", "xanh"][i % 4];
+          return (
+            <div key={k.nhan} className="min-w-0 rounded-nho border border-vien px-5 py-5" style={{ borderTop: `4px solid var(--sac-${mau}-mau)`, background: `linear-gradient(180deg, var(--sac-${mau}-nen), var(--giay-sang))` }}>
+              <div className="text-[13px] text-muc-2">{k.nhan}</div>
+              <div className="mt-2 flex items-end justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="text-[32px] font-semibold leading-none tabular-nums text-muc">{k.so}</div>
+                  <div className={`mt-1.5 text-[12px] ${k.mau}`}>{k.phu}</div>
+                </div>
+                <DuongXuHuong diem={k.diem} />
               </div>
-              <DuongXuHuong diem={k.diem} />
             </div>
-          </div>
-        ))}
+          );
+        })}
       </section>
 
       {/* khối + tuyển dụng */}
