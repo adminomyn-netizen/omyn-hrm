@@ -22,7 +22,7 @@ export default async function KhungUngDung({ children }: { children: React.React
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <main className="flex-1 px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-6 lg:px-10 lg:py-6">{children}</main>
           <ThanhTabDuoi vaiTro={nguoiDung.vaiTro} />
-          <ChatNoi choPhepSua={nguoiDung.vaiTro === "ky_thuat"} />
+          <ChatNoi choPhepSua={nguoiDung.vaiTro === "ky_thuat"} hoTen={nguoiDung.hoTen} />
         </div>
       </div>
     </div>
