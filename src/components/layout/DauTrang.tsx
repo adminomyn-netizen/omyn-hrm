@@ -285,6 +285,7 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
             <div className="nhan-muc">Email đăng nhập</div>
             <div className="mt-0.5 break-all text-[13px] text-muc-2">{email}</div>
           </div>
+          <ChuyenCheDo />
           <div className="border-t border-vien p-2">
             <button
               type="button"
@@ -337,7 +338,6 @@ export function DauTrang({ hoTen, email, vaiTro, viTri }: { hoTen: string; email
         <TimKiem vaiTro={vaiTro} />
       </div>
       <div className="flex shrink-0 items-center gap-1">
-        <ChuyenCheDo />
         <Chuong />
         <MenuAvatar hoTen={hoTen} email={email} viTri={viTri} />
       </div>
