@@ -27,6 +27,8 @@ export type MucMenu = {
   moTa: string;
   // không khai = mọi vai trò đều thấy
   chiVaiTro?: VaiTro[];
+  /** Chỉ hiện ở menu điện thoại/máy tính bảng; thanh bên của máy tính đã có nút ở đầu trang nên bỏ để khỏi trùng. */
+  chiDiDong?: boolean;
 };
 
 const CHI_QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
@@ -34,7 +36,7 @@ const CHI_QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
 export const menuChinh: MucMenu[] = [
   { ten: "Tổng quan", duong_dan: "/dashboard", nhom: "Chung", icon: LayoutDashboard, moTa: "Ai cũng thấy; nội dung theo từng tài khoản: nhân viên xem việc của mình, quản lý xem số liệu công ty." },
   { ten: "Tổng hợp", duong_dan: "/tong-hop", nhom: "Chung", icon: LayoutGrid, chiVaiTro: CHI_QUAN_LY, moTa: "Việc cần xử lý hôm nay và số liệu theo từng cụm: con người, hằng ngày, tiền lương." },
-  { ten: "Hướng dẫn", duong_dan: "/huong-dan", nhom: "Chung", icon: BookOpen, moTa: "Hướng dẫn riêng cho vai trò của bạn: nhân viên, Quản trị/Hành chính nhân sự hoặc Kỹ thuật." },
+  { ten: "Hướng dẫn", duong_dan: "/huong-dan", nhom: "Chung", icon: BookOpen, chiDiDong: true, moTa: "Hướng dẫn riêng cho vai trò của bạn: nhân viên, Quản trị/Hành chính nhân sự hoặc Kỹ thuật." },
   { ten: "Hồ sơ nhân sự", duong_dan: "/nhan-su", nhom: "Con người", icon: Users, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa hồ sơ nhân viên; cho nghỉ việc." },
   { ten: "Hồ sơ của tôi", duong_dan: "/ho-so-cua-toi", nhom: "Con người", icon: FolderOpen, moTa: "Điền sơ yếu lý lịch, người thân và tải giấy tờ của bạn; HCNS xác nhận." },
   { ten: "Khối và phòng ban", duong_dan: "/khoi", nhom: "Con người", icon: Building2, chiVaiTro: CHI_QUAN_LY, moTa: "Thêm, sửa, xoá khối; xem mỗi khối có bao nhiêu người." },
@@ -49,8 +51,8 @@ export const menuChinh: MucMenu[] = [
   { ten: "Kỹ thuật", duong_dan: "/ky-thuat", nhom: "Quản trị", icon: Activity, chiVaiTro: ["ky_thuat"], moTa: "Tình trạng hệ thống và số dòng dữ liệu. Chỉ tài khoản Kỹ thuật xem được." },
 ];
 
-export function locMenuTheoVaiTro(vaiTro: VaiTro | null): MucMenu[] {
-  return menuChinh.filter((m) => !m.chiVaiTro || (vaiTro && m.chiVaiTro.includes(vaiTro)));
+export function locMenuTheoVaiTro(vaiTro: VaiTro | null, boMucDiDong = false): MucMenu[] {
+  return menuChinh.filter((m) => (!m.chiVaiTro || (vaiTro && m.chiVaiTro.includes(vaiTro))) && !(boMucDiDong && m.chiDiDong));
 }
 
 /** Gom mục menu theo nhóm, giữ thứ tự xuất hiện đầu tiên của nhóm. */
