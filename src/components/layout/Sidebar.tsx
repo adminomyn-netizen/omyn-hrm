@@ -21,33 +21,23 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
 
   return (
     <aside
-      className={`thanh-ben-omyn sticky top-3 m-3 mr-0 hidden h-[calc(100vh-24px)] shrink-0 flex-col self-start rounded-[14px] text-menu-chu transition-[width] duration-150 ease-out lg:flex ${
+      className={`thanh-ben-omyn sticky top-[84px] m-4 mr-0 hidden shrink-0 flex-col self-start rounded-[20px] text-menu-chu transition-[width] duration-150 ease-out lg:flex ${
         thuGon ? "w-[72px]" : "w-[248px]"
       }`}
     >
-      <div className={`flex h-16 shrink-0 items-center ${thuGon ? "justify-center px-2" : "justify-between pl-6 pr-3"}`}>
-        {thuGon ? (
-          <span className="chu-tieu-de text-[26px] tracking-[0.05em] text-menu-sang">O</span>
-        ) : (
-          <>
-            <span className="flex items-center gap-2">
-              <span className="chu-tieu-de text-[30px] leading-none tracking-[0.2em] text-menu-sang">OMYN</span>
-              <span aria-hidden className="h-2 w-2" style={{ background: "var(--gradient-vang)", borderRadius: 9999 }} />
-            </span>
-            <button
-              type="button"
-              onClick={() => ghiTg("1")}
-              title="Thu gọn menu"
-              aria-label="Thu gọn menu"
-              className="rounded-nho p-2 text-menu-chu-phu hover:bg-menu-hover hover:text-menu-sang"
-            >
-              <ChevronsLeft strokeWidth={1.5} className="h-[18px] w-[18px]" />
-            </button>
-          </>
-        )}
+      <div className={`flex shrink-0 px-3 pt-3 ${thuGon ? "justify-center" : "justify-end"}`}>
+        <button
+          type="button"
+          onClick={() => ghiTg(thuGon ? "0" : "1")}
+          title={thuGon ? "Mở rộng menu" : "Thu nhỏ menu"}
+          aria-label={thuGon ? "Mở rộng menu" : "Thu nhỏ menu"}
+          className="rounded-nho p-2 text-menu-chu-phu hover:bg-menu-hover hover:text-menu-sang"
+        >
+          {thuGon ? <ChevronsRight strokeWidth={1.5} className="h-[18px] w-[18px]" /> : <ChevronsLeft strokeWidth={1.5} className="h-[18px] w-[18px]" />}
+        </button>
       </div>
 
-      <nav className="flex-1 space-y-5 overflow-y-auto px-3.5 pb-6 pt-3" aria-label="Menu chính">
+      <nav className="max-h-[calc(100vh-190px)] space-y-5 overflow-y-auto px-3.5 pb-5 pt-2" aria-label="Menu chính">
         {nhom.map((g) => (
           <div key={g.nhom}>
             {thuGon ? (
@@ -86,19 +76,6 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
         ))}
       </nav>
 
-      {thuGon && (
-        <div className="border-t border-menu-vien p-3.5">
-          <button
-            type="button"
-            onClick={() => ghiTg("0")}
-            title="Mở rộng menu"
-            aria-label="Mở rộng menu"
-            className="flex h-10 w-full items-center justify-center rounded-nho text-menu-chu-phu hover:bg-menu-hover hover:text-menu-sang"
-          >
-            <ChevronsRight strokeWidth={1.5} className="h-[18px] w-[18px]" />
-          </button>
-        </div>
-      )}
     </aside>
   );
 }
