@@ -21,7 +21,7 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
 
   return (
     <aside
-      className={`sticky top-0 hidden h-screen shrink-0 flex-col self-start bg-menu text-menu-chu transition-[width] duration-150 ease-out lg:flex ${
+      className={`thanh-ben-omyn sticky top-3 m-3 mr-0 hidden h-[calc(100vh-24px)] shrink-0 flex-col self-start rounded-[14px] text-menu-chu transition-[width] duration-150 ease-out lg:flex ${
         thuGon ? "w-[72px]" : "w-[248px]"
       }`}
     >
@@ -69,9 +69,9 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
                       aria-current={dangChon ? "page" : undefined}
                       className={`group relative flex items-center gap-3 rounded-nho py-2.5 text-[14px] transition-colors ${
                         thuGon ? "justify-center px-0" : "px-2.5"
-                      } ${dangChon ? "bg-menu-chon font-semibold text-menu-sang" : "font-medium text-menu-chu hover:bg-menu-hover hover:text-menu-sang"}`}
+                      } ${dangChon ? "muc-menu-omyn-dang" : "font-medium text-menu-chu hover:bg-menu-hover hover:text-menu-sang"}`}
                     >
-                      <Icon strokeWidth={1.6} className={`h-[19px] w-[19px] shrink-0 ${dangChon ? "text-menu-nhan" : "text-menu-chu-phu group-hover:text-menu-chu"}`} />
+                      <Icon strokeWidth={1.6} className={`h-[19px] w-[19px] shrink-0 ${dangChon ? "" : "text-menu-chu-phu group-hover:text-menu-chu"}`} />
                       {!thuGon && <span className="flex-1 truncate">{muc.ten}</span>}
                       {so > 0 && !thuGon && (
                         <span className="nut-vang min-w-[20px] rounded-[10px] px-1.5 py-px text-center text-[11px] leading-[18px]">{so > 99 ? "99+" : so}</span>
