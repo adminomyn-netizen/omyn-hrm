@@ -2,6 +2,7 @@ import { hopViTri, tachViTri } from "@/lib/chuc-vu";
 import type { CauHinhViTri } from "@/lib/dinh-vi";
 import { khongCanChamCong } from "@/lib/chuc-danh";
 import { soNgayNghi } from "@/lib/don-tu";
+import { NHAN_THIEU, ngayLamViecTruoc, nguoiPhaiChamCong, nhacHienTai, thieuNgayTruoc } from "@/lib/nhac-cong";
 import "server-only";
 import { createAdminClient } from "./supabase/admin";
 
@@ -464,7 +465,7 @@ export async function layThongBao(
     if (!nvId) {
       ra.push({ id: "chua-gan-ho-so", loai: "he_thong", tieuDe: "Chưa gắn hồ sơ nhân sự", noiDung: "Tài khoản của bạn chưa gắn với hồ sơ nhân sự, nên chưa chấm công được. Báo bộ phận Nhân sự.", thoiDiem: new Date().toISOString(), href: "/cham-cong" });
     } else {
-      const [don, cc] = await Promise.all([
+      const [don] = await Promise.all([
         db
           .from("don_tu")
           .select("id, loai, tu_ngay, trang_thai, created_at")
@@ -473,7 +474,6 @@ export async function layThongBao(
           .gte("created_at", muoiBonNgayTruoc)
           .order("created_at", { ascending: false })
           .limit(10),
-        layChamCongHomNayCuaToi(nvId),
       ]);
       for (const d of don.data ?? []) {
         ra.push({
@@ -485,10 +485,31 @@ export async function layThongBao(
           href: "/don-tu",
         });
       }
-      const gio = gioHienTaiHCM();
-      if (!cc?.gio_vao && gio >= "08:30:00") {
-        ra.push({ id: `chua-cham-cong-${ngayHomNayHCM()}`, loai: "cham_cong", tieuDe: "Bạn chưa chấm công hôm nay", noiDung: "Hôm nay chưa có giờ vào. Vào trang Chấm công để chấm công.", thoiDiem: new Date().toISOString(), href: "/cham-cong" });
-      }
+    }
+  }
+
+  // Nhắc chấm công của chính mình (mọi vai trò, miễn là phải chấm công) cộng dồn với việc quản lý ở trên.
+  const homNay2 = ngayHomNayHCM(), g = gioHienTaiHCM(), phutNay = Number(g.slice(0, 2)) * 60 + Number(g.slice(3, 5)), bayGio = new Date().toISOString();
+  const canhan = (await nguoiPhaiChamCong(homNay2, nguoiDung.id))[0];
+  if (canhan) {
+    const nhac = nhacHienTai(canhan, phutNay);
+    // Khung 10 phút nằm trong id: mỗi lần nhắc lại là một thông báo mới, đã đọc lần trước không làm câm lần sau.
+    if (nhac) ra.push({ id: `nhac-${homNay2}-${nhac.khung}`, loai: "cham_cong", tieuDe: nhac.tieuDe, noiDung: nhac.noiDung, thoiDiem: bayGio, href: nhac.url });
+  }
+  const truoc = await ngayLamViecTruoc(homNay2);
+  const thieu = (await thieuNgayTruoc(truoc, nguoiDung.id))[0];
+  if (thieu) ra.push({ id: `quen-${truoc}-${thieu.thieu}`, loai: "cham_cong", tieuDe: "Hôm qua thiếu chấm công", noiDung: `Bạn thiếu ${NHAN_THIEU[thieu.thieu]} ngày ${ngayVN(truoc)}. Gửi đơn Giải trình công để được tính công.`, thoiDiem: bayGio, href: "/don-tu" });
+  if (nguoiDung.vaiTro === "admin" || nguoiDung.vaiTro === "ky_thuat") {
+    if (phutNay >= 9 * 60) {
+      const ds = await nguoiPhaiChamCong(homNay2), chua = ds.filter((n) => !n.vao).length;
+      if (chua > 0) ra.push({ id: `chua-cc-${homNay2}-${chua}`, loai: "cham_cong", tieuDe: "Người chưa chấm công hôm nay", noiDung: `Còn ${chua}/${ds.length} người chưa chấm công vào.`, thoiDiem: bayGio, href: "/bang-cong" });
+    }
+    const { data: th } = await db.from("tong_hop_hieu_suat").select("id, loai, tieu_de, noi_dung, tao_luc").gte("tao_luc", new Date(Date.now() - 370 * 86400_000).toISOString()).order("tao_luc", { ascending: false }).limit(12);
+    const HAN: Record<string, number> = { tuan: 8, thang: 35, nam: 370 }, daCo = new Set<string>();
+    for (const t of th ?? []) {
+      if (daCo.has(t.loai) || Date.now() - Date.parse(t.tao_luc) > HAN[t.loai] * 86400_000) continue;
+      daCo.add(t.loai);
+      ra.push({ id: `th-${t.id}`, loai: "he_thong", tieuDe: t.tieu_de, noiDung: t.noi_dung, thoiDiem: t.tao_luc, href: "/tong-hop" });
     }
   }
 

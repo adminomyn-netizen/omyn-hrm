@@ -18,6 +18,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { ChuyenCheDo } from "./ChuyenCheDo";
+import { BatThongBao } from "./BatThongBao";
 import { TimKiem } from "./TimKiem";
 import { datChuaDoc, datDemMenu } from "@/lib/dem-menu";
 
@@ -285,6 +286,7 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
             <div className="nhan-muc">Email đăng nhập</div>
             <div className="mt-0.5 break-all text-[13px] text-muc-2">{email}</div>
           </div>
+          <BatThongBao />
           <ChuyenCheDo />
           <div className="border-t border-vien p-2">
             <button

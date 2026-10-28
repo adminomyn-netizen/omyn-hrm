@@ -155,6 +155,21 @@ export type Database = {
           },
         ]
       }
+      cau_hinh_bi_mat: {
+        Row: {
+          gia_tri: string
+          khoa: string
+        }
+        Insert: {
+          gia_tri: string
+          khoa: string
+        }
+        Update: {
+          gia_tri?: string
+          khoa?: string
+        }
+        Relationships: []
+      }
       cham_cong: {
         Row: {
           gio_ra: string | null
@@ -195,6 +210,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      dang_ky_thong_bao: {
+        Row: {
+          auth: string
+          endpoint: string
+          gui_cuoi_luc: string | null
+          id: string
+          p256dh: string
+          tao_luc: string
+          thiet_bi: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          endpoint: string
+          gui_cuoi_luc?: string | null
+          id?: string
+          p256dh: string
+          tao_luc?: string
+          thiet_bi?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          endpoint?: string
+          gui_cuoi_luc?: string | null
+          id?: string
+          p256dh?: string
+          tao_luc?: string
+          thiet_bi?: string | null
+          user_id?: string
+        }
+        Relationships: []
       }
       dang_tin_kenh: {
         Row: {
@@ -636,6 +684,27 @@ export type Database = {
         }
         Relationships: []
       }
+      nhac_da_gui: {
+        Row: {
+          gui_luc: string
+          khung: string
+          ngay: string
+          user_id: string
+        }
+        Insert: {
+          gui_luc?: string
+          khung: string
+          ngay: string
+          user_id: string
+        }
+        Update: {
+          gui_luc?: string
+          khung?: string
+          ngay?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       nhan_vien: {
         Row: {
           chuc_danh: string | null
@@ -984,6 +1053,36 @@ export type Database = {
           },
         ]
       }
+      tong_hop_hieu_suat: {
+        Row: {
+          chi_tiet: Json
+          id: string
+          ky: string
+          loai: string
+          noi_dung: string
+          tao_luc: string
+          tieu_de: string
+        }
+        Insert: {
+          chi_tiet?: Json
+          id?: string
+          ky: string
+          loai: string
+          noi_dung: string
+          tao_luc?: string
+          tieu_de: string
+        }
+        Update: {
+          chi_tiet?: Json
+          id?: string
+          ky?: string
+          loai?: string
+          noi_dung?: string
+          tao_luc?: string
+          tieu_de?: string
+        }
+        Relationships: []
+      }
       ung_vien: {
         Row: {
           dien_thoai: string | null
@@ -1196,7 +1295,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      kiem_token_cron: { Args: { p: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

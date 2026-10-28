@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { guiChoNguoiDung } from "@/lib/push";
 import { congChuanTheoKy, tinhLuong, type DauVaoLuong, type ThamSo } from "@/lib/luong/tinh-luong";
 import { layBangCongThang } from "@/lib/bang-cong";
 
@@ -242,6 +243,13 @@ export async function chuyenKyLuong(fd: FormData): Promise<KetQuaLuong> {
   }
   const { error } = await db.from("ky_luong").update({ trang_thai: den, chuyen_luc: new Date().toISOString(), ...(den === "da_chi" ? { da_thanh_toan: true } : {}) }).eq("id", kyId);
   if (error) return { loi: "Chưa chuyển được bước. Thử lại sau." };
+  if (den === "da_duyet" || den === "da_chi") {
+    // Gửi phiếu lương cho từng người (như nút "Gửi bảng lương" bên Lark): thông báo chung chung, không ghi số tiền để khỏi lộ trên màn hình khoá.
+    const [{ data: ky2 }, { data: dong }] = await Promise.all([db.from("ky_luong").select("thang, nam").eq("id", kyId).maybeSingle(), db.from("bang_luong").select("nhan_vien:nhan_vien_id(user_id)").eq("ky_luong_id", kyId)]);
+    const users = (dong ?? []).map((d) => (d.nhan_vien as { user_id?: string | null } | null)?.user_id).filter((u): u is string => !!u);
+    const ky_ = ky2 ? `${String(ky2.thang).padStart(2, "0")}/${ky2.nam}` : "";
+    await guiChoNguoiDung(users, den === "da_duyet" ? { tieuDe: `Phiếu lương tháng ${ky_} đã có`, noiDung: "Mở để xem chi tiết công và các khoản. Thắc mắc báo nhân sự trong 1 ngày làm việc.", url: "/luong", tag: `luong-${kyId}` } : { tieuDe: `Lương tháng ${ky_} đã được chi`, noiDung: "Kiểm tra tài khoản và xem phiếu lương trong OMYN.", url: "/luong", tag: `luong-chi-${kyId}` });
+  }
   lamMoi();
   return { ok: true };
 }
