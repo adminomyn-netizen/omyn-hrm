@@ -238,6 +238,13 @@ body {
 @keyframes hien-nhanh { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 /* Đầu trang: bóng mỏng dưới đường kẻ để tách khỏi nội dung khi cuộn. */
 .dau-trang-omyn { background: linear-gradient(180deg, var(--the-1), var(--the-2)); box-shadow: 0 1px 0 var(--vien), 0 6px 14px -10px rgb(7 51 46 / 0.25); }
+.menu-ngang-omyn { background: var(--gradient-toi); box-shadow: 0 8px 18px -12px rgb(7 51 46 / 0.5); }
+.muc-menu-omyn { color: var(--menu-chu); font-weight: 450; transition: background-color 160ms ease-out, color 160ms ease-out; }
+.muc-menu-omyn svg { color: var(--menu-chu-phu); }
+.muc-menu-omyn:hover { background: var(--menu-chon); color: var(--menu-sang); }
+.muc-menu-omyn-dang { color: #2a1d00; font-weight: 600; background: linear-gradient(135deg, #fcd470 0%, var(--menu-nhan) 100%); box-shadow: 0 4px 14px -6px rgb(251 191 36 / 0.65); }
+.muc-menu-omyn-dang:hover { color: #2a1d00; background: linear-gradient(135deg, #fcd470 0%, var(--menu-nhan) 100%); }
+.muc-menu-omyn-dang svg { color: #2a1d00; }
 .muc-bang-nho { transition: background-color 120ms ease-out, color 120ms ease-out; }
 
 /* Mảng lục đậm có ánh teal, dùng cho panel thương hiệu. */

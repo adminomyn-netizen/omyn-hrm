@@ -8,6 +8,7 @@ import {
   CalendarClock,
   ChevronDown,
   Clock,
+  CircleHelp,
   Inbox,
   Info,
   LogOut,
@@ -337,9 +338,16 @@ export function DauTrang({ hoTen, email, vaiTro, viTri }: { hoTen: string; email
           <Menu strokeWidth={1.5} className="h-5 w-5" />
         </button>
         <span className="truncate text-[15px] font-semibold text-muc lg:hidden">{tieuDe}</span>
+        <Link href="/dashboard" className="mr-4 hidden shrink-0 items-center gap-2 lg:flex" aria-label="OMYN, về Tổng quan">
+          <span className="chu-tieu-de text-[26px] leading-none tracking-[0.2em] text-muc">OMYN</span>
+          <span aria-hidden className="h-2 w-2" style={{ background: "var(--gradient-vang)", borderRadius: 9999 }} />
+        </Link>
         <TimKiem vaiTro={vaiTro} />
       </div>
       <div className="flex shrink-0 items-center gap-1">
+        <Link href="/huong-dan" title="Hướng dẫn sử dụng" className="hidden items-center gap-2 rounded-nho px-3 py-2 text-[14px] text-muc-2 hover:bg-giay-tram hover:text-muc lg:flex">
+          <CircleHelp strokeWidth={1.6} className="h-[18px] w-[18px]" aria-hidden /><span className="hidden xl:inline">Hướng dẫn sử dụng</span>
+        </Link>
         <Chuong />
         <MenuAvatar hoTen={hoTen} email={email} viTri={viTri} />
       </div>
