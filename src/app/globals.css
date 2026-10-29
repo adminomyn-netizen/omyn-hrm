@@ -383,3 +383,20 @@ body {
   .tula-nay, .tula-bong { animation: none !important; }
   .tula-nut:active { transform: none; }
 }
+
+/* Ảnh đại diện tròn theo AMIA: nền dải teal, viền trắng + vòng teal mảnh, bóng nhẹ. */
+.vong-anh {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  border-radius: 50%; overflow: hidden; font-weight: 600; color: var(--chu-tren-vang);
+  background: var(--gradient-vang);
+  box-shadow: 0 0 0 2px var(--giay-sang), 0 0 0 3.5px #0f766e, 0 6px 12px -3px rgb(15 118 110 / 0.45);
+}
+.vong-anh img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+/* Khung điện thoại (như AMIA): cao đúng màn hình, đầu trang + thanh tab dưới đứng yên trong khung, chỉ <main> cuộn.
+ * height 100vh làm dự phòng, dvh theo vùng nhìn thấy thật nên thanh dưới không tụt khi thanh địa chỉ trình duyệt hiện. In ấn trả về cuộn cả trang. */
+@media (max-width: 1023px) {
+  .khung-di-dong { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
+  .noi-dung-cuon { overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+}
+@media print { .khung-di-dong { height: auto; overflow: visible; } .noi-dung-cuon { overflow: visible; } }

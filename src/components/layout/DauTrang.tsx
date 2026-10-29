@@ -267,7 +267,7 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
         aria-expanded={mo}
         className="flex items-center gap-2.5 rounded-nho py-1 pl-1 pr-2 hover:bg-giay-tram"
       >
-        <span className="nut-vang flex h-8 w-8 items-center justify-center text-[13px] font-semibold" style={{ borderRadius: 9999 }}>
+        <span className="vong-anh h-8 w-8 text-[13px]">
           {chuDau}
         </span>
         <span className="hidden max-w-[160px] truncate text-[14px] font-medium text-muc sm:block">{hoTen}</span>
@@ -276,7 +276,7 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
       {mo && (
         <div role="menu" aria-label="Tài khoản" className="the-noi bang-nho absolute right-0 top-full z-40 mt-2.5 w-[300px] max-w-[calc(100vw-1.5rem)] overflow-hidden">
           <div className="flex items-center gap-3.5 px-5 pb-4 pt-6">
-            <span className="nut-vang flex h-12 w-12 shrink-0 items-center justify-center text-[18px] font-semibold" style={{ borderRadius: 9999 }}>{chuDau}</span>
+            <span className="vong-anh h-12 w-12 text-[18px]">{chuDau}</span>
             <div className="min-w-0">
               <div className="truncate text-[15px] font-semibold text-muc">{hoTen}</div>
               <div className="mt-0.5 text-[13px] text-nhan-dam">{viTri}</div>
