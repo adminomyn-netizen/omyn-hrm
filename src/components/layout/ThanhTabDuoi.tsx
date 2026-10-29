@@ -34,7 +34,7 @@ export function ThanhTabDuoi({ vaiTro }: { vaiTro: VaiTro }) {
   return (
     <nav
       aria-label="Điều hướng nhanh"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-vien bg-giay-sang lg:hidden"
+      className="relative z-40 shrink-0 border-t border-vien bg-giay-sang lg:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="grid" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
