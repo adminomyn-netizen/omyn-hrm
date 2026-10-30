@@ -21,6 +21,8 @@ import {
   Megaphone,
   ListChecks,
   Target,
+  TrendingUp,
+  UserMinus,
   type LucideIcon,
 } from "lucide-react";
 import type { VaiTro } from "@/lib/auth";
@@ -212,6 +214,24 @@ export const menuChinh: MucMenu[] = [
     moTa: "Hồ sơ nghỉ việc: checklist bàn giao, chốt công-lương-BHXH, phỏng vấn thôi việc; chưa đủ thì chưa đóng.",
   },
   {
+    ten: "Biến động nhân sự",
+    duong_dan: "/bien-dong-nhan-su",
+    nhom: "Nhân sự",
+    phan: 10,
+    icon: TrendingUp,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Đầu kỳ, vào, ra, cuối kỳ của 12 tháng gần nhất.",
+  },
+  {
+    ten: "Tỷ lệ nghỉ việc",
+    duong_dan: "/ty-le-nghi-viec",
+    nhom: "Nhân sự",
+    phan: 10,
+    icon: UserMinus,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Tỷ lệ nghỉ theo tháng, theo năm và theo khối.",
+  },
+  {
     ten: "Lịch nhân sự",
     duong_dan: "/lich-nhan-su",
     nhom: "Nhân sự",
@@ -401,8 +421,6 @@ export const SAP_CO_NHAN_SU: readonly { phan: number; ten: string }[] = [
   { phan: 7, ten: "Báo cáo công lương" },
   { phan: 7, ten: "Quản lý chi phí" },
   { phan: 7, ten: "BHXH và phụ cấp" },
-  { phan: 10, ten: "Biến động nhân sự" },
-  { phan: 10, ten: "Tỷ lệ nghỉ việc" },
 ];
 
 export type NhomNhanSu = {

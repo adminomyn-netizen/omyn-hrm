@@ -45,6 +45,7 @@ export function DanhSachTuyenDung({
   const sapXep = useMemo(() => [...tin].sort((a, b) => Number(a.trang_thai === "Đã đóng") - Number(b.trang_thai === "Đã đóng")), [tin]);
   const [chonId, setChonId] = useState(tinBanDau && tin.some((t) => t.id === tinBanDau) ? tinBanDau : (sapXep[0]?.id ?? ""));
   const [hop, setHop] = useState<Hop | null>(moDangTuyen ? { k: "tin" } : null);
+  const [nhacTin, setNhacTin] = useState(false);
   const [ghiDe, setGhiDe] = useState<Record<string, string>>({});
   const [dangKeo, setDangKeo] = useState<string | null>(null);
   const [cotDich, setCotDich] = useState<string | null>(null);
@@ -108,13 +109,19 @@ export function DanhSachTuyenDung({
   return (
     <>
       <TieuDeTrang tieuDe="Tuyển dụng" phu={`${soMo} tin đang mở · ${tong} ứng viên · ${dangPv} đang phỏng vấn`}>
-        <button type="button" className={NUT_PHU} disabled={!tinChon} onClick={() => setHop({ k: "uv", man: "them" })}>+ Thêm ứng viên</button>
+        <button type="button" className={NUT_PHU} onClick={() => (tinChon ? setHop({ k: "uv", man: "them" }) : setNhacTin(true))}>+ Thêm ứng viên</button>
         <button type="button" className={NUT_CHINH} onClick={() => setHop({ k: "tin" })}>Đăng tuyển</button>
       </TieuDeTrang>
 
       {tin.length === 0 ? (
         <div className="mx-auto max-w-[620px] py-16 text-center">
           <p className="chu-tieu-de text-[28px] text-muc-3">Chưa có tin tuyển dụng nào.</p>
+          {nhacTin && (
+            <div role="alert" className="mt-4 rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">
+              Mỗi ứng viên thuộc một vị trí đang tuyển. Bấm &ldquo;Đăng tuyển&rdquo; tạo vị trí trước, rồi thêm ứng viên vào đó.
+              <button type="button" className={`${NUT_CHINH} mt-3`} onClick={() => { setNhacTin(false); setHop({ k: "tin" }); }}>Tạo vị trí tuyển dụng</button>
+            </div>
+          )}
           <p className="mt-3 text-[14px] leading-relaxed text-muc-3">
             Tin được tạo từ một yêu cầu tuyển dụng đã tiếp nhận (tab &ldquo;Yêu cầu&rdquo;), hoặc bấm &ldquo;Đăng tuyển&rdquo; để tạo tin trực tiếp.
             Ứng viên không tự nộp vào app này: HCNS nhận CV từ TopCV, Facebook, Zalo… rồi bấm &ldquo;+ Thêm ứng viên&rdquo; để theo dõi từng bước.
