@@ -210,6 +210,7 @@ const coMucMenu = (ma: string) =>
   menuChinh.some((m) => m.duong_dan === `/hr/${ma}`);
 const MAU_NHOM_KHAC: Record<string, number> = { "Lịch & báo cáo nhà nước": 8, "Phê duyệt": 6, "Hồ sơ & hợp đồng": 3, "Công, lương & bảo hiểm": 7 };
 const NHOM_DA_CO = [
+  "Đào tạo",
   "Tuyển dụng",
   "Hợp đồng & thăng tiến",
   "KPI & thi đua",
