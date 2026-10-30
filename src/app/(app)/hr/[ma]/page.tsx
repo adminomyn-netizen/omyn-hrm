@@ -8,6 +8,16 @@ import { yeuCauVaiTro } from "@/lib/auth";
 import { timMucHr } from "@/lib/hr-module";
 import { dbHr, laGiamDocTaiKhoan } from "@/lib/hr-db";
 
+/** Link "← …" đầu trang theo nhóm của mục (mục có quayVe riêng thì dùng cái đó). */
+const GOC_NHOM: Record<string, { href: string; nhan: string }> = {
+  "Tuyển dụng": { href: "/hr", nhan: "Sổ tuyển dụng" },
+  "Kinh doanh": { href: "/hr/gian-hang-san", nhan: "Gian hàng sàn" },
+  "Sản phẩm & Giá": { href: "/hr/san-pham", nhan: "Danh mục sản phẩm" },
+  "Pháp lý & Hồ sơ": { href: "/hr/ho-so-san-pham", nhan: "Hồ sơ theo sản phẩm" },
+  "Tài chính & Kho": { href: "/ton-kho", nhan: "Tồn kho" },
+  "Chiến lược": { href: "/hr/nghien-cuu-thi-truong", nhan: "Nghiên cứu thị trường" },
+};
+
 /** Trang chung cho các mục vận hành HCNS khai trong hr-module.ts (Quản trị/Kỹ thuật). */
 export default async function TrangMucHr({
   params,
@@ -18,6 +28,7 @@ export default async function TrangMucHr({
   const muc = timMucHr(ma);
   if (!muc) notFound();
   const nd = await yeuCauVaiTro(["admin", "ky_thuat"]);
+  const goc = muc.quayVe ?? (ma === "pd-danh-muc" ? { href: "/phe-duyet/lua-chon", nhan: "Lựa chọn trong phiếu" } : GOC_NHOM[muc.nhom]) ?? { href: "/trang-chu-nhan-su", nhan: "Trang chủ Nhân sự" };
   const chiXem = !!muc.chiGiamDocSua && !(await laGiamDocTaiKhoan(nd.id));
   const db = dbHr();
   const [dong, nv, khoi] = await Promise.all([
@@ -51,8 +62,8 @@ export default async function TrangMucHr({
         tieuDe={muc.ten}
         phu={
           <>
-            <Link href={muc.quayVe?.href ?? (muc.nhom === "Kinh doanh" ? "/hr/gian-hang-san" : muc.nhom === "Sản phẩm & Giá" ? "/hr/san-pham" : muc.nhom === "Pháp lý & Hồ sơ" ? "/hr/ho-so-san-pham" : ma === "pd-danh-muc" ? "/phe-duyet/lua-chon" : muc.nhom === "Tuyển dụng" ? "/hr" : "/trang-chu-nhan-su")} className="text-nhan-dam hover:underline">
-              ← {muc.quayVe?.nhan ?? (muc.nhom === "Kinh doanh" ? "Gian hàng sàn" : muc.nhom === "Sản phẩm & Giá" ? "Danh mục sản phẩm" : muc.nhom === "Pháp lý & Hồ sơ" ? "Hồ sơ theo sản phẩm" : ma === "pd-danh-muc" ? "Lựa chọn trong phiếu" : muc.nhom === "Tuyển dụng" ? "Sổ tuyển dụng" : "Trang chủ Nhân sự")}
+            <Link href={goc.href} className="text-nhan-dam hover:underline">
+              ← {goc.nhan}
             </Link>
             <span className="mx-2 text-vien-dam">·</span>
             {muc.moTa}
