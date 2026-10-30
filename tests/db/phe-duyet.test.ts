@@ -131,3 +131,26 @@ describe("Migration 0023: tăng ca, thưởng, sổ đổ phiếu", () => {
     expect(await loiMa(db.query(`insert into public.thuong_hoa_hong (nhan_vien_id, ngay, so_tien) values ($1,'2026-10-30',-1)`, [NV]))).toBe("23514");
   });
 });
+
+describe("Migration 0024: nghỉ việc", () => {
+  let db: PGlite;
+  const NV = u(701);
+  beforeAll(async () => { db = await taoDbVoiMigration(); await db.exec(`insert into auth.users (id) values ('${u(1)}'); insert into public.nhan_vien (id, ho_ten) values ('${NV}','A')`); });
+  it("trình duyệt/khách không đọc được", async () => {
+    for (const b of ["nghi_viec", "nghi_viec_muc"]) {
+      expect(await loiMa(chayVoiTu(db, { sub: u(1) }, `select * from public.${b}`)), b).toBe("42501");
+      expect(await loiMa(chayVoiKhach(db, `select * from public.${b}`)), b).toBe("42501");
+    }
+  });
+  it("mỗi người một hồ sơ đang mở; đóng rồi mở lại được; giá trị lạ bị chặn; xoá nhân sự xoá hồ sơ và mục", async () => {
+    const id = (await db.query<{ id: string }>(`insert into public.nghi_viec (nhan_vien_id, ngay_lam_viec_cuoi) values ($1, current_date + 30) returning id`, [NV])).rows[0].id;
+    expect(await loiMa(db.query(`insert into public.nghi_viec (nhan_vien_id, ngay_lam_viec_cuoi) values ($1, current_date + 30)`, [NV]))).toBe("23505");
+    expect(await loiMa(db.query(`insert into public.nghi_viec (nhan_vien_id, ngay_lam_viec_cuoi, loai) values ($1, current_date, 'Lạ')`, [NV]))).toBe("23514");
+    await db.query(`insert into public.nghi_viec_muc (nghi_viec_id, nhom, ten) values ($1,'Chốt công','x')`, [id]);
+    expect(await loiMa(db.query(`insert into public.nghi_viec_muc (nghi_viec_id, nhom, ten) values ($1,'Chốt công','  ')`, [id]))).toBe("23514");
+    await db.query(`update public.nghi_viec set trang_thai = 'Đã đóng' where id = $1`, [id]);
+    await db.query(`insert into public.nghi_viec (nhan_vien_id, ngay_lam_viec_cuoi) values ($1, current_date + 30)`, [NV]);
+    await db.query(`delete from public.nhan_vien where id = $1`, [NV]);
+    for (const b of ["nghi_viec", "nghi_viec_muc"]) expect((await db.query(`select 1 from public.${b}`)).rows, b).toHaveLength(0);
+  });
+});
