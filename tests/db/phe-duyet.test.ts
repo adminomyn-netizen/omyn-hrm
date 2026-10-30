@@ -154,3 +154,22 @@ describe("Migration 0024: nghỉ việc", () => {
     for (const b of ["nghi_viec", "nghi_viec_muc"]) expect((await db.query(`select 1 from public.${b}`)).rows, b).toHaveLength(0);
   });
 });
+
+describe("Migration 0025: hạn báo cáo nhà nước", () => {
+  let db: PGlite;
+  beforeAll(async () => { db = await taoDbVoiMigration(); await db.exec(`insert into auth.users (id) values ('${u(1)}')`); });
+  it("khởi tạo 3 mục chưa có mốc ngày (chờ xác nhận); trình duyệt/khách không đọc được", async () => {
+    const r = (await db.query<{ n: number; coHan: number }>(`select count(*)::int n, count(han_ngay)::int "coHan" from public.han_bao_cao_nha_nuoc`)).rows[0];
+    expect(r).toEqual({ n: 3, coHan: 0 });
+    expect(await loiMa(chayVoiTu(db, { sub: u(1) }, `select * from public.han_bao_cao_nha_nuoc`))).toBe("42501");
+    expect(await loiMa(chayVoiKhach(db, `select * from public.han_bao_cao_nha_nuoc`))).toBe("42501");
+  });
+  it("chu kỳ/ngày/tháng hợp lệ; hạn một lần chỉ khi chu kỳ Một lần; hằng năm có ngày thì phải có tháng", async () => {
+    await db.query(`insert into public.han_bao_cao_nha_nuoc (ten, chu_ky, han_ngay, han_thang) values ('a','Hằng năm',25,11)`);
+    expect(await loiMa(db.query(`insert into public.han_bao_cao_nha_nuoc (ten, chu_ky) values ('b','Lạ')`))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.han_bao_cao_nha_nuoc (ten, han_ngay) values ('c', 32)`))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.han_bao_cao_nha_nuoc (ten, chu_ky, han_mot_lan) values ('d','Hằng năm','2026-12-01')`))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.han_bao_cao_nha_nuoc (ten, chu_ky, han_ngay) values ('e','Hằng năm',5)`))).toBe("23514");
+    await db.query(`insert into public.han_bao_cao_nha_nuoc (ten, chu_ky, han_mot_lan) values ('f','Một lần','2026-12-01')`);
+  });
+});
