@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { gioHienTaiHCM, ngayHomNayHCM } from "@/lib/data";
 import { guiChoNguoiDung } from "@/lib/push";
 import { NHAN_THIEU, layNguoiQuanLy, nguoiPhaiChamCong, nhacHienTai, ngayLamViecTruoc, thieuNgayTruoc } from "@/lib/nhac-cong";
+import { nhacHr } from "@/lib/nhac-hr-data";
 import { kyCanBaoHomNay, tinhTongHop } from "@/lib/tong-hop-hieu-suat";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ export const maxDuration = 60;
  *  Mỗi người mỗi ngày mỗi khung nhắc đúng một lần (bảng nhac_da_gui), nên chạy lặp hay trễ vài phút cũng không gửi trùng.
  *  · Người phải chấm công: 10 và 5 phút trước 08:00, rồi cứ 10 phút một lần đến khi chấm công vào (dừng lúc 11:05); 10/5 phút trước 17:00 và cứ 10 phút một lần sau 17:00 đến khi chấm công ra (dừng lúc 20:00).
  *  · 08:30: ai thiếu check in/check out ở ngày làm việc trước mà chưa gửi đơn Giải trình công.
+ *  · HCNS & KPI (lib/nhac-hr-data.ts): nhắc phỏng vấn, tóm tắt HCNS sáng, đánh giá thử việc 30/60 ngày, xếp hạng KPI, nhắc nhập KPI.
  *  · Quản lý: 09:00 số người chưa chấm công; tổng hợp hiệu suất tuần (Thứ Hai), tháng (ngày 1), năm (1/1) lúc 08:00. */
 export async function GET(req: Request) {
   const mang = req.headers.get("authorization")?.replace(/^Bearer /, "") ?? "";
@@ -57,6 +59,8 @@ export async function GET(req: Request) {
       if (moi?.length) for (const u of quanLy) await gui(u, `tong_hop_${k.loai}`, { tieuDe: tt.tieuDe, noiDung: "Đã có tổng hợp mới. Mở chuông thông báo để xem số liệu.", url: "/tong-hop" });
     }
   }
+  let hr = 0;
+  try { hr = await nhacHr({ hom, phut, nowMs: Date.now(), gui, layQuanLy: layNguoiQuanLy }); } catch (e) { console.error("[nhac-hr] lỗi", (e as Error).message); }
   await db.from("nhac_da_gui").delete().lt("ngay", new Date(Date.now() - 60 * 86_400_000).toISOString().slice(0, 10));
-  return NextResponse.json({ ngay: hom, phut, canCham: ds.length, daGui });
+  return NextResponse.json({ ngay: hom, phut, canCham: ds.length, daGui, hr });
 }

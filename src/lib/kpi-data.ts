@@ -6,7 +6,7 @@ import { diemCacNguoi, diemCacPhong, xepHang, type ChiTieu, type Chieu, type Die
 
 export const homNayHcm = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
 
-export type NguoiKpiDay = NguoiKpi & { quanLyId: string | null; ma: string | null };
+export type NguoiKpiDay = NguoiKpi & { quanLyId: string | null; ma: string | null; userId: string | null };
 export type Toi = { nhanVienId: string | null; khoiId: string | null; vaiTro: "admin" | "ky_thuat" | "nhan_vien"; hoTen: string; laTruongPhong: boolean; xemToanCongTy: boolean };
 
 /** Sếp, Kỹ thuật và HCNS (đều là vai trò admin/ky_thuat) xem và nhập cho cả công ty. */
@@ -23,26 +23,33 @@ async function docHet<T>(lay: (tu: number, den: number) => PromiseLike<{ data: T
   return ra;
 }
 
-/** Người, chỉ tiêu đang dùng, khối và "tôi là ai" — một lần cho mỗi yêu cầu. */
-export const taiNen = cache(async () => {
-  const nd = await layNguoiDungDaDuyet();
+/** Người, chỉ tiêu đang dùng, khối — không cần phiên đăng nhập (cron dùng chung với trang). */
+export async function docNen() {
   const db = dbHr();
   const [nv, ct, kh] = await Promise.all([
     db.from("nhan_vien").select("id, ho_ten, ma_nhan_vien, khoi_id, quan_ly_id, user_id").neq("trang_thai", "Đã nghỉ").order("ho_ten").limit(2000),
     db.from("kpi_chi_tieu").select("id, khoi_id, ten, don_vi, muc_tieu_ngay, trong_so, chieu").eq("hoat_dong", true).order("tao_luc").limit(500),
     db.from("khoi").select("id, ten").order("ten").limit(200),
   ]);
-  const nguoi: NguoiKpiDay[] = (nv.data ?? []).map((x) => ({ id: x.id, hoTen: x.ho_ten, khoiId: x.khoi_id, quanLyId: x.quan_ly_id, ma: x.ma_nhan_vien }));
+  const nguoi: NguoiKpiDay[] = (nv.data ?? []).map((x) => ({ id: x.id, hoTen: x.ho_ten, khoiId: x.khoi_id, quanLyId: x.quan_ly_id, ma: x.ma_nhan_vien, userId: x.user_id }));
   const chiTieu: (ChiTieu & { donVi: string })[] = (ct.data ?? []).map((x) => ({ id: x.id, khoiId: x.khoi_id, ten: x.ten, donVi: x.don_vi ?? "", mucTieuNgay: Number(x.muc_tieu_ngay), trongSo: x.trong_so, chieu: x.chieu as Chieu }));
   const khoi = new Map<string, string>((kh.data ?? []).map((x) => [x.id, x.ten]));
-  const toiRow = (nv.data ?? []).find((x) => x.user_id === nd.id);
+  return { nguoi, chiTieu, khoi };
+}
+export type Nen = Awaited<ReturnType<typeof docNen>>;
+
+/** Nền + "tôi là ai" — một lần cho mỗi yêu cầu. */
+export const taiNen = cache(async () => {
+  const nd = await layNguoiDungDaDuyet();
+  const nen = await docNen();
+  const toiRow = nen.nguoi.find((x) => x.userId === nd.id);
   const nhanVienId = toiRow?.id ?? null;
   const toi: Toi = {
-    nhanVienId, khoiId: toiRow?.khoi_id ?? null, vaiTro: nd.vaiTro, hoTen: nd.hoTen,
-    laTruongPhong: !!nhanVienId && nguoi.some((n) => n.quanLyId === nhanVienId),
+    nhanVienId, khoiId: toiRow?.khoiId ?? null, vaiTro: nd.vaiTro, hoTen: nd.hoTen,
+    laTruongPhong: !!nhanVienId && nen.nguoi.some((n) => n.quanLyId === nhanVienId),
     xemToanCongTy: QUAN_TRI.has(nd.vaiTro),
   };
-  return { nguoi, chiTieu, khoi, toi };
+  return { ...nen, toi };
 });
 
 /** Những người `toi` được nhập kết quả hộ: quản trị cả công ty; trưởng phòng (người được trỏ quan_ly_id) cho cấp dưới trực tiếp; ai cũng nhập được của chính mình. */
@@ -71,6 +78,10 @@ export type DongPhong = XepHang<{ id: string; ten: string; diem: number; soNguoi
 /** Bảng xếp hạng của một kỳ: phòng, toàn công ty, trong từng phòng, kèm điểm chi tiết từng người (để người đó xem mình hụt ở đâu). */
 export async function bangXepHang(ky: Ky) {
   const nen = await taiNen();
+  return { nen, ...(await tinhBang(nen, ky)) };
+}
+
+export async function tinhBang(nen: Nen, ky: Ky) {
   const kq = await docKetQua(ky.tu, ky.den);
   const diem = diemCacNguoi(nen.nguoi, nen.chiTieu, kq);
   const phong = diemCacPhong(nen.nguoi, diem);
@@ -81,5 +92,5 @@ export async function bangXepHang(ky: Ky) {
   const chiTiet = new Map<string, DiemChiTieu[]>([...diem].map(([id, v]) => [id, v.chiTiet]));
   const soNgayCoBao = new Set(kq.map((r) => r.ngay)).size;
   const daBaoHomNay = (id: string, ngay: string) => kq.some((r) => r.nhanVienId === id && r.ngay === ngay);
-  return { nen, hangPhong, toanCongTy, trongPhong, chiTiet, soNgayCoBao, daBaoHomNay };
+  return { hangPhong, toanCongTy, trongPhong, chiTiet, soNgayCoBao, daBaoHomNay };
 }
