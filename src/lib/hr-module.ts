@@ -38,6 +38,8 @@ export type MucHr = {
   sapXep: { cot: string; giam?: boolean };
   /** Cột ngày để cảnh báo sắp đến hạn (số ngày tới). */
   canhBao?: { cot: string; ngay: number; nhan: string };
+  /** Chỉ vai giám đốc được thêm/sửa/xoá; các vai khác chỉ xem. */
+  chiGiamDocSua?: boolean;
   /** Một câu hướng dẫn khi chưa có dữ liệu. */
   trong: string;
 };
@@ -151,7 +153,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "kpi-thuong", ten: "Khen thưởng thi đua", nhom: "KPI & thi đua", bang: "kpi_thuong", tieuDe: "pham_vi",
+    ma: "kpi-thuong", ten: "Khen thưởng thi đua", nhom: "KPI & thi đua", bang: "kpi_thuong", tieuDe: "pham_vi", chiGiamDocSua: true,
     moTa: "Phần thưởng cho hạng 1-2-3 theo tháng/quý, cho phòng, cá nhân trong phòng và cá nhân toàn công ty.",
     sapXep: { cot: "tao_luc" }, trong: "Chưa có mức thưởng. Thêm mức cho hạng 1 của tháng.",
     cot: [

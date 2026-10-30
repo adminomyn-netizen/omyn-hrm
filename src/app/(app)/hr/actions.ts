@@ -2,22 +2,23 @@
 
 import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
-import { dbHr } from "@/lib/hr-db";
+import { dbHr, laGiamDocTaiKhoan } from "@/lib/hr-db";
 import { chuanHoaGiaTri, timMucHr } from "@/lib/hr-module";
 
 export type KetQuaHr = { loi?: string; ok?: boolean };
 const KHONG_QUYEN: KetQuaHr = { loi: "Bạn không có quyền thực hiện thao tác này." };
 
 /** Chỉ Quản trị/Kỹ thuật (phòng HCNS) được sửa dữ liệu vận hành HCNS. Cột lấy từ cấu hình, không nhận cột lạ từ trình duyệt. */
-async function nguoiQuanTri() {
+async function nguoiQuanTri(chiGiamDoc = false) {
   const nd = await layNguoiDungHienTai();
-  return nd && (nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat") ? nd : null;
+  if (!nd || !(nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat")) return null;
+  return chiGiamDoc && !(await laGiamDocTaiKhoan(nd.id)) ? null : nd;
 }
 
 export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
-  if (!(await nguoiQuanTri())) return KHONG_QUYEN;
   const muc = timMucHr(String(fd.get("ma") ?? ""));
   if (!muc) return { loi: "Không tìm thấy mục này." };
+  if (!(await nguoiQuanTri(muc.chiGiamDocSua))) return muc.chiGiamDocSua ? { loi: "Chỉ giám đốc được nhập hoặc sửa mục này." } : KHONG_QUYEN;
   const id = String(fd.get("id") ?? "");
   if (id && !/^[0-9a-f-]{36}$/i.test(id)) return { loi: "Bản ghi không hợp lệ." };
   const dong: Record<string, string | number | boolean | null> = {};
@@ -34,9 +35,9 @@ export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
 }
 
 export async function xoaBanGhiHr(ma: string, id: string): Promise<KetQuaHr> {
-  if (!(await nguoiQuanTri())) return KHONG_QUYEN;
   const muc = timMucHr(ma);
   if (!muc || !/^[0-9a-f-]{36}$/i.test(id)) return { loi: "Bản ghi không hợp lệ." };
+  if (!(await nguoiQuanTri(muc.chiGiamDocSua))) return muc.chiGiamDocSua ? { loi: "Chỉ giám đốc được xoá mục này." } : KHONG_QUYEN;
   const { error } = await dbHr().from(muc.bang).delete().eq("id", id);
   if (error) return { loi: "Chưa xoá được." };
   revalidatePath(`/hr/${muc.ma}`); revalidatePath("/hr");

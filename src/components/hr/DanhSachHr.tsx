@@ -41,7 +41,7 @@ function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string
 }
 
 /** Thẻ danh sách + hộp thoại thêm/sửa cho mọi mục HR khai trong hr-module.ts. Thẻ gọn trên điện thoại, 2–3 cột trên máy tính. */
-export function DanhSachHr({ muc, dong, nv, khoi, tc = {} }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]> }) {
+export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]>; chiXem?: boolean }) {
   const [tim, setTim] = useState("");
   const [loc, setLoc] = useState("");
   const [sua, setSua] = useState<Dong | "moi" | null>(null);
@@ -69,7 +69,7 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {} }: { muc: MucHr; dong:
           <Search strokeWidth={1.6} className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muc-3" />
           <input value={tim} onChange={(e) => setTim(e.target.value)} placeholder="Tìm nhanh…" aria-label="Tìm trong danh sách" className={`${O_NHAP} pl-9`} />
         </div>
-        <button type="button" onClick={() => setSua("moi")} className={`${NUT_CHINH} ml-auto flex items-center gap-1.5`}><Plus strokeWidth={1.8} className="h-4 w-4" />Thêm mới</button>
+        {chiXem ? <span className="ml-auto text-[13px] text-muc-3">Chỉ xem — {muc.chiGiamDocSua ? "chỉ giám đốc nhập/sửa" : "bạn không có quyền sửa"}</span> : <button type="button" onClick={() => setSua("moi")} className={`${NUT_CHINH} ml-auto flex items-center gap-1.5`}><Plus strokeWidth={1.8} className="h-4 w-4" />Thêm mới</button>}
       </div>
       {cotTT?.luaChon && (
         <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label="Lọc theo trạng thái">
@@ -89,7 +89,7 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {} }: { muc: MucHr; dong:
             const sapDen = ngayCB !== null && ngayCB >= 0 && ngayCB <= muc.canhBao!.ngay;
             return (
               <li key={d.id}>
-                <button type="button" onClick={() => setSua(d)} className="the-noi group flex h-full w-full flex-col gap-3 rounded-nho border border-vien bg-giay-sang p-4 text-left transition-shadow hover:[box-shadow:var(--bong-2)]">
+                <button type="button" onClick={() => !chiXem && setSua(d)} disabled={chiXem} className={`the-noi group flex h-full w-full flex-col gap-3 rounded-nho border border-vien bg-giay-sang p-4 text-left transition-shadow hover:[box-shadow:var(--bong-2)] ${chiXem ? "cursor-default" : ""}`}>
                   <div className="flex items-start justify-between gap-3">
                     <h3 className="min-w-0 text-[16px] font-semibold leading-snug text-muc">{hienGiaTri(cotTieuDe, d, nvMap, khoiMap, tcMap) || "(chưa đặt tên)"}</h3>
                     <Pencil strokeWidth={1.6} className="mt-1 h-4 w-4 shrink-0 text-muc-3 opacity-0 transition-opacity group-hover:opacity-100" />
