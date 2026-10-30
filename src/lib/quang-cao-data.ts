@@ -54,3 +54,44 @@ export async function bangQuangCao(nt: NenTang, tu: string, den: string, cap: { 
     khoa: trangThaiKhoa(process.env),
   };
 }
+
+type SoLieuNen = { chi_tieu: number | string; don: number | string; doanh_thu: number | string };
+const cong = (ds: SoLieuNen[]) => ds.reduce<{ chiTieu: number; don: number; doanhThu: number }>((a, x) => ({ chiTieu: a.chiTieu + Number(x.chi_tieu), don: a.don + Number(x.don), doanhThu: a.doanhThu + Number(x.doanh_thu) }), { chiTieu: 0, don: 0, doanhThu: 0 });
+
+/** Đọc hết một bảng số liệu ngày trong khoảng (từng trang 1000 dòng). */
+async function docTrang(bang: string, cot: string, tu: string, den: string, cotNgay = "ngay") {
+  const db = dbHr(), ra: Record<string, string | number>[] = [];
+  for (let i = 0; i < 200_000; i += 1000) {
+    const { data } = await db.from(bang).select(cot).gte(cotNgay, tu).lte(cotNgay, den).order(cotNgay).range(i, i + 999);
+    ra.push(...((data ?? []) as unknown as Record<string, string | number>[]));
+    if (!data || data.length < 1000) break;
+  }
+  return ra;
+}
+
+/** Số liệu Shopee theo ngày (doanh thu, đơn, quảng cáo) cho các gian hàng trong khoảng. */
+export async function bangShopee(tu: string, den: string) {
+  const db = dbHr();
+  const [sl, gh, ls] = await Promise.all([
+    docTrang("qc_shopee_so_lieu_ngay", "gian_hang_id, ngay, so_don, don_huy, doanh_thu, chi_phi_qc, hien_thi_qc, nhap_qc, don_tu_qc, doanh_thu_tu_qc", tu, den),
+    db.from("qc_shopee_gian_hang").select("id, ten").order("ten").limit(100),
+    db.from("qc_nhat_ky_dong_bo").select("trang_thai, bat_dau, so_dong, ghi_chu").eq("nen_tang", "Shopee").order("bat_dau", { ascending: false }).limit(1),
+  ]);
+  const tong = sl.reduce<Record<"soDon" | "donHuy" | "doanhThu" | "chiPhiQc" | "hienThi" | "nhap" | "donQc" | "doanhThuQc", number>>((a, x) => ({ soDon: a.soDon + Number(x.so_don), donHuy: a.donHuy + Number(x.don_huy), doanhThu: a.doanhThu + Number(x.doanh_thu), chiPhiQc: a.chiPhiQc + Number(x.chi_phi_qc), hienThi: a.hienThi + Number(x.hien_thi_qc), nhap: a.nhap + Number(x.nhap_qc), donQc: a.donQc + Number(x.don_tu_qc), doanhThuQc: a.doanhThuQc + Number(x.doanh_thu_tu_qc) }), { soDon: 0, donHuy: 0, doanhThu: 0, chiPhiQc: 0, hienThi: 0, nhap: 0, donQc: 0, doanhThuQc: 0 });
+  const theoGianHang = (gh.data ?? []).map((g) => { const r = sl.filter((x) => x.gian_hang_id === g.id); return { id: g.id as string, ten: g.ten as string, soDon: r.reduce((a, x) => a + Number(x.so_don), 0), doanhThu: r.reduce((a, x) => a + Number(x.doanh_thu), 0), chiPhiQc: r.reduce((a, x) => a + Number(x.chi_phi_qc), 0) }; });
+  return { tong, theoGianHang, theoNgay: sl.map((x) => ({ ngay: String(x.ngay), doanhThu: Number(x.doanh_thu), chiTieu: Number(x.chi_phi_qc) })), lanCuoi: (ls.data?.[0] ?? null) as { trang_thai: string; bat_dau: string; so_dong: number; ghi_chu: string | null } | null, khoa: trangThaiKhoa(process.env) };
+}
+
+/** Bảng so sánh ba nền tảng trong khoảng: chi tiêu quảng cáo, đơn và doanh thu TỪ QUẢNG CÁO (cùng một thước đo để so sánh được). */
+export async function tongQuanNenTang(tu: string, den: string) {
+  const [fb, tt, sp] = await Promise.all([
+    docTrang("qc_meta_so_lieu", "chi_tieu, don_mua, doanh_thu", tu, den),
+    docTrang("qc_tiktok_so_lieu", "chi_tieu, chuyen_doi, doanh_thu", tu, den),
+    docTrang("qc_shopee_so_lieu_ngay", "chi_phi_qc, don_tu_qc, doanh_thu_tu_qc, so_don, doanh_thu", tu, den),
+  ]);
+  const f = cong(fb.map((x) => ({ chi_tieu: x.chi_tieu, don: x.don_mua, doanh_thu: x.doanh_thu })));
+  const t = cong(tt.map((x) => ({ chi_tieu: x.chi_tieu, don: x.chuyen_doi, doanh_thu: x.doanh_thu })));
+  const s = cong(sp.map((x) => ({ chi_tieu: x.chi_phi_qc, don: x.don_tu_qc, doanh_thu: x.doanh_thu_tu_qc })));
+  const caGianHang = sp.reduce<{ don: number; doanhThu: number }>((a, x) => ({ don: a.don + Number(x.so_don), doanhThu: a.doanhThu + Number(x.doanh_thu) }), { don: 0, doanhThu: 0 });
+  return { facebook: f, tiktok: t, shopee: s, shopeeCaGianHang: caGianHang, khoa: trangThaiKhoa(process.env) };
+}
