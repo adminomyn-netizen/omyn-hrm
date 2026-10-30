@@ -60,8 +60,8 @@ export default async function TrangOnboarding() {
         tieuDe="Onboarding & thử việc"
         phu={
           <>
-            <Link href="/hr" className="text-nhan-dam hover:underline">
-              ← Kế hoạch tuyển dụng
+            <Link href="/trang-chu-nhan-su" className="text-nhan-dam hover:underline">
+              ← Trang chủ Nhân sự
             </Link>
             <span className="mx-2 text-vien-dam">·</span>Từ ngày nhận offer tới
             hết 60 ngày thử việc
