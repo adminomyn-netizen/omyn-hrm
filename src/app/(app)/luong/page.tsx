@@ -4,7 +4,9 @@ import { redirect } from "next/navigation";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { QuanLyLuong } from "@/components/luong/QuanLyLuong";
 import { PhieuLuongCuaToi, type PhieuView } from "@/components/luong/PhieuLuongCuaToi";
-import { layDongLuongCuaKy, layKyLuong, layNhanVienIdTheoUser, layPhieuLuongCuaToi, layThamSoLuong, layThoaThuanLuong } from "@/lib/data";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { phepNamDuoc } from "@/lib/quy-phep";
+import { layPhepNamDaDung, layDongLuongCuaKy, layKyLuong, layNhanVienIdTheoUser, layPhieuLuongCuaToi, layThamSoLuong, layThoaThuanLuong } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { THAM_SO_MAC_DINH, type ThamSo } from "@/lib/luong/tinh-luong";
 import type { DongLuongView } from "@/components/luong/ChiTietDongLuong";
@@ -22,9 +24,18 @@ export default async function TrangLuong({ searchParams }: { searchParams: Promi
       hoa_hong: Number(d.hoa_hong), thuong_khac: Number(d.thuong_khac), tong_thu_nhap: Number(d.tong_thu_nhap), bh_xh: Number(d.bh_xh), bh_yt: Number(d.bh_yt), bh_tn: Number(d.bh_tn),
       thue_tncn: Number(d.thue_tncn), khau_tru_khac: Number(d.khau_tru_khac), thuc_linh: Number(d.thuc_linh),
     }));
+    const nam = Number(new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }).slice(0, 4));
+    const phep = nvId
+      ? await (async () => {
+          const { data } = await createAdminClient().from("nhan_vien").select("ngay_vao_lam").eq("id", nvId).maybeSingle();
+          const duoc = phepNamDuoc(data?.ngay_vao_lam ?? null, nam);
+          return { nam, duoc, con: duoc - (await layPhepNamDaDung(nvId, nam)) };
+        })()
+      : null;
     return (
       <div className="space-y-10">
         <TieuDeTrang tieuDe="Phiếu lương" phu="Phiếu lương các kỳ đã duyệt của bạn" />
+        {phep && <p className="max-w-xl text-[14px] text-muc-2">Phép năm {phep.nam}: còn <strong className="text-muc">{phep.con}</strong> trên {phep.duoc} ngày.</p>}
         <PhieuLuongCuaToi ds={phieu} />
       </div>
     );

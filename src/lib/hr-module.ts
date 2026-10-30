@@ -305,6 +305,30 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
     ],
   },
+  {
+    ma: "tang-ca", ten: "Giờ tăng ca", nhom: "Công, lương & bảo hiểm", bang: "tang_ca", tieuDe: "nhan_vien_id",
+    moTa: "Giờ làm thêm đã xác nhận, tự có khi phiếu “xác nhận làm thêm giờ” được duyệt; nhập tay ở đây khi cần bổ sung. Cuối tháng tự cộng vào bảng lương theo ngày thường/nghỉ tuần/lễ. Giới hạn giờ theo tham số lương (chờ kế toán/luật sư xác nhận).",
+    sapXep: { cot: "ngay", giam: true }, trong: "Chưa có giờ tăng ca nào.",
+    cot: [
+      { k: "nhan_vien_id", nhan: "Nhân sự", kieu: "nv", batBuoc: true, the: true },
+      { k: "ngay", nhan: "Ngày", kieu: "ngay", batBuoc: true, the: true },
+      { k: "so_gio", nhan: "Số giờ (0,5 - 12)", kieu: "so", batBuoc: true, mac: 1, khoang: [1, 12], the: true },
+      { k: "loai_ngay", nhan: "Loại ngày", kieu: "chon", luaChon: ["Ngày thường", "Ngày nghỉ tuần", "Ngày lễ"], mac: "Ngày thường", the: true },
+      { k: "ly_do", nhan: "Lý do", kieu: "chu", rong: true },
+    ],
+  },
+  {
+    ma: "thuong-hoa-hong", ten: "Thưởng, hoa hồng, phụ cấp khác", nhom: "Công, lương & bảo hiểm", bang: "thuong_hoa_hong", tieuDe: "nhan_vien_id",
+    moTa: "Khoản thưởng, hoa hồng, phụ cấp khác theo ngày phát sinh; khi lập bảng lương của tháng đó sẽ tự cộng vào dòng lương (hoa hồng riêng, thưởng và phụ cấp khác gộp “thưởng khác”).",
+    sapXep: { cot: "ngay", giam: true }, trong: "Chưa có khoản thưởng/hoa hồng nào.",
+    cot: [
+      { k: "nhan_vien_id", nhan: "Nhân sự", kieu: "nv", batBuoc: true, the: true },
+      { k: "ngay", nhan: "Ngày phát sinh", kieu: "ngay", batBuoc: true, the: true },
+      { k: "loai", nhan: "Loại", kieu: "chon", luaChon: ["Thưởng", "Hoa hồng", "Phụ cấp khác"], mac: "Thưởng", the: true },
+      { k: "so_tien", nhan: "Số tiền (đ)", kieu: "tien", batBuoc: true, mac: 0, the: true },
+      { k: "ly_do", nhan: "Lý do", kieu: "chu", rong: true },
+    ],
+  },
 ];
 
 export const timMucHr = (ma: string) => HR_MUC.find((m) => m.ma === ma);

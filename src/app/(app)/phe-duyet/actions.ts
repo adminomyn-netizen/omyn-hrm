@@ -11,6 +11,7 @@ import {
   type HanhDongDuyet, type HangLuong, type O,
 } from "@/lib/phe-duyet";
 import { mauTheoMa } from "@/lib/phe-duyet-mau";
+import { apDungPhieuDaDuyet, kiemTangCaTruocNop } from "@/lib/phe-duyet-ap-dung-data";
 import {
   COT_PHIEU, KHO_TEP, baoNguoiDung, baoTheoCauHinh, mauHieuLuc, docDanhMuc, docLuong, docNhomMa, docO, ghiO, nguCanhNguoiDuyet, nhanVienCuaTaiKhoan, type PhieuTho,
 } from "@/lib/phe-duyet-data";
@@ -107,6 +108,10 @@ export async function nopPhieu(ma: string, du: Record<string, unknown>, tep: Tep
   if (Object.keys(loi).length > 0) return { loi: "Kiểm tra lại các ô báo đỏ.", loiO: loi };
   const loiTep = await kiemTepMoi(tep, nd.id);
   if (loiTep) return { loi: loiTep };
+  if (ma === "xac-nhan-lam-them-gio") {
+    const loiTc = await kiemTangCaTruocNop(nguoiNop.id, sach);
+    if (loiTc) return { loi: loiTc };
+  }
 
   const nhomMa = nhom?.nhom ?? mau.nhomMacDinh;
   const homNay = ngayHomNayHCM();
@@ -171,6 +176,7 @@ export async function xuLyPhieu(id: string, hanhDong: HanhDongDuyet, ghiChu: str
   if (!cas || cas.length === 0) return { loi: "Phiếu vừa được người khác xử lý, tải lại trang để xem." };
   await ghiO(o, kq.o, luc, { oId: q.oDuyet.id, yKien: ghiChu.trim() || null });
   await lichSu(id, p.buoc_hien_tai, nd.id, nd.hoTen, hanhDong, ghiChu);
+  if (kq.trangThai === "Đã duyệt") await apDungPhieuDaDuyet(id, { id: nd.id, hoTen: nd.hoTen });
 
   const mau = mauTheoMa(p.ma_phieu);
   const nguoiNopUser = await userCuaNhanVien(p.nguoi_nop_id);
@@ -211,6 +217,10 @@ export async function nopLaiPhieu(id: string, du: Record<string, unknown>, tep: 
   if (Object.keys(loi).length > 0) return { loi: "Kiểm tra lại các ô báo đỏ.", loiO: loi };
   const loiTep = await kiemTepMoi(tep, nd.id);
   if (loiTep) return { loi: loiTep };
+  if (p.ma_phieu === "xac-nhan-lam-them-gio" && nv) {
+    const loiTc = await kiemTangCaTruocNop(nv.id, sach);
+    if (loiTc) return { loi: loiTc };
+  }
   const loiLuu = await luuTep(id, tep);
   if (loiLuu) return { loi: loiLuu };
 

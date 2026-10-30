@@ -64,9 +64,28 @@ export default async function TrangHr() {
           {HR_MUC.map((m, i) => m.nhom !== "KPI & thi đua" ? null : <Muc key={m.ma} href={`/hr/${m.ma}`} Icon={ICON[m.ma] ?? Target} ten={m.ten} moTa={m.moTa} so={soMuc[i]} />)}
         </ul>
       </section>
+      {NHOM_KHAC.map((nhom, k) => (
+        <section key={nhom} aria-label={nhom} className="mt-8">
+          <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">{5 + k} · {nhom}</h2>
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+            {(LIEN_KET_THEM[nhom] ?? []).map((l) => <Muc key={l.href} href={l.href} Icon={l.Icon} ten={l.ten} moTa={l.moTa} />)}
+            {HR_MUC.map((m, i) => m.nhom !== nhom ? null : <Muc key={m.ma} href={`/hr/${m.ma}`} Icon={ICON[m.ma] ?? Target} ten={m.ten} moTa={m.moTa} so={soMuc[i]} />)}
+          </ul>
+        </section>
+      ))}
     </>
   );
 }
+
+const NHOM_DA_CO = ["Tuyển dụng", "Hợp đồng & thăng tiến", "KPI & thi đua", "BSC & mục tiêu"];
+const NHOM_KHAC = [...new Set(HR_MUC.map((m) => m.nhom))].filter((n) => !NHOM_DA_CO.includes(n));
+const LIEN_KET_THEM: Record<string, { href: string; Icon: typeof Target; ten: string; moTa: string }[]> = {
+  "Hồ sơ & hợp đồng": [{ href: "/nhan-su", Icon: UserCheck, ten: "Hồ sơ nhân sự", moTa: "Sơ yếu lý lịch, giấy tờ bắt buộc theo luật, cảnh báo thiếu giấy tờ, hợp đồng và tài sản của từng người." }],
+  "Công, lương & bảo hiểm": [
+    { href: "/bang-cong", Icon: CalendarClock, ten: "Bảng công tháng", moTa: "Chấm công cả tháng theo mã công và ngày lễ." },
+    { href: "/luong", Icon: Wallet, ten: "Bảng lương", moTa: "Kỳ lương, thỏa thuận lương, tham số (bảo hiểm, thuế, giới hạn tăng ca)." },
+  ],
+};
 
 function Muc({ href, Icon, ten, moTa, so }: { href: string; Icon: typeof Target; ten: string; moTa: string; so?: number }) {
   return (

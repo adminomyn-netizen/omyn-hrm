@@ -6,6 +6,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { guiChoNguoiDung } from "@/lib/push";
 import { congChuanTheoKy, tinhLuong, type DauVaoLuong, type ThamSo } from "@/lib/luong/tinh-luong";
 import { layBangCongThang } from "@/lib/bang-cong";
+import { tongGioTheoLoai } from "@/lib/tang-ca";
+import { dbHr } from "@/lib/hr-db";
 
 export type KetQuaLuong = { loi?: string; ok?: boolean; thongBao?: string };
 const KHONG_QUYEN: KetQuaLuong = { loi: "Chỉ Quản trị và Kỹ thuật mới được xem và sửa lương." };
@@ -144,6 +146,21 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
     layBangCongThang(ky.nam, ky.thang),
   ]);
   const congTheoNguoi = new Map(cc.dong.map((d) => [d.nhanVienId, d.tong]));
+  // Giờ tăng ca đã xác nhận và thưởng/hoa hồng trong tháng của kỳ lương: đổ thẳng vào dòng lương (không nhập hai lần).
+  const dauThang = `${ky.nam}-${String(ky.thang).padStart(2, "0")}-01`;
+  const dauThangSau = ky.thang === 12 ? `${ky.nam + 1}-01-01` : `${ky.nam}-${String(ky.thang + 1).padStart(2, "0")}-01`;
+  const [tcTho, thTho] = await Promise.all([
+    dbHr().from("tang_ca").select("nhan_vien_id, so_gio, loai_ngay").gte("ngay", dauThang).lt("ngay", dauThangSau),
+    dbHr().from("thuong_hoa_hong").select("nhan_vien_id, loai, so_tien").gte("ngay", dauThang).lt("ngay", dauThangSau),
+  ]);
+  const tcTheo = new Map<string, { so_gio: number; loai_ngay: string }[]>();
+  for (const r of (tcTho.data ?? []) as { nhan_vien_id: string; so_gio: number; loai_ngay: string }[]) tcTheo.set(r.nhan_vien_id, [...(tcTheo.get(r.nhan_vien_id) ?? []), r]);
+  const thTheo = new Map<string, { hoaHong: number; thuongKhac: number }>();
+  for (const r of (thTho.data ?? []) as { nhan_vien_id: string; loai: string; so_tien: number }[]) {
+    const c = thTheo.get(r.nhan_vien_id) ?? { hoaHong: 0, thuongKhac: 0 };
+    if (r.loai === "Hoa hồng") c.hoaHong += Number(r.so_tien); else c.thuongKhac += Number(r.so_tien);
+    thTheo.set(r.nhan_vien_id, c);
+  }
   const ttMap = new Map((tt.data ?? []).map((t) => [t.nhan_vien_id, t]));
   const daCo = new Set((co.data ?? []).map((c) => c.nhan_vien_id));
   const thieu: string[] = [];
@@ -156,6 +173,8 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
       continue;
     }
     const congChuan = congChuanTheoKy(t.kieu_cong as "van_phong" | "van_hanh", ky.nam, ky.thang, p.cong_chuan_van_phong);
+    const gioOt = tongGioTheoLoai(tcTheo.get(n.id) ?? []);
+    const thuong = thTheo.get(n.id) ?? { hoaHong: 0, thuongKhac: 0 };
     // Công hưởng và ngày làm lấy từ bảng công tháng (X, N, CT, P, L…): cùng một hàm với bảng chấm công nên không lệch nhau.
     const tong = congTheoNguoi.get(n.id);
     const congHuong = Math.min(tong?.congHuong ?? 0, congChuan);
@@ -163,7 +182,7 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
     const dong: Dong = {
       luong_thoa_thuan: Number(t.luong_thoa_thuan), ty_le_kpi: t.ty_le_kpi, thu_viec: n.trang_thai === "Thử việc", cong_chuan: congChuan, cong_huong: congHuong, ngay_lam: ngayCham,
       ty_le_ht_kpi: 100, phu_cap: Number(t.phu_cap), phu_cap_mien_thue: t.phu_cap_mien_thue, an_ca: t.an_ca, dong_bh: t.dong_bh, so_nguoi_phu_thuoc: t.so_nguoi_phu_thuoc,
-      gio_ot_thuong: 0, gio_ot_nghi_tuan: 0, gio_ot_le: 0, hoa_hong: 0, thuong_khac: 0, khau_tru_khac: 0,
+      gio_ot_thuong: gioOt.thuong, gio_ot_nghi_tuan: gioOt.nghiTuan, gio_ot_le: gioOt.le, hoa_hong: thuong.hoaHong, thuong_khac: thuong.thuongKhac, khau_tru_khac: 0,
     };
     moi.push({ ky_luong_id: kyId, nhan_vien_id: n.id, kieu_cong: t.kieu_cong, ...dong, ...cotKetQua(tuDong(dong), p) });
   }
