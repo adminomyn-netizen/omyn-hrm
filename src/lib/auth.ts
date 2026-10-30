@@ -42,6 +42,8 @@ export const layNguoiDungHienTai = cache(async () => {
     id: user.id,
     email: user.email ?? "",
     hoTen: (user.app_metadata?.ho_ten as string) || (user.email ?? ""),
+    /** Tài khoản do quản trị tạo với mật khẩu tạm: phải đặt mật khẩu mới trước khi dùng app. */
+    phaiDoiMatKhau: user.app_metadata?.phai_doi_mat_khau === true,
     // Thiếu vai trò = "cho_duyet": tài khoản tự đăng ký chưa được Kỹ thuật duyệt, không có quyền gì.
     // app_metadata chỉ máy chủ sửa được (người dùng thì không). Quyền Quản trị đặt CỨNG theo vị trí:
     // phòng ban Hành chính nhân sự hoặc chức vụ Tổng giám đốc/Phó tổng giám đốc/Giám đốc/Phó giám đốc (xem chuc-danh.ts).
@@ -67,6 +69,7 @@ export async function layNguoiDungDaDuyet() {
   const nguoiDung = await layNguoiDungHienTai();
   if (!nguoiDung) redirect("/dang-nhap");
   if (nguoiDung.vaiTro === "cho_duyet") redirect("/cho-duyet");
+  if (nguoiDung.phaiDoiMatKhau) redirect("/doi-mat-khau");
   return nguoiDung as typeof nguoiDung & { vaiTro: Exclude<VaiTro, "cho_duyet"> };
 }
 
@@ -75,5 +78,5 @@ export async function layNguoiDungDaDuyet() {
  * cuối POST công khai với ai đã đăng nhập, ẩn nút ở giao diện không chặn được. */
 export async function coVaiTro(choPhep: VaiTro[]) {
   const nguoiDung = await layNguoiDungHienTai();
-  return !!nguoiDung && choPhep.includes(nguoiDung.vaiTro);
+  return !!nguoiDung && !nguoiDung.phaiDoiMatKhau && choPhep.includes(nguoiDung.vaiTro);
 }
