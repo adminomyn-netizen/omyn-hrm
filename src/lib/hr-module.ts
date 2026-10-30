@@ -392,6 +392,53 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
+    ma: "doanh-thu-ngan-sach", ten: "Doanh thu và ngân sách quỹ lương", nhom: "Số liệu báo cáo HR", bang: "chi_so_hr_ky", tieuDe: "thang",
+    moTa: "Mỗi tháng một dòng (nhập ngày mùng 1): doanh thu và ngân sách quỹ lương. Báo cáo HR dùng để tính quỹ lương so với ngân sách, quỹ lương trên doanh thu, doanh thu bình quân mỗi người. Chưa nhập thì báo cáo để trống.",
+    sapXep: { cot: "thang", giam: true }, trong: "Chưa nhập tháng nào.",
+    cot: [
+      { k: "thang", nhan: "Tháng (ngày mùng 1)", kieu: "ngay", batBuoc: true, the: true },
+      { k: "doanh_thu", nhan: "Doanh thu (đ)", kieu: "tien", coTheTrong: true, the: true },
+      { k: "ngan_sach_quy_luong", nhan: "Ngân sách quỹ lương (đ)", kieu: "tien", coTheTrong: true, the: true },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "dinh-bien", ten: "Định biên theo khối", nhom: "Số liệu báo cáo HR", bang: "chi_so_hr_dinh_bien", tieuDe: "khoi_id",
+    moTa: "Số người được duyệt của từng khối. Báo cáo HR so với số người thực tế.",
+    sapXep: { cot: "tao_luc" }, trong: "Chưa có định biên khối nào.",
+    cot: [
+      { k: "khoi_id", nhan: "Khối", kieu: "khoi", batBuoc: true, the: true },
+      { k: "so_dinh_bien", nhan: "Số người định biên", kieu: "so", batBuoc: true, mac: 1, khoang: [0, 10000], the: true },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "vi-tri-chu-chot", ten: "Vị trí chủ chốt và người kế cận", nhom: "Số liệu báo cáo HR", bang: "chi_so_hr_chu_chot", tieuDe: "vi_tri", trangThai: "muc_san_sang",
+    moTa: "Các vị trí chủ chốt, ai đang giữ và ai kế cận. Báo cáo HR tính tỷ lệ vị trí chủ chốt đã có người kế cận.",
+    sapXep: { cot: "tao_luc" }, trong: "Chưa khai báo vị trí chủ chốt nào.",
+    cot: [
+      { k: "vi_tri", nhan: "Vị trí chủ chốt", kieu: "chu", batBuoc: true, the: true, goiY: "Trưởng phòng Kinh doanh" },
+      { k: "khoi_id", nhan: "Khối", kieu: "khoi", the: true },
+      { k: "nguoi_giu_id", nhan: "Người đang giữ", kieu: "nv", the: true },
+      { k: "ke_can_id", nhan: "Người kế cận", kieu: "nv", the: true },
+      { k: "muc_san_sang", nhan: "Mức sẵn sàng", kieu: "chon", luaChon: ["Sẵn sàng ngay", "Sau 1 năm", "Chưa sẵn sàng"], coTheTrong: true },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "tam-ung", ten: "Tạm ứng nhân viên", nhom: "Số liệu báo cáo HR", bang: "tam_ung_nhan_vien", tieuDe: "nhan_vien_id", trangThai: "tinh_trang",
+    moTa: "Các khoản tạm ứng của từng người. Còn “Chưa thu hồi” sẽ hiện ở Báo cáo HR cùng tài sản chưa thu hồi của người nghỉ việc.",
+    sapXep: { cot: "ngay_ung", giam: true }, trong: "Chưa ghi khoản tạm ứng nào.",
+    cot: [
+      { k: "nhan_vien_id", nhan: "Người tạm ứng", kieu: "nv", batBuoc: true, the: true },
+      { k: "so_tien", nhan: "Số tiền (đ)", kieu: "tien", batBuoc: true, the: true },
+      { k: "ngay_ung", nhan: "Ngày ứng", kieu: "ngay", batBuoc: true, the: true },
+      { k: "tinh_trang", nhan: "Tình trạng", kieu: "chon", luaChon: ["Chưa thu hồi", "Đã thu hồi"], mac: "Chưa thu hồi" },
+      { k: "ngay_thu_hoi", nhan: "Ngày thu hồi", kieu: "ngay" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
     ma: "thang-chuc-dieu-chuyen", ten: "Lịch sử thăng chức và điều chuyển", nhom: "Hợp đồng & thăng tiến", bang: "thang_chuc_dieu_chuyen", tieuDe: "nhan_vien_id", trangThai: "loai",
     moTa: "Mỗi lần thăng chức, điều chuyển, bổ nhiệm của từng người: từ chức danh/khối nào sang đâu, ngày hiệu lực, số quyết định. Ghi sổ, không tự đổi hồ sơ nhân sự.",
     sapXep: { cot: "ngay_hieu_luc", giam: true }, trong: "Chưa có lần thăng chức hay điều chuyển nào.",
