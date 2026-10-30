@@ -54,3 +54,27 @@ describe("việc & mức đạt", () => {
     expect([mucDat(null), mucDat(120), mucDat(100), mucDat(85), mucDat(79.9)]).toEqual(["chua", "tot", "tot", "theo-doi", "cham"]);
   });
 });
+
+import { tinhCay } from "@/lib/bsc";
+describe("tinhCay", () => {
+  const goc = [{ id: "g1", ten: "Tài chính" }, { id: "g2", ten: "Khách hàng" }];
+  const muc = [{ id: "m1", gocNhinId: "g1", ten: "Tăng doanh thu", moTa: "" }, { id: "m2", gocNhinId: "g2", ten: "Giữ khách", moTa: "" }];
+  const cs = [
+    { id: "c1", mucTieuId: "m1", ten: "Doanh thu", donVi: "tr", cachGop: "Cộng dồn" as const, trongSo: 60, thangs: [t(1, 100, 100), t(2, 100, 50)] },
+    { id: "c2", mucTieuId: "m1", ten: "Biên lợi nhuận", donVi: "%", cachGop: "Cuối kỳ" as const, trongSo: 40, thangs: [t(2, 20, 20)] },
+    { id: "c3", mucTieuId: "m2", ten: "Khách quay lại", donVi: "người", cachGop: "Trung bình" as const, trongSo: 100, thangs: [] },
+  ];
+  it("điểm từng cấp, mục tiêu chưa có số liệu thì null và không kéo góc nhìn xuống", () => {
+    const r = tinhCay(goc, muc, cs, 2);
+    expect(r.goc[0].mucTieu[0].chiSo[0]).toMatchObject({ diem: 75, keThang: 100, thucThang: 50 }); // (100+50)/(100+100)
+    expect(r.goc[0].mucTieu[0].diem).toBe(85); // (75*60 + 100*40)/100
+    expect(r.goc[0].diem).toBe(85);
+    expect(r.goc[1].diem).toBeNull();
+    expect(r.tong).toBe(85);
+  });
+  it("cảnh báo khi trọng số mục tiêu không đủ 100", () => {
+    const r = tinhCay(goc, muc, [{ ...cs[0], trongSo: 30 }, cs[1]], 2);
+    expect(r.goc[0].mucTieu[0]).toMatchObject({ tongTrongSo: 70, canhBao: true });
+  });
+  it("xem đến tháng sau tháng có số liệu vẫn tính dồn các tháng trước", () => expect(tinhCay(goc, muc, cs, 12).tong).toBe(85)); // cộng dồn 150/200 = 75; cuối kỳ lấy tháng 2 = 100
+});

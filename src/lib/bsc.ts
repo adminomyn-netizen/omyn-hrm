@@ -49,3 +49,29 @@ export function trangThaiViec(v: { tienDo: number; batDau: string; ketThuc: stri
 export function mucDat(d: number | null): "tot" | "theo-doi" | "cham" | "chua" {
   return d === null ? "chua" : d >= 100 ? "tot" : d >= 80 ? "theo-doi" : "cham";
 }
+
+// ---- Dựng cây BSC: chỉ số → mục tiêu → góc nhìn → tổng ----
+export type ChiSoVao = { id: string; mucTieuId: string; ten: string; donVi: string; cachGop: CachGop; trongSo: number; thangs: ThangSo[] };
+export type MucTieuVao = { id: string; gocNhinId: string; ten: string; moTa: string };
+export type GocNhinVao = { id: string; ten: string };
+export type ChiSoRa = ChiSoVao & { diem: number | null; keThang: number | null; thucThang: number | null };
+export type MucTieuRa = MucTieuVao & { diem: number | null; tongTrongSo: number; canhBao: boolean; chiSo: ChiSoRa[] };
+export type GocNhinRa = GocNhinVao & { diem: number | null; canhBao: boolean; mucTieu: MucTieuRa[] };
+
+/** Điểm từng cấp đến hết `denThang`. Mục tiêu nặng bằng tổng trọng số các chỉ số của nó; góc nhìn nặng bằng tổng trọng số các mục tiêu. */
+export function tinhCay(goc: readonly GocNhinVao[], muc: readonly MucTieuVao[], cs: readonly ChiSoVao[], denThang: number): { tong: number | null; goc: GocNhinRa[] } {
+  const mucRa = (m: MucTieuVao): MucTieuRa => {
+    const chiSo: ChiSoRa[] = cs.filter((c) => c.mucTieuId === m.id).map((c) => {
+      const t = c.thangs.find((x) => x.thang === denThang);
+      return { ...c, diem: diemChiSo(c.thangs, denThang, c.cachGop), keThang: t?.keHoach ?? null, thucThang: t?.thucTe ?? null };
+    });
+    const g = diemGop(chiSo.map((c) => ({ diem: c.diem, trongSo: c.trongSo })));
+    return { ...m, diem: g.diem, tongTrongSo: g.tongTrongSo, canhBao: g.canhBao, chiSo };
+  };
+  const gocRa: GocNhinRa[] = goc.map((g) => {
+    const mt = muc.filter((m) => m.gocNhinId === g.id).map(mucRa);
+    const t = diemGop(mt.map((m) => ({ diem: m.diem, trongSo: m.tongTrongSo })));
+    return { ...g, diem: t.diem, canhBao: t.canhBao, mucTieu: mt };
+  });
+  return { tong: diemGop(gocRa.map((g) => ({ diem: g.diem, trongSo: g.mucTieu.reduce((a, m) => a + m.tongTrongSo, 0) }))).diem, goc: gocRa };
+}
