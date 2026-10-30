@@ -9,8 +9,7 @@ import { MucTrang } from "@/components/ui/MucTrang";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { PanelXuLy } from "@/components/phe-duyet/PanelXuLy";
 import { dbHr } from "@/lib/hr-db";
-import { TEN_TRANG_THAI_O, taiPhieuDeXem } from "@/lib/phe-duyet-data";
-import { mauTheoMa } from "@/lib/phe-duyet-mau";
+import { TEN_TRANG_THAI_O, mauHieuLuc, taiPhieuDeXem } from "@/lib/phe-duyet-data";
 import { quyenTrenPhieu, truongDangHien, type Truong } from "@/lib/phe-duyet";
 
 const MAU_TT = { "Chờ duyệt": "cho", "Cần bổ sung": "cho", "Đã duyệt": "tot", "Từ chối": "loi", "Đã huỷ": "tram" } as const;
@@ -23,7 +22,7 @@ export default async function TrangPhieu({ params }: { params: Promise<{ id: str
   const nd = await yeuCauDangNhapDaDuyet();
   const { id } = await params;
   const x = await taiPhieuDeXem(id, nd);
-  const mau = x && mauTheoMa(x.phieu.ma_phieu);
+  const mau = x && (await mauHieuLuc(x.phieu.ma_phieu));
   if (!x || !mau) notFound();
   const { phieu: p, o, nv, tep, lichSu } = x;
 

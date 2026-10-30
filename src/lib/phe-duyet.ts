@@ -228,6 +228,34 @@ export function kiemTraPhieu(mau: MauPhieu, du: DuLieu, ctx: NguCanhKiemTra): Ke
   return { loi, sach };
 }
 
+
+// ---------------------------------------------------------------- ghi đè cấu hình ô (màn Setup luồng phiếu)
+
+export type CheDoHien = "Mặc định" | "Luôn hiện" | "Theo điều kiện" | "Ẩn";
+export type GhiDeO = { truong: string; batBuoc: "Mặc định" | "Bắt buộc" | "Không bắt buộc"; cheDoHien: CheDoHien; hienTruong: string | null; hienGiaTri: string[] | null };
+
+/** Mẫu phiếu sau khi áp các ghi đè của Kỹ thuật lên từng ô cấp trên cùng. Ẩn = ô không hiện và không bắt buộc. */
+export function apDungGhiDe(mau: MauPhieu, ds: readonly GhiDeO[]): MauPhieu {
+  if (ds.length === 0) return mau;
+  const theo = new Map(ds.map((g) => [g.truong, g]));
+  return {
+    ...mau,
+    truong: mau.truong.map((t) => {
+      const g = theo.get(t.ma);
+      if (!g) return t;
+      const n: Truong = { ...t };
+      if (g.batBuoc !== "Mặc định") n.batBuoc = g.batBuoc === "Bắt buộc";
+      if (g.cheDoHien === "Luôn hiện") delete n.hien;
+      else if (g.cheDoHien === "Ẩn") n.hien = { truong: "__an__", la: [] };
+      else if (g.cheDoHien === "Theo điều kiện" && g.hienTruong && g.hienGiaTri?.length) n.hien = { truong: g.hienTruong, la: g.hienGiaTri };
+      return n;
+    }),
+  };
+}
+
+/** Ô nào được dùng làm ô điều khiển điều kiện hiện của ô khác: chỉ ô chọn/danh mục cấp trên cùng, không phải chính nó. */
+export const oDieuKhienDuoc = (mau: MauPhieu, truong: string) => mau.truong.filter((t) => (t.kieu === "chon" || t.kieu === "dm") && t.ma !== truong);
+
 // ---------------------------------------------------------------- luồng duyệt
 
 export type KieuBuoc = "AND" | "OR" | "CC";

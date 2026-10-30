@@ -44,9 +44,6 @@ export type MucHr = {
   trong: string;
 };
 
-import { MAU_PHIEU } from "./phe-duyet-mau";
-
-const MA_PHIEU = MAU_PHIEU.map((m) => m.ma);
 const UU_TIEN = ["Cao", "Trung bình", "Thấp"] as const;
 
 export const HR_MUC: readonly MucHr[] = [
@@ -266,32 +263,6 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "tien_do", nhan: "Tiến độ (0-100%)", kieu: "so", mac: 0, khoang: [0, 100], the: true },
       { k: "ket_qua", nhan: "Kết quả", kieu: "nhieu", rong: true },
       { k: "mo_ta", nhan: "Mô tả", kieu: "nhieu", rong: true },
-    ],
-  },
-  {
-    ma: "pd-luong-duyet", ten: "Luồng duyệt từng phiếu", nhom: "Phê duyệt", bang: "pd_luong_duyet", tieuDe: "ma_phieu",
-    moTa: "Người duyệt từng bước của mỗi loại phiếu. Cùng số bước = cùng một bước (AND: mọi người phải duyệt, OR: một người là đủ, CC: chỉ nhận bản sao). Hàng có điều kiện chỉ áp dụng khi ô của phiếu đúng giá trị (vd don_vi = ADL). Khung mặc định: Quản lý trực tiếp rồi Giám đốc.",
-    sapXep: { cot: "ma_phieu" }, trong: "Chưa có luồng duyệt.",
-    cot: [
-      { k: "ma_phieu", nhan: "Loại phiếu", kieu: "chon", luaChon: MA_PHIEU, batBuoc: true, the: true },
-      { k: "buoc", nhan: "Bước số", kieu: "so", batBuoc: true, mac: 1, khoang: [1, 30], the: true },
-      { k: "ten_buoc", nhan: "Tên bước", kieu: "chu", goiY: "Kế toán kiểm tra" },
-      { k: "kieu", nhan: "Kiểu duyệt", kieu: "chon", luaChon: ["AND", "OR", "CC"], mac: "AND", the: true },
-      { k: "loai_nguoi", nhan: "Người duyệt là", kieu: "chon", luaChon: ["Quản lý trực tiếp", "Quản lý cấp trên", "Chức danh", "Nhân viên", "Giám đốc", "Kỹ thuật"], mac: "Quản lý trực tiếp", the: true },
-      { k: "chuc_danh", nhan: "Chức danh (khi chọn “Chức danh”)", kieu: "chu", goiY: "Kế toán tổng hợp" },
-      { k: "nhan_vien_id", nhan: "Nhân sự (khi chọn “Nhân viên”)", kieu: "nv" },
-      { k: "dieu_kien_truong", nhan: "Chỉ áp dụng khi ô… (mã ô, tuỳ chọn)", kieu: "chu", goiY: "don_vi" },
-      { k: "dieu_kien_gia_tri", nhan: "…có giá trị (đi kèm ô bên trên)", kieu: "chu", goiY: "ADL" },
-    ],
-  },
-  {
-    ma: "pd-nhom-ma", ten: "Nhóm mã phiếu", nhom: "Phê duyệt", bang: "pd_cau_hinh_phieu", tieuDe: "ma_phieu",
-    moTa: "Mỗi loại phiếu thuộc nhóm mã nào (HR, FIN, MKT, ADM… hoặc nhóm mới, 2-6 chữ in hoa). Mã phiếu có dạng NHÓM-AAMM-0001, số chạy tăng theo tháng và không trùng. Đổi nhóm chỉ áp dụng cho phiếu nộp từ sau.",
-    sapXep: { cot: "ma_phieu" }, trong: "Chưa có cấu hình.",
-    cot: [
-      { k: "ma_phieu", nhan: "Loại phiếu", kieu: "chon", luaChon: MA_PHIEU, batBuoc: true, the: true },
-      { k: "nhom_ma", nhan: "Nhóm mã", kieu: "chu", batBuoc: true, mac: "HR", the: true, goiY: "HR, FIN, MKT, ADM" },
-      { k: "dang_dung", nhan: "Đang dùng", kieu: "co", mac: true, the: true },
     ],
   },
   {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
-  batDauLuong, thanhCong, dungCacO, hangApDung, kiemTraPhieu, laSoPhieu, quyenTrenPhieu, soPhieuText, thangMa, tienBangChu, tienToiBuocSau, xuLyO,
+  apDungGhiDe, oDieuKhienDuoc, type GhiDeO, batDauLuong, thanhCong, dungCacO, hangApDung, kiemTraPhieu, laSoPhieu, quyenTrenPhieu, soPhieuText, thangMa, tienBangChu, tienToiBuocSau, xuLyO,
   type HangLuong, type NguCanhNguoiDuyet, type NhanSuDuyet, type O,
 } from "@/lib/phe-duyet";
 import { MAU_PHIEU, mauTheoMa } from "@/lib/phe-duyet-mau";
@@ -162,5 +162,26 @@ describe("luồng duyệt", () => {
     expect(quyenTrenPhieu(p, bd.o, { nhanVienId: u(1), userId: u(101) })).toMatchObject({ oDuyet: null, huy: true, suaVaNopLai: false });
     expect(quyenTrenPhieu({ ...p, trangThai: "Cần bổ sung" }, bd.o, { nhanVienId: u(1), userId: u(101) }).suaVaNopLai).toBe(true);
     expect(quyenTrenPhieu({ ...p, trangThai: "Đã duyệt" }, bd.o, { nhanVienId: u(2), userId: u(102) }).oDuyet).toBeNull();
+  });
+});
+
+describe("ghi đè ô của Kỹ thuật", () => {
+  const mau = mauTheoMa("de-nghi-hoan-ung")!;
+  const g = (truong: string, mo: Partial<GhiDeO>): GhiDeO => ({ truong, batBuoc: "Mặc định", cheDoHien: "Mặc định", hienTruong: null, hienGiaTri: null, ...mo });
+  it("không có ghi đè thì giữ nguyên; ẩn bỏ ô và bỏ bắt buộc; luôn hiện bỏ điều kiện; điều kiện mới thay điều kiện cũ", () => {
+    expect(apDungGhiDe(mau, [])).toBe(mau);
+    const m = apDungGhiDe(mau, [g("link_dinh_kem", { cheDoHien: "Ẩn" }), g("ten_chu_tk", { cheDoHien: "Luôn hiện" }), g("tai_khoan", { cheDoHien: "Theo điều kiện", hienTruong: "don_vi", hienGiaTri: ["ADL"] }), g("noi_dung", { batBuoc: "Không bắt buộc" })]);
+    const r = kiemTraPhieu(m, { can_thanh_toan_them: "Không", don_vi: "AVI" }, CTX);
+    expect(r.loi.link_dinh_kem).toBeUndefined();
+    expect(r.loi.ten_chu_tk).toBeTruthy();
+    expect(r.loi.tai_khoan).toBeUndefined();
+    expect(r.loi.noi_dung).toBeUndefined();
+    expect(kiemTraPhieu(m, { don_vi: "ADL" }, CTX).loi.tai_khoan).toBeTruthy();
+  });
+  it("chỉ ô chọn/danh mục khác chính nó làm được ô điều khiển", () => {
+    const ds = oDieuKhienDuoc(mau, "don_vi").map((t) => t.ma);
+    expect(ds).toContain("can_thanh_toan_them");
+    expect(ds).not.toContain("don_vi");
+    expect(ds).not.toContain("noi_dung");
   });
 });

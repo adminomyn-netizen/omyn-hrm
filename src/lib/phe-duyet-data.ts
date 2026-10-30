@@ -122,3 +122,41 @@ export async function taiPhieuCoTheNoi(userId: string): Promise<{ id: string; te
   const { data } = await dbHr().from("pd_phieu").select("id, so_phieu, ma_phieu, tao_luc").eq("nguoi_nop_id", nv.id).eq("trang_thai", "Đã duyệt").order("tao_luc", { ascending: false }).limit(100);
   return ((data ?? []) as { id: string; so_phieu: string; ma_phieu: string }[]).map((p) => ({ id: p.id, ten: p.so_phieu, maPhieu: p.ma_phieu }));
 }
+
+import { apDungGhiDe, giaiNguoiDuyet, type CheDoHien, type GhiDeO } from "@/lib/phe-duyet";
+import { mauTheoMa } from "@/lib/phe-duyet-mau";
+
+export async function docGhiDe(maPhieu: string): Promise<GhiDeO[]> {
+  const { data } = await dbHr().from("pd_o_cau_hinh").select("truong, bat_buoc, che_do_hien, hien_truong, hien_gia_tri").eq("ma_phieu", maPhieu);
+  return ((data ?? []) as { truong: string; bat_buoc: GhiDeO["batBuoc"]; che_do_hien: CheDoHien; hien_truong: string | null; hien_gia_tri: string[] | null }[]).map((r) => ({
+    truong: r.truong, batBuoc: r.bat_buoc, cheDoHien: r.che_do_hien, hienTruong: r.hien_truong, hienGiaTri: r.hien_gia_tri,
+  }));
+}
+
+/** Mẫu phiếu đang có hiệu lực: cấu hình trong mã nguồn + ghi đè của Kỹ thuật. */
+export async function mauHieuLuc(maPhieu: string) {
+  const mau = mauTheoMa(maPhieu);
+  return mau ? apDungGhiDe(mau, await docGhiDe(maPhieu)) : null;
+}
+
+export const SU_KIEN_THONG_BAO = ["Nộp phiếu", "Duyệt xong", "Từ chối", "Cần bổ sung", "Huỷ"] as const;
+export type SuKienThongBao = (typeof SU_KIEN_THONG_BAO)[number];
+
+/** Báo thêm những người Kỹ thuật đã cài để nhận thông báo ở sự kiện này (không báo trùng người đã được báo). */
+export async function baoTheoCauHinh(maPhieu: string, suKien: SuKienThongBao, nguoiNopId: string | null, tin: { tieuDe: string; noiDung: string; url: string }, daBao: (string | null)[] = []) {
+  try {
+    const { data } = await dbHr().from("pd_thong_bao_cau_hinh").select("loai_nguoi, chuc_danh, nhan_vien_id").eq("ma_phieu", maPhieu).eq("su_kien", suKien).eq("dang_bat", true);
+    const ds = (data ?? []) as { loai_nguoi: LoaiNguoiDuyet; chuc_danh: string | null; nhan_vien_id: string | null }[];
+    if (ds.length === 0) return;
+    const nguoiNop = nguoiNopId ? (await dbHr().from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, quan_ly_id, trang_thai").eq("id", nguoiNopId).maybeSingle()).data as NvTho | null : null;
+    const ctx = await nguCanhNguoiDuyet(nguoiNop ? sangNhanSu(nguoiNop) : null);
+    const user = new Set<string>();
+    for (const r of ds) {
+      const h: HangLuong = { buoc: 0, tenBuoc: null, kieu: "CC", loaiNguoi: r.loai_nguoi, chucDanh: r.chuc_danh, nhanVienId: r.nhan_vien_id, dieuKienTruong: null, dieuKienGiaTri: null };
+      for (const n of giaiNguoiDuyet(h, ctx)) if (n.userId && !daBao.includes(n.userId)) user.add(n.userId);
+    }
+    await baoNguoiDung([...user], tin);
+  } catch (e) {
+    console.error("[pd] thông báo theo cấu hình lỗi", e);
+  }
+}
