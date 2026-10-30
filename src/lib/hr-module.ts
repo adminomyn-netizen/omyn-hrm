@@ -1,6 +1,8 @@
 /** Cấu hình các mục vận hành HCNS chuyển từ Lark (docs/mapping-lark-hr.md). Một khai báo → bảng/thẻ danh sách, biểu mẫu thêm/sửa, kiểm tra ở máy chủ.
  * Thêm mục mới = thêm một khối vào HR_MUC (+ migration cho bảng); không cần viết thêm trang. Không dùng hàm trong cấu hình để truyền được sang trình duyệt. */
 
+const KENH_ND = ["Facebook", "TikTok", "Shopee", "Zalo", "Website", "Khác"] as const;
+
 export type KieuCot = "chu" | "nhieu" | "so" | "tien" | "ngay" | "gio" | "chon" | "co" | "nv" | "khoi" | "tc";
 
 export type CotHr = {
@@ -42,6 +44,8 @@ export type MucHr = {
   chiGiamDocSua?: boolean;
   /** Một câu hướng dẫn khi chưa có dữ liệu. */
   trong: string;
+  /** Link "← …" ở đầu trang chi tiết; mặc định theo nhóm (Tuyển dụng → Sổ tuyển dụng, còn lại → Trang chủ Nhân sự). */
+  quayVe?: { href: string; nhan: string };
 };
 
 const UU_TIEN = ["Cao", "Trung bình", "Thấp"] as const;
@@ -435,6 +439,75 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "ngay_ung", nhan: "Ngày ứng", kieu: "ngay", batBuoc: true, the: true },
       { k: "tinh_trang", nhan: "Tình trạng", kieu: "chon", luaChon: ["Chưa thu hồi", "Đã thu hồi"], mac: "Chưa thu hồi" },
       { k: "ngay_thu_hoi", nhan: "Ngày thu hồi", kieu: "ngay" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "lich-noi-dung", ten: "Lịch nội dung", nhom: "Marketing & Thương hiệu", bang: "mkt_lich_noi_dung", tieuDe: "chu_de", trangThai: "trang_thai",
+    moTa: "Lịch bài đăng theo ngày và kênh: chủ đề, người làm, đã duyệt chưa, đã đăng chưa. Mỗi bài một dòng.",
+    sapXep: { cot: "ngay_dang", giam: true }, trong: "Chưa có bài nào trong lịch.",
+    quayVe: { href: "/quang-cao", nhan: "Quảng cáo" },
+    cot: [
+      { k: "ngay_dang", nhan: "Ngày đăng", kieu: "ngay", batBuoc: true, the: true },
+      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: KENH_ND, mac: "Facebook", the: true },
+      { k: "chu_de", nhan: "Chủ đề", kieu: "chu", batBuoc: true },
+      { k: "nguoi_lam_id", nhan: "Người làm", kieu: "nv", the: true },
+      { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Lên ý tưởng", "Đang làm", "Chờ duyệt", "Đã duyệt", "Đã đăng", "Huỷ"], mac: "Lên ý tưởng" },
+      { k: "link_bai", nhan: "Link bài", kieu: "chu" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "duyet-noi-dung", ten: "Duyệt nội dung quảng cáo", nhom: "Marketing & Thương hiệu", bang: "mkt_duyet_noi_dung", tieuDe: "tieu_de", trangThai: "trang_thai",
+    moTa: "Nội dung quảng cáo gửi duyệt trước khi đăng, kèm danh sách kiểm: không dùng từ cấm hoặc hứa công dụng như thuốc, sản phẩm có số công bố, hình ảnh khách có đồng ý. Danh sách từ cấm chính thức chờ chị Lâm hoặc luật sư xác nhận.",
+    sapXep: { cot: "ngay_gui", giam: true }, trong: "Chưa có nội dung nào gửi duyệt.",
+    quayVe: { href: "/quang-cao", nhan: "Quảng cáo" },
+    cot: [
+      { k: "tieu_de", nhan: "Tiêu đề nội dung", kieu: "chu", batBuoc: true },
+      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: KENH_ND, mac: "Facebook", the: true },
+      { k: "ngay_gui", nhan: "Ngày gửi", kieu: "ngay", batBuoc: true, the: true },
+      { k: "nguoi_gui_id", nhan: "Người gửi", kieu: "nv", the: true },
+      { k: "noi_dung", nhan: "Nội dung", kieu: "nhieu", rong: true },
+      { k: "link", nhan: "Link bản nháp", kieu: "chu" },
+      { k: "khong_tu_cam", nhan: "Không có từ cấm, không hứa công dụng như thuốc", kieu: "co", mac: false },
+      { k: "co_so_cong_bo", nhan: "Sản phẩm đã có số công bố", kieu: "co", mac: false },
+      { k: "co_dong_y_hinh_anh", nhan: "Hình ảnh người thật đã được đồng ý", kieu: "co", mac: false },
+      { k: "trang_thai", nhan: "Kết quả duyệt", kieu: "chon", luaChon: ["Chờ duyệt", "Đạt", "Cần sửa", "Không đạt"], mac: "Chờ duyệt" },
+      { k: "nguoi_duyet", nhan: "Người duyệt", kieu: "chu" },
+      { k: "nhan_xet", nhan: "Nhận xét", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "kol-koc", ten: "Booking KOL và KOC", nhom: "Marketing & Thương hiệu", bang: "mkt_kol_koc", tieuDe: "ten", trangThai: "trang_thai",
+    moTa: "Từng người hợp tác: sản phẩm, chi phí thoả thuận và thực tế, ngày đăng, đã nghiệm thu và thanh toán chưa.",
+    sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có KOL hay KOC nào.",
+    quayVe: { href: "/quang-cao", nhan: "Quảng cáo" },
+    cot: [
+      { k: "ten", nhan: "Tên", kieu: "chu", batBuoc: true },
+      { k: "loai", nhan: "Loại", kieu: "chon", luaChon: ["KOL", "KOC"], mac: "KOC", the: true },
+      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: ["Facebook", "TikTok", "Instagram", "YouTube", "Khác"], mac: "TikTok", the: true },
+      { k: "link_kenh", nhan: "Link kênh", kieu: "chu" },
+      { k: "san_pham", nhan: "Sản phẩm hợp tác", kieu: "chu", the: true },
+      { k: "chi_phi_thoa_thuan", nhan: "Chi phí thoả thuận (đ)", kieu: "tien", coTheTrong: true, the: true },
+      { k: "chi_phi_thuc_te", nhan: "Chi phí thực tế (đ)", kieu: "tien", coTheTrong: true },
+      { k: "ngay_dang", nhan: "Ngày đăng", kieu: "ngay" },
+      { k: "nguoi_phu_trach_id", nhan: "Người phụ trách", kieu: "nv" },
+      { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Đã liên hệ", "Đã chốt", "Đã đăng", "Đã nghiệm thu", "Đã thanh toán", "Huỷ"], mac: "Đã liên hệ" },
+      { k: "link_bai", nhan: "Link bài đăng", kieu: "chu" },
+      { k: "ghi_chu", nhan: "Ghi chú, biên bản nghiệm thu", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "ngan-sach-qc", ten: "Ngân sách quảng cáo", nhom: "Marketing & Thương hiệu", bang: "mkt_ngan_sach_qc", tieuDe: "kenh", trangThai: "trang_thai",
+    moTa: "Ngân sách quảng cáo duyệt trước theo tháng và kênh, quyết toán sau bằng số thực chi. Số chi tiêu tự kéo về nằm ở màn Quảng cáo.",
+    sapXep: { cot: "thang", giam: true }, trong: "Chưa có ngân sách tháng nào.",
+    quayVe: { href: "/quang-cao", nhan: "Quảng cáo" },
+    cot: [
+      { k: "thang", nhan: "Tháng (ngày mùng 1)", kieu: "ngay", batBuoc: true, the: true },
+      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: ["Facebook", "TikTok", "Shopee", "Google", "KOL/KOC", "Khác"], mac: "Facebook", the: true },
+      { k: "ngan_sach_duyet", nhan: "Ngân sách duyệt (đ)", kieu: "tien", batBuoc: true, the: true },
+      { k: "thuc_chi", nhan: "Thực chi (đ)", kieu: "tien", coTheTrong: true, the: true },
+      { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Chờ duyệt", "Đã duyệt", "Đã quyết toán"], mac: "Chờ duyệt" },
       { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
     ],
   },
