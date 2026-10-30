@@ -93,7 +93,7 @@ export default async function TrangTongQuan() {
                   style={{
                     height: Math.max(4, Math.round((so / lonNhat) * 46)),
                     borderRadius: 3,
-                    background: so === lonNhat && so > 0 ? "linear-gradient(180deg,#7FE3D2,#14938A)" : "rgba(227,242,239,.22)",
+                    background: so === lonNhat && so > 0 ? "linear-gradient(180deg,#E8A0AE,#B8475A)" : "rgba(246,235,236,.22)",
                   }}
                 />
               ))}
@@ -178,7 +178,7 @@ export default async function TrangTongQuan() {
                     </div>
                     <div className="mt-2.5 flex gap-1" aria-hidden>
                       {Array.from({ length: 6 }, (_, i) => (
-                        <span key={i} className="h-1 flex-1" style={{ borderRadius: 2, background: i < t.buoc ? "linear-gradient(90deg,#7FE3D2,#14938A)" : "var(--giay-tram)" }} />
+                        <span key={i} className="h-1 flex-1" style={{ borderRadius: 2, background: i < t.buoc ? "linear-gradient(90deg,#E8A0AE,#B8475A)" : "var(--giay-tram)" }} />
                       ))}
                     </div>
                   </li>
