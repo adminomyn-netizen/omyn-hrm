@@ -37,7 +37,7 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
         </button>
       </div>
 
-      <nav className="max-h-[calc(100vh-190px)] space-y-5 overflow-y-auto px-3.5 pb-5 pt-2" aria-label="Menu chính">
+      <nav className="cuon-an-thanh max-h-[calc(100vh-190px)] space-y-5 overflow-y-auto px-3.5 pb-5 pt-2" aria-label="Menu chính">
         {nhom.map((g) => (
           <div key={g.nhom}>
             {thuGon ? (
