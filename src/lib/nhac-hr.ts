@@ -29,6 +29,15 @@ export function offerCanNhac(hanTraLoi: string | null, trangThai: string, homNay
   return nhacVaoNgay(con) ? con : null;
 }
 
+/** Mốc nhắc hợp đồng sắp hết hạn: còn 45, 30, 15, 7 ngày, đúng hạn, trễ 3 ngày (45 ngày đủ để đánh giá tái ký và soạn hợp đồng mới). */
+export const NGAY_NHAC_HOP_DONG = new Set([45, 30, 15, 7, 0, -3]);
+/** Số ngày còn lại nếu hôm nay là mốc cần nhắc của một hợp đồng đang hiệu lực có thời hạn, ngược lại null. */
+export function hopDongCanNhac(denNgay: string | null, trangThai: string, homNay: string): number | null {
+  if (!denNgay || trangThai !== "Đang hiệu lực") return null;
+  const con = soNgayTu(homNay, denNgay);
+  return NGAY_NHAC_HOP_DONG.has(con) ? con : null;
+}
+
 /** Còn bao nhiêu phút tới giờ phỏng vấn nếu nằm trong 65 phút tới (cron chạy 5 phút/lần, mỗi buổi chỉ gửi một lần nhờ khoá), ngược lại null. */
 export function phutToiPhongVan(thoiGianMs: number, bayGioMs: number): number | null {
   const p = Math.ceil((thoiGianMs - bayGioMs) / 60_000);
@@ -38,17 +47,18 @@ export function phutToiPhongVan(thoiGianMs: number, bayGioMs: number): number | 
 /** Cụm từ "còn 3 ngày / hôm nay / trễ 2 ngày". */
 export const nhanHan = (con: number) => (con > 0 ? `còn ${con} ngày` : con === 0 ? "đến hạn hôm nay" : `trễ ${-con} ngày`);
 
-export type SoLieuHcns = { phongVanHomNay: number; offerCanNhac: number; danhGiaCanNhac: number; deXuatCho: number };
+export type SoLieuHcns = { phongVanHomNay: number; offerCanNhac: number; danhGiaCanNhac: number; deXuatCho: number; hopDongSapHan?: number };
 /** Bản tóm tắt sáng cho quản lý HCNS; không có việc nào thì không gửi. */
 export function tomTatHcns(s: SoLieuHcns): TinHr | null {
   const phan = [
     s.phongVanHomNay && `${s.phongVanHomNay} buổi phỏng vấn hôm nay`,
     s.offerCanNhac && `${s.offerCanNhac} offer cần chốt`,
     s.danhGiaCanNhac && `${s.danhGiaCanNhac} đánh giá thử việc đến hạn`,
+    s.hopDongSapHan && `${s.hopDongSapHan} hợp đồng sắp hết hạn`,
     s.deXuatCho && `${s.deXuatCho} đề xuất chờ duyệt`,
   ].filter(Boolean) as string[];
   if (!phan.length) return null;
-  const url = s.danhGiaCanNhac ? "/hr/onboarding" : s.offerCanNhac ? "/hr/offer-tuyen-dung" : s.phongVanHomNay ? "/hr/lich-phong-van" : "/hr/de-xuat-phe-duyet";
+  const url = s.hopDongSapHan ? "/hr/hop-dong-lao-dong" : s.danhGiaCanNhac ? "/hr/onboarding" : s.offerCanNhac ? "/hr/offer-tuyen-dung" : s.phongVanHomNay ? "/hr/lich-phong-van" : "/hr/de-xuat-phe-duyet";
   return { khung: "hr_tom_tat", tieuDe: "Việc HCNS hôm nay", noiDung: phan.join(" · "), url };
 }
 

@@ -2,7 +2,7 @@ import "server-only";
 import { dbHr } from "@/lib/hr-db";
 import { chiTieuApCho, docKy } from "@/lib/kpi";
 import { docKetQua, docNen, tinhBang } from "@/lib/kpi-data";
-import { danhGiaCanNhac, kyCanBaoXepHang, nhanHan, offerCanNhac, phutToiPhongVan, tinXepHang, tomTatHcns, type TinHr } from "@/lib/nhac-hr";
+import { congNgay, danhGiaCanNhac, hopDongCanNhac, kyCanBaoXepHang, nhanHan, offerCanNhac, phutToiPhongVan, tinXepHang, tomTatHcns, type TinHr } from "@/lib/nhac-hr";
 import { ngayLamViecTruoc } from "@/lib/nhac-cong";
 
 type Gui = (userId: string, khung: string, tin: Omit<TinHr, "khung">) => Promise<void>;
@@ -39,18 +39,20 @@ export async function nhacHr(c: NgCanh): Promise<number> {
 
   // 2. Tóm tắt sáng cho HCNS + nhắc mentor
   if (c.phut >= 8 * 60 && c.phut < 10 * 60) {
-    const [pvHom, offers, onb, dg, dx] = await Promise.all([
+    const [pvHom, offers, onb, dg, dx, hd] = await Promise.all([
       db.from("lich_phong_van").select("id", { count: "exact", head: true }).eq("ket_qua", "Chờ").gte("thoi_gian", `${c.hom}T00:00:00+07:00`).lte("thoi_gian", `${c.hom}T23:59:59+07:00`),
       db.from("offer_tuyen_dung").select("ten_ung_vien, han_tra_loi, trang_thai").in("trang_thai", ["Đã gửi", "Thương lượng"]).not("han_tra_loi", "is", null),
       db.from("theo_doi_onboarding").select("id, ho_ten, mentor_id, ngay_bat_dau, so_ngay_thu_viec").eq("tinh_trang", "Đang thử việc").limit(500),
       db.from("danh_gia_thu_viec").select("onb_id, moc").limit(2000),
       db.from("de_xuat_phe_duyet").select("id", { count: "exact", head: true }).eq("trang_thai", "Chờ duyệt"),
+      db.from("hop_dong_lao_dong").select("id, nhan_vien_id, den_ngay, trang_thai").eq("trang_thai", "Đang hiệu lực").not("den_ngay", "is", null).gte("den_ngay", congNgay(c.hom, -3)).lte("den_ngay", congNgay(c.hom, 45)).limit(500),
     ]);
+    const hdNhac = (hd.data ?? []).filter((h) => hopDongCanNhac(h.den_ngay, h.trang_thai, c.hom) !== null);
     const offerNhac = (offers.data ?? []).filter((o) => offerCanNhac(o.han_tra_loi, o.trang_thai, c.hom) !== null);
     const daCo = new Map<string, string[]>();
     for (const d of dg.data ?? []) daCo.set(d.onb_id, [...(daCo.get(d.onb_id) ?? []), d.moc]);
     const dgNhac = (onb.data ?? []).flatMap((o) => danhGiaCanNhac(o.ngay_bat_dau, c.hom, daCo.get(o.id) ?? [], o.so_ngay_thu_viec).map((d) => ({ ...d, onbId: o.id, ten: o.ho_ten, mentorId: o.mentor_id as string | null })));
-    const tt = tomTatHcns({ phongVanHomNay: pvHom.count ?? 0, offerCanNhac: offerNhac.length, danhGiaCanNhac: dgNhac.length, deXuatCho: dx.count ?? 0 });
+    const tt = tomTatHcns({ phongVanHomNay: pvHom.count ?? 0, offerCanNhac: offerNhac.length, danhGiaCanNhac: dgNhac.length, deXuatCho: dx.count ?? 0, hopDongSapHan: hdNhac.length });
     if (tt) for (const u of await c.layQuanLy()) await gui(u, tt.khung, { tieuDe: tt.tieuDe, noiDung: tt.noiDung, url: tt.url });
     const uMentor = await userCua(dgNhac.map((d) => d.mentorId));
     for (const d of dgNhac) {

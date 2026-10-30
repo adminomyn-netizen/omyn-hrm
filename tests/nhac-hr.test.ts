@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { danhGiaCanNhac, kyCanBaoXepHang, nhanHan, offerCanNhac, phutToiPhongVan, soNgayTu, tinXepHang, tomTatHcns } from "@/lib/nhac-hr";
+import { danhGiaCanNhac, hopDongCanNhac, kyCanBaoXepHang, nhanHan, offerCanNhac, phutToiPhongVan, soNgayTu, tinXepHang, tomTatHcns } from "@/lib/nhac-hr";
 
 describe("danhGiaCanNhac", () => {
   it("vào làm 01/10: mốc 30 ngày = 31/10, nhắc khi còn 3 ngày, đúng hạn, trễ 2 ngày", () => {
@@ -58,5 +58,22 @@ describe("offer, phỏng vấn, tóm tắt, xếp hạng", () => {
     expect(t.noiDung).toContain("Phòng Kinh doanh hạng 2/4");
     expect(t.noiDung).toContain("Dẫn đầu: An");
     expect(tinXepHang({ kyNhan: "x", kyMa: "k", hangCaNhan: 2, tongNguoi: 9, diem: 100, top: "An" }).noiDung).not.toContain("Dẫn đầu");
+  });
+});
+
+describe("hợp đồng sắp hết hạn", () => {
+  it("nhắc đúng các mốc 45/30/15/7/0/-3, chỉ hợp đồng đang hiệu lực có thời hạn", () => {
+    expect(hopDongCanNhac("2026-12-14", "Đang hiệu lực", "2026-10-30")).toBe(45);
+    expect(hopDongCanNhac("2026-11-29", "Đang hiệu lực", "2026-10-30")).toBe(30);
+    expect(hopDongCanNhac("2026-10-30", "Đang hiệu lực", "2026-10-30")).toBe(0);
+    expect(hopDongCanNhac("2026-10-27", "Đang hiệu lực", "2026-10-30")).toBe(-3);
+    expect(hopDongCanNhac("2026-11-20", "Đang hiệu lực", "2026-10-30")).toBeNull();
+    expect(hopDongCanNhac("2026-11-29", "Đã chấm dứt", "2026-10-30")).toBeNull();
+    expect(hopDongCanNhac(null, "Đang hiệu lực", "2026-10-30")).toBeNull();
+  });
+  it("tóm tắt có dòng hợp đồng và ưu tiên trỏ vào hợp đồng", () => {
+    const t = tomTatHcns({ phongVanHomNay: 1, offerCanNhac: 0, danhGiaCanNhac: 0, deXuatCho: 0, hopDongSapHan: 2 })!;
+    expect(t.noiDung).toBe("1 buổi phỏng vấn hôm nay · 2 hợp đồng sắp hết hạn");
+    expect(t.url).toBe("/hr/hop-dong-lao-dong");
   });
 });

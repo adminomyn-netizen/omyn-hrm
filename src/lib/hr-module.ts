@@ -16,6 +16,10 @@ export type CotHr = {
   /** Chiếm cả hàng trong biểu mẫu. */
   rong?: boolean;
   goiY?: string;
+  /** Cột số được để trống (lưu null thay vì 0). */
+  coTheTrong?: boolean;
+  /** Khoảng giá trị hợp lệ [nhỏ nhất, lớn nhất] cho cột số. */
+  khoang?: readonly [number, number];
 };
 
 export type MucHr = {
@@ -156,6 +160,39 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "mo_ta", nhan: "Mô tả", kieu: "chu", rong: true, goiY: "Cờ thi đua + bữa trưa cả phòng" },
     ],
   },
+  {
+    ma: "hop-dong-lao-dong", ten: "Hợp đồng lao động", nhom: "Hợp đồng & thăng tiến", bang: "hop_dong_lao_dong", tieuDe: "nhan_vien_id", trangThai: "trang_thai",
+    moTa: "Theo dõi từng hợp đồng: loại, lần ký, thời hạn; cảnh báo hợp đồng sắp hết hạn trong 45 ngày để kịp đánh giá tái ký.",
+    sapXep: { cot: "den_ngay" }, canhBao: { cot: "den_ngay", ngay: 45, nhan: "Sắp hết hạn" }, trong: "Chưa có hợp đồng. Thêm hợp đồng đầu tiên của nhân sự.",
+    cot: [
+      { k: "nhan_vien_id", nhan: "Nhân sự", kieu: "nv", the: true },
+      { k: "ten_nguoi_ky", nhan: "Tên người ký (nếu chưa có hồ sơ, vd cộng tác viên)", kieu: "chu" },
+      { k: "loai", nhan: "Loại hợp đồng", kieu: "chon", luaChon: ["Thử việc", "Xác định thời hạn", "Không xác định thời hạn", "Cộng tác viên", "Khác"], mac: "Xác định thời hạn", the: true },
+      { k: "so_hop_dong", nhan: "Số hợp đồng", kieu: "chu", the: true },
+      { k: "lan", nhan: "Lần ký", kieu: "so", mac: 1, khoang: [1, 20] },
+      { k: "tu_ngay", nhan: "Từ ngày", kieu: "ngay", batBuoc: true, the: true },
+      { k: "den_ngay", nhan: "Đến ngày (trống = không thời hạn)", kieu: "ngay", the: true },
+      { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Chờ ký", "Đang hiệu lực", "Đã hết hạn", "Đã chấm dứt"], mac: "Đang hiệu lực" },
+      { k: "pham_vi", nhan: "Phạm vi công việc", kieu: "chu" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "danh-gia-tai-ky", ten: "Đánh giá tái ký hợp đồng", nhom: "Hợp đồng & thăng tiến", bang: "danh_gia_tai_ky", tieuDe: "nhan_vien_id", trangThai: "de_xuat",
+    moTa: "Chấm kết quả, thái độ, năng lực, mức độ phù hợp (1-5) và đề xuất ký tiếp hay không.",
+    sapXep: { cot: "ngay", giam: true }, trong: "Chưa có đánh giá tái ký nào.",
+    cot: [
+      { k: "nhan_vien_id", nhan: "Nhân sự", kieu: "nv", batBuoc: true, the: true },
+      { k: "ket_qua_cong_viec", nhan: "Kết quả công việc (1-5)", kieu: "so", coTheTrong: true, khoang: [1, 5], the: true },
+      { k: "thai_do", nhan: "Thái độ (1-5)", kieu: "so", coTheTrong: true, khoang: [1, 5], the: true },
+      { k: "nang_luc", nhan: "Năng lực (1-5)", kieu: "so", coTheTrong: true, khoang: [1, 5], the: true },
+      { k: "muc_do_phu_hop", nhan: "Mức độ phù hợp (1-5)", kieu: "so", coTheTrong: true, khoang: [1, 5], the: true },
+      { k: "de_xuat", nhan: "Đề xuất", kieu: "chon", luaChon: ["Chờ quyết định", "Ký tiếp có thời hạn", "Ký không thời hạn", "Gia hạn thử việc", "Không tái ký"], mac: "Chờ quyết định" },
+      { k: "nguoi_danh_gia_id", nhan: "Người đánh giá", kieu: "nv" },
+      { k: "ngay", nhan: "Ngày đánh giá", kieu: "ngay" },
+      { k: "nhan_xet", nhan: "Nhận xét và đề xuất", kieu: "nhieu", rong: true },
+    ],
+  },
 ];
 
 export const timMucHr = (ma: string) => HR_MUC.find((m) => m.ma === ma);
@@ -168,9 +205,10 @@ export function chuanHoaGiaTri(c: CotHr, tho: string): { v: string | number | bo
     case "chu": return { v: s ? s.slice(0, 200) : null };
     case "nhieu": return { v: s ? s.slice(0, 2000) : null };
     case "so": case "tien": {
-      if (!s) return { v: c.kieu === "so" ? 0 : null };
+      if (!s) return { v: c.kieu === "so" && !c.coTheTrong ? 0 : null };
       const n = Number(s.replace(/[.,\s]/g, ""));
       if (!Number.isFinite(n) || n < 0 || n > 1e12) return { loi: `“${c.nhan}” phải là số không âm.` };
+      if (c.khoang && (n < c.khoang[0] || n > c.khoang[1])) return { loi: `“${c.nhan}” phải từ ${c.khoang[0]} đến ${c.khoang[1]}.` };
       return { v: Math.round(n) };
     }
     case "ngay": return !s ? { v: null } : /^\d{4}-\d{2}-\d{2}$/.test(s) ? { v: s } : { loi: `“${c.nhan}” chưa đúng ngày.` };
