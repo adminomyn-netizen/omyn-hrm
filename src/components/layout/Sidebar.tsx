@@ -22,11 +22,11 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
   const dem = useDemMenu();
   const thuGon = tg === "1";
   const nhom = gomTheoNhom(locMenuTheoVaiTro(vaiTro, true));
-  // Nhóm gọn lại cho đỡ rối: chỉ "Chung" và nhóm đang đứng trong đó luôn mở; nhóm khác bấm tiêu đề để mở/đóng (nhớ lại cho lần sau).
+  // Nhóm gọn lại cho đỡ rối: bấm tiêu đề nhóm nào cũng mở/đóng được (nhớ lại cho lần sau). Chưa chọn gì thì chỉ "Chung" và nhóm đang đứng trong đó mở.
   const [moRaw, ghiMo] = useLuuTru(KHOA_MO_NHOM, "{}");
   const mo = useMemo<Record<string, boolean>>(() => { try { return JSON.parse(moRaw); } catch { return {}; } }, [moRaw]);
   const coMucDangChon = (g: (typeof nhom)[number]) => g.muc.some((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"));
-  const dangMo = (g: (typeof nhom)[number]) => thuGon || g.nhom === "Chung" || coMucDangChon(g) || mo[g.nhom] === true;
+  const dangMo = (g: (typeof nhom)[number]) => thuGon || g.nhom === "Chung" || (g.nhom in mo ? mo[g.nhom] : coMucDangChon(g));
 
   return (
     <aside
@@ -62,13 +62,12 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
                 <button
                   type="button"
                   aria-expanded={dangMo(g)}
-                  disabled={coMucDangChon(g)}
                   onClick={() => ghiMo(JSON.stringify({ ...mo, [g.nhom]: !dangMo(g) }))}
-                  className="flex w-full items-center gap-2 rounded-nho px-2.5 pb-2 pt-1 text-left text-[11px] font-medium uppercase tracking-[0.12em] text-menu-chu-phu hover:text-menu-chu disabled:cursor-default"
+                  className="flex w-full items-center gap-2 rounded-nho px-2.5 pb-2 pt-1 text-left text-[11px] font-medium uppercase tracking-[0.12em] text-menu-chu-phu hover:text-menu-chu"
                 >
                   <span className="flex-1">{g.nhom}</span>
                   {!dangMo(g) && g.muc.some((m) => (dem[m.duong_dan] ?? 0) > 0) && <span aria-label="Có mục mới" className="h-2 w-2" style={{ background: "var(--gradient-vang)", borderRadius: 9999 }} />}
-                  {!coMucDangChon(g) && <ChevronDown strokeWidth={1.6} className={`h-3.5 w-3.5 transition-transform ${dangMo(g) ? "" : "-rotate-90"}`} />}
+                  <ChevronDown strokeWidth={1.6} className={`h-3.5 w-3.5 transition-transform ${dangMo(g) ? "" : "-rotate-90"}`} />
                 </button>
               )
             )}
