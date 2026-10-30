@@ -17,7 +17,7 @@ export function AuthShell({ children, tieuDe, moTa }: { children: React.ReactNod
             <br />
             <span className="chu-vang">một đội ngũ được chăm chút.</span>
           </p>
-          <div className="my-7 h-px w-24" style={{ background: "linear-gradient(90deg,#5FD0BD,transparent)" }} />
+          <div className="my-7 h-px w-24" style={{ background: "linear-gradient(90deg,#E0A0AC,transparent)" }} />
           <p className="max-w-sm text-[15px] leading-relaxed text-[#cfe5e1]">Hồ sơ, chấm công, đơn từ và lương của OMYN Cosmetics trong một nơi gọn gàng.</p>
         </div>
         <p className="relative text-[12px] text-[#93bab3]">Công ty Cổ phần OMYN Cosmetics</p>

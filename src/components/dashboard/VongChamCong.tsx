@@ -8,11 +8,11 @@ export function VongChamCong({ da, tong, kichThuoc = 150 }: { da: number; tong: 
       <svg width={kichThuoc} height={kichThuoc} viewBox="0 0 150 150" role="img" aria-label={`${da} trên ${tong} người đã chấm công`}>
         <defs>
           <linearGradient id="vong-vang" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor="#7FE3D2" />
-            <stop offset="1" stopColor="#14938A" />
+            <stop offset="0" stopColor="#E8A0AE" />
+            <stop offset="1" stopColor="#B8475A" />
           </linearGradient>
         </defs>
-        <circle cx="75" cy="75" r={r} fill="none" stroke="rgba(227,242,239,.14)" strokeWidth="10" />
+        <circle cx="75" cy="75" r={r} fill="none" stroke="rgba(246,235,236,.14)" strokeWidth="10" />
         {tyLe > 0 && (
           <circle cx="75" cy="75" r={r} fill="none" stroke="url(#vong-vang)" strokeWidth="10" strokeLinecap="round" strokeDasharray={`${chuVi * tyLe} ${chuVi}`} transform="rotate(-90 75 75)" />
         )}
