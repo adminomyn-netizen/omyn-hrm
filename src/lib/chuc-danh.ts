@@ -22,3 +22,6 @@ export const CHUC_VU_KHONG_CHAM_CONG = ["tổng giám đốc", "giám đốc"];
 export function khongCanChamCong(vaiTro: string | null | undefined, chucDanh: string | null | undefined) {
   return vaiTro === "ky_thuat" || CHUC_VU_KHONG_CHAM_CONG.includes((chucDanh ?? "").trim().toLowerCase());
 }
+
+/** Chức vụ giám đốc (Tổng giám đốc, Giám đốc): người duy nhất được nhập/sửa mức thưởng thi đua KPI (anh Nam 30/10). Phó giám đốc KHÔNG tính. */
+export const laGiamDoc = (chucDanh: string | null | undefined) => CHUC_VU_KHONG_CHAM_CONG.includes((chucDanh ?? "").trim().toLowerCase());

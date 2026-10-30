@@ -2,6 +2,8 @@ import "server-only";
 import { cache } from "react";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { dbHr } from "@/lib/hr-db";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { khongCanChamCong } from "@/lib/chuc-danh";
 import { diemCacNguoi, diemCacPhong, xepHang, type ChiTieu, type Chieu, type DiemChiTieu, type Ky, type KetQuaNgay, type NguoiKpi, type XepHang } from "@/lib/kpi";
 
 export const homNayHcm = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
@@ -27,11 +29,15 @@ async function docHet<T>(lay: (tu: number, den: number) => PromiseLike<{ data: T
 export async function docNen() {
   const db = dbHr();
   const [nv, ct, kh] = await Promise.all([
-    db.from("nhan_vien").select("id, ho_ten, ma_nhan_vien, khoi_id, quan_ly_id, user_id").neq("trang_thai", "Đã nghỉ").order("ho_ten").limit(2000),
+    db.from("nhan_vien").select("id, ho_ten, ma_nhan_vien, khoi_id, quan_ly_id, user_id, chuc_danh").neq("trang_thai", "Đã nghỉ").order("ho_ten").limit(2000),
     db.from("kpi_chi_tieu").select("id, khoi_id, ten, don_vi, muc_tieu_ngay, trong_so, chieu").eq("hoat_dong", true).order("tao_luc").limit(500),
     db.from("khoi").select("id, ten").order("ten").limit(200),
   ]);
-  const nguoi: NguoiKpiDay[] = (nv.data ?? []).map((x) => ({ id: x.id, hoTen: x.ho_ten, khoiId: x.khoi_id, quanLyId: x.quan_ly_id, ma: x.ma_nhan_vien, userId: x.user_id }));
+  // Miễn KPI: Tổng giám đốc, Giám đốc và tài khoản Kỹ thuật (chị Lâm/anh Nam 30/10) — cùng nhóm miễn chấm công.
+  const kyThuat = new Set<string>();
+  const { data: us } = await createAdminClient().auth.admin.listUsers({ page: 1, perPage: 1000 });
+  for (const u of us?.users ?? []) if (u.app_metadata?.vai_tro === "ky_thuat") kyThuat.add(u.id);
+  const nguoi: NguoiKpiDay[] = (nv.data ?? []).filter((x) => !khongCanChamCong(x.user_id && kyThuat.has(x.user_id) ? "ky_thuat" : "nhan_vien", x.chuc_danh)).map((x) => ({ id: x.id, hoTen: x.ho_ten, khoiId: x.khoi_id, quanLyId: x.quan_ly_id, ma: x.ma_nhan_vien, userId: x.user_id }));
   const chiTieu: (ChiTieu & { donVi: string })[] = (ct.data ?? []).map((x) => ({ id: x.id, khoiId: x.khoi_id, ten: x.ten, donVi: x.don_vi ?? "", mucTieuNgay: Number(x.muc_tieu_ngay), trongSo: x.trong_so, chieu: x.chieu as Chieu }));
   const khoi = new Map<string, string>((kh.data ?? []).map((x) => [x.id, x.ten]));
   return { nguoi, chiTieu, khoi };
