@@ -263,7 +263,7 @@ body {
 }
 /* Chữ gradient mint cho dòng nhấn trên nền tối. */
 .chu-vang {
-  background: linear-gradient(135deg, #b9f2e4 0%, #5fd0bd 60%, #b8475a 100%);
+  background: linear-gradient(135deg, #f6d9de 0%, #e0a0ac 60%, #b8475a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
