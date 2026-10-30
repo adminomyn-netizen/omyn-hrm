@@ -1,0 +1,24 @@
+# Bàn giao phiên Omyn HRM — 30/10/2026 (Tula → phiên Omyn riêng)
+
+Bạn là **Tula**, trợ lý của chị Lâm. Phiên này CHỈ làm **Omyn HRM** (không đụng AMIA OS). Đọc `/Users/phamtunglam/project___1140/CLAUDE.md` trước. Chị tách 2 phiên vì phiên cũ quá dài, tốn token.
+
+## Bối cảnh
+Omyn HRM: Next.js + Supabase project `umdeugfmeircsywuuwpi`, repo `adminomyn-netizen/omyn-hrm`, thư mục `/Users/phamtunglam/project___1140/hrm-omyn/repo-mau`. Đang chạy HRM thật. Chị Lâm 30/10: Omyn "đơn giản quá", phải thành ứng dụng **vận hành phòng HR** theo từng cụm việc, từ nhập hồ sơ onboard tới nghỉ việc, "đầy đủ không thiếu sót", đẹp, thuận tiện, thu hút; bê toàn bộ HR bên Lark sang. Chi tiết khoảng trống: `docs/khoang-trong-hr-lark-30-10.md` (LƯU Ý đính chính: Omyn ĐÃ có ngày sinh `ho_so_ca_nhan.ngay_sinh` và `than_nhan`). Thiết kế nguồn: `docs/mapping-lark-hr.md`. Cấu trúc 79 bảng Lark đã dump: `/private/tmp/claude-501/-Users-phamtunglam-project---1140/962d4706-11d1-48bf-b1f9-52cc608d2895/scratchpad/lark-hr-fields.json` (nếu còn; dựng lại bằng `lark-cli2 base +table-list/+field-list --base-token V0pVbwdzsaS6VisuvNwjSkWhpIg|N83ebZyzAaWGWPsJQPQjp66Kpob|JypXbgmiUawsARsQEfej3PLYpNb --as user`, chỉ đọc).
+
+## Đã làm
+- Nhánh `omyn-hr-vong-doi` (PR #49, CHƯA gộp): migration `0017` (9 bảng: muc_tieu_tuyen_dung, ngan_sach_tuyen_dung, kenh_tuyen_dung, lich_phong_van, offer_tuyen_dung, de_xuat_phe_duyet, theo_doi_onboarding, onb_nhiem_vu, danh_gia_thu_viec; FORCE RLS như 0016); khung `src/lib/hr-module.ts` + `/hr` (trung tâm) + `/hr/[ma]` (6 mục theo cấu hình: thẻ, tìm, lọc trạng thái, cảnh báo đến hạn, thêm/sửa/xoá) + `/hr/onboarding` & `/hr/onboarding/[id]` (lộ trình 15 việc/4 giai đoạn, đánh giá mentor 30/60 ngày, hồ sơ & trạng thái) + mục menu "Vận hành HCNS". tsc/eslint/thiết kế sạch, 111 test qua, migration qua PGlite.
+- Nhánh `omyn-kpi` (đã đẩy, CHỈ có migration `0018_kpi_ranking.sql`: kpi_chi_tieu, kpi_ket_qua, kpi_thuong; chưa có code). Nó chồng lên `omyn-hr-vong-doi`.
+- Đã gộp: PR #48 (khung di động dvh + avatar vòng viền theo AMIA).
+
+## CHẶN hiện tại
+Chưa áp được migration lên DB Omyn: token Keychain `tula-supabase-msc-token` chỉ thấy project AMIA (403 trên Omyn); trình duyệt ABA chưa đăng nhập Supabase (GitHub đòi mật khẩu); `supabase` CLI không cài; không có mật khẩu DB Omyn. **Anh Nam sẽ dán 0017 vào SQL Editor của project Omyn (làm sau).** Khi anh Nam báo xong: kiểm bảng có chưa (đọc bằng service-role `.from("muc_tieu_tuyen_dung").select("id").limit(1)` qua `.env.local`, KHÔNG in khoá), rồi gộp PR #49 (`gh pr merge 49 --squash --admin`), kiểm Vercel. KHÔNG gộp trước khi bảng có (menu mới sẽ báo lỗi). Gom MỌI migration còn lại thành ít đợt nhất (0018 KPI + các cụm sau) để anh Nam không phải dán nhiều lần.
+
+## Việc tiếp (thứ tự chị chốt)
+1. **KPI + ranking + đánh giá** (chị + anh/chị Linh): mỗi ngày báo cáo đổ về; xếp hạng nhất-nhì-ba từng phòng; xếp hạng từng nhân sự trong phòng và toàn công ty; khen thưởng theo tháng/quý; đơn giản; thi đua. Thiết kế đã chọn: chỉ tiêu có mục tiêu NGÀY (chung hoặc theo khối), nhập kết quả mỗi ngày từng người (lead/HR nhập cho phòng, nhân viên nhập của mình), điểm = trung bình % đạt (trần 120%, chỉ tiêu "càng thấp càng tốt" đảo ngược) × trọng số, mẫu số là các ngày có ai báo cho chỉ tiêu đó; xếp hạng ngày/tháng/quý; bục 1-2-3 như AMIA `BangXepHangDep`. Dùng khung `hr-module.ts` cho cấu hình chỉ tiêu/thưởng; trang `/kpi` (dashboard theo vai) + `/kpi/nhap`. Có test thuần cho hàm tính điểm.
+2. **Dashboard theo vai:** sếp + Kỹ thuật + HR thấy cả công ty; lead phòng (người có `quan_ly_id` trỏ tới mình) thấy các phòng thi đua + phòng mình; nhân sự thấy phòng mình + ranking toàn công ty.
+3. **Thông báo liên tục** cho người có trách nhiệm (phỏng vấn sắp tới, offer hết hạn trả lời, đánh giá 30/60 ngày tới hạn, chưa nhập KPI hôm nay, bảng xếp hạng ngày…): dùng hạ tầng sẵn có `src/lib/push.ts`, `nhac-cong.ts`, migration 0014 (cron có `kiem_token_cron`).
+4. Các cụm còn lại theo `docs/khoang-trong-hr-lark-30-10.md`: hợp đồng LĐ (+ trang "đến hạn"), lộ trình thăng tiến, khảo sát/đơn nghỉ việc + checklist bàn giao, quỹ phép + lịch nghỉ phép, làm thêm giờ, điều chỉnh công, đăng ký nghỉ tháng, thưởng phạt, thuế TNCN, BSC, eNPS, tài sản cấp phát, báo cáo phân nhóm, quyền xem toàn công ty cho cấp lãnh đạo.
+Cần email tự động từ lúc có CV tới pass phỏng vấn (chị dặn) — soạn mẫu + hàng đợi, nguồn gửi hỏi chị.
+
+## Quy trình
+Mỗi lát 15–20 phút = migration + trang + quyền + test (PGlite `tests/db`), PR rồi gộp khi bảng đã có. `npx tsc --noEmit`, `npx eslint`, `node scripts/kiem-tra-thiet-ke.mjs` (cấm `rounded-full`, bóng nặng, emoji…), `npx vitest run` (hiện 111). Ghi vào `ags task log` nếu có mã việc; báo 1 dòng cho chị sau mỗi lát. Mẫu giao diện: AMIA OS (cùng token `--giay-sang`, `rounded-nho`…); mobile theo khung `khung-di-dong`. Không in token/khoá. Đọc memory `tula-omyn-bo-hr-lark-sang-30-10.md` và `tula-omyn-theo-thiet-ke-amia-chat-bot-29-10.md`.
