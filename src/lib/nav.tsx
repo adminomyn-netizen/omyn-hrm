@@ -15,6 +15,7 @@ import {
   Users,
   Wallet,
   Briefcase,
+  Trophy,
   type LucideIcon,
 } from "lucide-react";
 import type { VaiTro } from "@/lib/auth";
@@ -44,6 +45,7 @@ export const menuChinh: MucMenu[] = [
   { ten: "Tuyển dụng", duong_dan: "/tuyen-dung", nhom: "Con người", icon: UserPlus, chiVaiTro: CHI_QUAN_LY, moTa: "Tiếp nhận yêu cầu tuyển dụng, đăng tin theo kênh, theo dõi ứng viên qua từng vòng, chi phí và báo cáo." },
   { ten: "Yêu cầu tuyển dụng", duong_dan: "/yeu-cau-tuyen-dung", nhom: "Con người", icon: ClipboardList, chiVaiTro: ["nhan_vien"], moTa: "Trưởng bộ phận gửi yêu cầu tuyển người và theo dõi HCNS xử lý." },
   { ten: "Vận hành HCNS", duong_dan: "/hr", nhom: "Con người", icon: Briefcase, chiVaiTro: CHI_QUAN_LY, moTa: "Kế hoạch tuyển dụng, phỏng vấn, offer, onboarding và lộ trình 60 ngày thử việc." },
+  { ten: "Thi đua KPI", duong_dan: "/kpi", nhom: "Con người", icon: Trophy, moTa: "Bảng xếp hạng phòng và cá nhân theo ngày, tháng, quý; nhập kết quả KPI hằng ngày." },
   { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia", nhom: "Con người", icon: BarChart3, chiVaiTro: CHI_QUAN_LY, moTa: "Điểm và xếp loại hiệu suất theo kỳ." },
   { ten: "Chấm công", duong_dan: "/cham-cong", nhom: "Hằng ngày", icon: Clock, moTa: "Chấm công vào/ra và xem lịch công của bạn." },
   { ten: "Bảng công tháng", duong_dan: "/bang-cong", nhom: "Hằng ngày", icon: CalendarDays, chiVaiTro: CHI_QUAN_LY, moTa: "Bảng chấm công cả tháng theo mã công (X, N, CT, P, L…) và ngày nghỉ lễ." },

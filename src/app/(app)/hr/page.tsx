@@ -1,14 +1,14 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { ArrowRight, ClipboardList, Handshake, Megaphone, UserCheck, Wallet, CalendarClock, FileCheck2, Target } from "lucide-react";
+import { ArrowRight, ClipboardList, Handshake, Megaphone, UserCheck, Wallet, CalendarClock, FileCheck2, Target, Trophy, Gauge, Award } from "lucide-react";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { yeuCauVaiTro } from "@/lib/auth";
 import { dbHr } from "@/lib/hr-db";
 import { HR_MUC } from "@/lib/hr-module";
 
 const ICON: Record<string, typeof Target> = {
-  "muc-tieu-tuyen-dung": Target, "ngan-sach-tuyen-dung": Wallet, "kenh-tuyen-dung": Megaphone, "lich-phong-van": CalendarClock, "offer-tuyen-dung": Handshake, "de-xuat-phe-duyet": FileCheck2,
+  "muc-tieu-tuyen-dung": Target, "ngan-sach-tuyen-dung": Wallet, "kenh-tuyen-dung": Megaphone, "lich-phong-van": CalendarClock, "offer-tuyen-dung": Handshake, "de-xuat-phe-duyet": FileCheck2, "kpi-chi-tieu": Gauge, "kpi-thuong": Award,
 };
 
 /** Trung tâm vận hành HCNS: đi theo thứ tự công việc thật, từ kế hoạch tuyển dụng tới hết 60 ngày thử việc. */
@@ -42,13 +42,20 @@ export default async function TrangHr() {
         <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">1 · Tuyển dụng</h2>
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           <Muc href="/tuyen-dung" Icon={ClipboardList} ten="Tin tuyển dụng & ứng viên" moTa="Đăng tin theo kênh, theo dõi ứng viên qua từng vòng." />
-          {HR_MUC.map((m, i) => { const Icon = ICON[m.ma] ?? Target; return <Muc key={m.ma} href={`/hr/${m.ma}`} Icon={Icon} ten={m.ten} moTa={m.moTa} so={soMuc[i]} />; })}
+          {HR_MUC.map((m, i) => m.nhom !== "Tuyển dụng" ? null : <Muc key={m.ma} href={`/hr/${m.ma}`} Icon={ICON[m.ma] ?? Target} ten={m.ten} moTa={m.moTa} so={soMuc[i]} />)}
         </ul>
       </section>
       <section aria-label="Onboarding" className="mt-8">
         <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">2 · Onboarding & thử việc 60 ngày</h2>
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           <Muc href="/hr/onboarding" Icon={UserCheck} ten="Onboarding & thử việc" moTa="Lộ trình 4 giai đoạn, hồ sơ, đánh giá mentor 30/60 ngày, quyết định lên chính thức." so={onb.count ?? 0} />
+        </ul>
+      </section>
+      <section aria-label="KPI và thi đua" className="mt-8">
+        <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">3 · KPI & thi đua</h2>
+        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
+          <Muc href="/kpi" Icon={Trophy} ten="Bảng xếp hạng thi đua" moTa="Xếp hạng phòng, người trong phòng và toàn công ty theo ngày, tháng, quý." />
+          {HR_MUC.map((m, i) => m.nhom !== "KPI & thi đua" ? null : <Muc key={m.ma} href={`/hr/${m.ma}`} Icon={ICON[m.ma] ?? Target} ten={m.ten} moTa={m.moTa} so={soMuc[i]} />)}
         </ul>
       </section>
     </>

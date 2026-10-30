@@ -130,6 +130,32 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
     ],
   },
+  {
+    ma: "kpi-chi-tieu", ten: "Chỉ tiêu KPI", nhom: "KPI & thi đua", bang: "kpi_chi_tieu", tieuDe: "ten",
+    moTa: "Chỉ tiêu có mục tiêu NGÀY, chung cho mọi khối hoặc riêng một khối; trọng số 1-10 cho điểm tổng.",
+    sapXep: { cot: "tao_luc" }, trong: "Chưa có chỉ tiêu. Thêm chỉ tiêu đầu tiên (vd Cuộc gọi/ngày, mục tiêu 20).",
+    cot: [
+      { k: "ten", nhan: "Tên chỉ tiêu", kieu: "chu", batBuoc: true, goiY: "Cuộc gọi chăm sóc" },
+      { k: "khoi_id", nhan: "Áp cho khối (trống = mọi khối)", kieu: "khoi", the: true },
+      { k: "muc_tieu_ngay", nhan: "Mục tiêu mỗi ngày", kieu: "so", batBuoc: true, mac: 1, the: true, goiY: "Phải lớn hơn 0" },
+      { k: "don_vi", nhan: "Đơn vị", kieu: "chu", the: true, goiY: "cuộc / đơn / bài" },
+      { k: "trong_so", nhan: "Trọng số (1-10)", kieu: "so", mac: 1, the: true },
+      { k: "chieu", nhan: "Chiều tốt", kieu: "chon", luaChon: ["Càng cao càng tốt", "Càng thấp càng tốt"], mac: "Càng cao càng tốt", the: true },
+      { k: "hoat_dong", nhan: "Đang dùng", kieu: "co", mac: true },
+    ],
+  },
+  {
+    ma: "kpi-thuong", ten: "Khen thưởng thi đua", nhom: "KPI & thi đua", bang: "kpi_thuong", tieuDe: "pham_vi",
+    moTa: "Phần thưởng cho hạng 1-2-3 theo tháng/quý, cho phòng, cá nhân trong phòng và cá nhân toàn công ty.",
+    sapXep: { cot: "tao_luc" }, trong: "Chưa có mức thưởng. Thêm mức cho hạng 1 của tháng.",
+    cot: [
+      { k: "ky_loai", nhan: "Kỳ", kieu: "chon", luaChon: ["Tháng", "Quý"], mac: "Tháng", the: true },
+      { k: "pham_vi", nhan: "Phạm vi", kieu: "chon", luaChon: ["Phòng", "Cá nhân trong phòng", "Cá nhân toàn công ty"], mac: "Phòng", the: true },
+      { k: "hang", nhan: "Hạng (1-3)", kieu: "so", batBuoc: true, mac: 1, the: true },
+      { k: "so_tien", nhan: "Số tiền (đ)", kieu: "tien", mac: 0, the: true },
+      { k: "mo_ta", nhan: "Mô tả", kieu: "chu", rong: true, goiY: "Cờ thi đua + bữa trưa cả phòng" },
+    ],
+  },
 ];
 
 export const timMucHr = (ma: string) => HR_MUC.find((m) => m.ma === ma);
