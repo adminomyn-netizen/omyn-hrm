@@ -2,12 +2,25 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Briefcase, CornerDownLeft, Search, UserPlus, Users } from "lucide-react";
+import {
+  Briefcase,
+  CornerDownLeft,
+  Search,
+  UserPlus,
+  Users,
+} from "lucide-react";
 import { locMenuTheoVaiTro } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
 import type { KetQuaTim } from "@/app/api/tim-kiem/route";
 
-type Muc = { khoa: string; tieuDe: string; phu: string; href: string; Icon: typeof Users; nhom: string };
+type Muc = {
+  khoa: string;
+  tieuDe: string;
+  phu: string;
+  href: string;
+  Icon: typeof Users;
+  nhom: string;
+};
 
 /** Hộp tìm nhanh (⌘K / Ctrl+K): nhảy tới trang, nhân viên, ứng viên, tin tuyển dụng. Quản lý tìm cả dữ liệu; nhân viên chỉ nhảy trang. */
 export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
@@ -49,7 +62,10 @@ export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
     let huy = false;
     const h = setTimeout(async () => {
       try {
-        const r = await fetch(`/api/tim-kiem?q=${encodeURIComponent(q.trim())}`, { cache: "no-store" });
+        const r = await fetch(
+          `/api/tim-kiem?q=${encodeURIComponent(q.trim())}`,
+          { cache: "no-store" },
+        );
         if (!r.ok) return;
         const j = (await r.json()) as { ketQua: KetQua };
         if (!huy) setTu(j.ketQua);
@@ -69,7 +85,14 @@ export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
     const trang: Muc[] = locMenuTheoVaiTro(vaiTro)
       .filter((m) => !k || m.ten.toLowerCase().includes(k))
       .slice(0, k ? 5 : 6)
-      .map((m) => ({ khoa: `t-${m.duong_dan}`, tieuDe: m.ten, phu: m.moTa, href: m.duong_dan, Icon: m.icon, nhom: "Trang" }));
+      .map((m) => ({
+        khoa: `t-${m.duong_dan}`,
+        tieuDe: m.ten,
+        phu: m.moTa,
+        href: m.duong_dan,
+        Icon: m.icon,
+        nhom: "Trang",
+      }));
     const du: Muc[] =
       k.length >= 2
         ? tu.map((x) => ({
@@ -77,8 +100,18 @@ export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
             tieuDe: x.tieuDe,
             phu: x.phu,
             href: x.href,
-            Icon: x.loai === "nhan_vien" ? Users : x.loai === "ung_vien" ? UserPlus : Briefcase,
-            nhom: x.loai === "nhan_vien" ? "Nhân viên" : x.loai === "ung_vien" ? "Ứng viên" : "Tin tuyển dụng",
+            Icon:
+              x.loai === "nhan_vien"
+                ? Users
+                : x.loai === "ung_vien"
+                  ? UserPlus
+                  : Briefcase,
+            nhom:
+              x.loai === "nhan_vien"
+                ? "Nhân viên"
+                : x.loai === "ung_vien"
+                  ? "Ứng viên"
+                  : "Tin tuyển dụng",
           }))
         : [];
     return [...du, ...trang];
@@ -124,16 +157,36 @@ export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
         className="flex h-9 items-center gap-2.5 rounded-nho border border-vien bg-giay-sang px-3 text-[13px] text-muc-3 hover:border-nhan sm:w-[22rem] sm:max-w-full"
       >
         <Search strokeWidth={1.6} className="h-4 w-4 shrink-0" />
-        <span className="hidden flex-1 truncate text-left sm:block">{laQuanLy ? "Tìm nhân viên, ứng viên, tin tuyển dụng" : "Tìm trang"}</span>
-        <kbd className="hidden rounded-[4px] border border-vien px-1.5 py-px text-[11px] sm:block">⌘K</kbd>
+        <span className="hidden flex-1 truncate text-left sm:block">
+          {laQuanLy ? "Tìm nhân viên, ứng viên, tin tuyển dụng" : "Tìm trang"}
+        </span>
+        <kbd className="hidden rounded-[4px] border border-vien px-1.5 py-px text-[11px] sm:block">
+          ⌘K
+        </kbd>
       </button>
 
       {mo && (
-        <div className="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-[12vh]" onKeyDown={phim}>
-          <button aria-label="Đóng tìm kiếm" tabIndex={-1} className="fixed inset-0 bg-muc/45" onClick={dong} />
-          <div role="dialog" aria-modal="true" aria-label="Tìm kiếm" className="relative w-full max-w-xl overflow-hidden rounded-hop border border-vien bg-giay-sang shadow-[0_24px_60px_rgba(0,0,0,0.35)]">
+        <div
+          className="fixed inset-0 z-[60] flex items-start justify-center px-4 pt-[12vh]"
+          onKeyDown={phim}
+        >
+          <button
+            aria-label="Đóng tìm kiếm"
+            tabIndex={-1}
+            className="fixed inset-0 bg-muc/45"
+            onClick={dong}
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Tìm kiếm"
+            className="relative w-full max-w-xl overflow-hidden rounded-hop border border-vien bg-giay-sang shadow-[0_24px_60px_rgba(0,0,0,0.35)]"
+          >
             <div className="flex items-center gap-3 border-b border-vien px-4">
-              <Search strokeWidth={1.6} className="h-[18px] w-[18px] shrink-0 text-nhan" />
+              <Search
+                strokeWidth={1.6}
+                className="h-[18px] w-[18px] shrink-0 text-nhan"
+              />
               <input
                 ref={oRef}
                 value={q}
@@ -144,19 +197,35 @@ export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
                 role="combobox"
                 aria-expanded="true"
                 aria-controls="tk-ds"
-                aria-activedescendant={muc[dangTro] ? `tk-${muc[dangTro].khoa}` : undefined}
-                placeholder={laQuanLy ? "Gõ tên nhân viên, ứng viên, vị trí hoặc tên trang" : "Gõ tên trang"}
+                aria-activedescendant={
+                  muc[dangTro] ? `tk-${muc[dangTro].khoa}` : undefined
+                }
+                placeholder={
+                  laQuanLy
+                    ? "Gõ tên nhân viên, ứng viên, vị trí hoặc tên trang"
+                    : "Gõ tên trang"
+                }
                 className="h-14 flex-1 bg-transparent text-[16px] text-muc outline-none placeholder:text-muc-3"
               />
-              <kbd className="rounded-[4px] border border-vien px-1.5 py-px text-[11px] text-muc-3">Esc</kbd>
+              <kbd className="rounded-[4px] border border-vien px-1.5 py-px text-[11px] text-muc-3">
+                Esc
+              </kbd>
             </div>
-            <ul id="tk-ds" role="listbox" className="max-h-[50vh] overflow-y-auto p-2">
+            <ul
+              id="tk-ds"
+              role="listbox"
+              className="max-h-[50vh] overflow-y-auto p-2"
+            >
               {muc.map((m, i) => {
                 const dauNhom = m.nhom !== nhomTruoc;
                 nhomTruoc = m.nhom;
                 return (
                   <li key={m.khoa} role="presentation">
-                    {dauNhom && <div className="px-3 pb-1 pt-2.5 text-[11px] font-medium uppercase tracking-[0.1em] text-muc-3">{m.nhom}</div>}
+                    {dauNhom && (
+                      <div className="px-3 pb-1 pt-2.5 text-[11px] font-medium uppercase tracking-[0.1em] text-muc-3">
+                        {m.nhom}
+                      </div>
+                    )}
                     <div
                       id={`tk-${m.khoa}`}
                       role="option"
@@ -165,17 +234,33 @@ export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
                       onClick={() => di(m)}
                       className={`flex cursor-pointer items-center gap-3 rounded-nho px-3 py-2.5 ${i === dangTro ? "bg-giay-tram" : ""}`}
                     >
-                      <m.Icon strokeWidth={1.6} className="h-[18px] w-[18px] shrink-0 text-nhan" />
+                      <m.Icon
+                        strokeWidth={1.6}
+                        className="h-[18px] w-[18px] shrink-0 text-nhan"
+                      />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-[14px] font-medium text-muc">{m.tieuDe}</span>
-                        <span className="block truncate text-[12px] text-muc-3">{m.phu}</span>
+                        <span className="block truncate text-[14px] font-medium text-muc">
+                          {m.tieuDe}
+                        </span>
+                        <span className="block truncate text-[12px] text-muc-3">
+                          {m.phu}
+                        </span>
                       </span>
-                      {i === dangTro && <CornerDownLeft strokeWidth={1.6} className="h-4 w-4 shrink-0 text-muc-3" />}
+                      {i === dangTro && (
+                        <CornerDownLeft
+                          strokeWidth={1.6}
+                          className="h-4 w-4 shrink-0 text-muc-3"
+                        />
+                      )}
                     </div>
                   </li>
                 );
               })}
-              {muc.length === 0 && <li className="px-3 py-10 text-center text-[14px] text-muc-3">Không tìm thấy &ldquo;{q}&rdquo;.</li>}
+              {muc.length === 0 && (
+                <li className="px-3 py-10 text-center text-[14px] text-muc-3">
+                  Không tìm thấy &ldquo;{q}&rdquo;.
+                </li>
+              )}
             </ul>
           </div>
         </div>
