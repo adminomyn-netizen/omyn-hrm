@@ -6,7 +6,15 @@ export const LOAI_TAI_LIEU = [
 export type LoaiTaiLieu = (typeof LOAI_TAI_LIEU)[number];
 
 /** Giấy tờ bắt buộc phải có trong hồ sơ (theo bảng "Quản lý nhân sự" của MSC: ảnh CCCD, NDA, hợp đồng). */
-export const GIAY_TO_BAT_BUOC: readonly LoaiTaiLieu[] = ["CCCD mặt trước", "CCCD mặt sau", "Sơ yếu lý lịch", "Hợp đồng lao động", "Cam kết bảo mật (NDA)"];
+/** Giấy tờ bắt buộc theo luật (chị Lâm chốt 30/10): CCCD hai mặt, sơ yếu lý lịch, bằng cấp, giấy khám sức khoẻ, sổ BHXH. Mã số thuế là trường thông tin, kiểm riêng ở truongThieuTheoLuat. */
+export const GIAY_TO_THEO_LUAT: readonly LoaiTaiLieu[] = ["CCCD mặt trước", "CCCD mặt sau", "Sơ yếu lý lịch", "Bằng cấp", "Giấy khám sức khoẻ", "Sổ BHXH"];
+/** Giấy tờ theo quy định công ty. */
+export const GIAY_TO_CONG_TY: readonly LoaiTaiLieu[] = ["Hợp đồng lao động", "Cam kết bảo mật (NDA)"];
+export const GIAY_TO_BAT_BUOC: readonly LoaiTaiLieu[] = [...GIAY_TO_THEO_LUAT, ...GIAY_TO_CONG_TY];
+/** Thông tin bắt buộc theo luật trong sơ yếu lý lịch. */
+export const TRUONG_BAT_BUOC_THEO_LUAT: readonly { k: string; nhan: string }[] = [{ k: "cccd", nhan: "Số CCCD" }, { k: "ma_so_thue", nhan: "Mã số thuế" }, { k: "so_bhxh", nhan: "Số sổ BHXH" }];
+/** Thông tin bắt buộc theo luật còn thiếu trong hồ sơ cá nhân. */
+export const truongThieuTheoLuat = (h: Record<string, unknown> | null) => TRUONG_BAT_BUOC_THEO_LUAT.filter((t) => String(h?.[t.k] ?? "").trim() === "").map((t) => t.nhan);
 export const TRANG_THAI_TAI_LIEU = ["Chờ xác nhận", "Đã xác nhận", "Cần bổ sung"] as const;
 
 export const MIME_CHO_PHEP = ["application/pdf", "image/jpeg", "image/png"] as const;

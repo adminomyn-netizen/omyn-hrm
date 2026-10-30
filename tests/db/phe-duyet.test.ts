@@ -76,3 +76,28 @@ describe("Migration 0021: cấu hình luồng phiếu", () => {
     expect(await loiMa(db.query(`insert into public.pd_cau_hinh_lich_su (ma_phieu, doi_tuong, hanh_dong, mo_ta) values ('x','Lạ','Thêm','t')`))).toBe("23514");
   });
 });
+
+describe("Migration 0022: hồ sơ + hợp đồng", () => {
+  let db: PGlite;
+  const NV = u(501);
+  beforeAll(async () => { db = await taoDbVoiMigration(); await db.exec(`insert into auth.users (id) values ('${u(1)}'); insert into public.nhan_vien (id, ho_ten) values ('${NV}','A')`); });
+  it("trình duyệt và khách không đọc được", async () => {
+    for (const b of ["hop_dong_phu_luc", "tai_san_cap_phat", "nhan_su_lich_su"]) {
+      expect(await loiMa(chayVoiTu(db, { sub: u(1) }, `select * from public.${b}`)), b).toBe("42501");
+      expect(await loiMa(chayVoiKhach(db, `select * from public.${b}`)), b).toBe("42501");
+    }
+  });
+  it("phụ lục: loại/nội dung/ngày hợp lệ; tài sản: số lượng > 0, ngày trả không trước ngày cấp; xoá nhân sự xoá cả hai nhưng giữ lịch sử", async () => {
+    await db.query(`insert into public.hop_dong_phu_luc (nhan_vien_id, loai_thay_doi, ngay_hieu_luc, noi_dung) values ($1,'Gia hạn','2026-11-01','x')`, [NV]);
+    expect(await loiMa(db.query(`insert into public.hop_dong_phu_luc (nhan_vien_id, loai_thay_doi, ngay_hieu_luc, noi_dung) values ($1,'Lạ','2026-11-01','x')`, [NV]))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.hop_dong_phu_luc (nhan_vien_id, ngay_hieu_luc, noi_dung) values ($1,'2026-11-01','  ')`, [NV]))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.hop_dong_phu_luc (nhan_vien_id, ngay_hieu_luc, den_ngay_moi, noi_dung) values ($1,'2026-11-01','2026-10-01','x')`, [NV]))).toBe("23514");
+    await db.query(`insert into public.tai_san_cap_phat (nhan_vien_id, ten_tai_san, ngay_cap) values ($1,'Laptop','2026-10-01')`, [NV]);
+    expect(await loiMa(db.query(`insert into public.tai_san_cap_phat (nhan_vien_id, ten_tai_san, ngay_cap, so_luong) values ($1,'x','2026-10-01',0)`, [NV]))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.tai_san_cap_phat (nhan_vien_id, ten_tai_san, ngay_cap, ngay_tra) values ($1,'x','2026-10-10','2026-10-01')`, [NV]))).toBe("23514");
+    await db.query(`insert into public.nhan_su_lich_su (nhan_vien_id, doi_tuong, hanh_dong, mo_ta) values ($1,'Tài sản cấp phát','Thêm','t')`, [NV]);
+    await db.query(`delete from public.nhan_vien where id = $1`, [NV]);
+    for (const b of ["hop_dong_phu_luc", "tai_san_cap_phat"]) expect((await db.query(`select 1 from public.${b}`)).rows, b).toHaveLength(0);
+    expect((await db.query(`select 1 from public.nhan_su_lich_su`)).rows).toHaveLength(1);
+  });
+});
