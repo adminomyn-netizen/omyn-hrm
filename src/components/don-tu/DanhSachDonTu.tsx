@@ -54,7 +54,7 @@ export function DanhSachDonTu({ che, don, nopDon: thongTinNop }: { che: "quan-ly
 
   return (
     <>
-      <TieuDeTrang tieuDe="Đơn từ và phê duyệt" phu={che === "quan-ly" ? `${soCho} đơn chờ duyệt · ${hien.length} đơn tất cả` : `${hien.length} đơn của bạn`}>
+      <TieuDeTrang tieuDe="Đơn nghỉ và giải trình công" phu={che === "quan-ly" ? `${soCho} đơn chờ duyệt · ${hien.length} đơn tất cả` : `${hien.length} đơn của bạn`}>
         {thongTinNop && <button type="button" className={NUT_CHINH} onClick={() => setNop(true)}>Nộp đơn mới</button>}
       </TieuDeTrang>
       <div className="flex flex-wrap items-end justify-between gap-4 border-b border-vien">
