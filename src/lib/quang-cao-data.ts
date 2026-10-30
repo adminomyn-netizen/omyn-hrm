@@ -95,3 +95,9 @@ export async function tongQuanNenTang(tu: string, den: string) {
   const caGianHang = sp.reduce<{ don: number; doanhThu: number }>((a, x) => ({ don: a.don + Number(x.so_don), doanhThu: a.doanhThu + Number(x.doanh_thu) }), { don: 0, doanhThu: 0 });
   return { facebook: f, tiktok: t, shopee: s, shopeeCaGianHang: caGianHang, khoa: trangThaiKhoa(process.env) };
 }
+
+/** Chi tiêu quảng cáo mỗi ngày cộng cả ba nền tảng (cho biểu đồ tổng quan). */
+export async function chiTieuNgayTatCa(tu: string, den: string) {
+  const [fb, tt, sp] = await Promise.all([docTrang("qc_meta_so_lieu", "ngay, chi_tieu", tu, den), docTrang("qc_tiktok_so_lieu", "ngay, chi_tieu", tu, den), docTrang("qc_shopee_so_lieu_ngay", "ngay, chi_phi_qc", tu, den)]);
+  return [...fb.map((x) => ({ ngay: String(x.ngay), chiTieu: Number(x.chi_tieu) })), ...tt.map((x) => ({ ngay: String(x.ngay), chiTieu: Number(x.chi_tieu) })), ...sp.map((x) => ({ ngay: String(x.ngay), chiTieu: Number(x.chi_phi_qc) }))];
+}
