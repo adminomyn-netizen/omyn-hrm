@@ -60,6 +60,7 @@ export const menuChinh: MucMenu[] = [
   { ten: "Đơn từ và phê duyệt", duong_dan: "/don-tu", nhom: "Nhân sự", icon: Inbox, moTa: "Nộp đơn nghỉ, công tác, tạm ứng và theo dõi kết quả duyệt." },
   { ten: "Bảng lương", duong_dan: "/luong", nhom: "Nhân sự", icon: Wallet, chiVaiTro: ["admin", "ky_thuat", "nhan_vien"], moTa: "Quản trị và Kỹ thuật: kỳ lương, thỏa thuận lương, tham số. Nhân viên: phiếu lương của mình." },
   { ten: "Báo cáo và biểu mẫu", duong_dan: "/bao-cao", nhom: "Quản trị", icon: FileBarChart, chiVaiTro: CHI_QUAN_LY, moTa: "Báo cáo tổng hợp và biểu mẫu." },
+  { ten: "Setup luồng phiếu", duong_dan: "/ky-thuat/luong-phieu", nhom: "Quản trị", icon: ClipboardCheck, chiVaiTro: ["ky_thuat"], moTa: "Chỉnh bước duyệt, người duyệt, điều kiện hiện ô, nhóm mã và thông báo của từng loại phiếu; có lịch sử sửa." },
   { ten: "Kỹ thuật", duong_dan: "/ky-thuat", nhom: "Quản trị", icon: Activity, chiVaiTro: ["ky_thuat"], moTa: "Tình trạng hệ thống và số dòng dữ liệu. Chỉ tài khoản Kỹ thuật xem được." },
 ];
 

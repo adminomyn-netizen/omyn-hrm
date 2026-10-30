@@ -46,3 +46,33 @@ describe("Migration 0020: phê duyệt", () => {
     for (const b of ["pd_buoc", "pd_lich_su", "pd_tep"]) expect((await db.query(`select 1 from public.${b}`)).rows, b).toHaveLength(0);
   });
 });
+
+describe("Migration 0021: cấu hình luồng phiếu", () => {
+  let db: PGlite;
+  beforeAll(async () => { db = await taoDbVoiMigration(); await db.exec(`insert into auth.users (id) values ('${u(1)}')`); });
+  it("trình duyệt và khách không đọc được", async () => {
+    for (const b of ["pd_o_cau_hinh", "pd_thong_bao_cau_hinh", "pd_cau_hinh_lich_su"]) {
+      expect(await loiMa(chayVoiTu(db, { sub: u(1) }, `select * from public.${b}`)), b).toBe("42501");
+      expect(await loiMa(chayVoiKhach(db, `select * from public.${b}`)), b).toBe("42501");
+    }
+  });
+  it("ghi đè ô: điều kiện phải đủ cặp ô + giá trị; mỗi ô một dòng; giá trị lạ bị chặn", async () => {
+    await db.query(`insert into public.pd_o_cau_hinh (ma_phieu, truong, che_do_hien, hien_truong, hien_gia_tri) values ('x','a','Theo điều kiện','b','{ADL}')`);
+    expect(await loiMa(db.query(`insert into public.pd_o_cau_hinh (ma_phieu, truong) values ('x','a')`))).toBe("23505");
+    expect(await loiMa(db.query(`insert into public.pd_o_cau_hinh (ma_phieu, truong, che_do_hien) values ('x','c','Theo điều kiện')`))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.pd_o_cau_hinh (ma_phieu, truong, hien_truong, hien_gia_tri) values ('x','d','b','{ADL}')`))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.pd_o_cau_hinh (ma_phieu, truong, bat_buoc) values ('x','e','Có')`))).toBe("23514");
+  });
+  it("thông báo: sự kiện/loại người hợp lệ, chức danh/nhân viên đi kèm; xoá nhân sự xoá luôn dòng", async () => {
+    expect(await loiMa(db.query(`insert into public.pd_thong_bao_cau_hinh (ma_phieu, su_kien, loai_nguoi) values ('x','Lạ','Giám đốc')`))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.pd_thong_bao_cau_hinh (ma_phieu, su_kien, loai_nguoi) values ('x','Nộp phiếu','Chức danh')`))).toBe("23514");
+    await db.query(`insert into public.nhan_vien (id, ho_ten) values ('${u(7)}','A')`);
+    await db.query(`insert into public.pd_thong_bao_cau_hinh (ma_phieu, su_kien, loai_nguoi, nhan_vien_id) values ('x','Duyệt xong','Nhân viên','${u(7)}')`);
+    await db.query(`delete from public.nhan_vien where id = '${u(7)}'`);
+    expect((await db.query(`select 1 from public.pd_thong_bao_cau_hinh`)).rows).toHaveLength(0);
+  });
+  it("lịch sử cấu hình: đối tượng và hành động hợp lệ", async () => {
+    await db.query(`insert into public.pd_cau_hinh_lich_su (ma_phieu, doi_tuong, hanh_dong, mo_ta) values ('x','Bước duyệt','Thêm','t')`);
+    expect(await loiMa(db.query(`insert into public.pd_cau_hinh_lich_su (ma_phieu, doi_tuong, hanh_dong, mo_ta) values ('x','Lạ','Thêm','t')`))).toBe("23514");
+  });
+});

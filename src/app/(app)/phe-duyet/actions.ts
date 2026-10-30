@@ -12,7 +12,7 @@ import {
 } from "@/lib/phe-duyet";
 import { mauTheoMa } from "@/lib/phe-duyet-mau";
 import {
-  COT_PHIEU, KHO_TEP, baoNguoiDung, docDanhMuc, docLuong, docNhomMa, docO, ghiO, nguCanhNguoiDuyet, nhanVienCuaTaiKhoan, type PhieuTho,
+  COT_PHIEU, KHO_TEP, baoNguoiDung, baoTheoCauHinh, mauHieuLuc, docDanhMuc, docLuong, docNhomMa, docO, ghiO, nguCanhNguoiDuyet, nhanVienCuaTaiKhoan, type PhieuTho,
 } from "@/lib/phe-duyet-data";
 
 // Xem ghi chú trong src/lib/actions.ts: gọi từ onClick của nút type="button", không từ <form> submit thật.
@@ -94,7 +94,7 @@ const URL_PHIEU = (id: string) => `/phe-duyet/${id}`;
 /** Nộp phiếu mới: kiểm tra, cấp số phiếu, lưu tệp, dựng luồng duyệt rồi báo người duyệt bước đầu. */
 export async function nopPhieu(ma: string, du: Record<string, unknown>, tep: TepMoi[]): Promise<KetQuaPd> {
   const nd = await nguoiHienTai();
-  const mau = mauTheoMa(ma);
+  const mau = await mauHieuLuc(ma);
   if (!mau) return { loi: "Không có loại phiếu này." };
   const nhom = (await docNhomMa())[ma];
   if (nhom && !nhom.dung) return { loi: "Loại phiếu này đang tạm ngưng." };
@@ -140,6 +140,7 @@ export async function nopPhieu(ma: string, du: Record<string, unknown>, tep: Tep
 
   await baoNguoiDung(kq.canBao.cho.map((x) => x.userId), { tieuDe: `Phiếu chờ bạn duyệt: ${soPhieu}`, noiDung: `${mau.ten} — ${nguoiNop.hoTen}`, url: URL_PHIEU(id), tag: `pd-${id}` });
   await baoNguoiDung(kq.canBao.banSao.map((x) => x.userId), { tieuDe: `Bản sao phiếu ${soPhieu}`, noiDung: `${mau.ten} — ${nguoiNop.hoTen}`, url: URL_PHIEU(id) });
+  await baoTheoCauHinh(ma, "Nộp phiếu", nguoiNop.id, { tieuDe: `Phiếu mới: ${soPhieu}`, noiDung: `${mau.ten} — ${nguoiNop.hoTen}`, url: URL_PHIEU(id) }, [nd.id, ...kq.canBao.cho.map((x) => x.userId), ...kq.canBao.banSao.map((x) => x.userId)]);
   revalidatePath("/phe-duyet");
   return { ok: true, id, soPhieu };
 }
@@ -173,6 +174,8 @@ export async function xuLyPhieu(id: string, hanhDong: HanhDongDuyet, ghiChu: str
 
   const mau = mauTheoMa(p.ma_phieu);
   const nguoiNopUser = await userCuaNhanVien(p.nguoi_nop_id);
+  const suKien = kq.trangThai === "Đã duyệt" ? "Duyệt xong" : kq.trangThai === "Từ chối" ? "Từ chối" : kq.trangThai === "Cần bổ sung" ? "Cần bổ sung" : null;
+  if (suKien) await baoTheoCauHinh(p.ma_phieu, suKien, p.nguoi_nop_id, { tieuDe: `Phiếu ${suKien === "Duyệt xong" ? "đã được duyệt" : suKien === "Từ chối" ? "bị từ chối" : "cần bổ sung"}: ${p.so_phieu}`, noiDung: `${mau?.ten ?? p.ma_phieu} — ${p.nguoi_nop?.ho_ten ?? ""}`, url: URL_PHIEU(id) }, [nguoiNopUser, nd.id]);
   const ten = `${p.so_phieu} — ${mau?.ten ?? p.ma_phieu}`;
   if (kq.trangThai === "Đã duyệt") await baoNguoiDung([nguoiNopUser], { tieuDe: `Phiếu đã được duyệt: ${p.so_phieu}`, noiDung: ten, url: URL_PHIEU(id) });
   else if (kq.trangThai === "Từ chối") await baoNguoiDung([nguoiNopUser], { tieuDe: `Phiếu bị từ chối: ${p.so_phieu}`, noiDung: `${nd.hoTen}: ${ghiChu.trim()}`, url: URL_PHIEU(id) });
@@ -200,7 +203,7 @@ export async function nopLaiPhieu(id: string, du: Record<string, unknown>, tep: 
   const o = await docO(id);
   const q = quyenTrenPhieu({ trangThai: p.trang_thai, nguoiNopId: p.nguoi_nop_id, buocHienTai: p.buoc_hien_tai }, o, { nhanVienId: nv?.id ?? null, userId: nd.id });
   if (!q.suaVaNopLai) return { loi: "Phiếu này không ở trạng thái cần bổ sung của bạn." };
-  const mau = mauTheoMa(p.ma_phieu);
+  const mau = await mauHieuLuc(p.ma_phieu);
   if (!mau) return { loi: "Loại phiếu không còn." };
   const oTep = new Set(mau.truong.filter((t) => t.kieu === "tep").map((t) => t.ma));
   if (tep.some((t) => !oTep.has(t.truong))) return { loi: "Tệp đính kèm không hợp lệ." };
@@ -239,6 +242,7 @@ export async function huyPhieu(id: string, ghiChu: string): Promise<KetQuaPd> {
   await lichSu(id, null, nd.id, nd.hoTen, "Huỷ", ghiChu);
   const dangCho = o.filter((x: O) => x.kieu !== "CC" && x.trangThai === "Chờ" && x.buoc === p.buoc_hien_tai);
   await baoNguoiDung(dangCho.map((x) => x.userId), { tieuDe: `Phiếu đã bị huỷ: ${p.so_phieu}`, noiDung: `${nv?.hoTen ?? ""} đã huỷ phiếu`, url: URL_PHIEU(id) });
+  await baoTheoCauHinh(p.ma_phieu, "Huỷ", p.nguoi_nop_id, { tieuDe: `Phiếu đã bị huỷ: ${p.so_phieu}`, noiDung: `${nv?.hoTen ?? ""} đã huỷ phiếu`, url: URL_PHIEU(id) }, [nd.id, ...dangCho.map((x) => x.userId)]);
   revalidatePath("/phe-duyet"); revalidatePath(URL_PHIEU(id));
   return { ok: true, id, soPhieu: p.so_phieu };
 }

@@ -4,8 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { yeuCauDangNhapDaDuyet } from "@/lib/phe-duyet-quyen";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { FormPhieu } from "@/components/phe-duyet/FormPhieu";
-import { mauTheoMa } from "@/lib/phe-duyet-mau";
-import { docDanhMuc, taiDanhSachNhanSu, taiPhieuCoTheNoi, taiPhieuDeXem } from "@/lib/phe-duyet-data";
+import { docDanhMuc, mauHieuLuc, taiDanhSachNhanSu, taiPhieuCoTheNoi, taiPhieuDeXem } from "@/lib/phe-duyet-data";
 import { quyenTrenPhieu } from "@/lib/phe-duyet";
 
 /** Sửa phiếu theo yêu cầu bổ sung rồi nộp lại (luồng duyệt chạy lại từ bước đầu). */
@@ -13,7 +12,7 @@ export default async function TrangSuaPhieu({ params }: { params: Promise<{ id: 
   const nd = await yeuCauDangNhapDaDuyet();
   const { id } = await params;
   const x = await taiPhieuDeXem(id, nd);
-  const mau = x && mauTheoMa(x.phieu.ma_phieu);
+  const mau = x && (await mauHieuLuc(x.phieu.ma_phieu));
   if (!x || !mau) notFound();
   const q = quyenTrenPhieu({ trangThai: x.phieu.trang_thai, nguoiNopId: x.phieu.nguoi_nop_id, buocHienTai: x.phieu.buoc_hien_tai }, x.o, { nhanVienId: x.nv?.id ?? null, userId: nd.id });
   if (!q.suaVaNopLai) redirect(`/phe-duyet/${id}`);
