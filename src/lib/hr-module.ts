@@ -266,8 +266,8 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "pd-danh-muc", ten: "Danh mục lựa chọn của phiếu", nhom: "Phê duyệt", bang: "pd_danh_muc", tieuDe: "gia_tri",
-    moTa: "Các danh sách chọn trong phiếu: Đơn vị làm việc, Nhóm làm việc, Bộ phận, Phòng ban, Chức vụ, Vị trí, Khoản chi, Tài khoản quỹ, Loại nghỉ. Danh sách còn trống thì phiếu cho nhập chữ tự do.",
+    ma: "pd-danh-muc", ten: "Sửa danh sách lựa chọn", nhom: "Phê duyệt", bang: "pd_danh_muc", tieuDe: "gia_tri", trangThai: "loai",
+    moTa: "Thêm, đổi, xoá từng lựa chọn của các ô chọn trong phiếu. Bấm tên danh sách ở hàng lọc để chỉ xem một danh sách. Danh sách còn trống thì phiếu cho nhập chữ tự do. Xem phiếu nào dùng danh sách nào ở màn Lựa chọn trong phiếu.",
     sapXep: { cot: "loai" }, trong: "Chưa có danh mục.",
     cot: [
       { k: "loai", nhan: "Danh mục", kieu: "chon", luaChon: ["Đơn vị làm việc", "Nhóm làm việc", "Bộ phận", "Phòng ban", "Chức vụ", "Vị trí", "Khoản chi", "Tài khoản quỹ", "Loại nghỉ"], batBuoc: true, the: true },

@@ -51,8 +51,8 @@ export default async function TrangMucHr({
         tieuDe={muc.ten}
         phu={
           <>
-            <Link href={muc.nhom === "Tuyển dụng" ? "/hr" : "/trang-chu-nhan-su"} className="text-nhan-dam hover:underline">
-              ← {muc.nhom === "Tuyển dụng" ? "Sổ tuyển dụng" : "Trang chủ Nhân sự"}
+            <Link href={ma === "pd-danh-muc" ? "/phe-duyet/lua-chon" : muc.nhom === "Tuyển dụng" ? "/hr" : "/trang-chu-nhan-su"} className="text-nhan-dam hover:underline">
+              ← {ma === "pd-danh-muc" ? "Lựa chọn trong phiếu" : muc.nhom === "Tuyển dụng" ? "Sổ tuyển dụng" : "Trang chủ Nhân sự"}
             </Link>
             <span className="mx-2 text-vien-dam">·</span>
             {muc.moTa}
