@@ -26,3 +26,37 @@ export function anhXaTikTokSoLieu(r: { dimensions?: Obj; metrics?: Obj }) {
   const d = r.dimensions ?? {}, m = r.metrics ?? {};
   return { quang_cao_id: String(d.ad_id), ngay: String(d.stat_time_day).slice(0, 10), chi_tieu: n(m.spend), hien_thi: Math.round(n(m.impressions)), nhap: Math.round(n(m.clicks)), tiep_can: Math.round(n(m.reach)), chuyen_doi: n(m.conversion), ket_qua: n(m.result) };
 }
+
+/** Meta: đơn mua và giá trị mua từ `actions`/`action_values`. Ưu tiên omni_purchase (đã khử trùng lặp giữa các kênh), không có mới dùng purchase. */
+export function muaMeta(actions: unknown, giaTri: unknown): { don: number; doanhThu: number } {
+  const lay = (v: unknown) => { const m = hanhDongMeta(v); return m.omni_purchase ?? m.purchase ?? 0; };
+  return { don: Math.round(lay(actions)), doanhThu: lay(giaTri) };
+}
+export const anhXaMetaSoLieuDayDu = (r: Obj) => { const mua = muaMeta(r.actions, r.action_values); return { ...anhXaMetaSoLieu(r), don_mua: mua.don, doanh_thu: mua.doanhThu }; };
+
+// ---- Shopee ----
+const ngayVN = (giayUnix: number) => new Date(giayUnix * 1000 + 7 * 3600e3).toISOString().slice(0, 10);
+/** Đơn Shopee bị huỷ/đang huỷ/hoàn không tính doanh thu. */
+export const donHuyShopee = (trangThai: string | null) => /^(CANCELLED|IN_CANCEL|INVALID)$/i.test(trangThai ?? "");
+
+export const anhXaShopeeDon = (o: Obj, gianHangId: string) => {
+  const t = n(o.create_time);
+  return { ma_don: String(o.order_sn), gian_hang_id: gianHangId, trang_thai: s(o.order_status), tao_don_luc: new Date(t * 1000).toISOString(), ngay: ngayVN(t), tong_tien: n(o.total_amount), phi_van_chuyen: n(o.actual_shipping_fee ?? o.estimated_shipping_fee), so_san_pham: Array.isArray(o.item_list) ? o.item_list.length : 0, du_lieu_goc: o };
+};
+
+/** Gộp đơn theo ngày: số đơn (không tính đơn huỷ), đơn huỷ, doanh thu (không tính đơn huỷ). */
+export function gopDonTheoNgay(dons: readonly { ngay: string; trang_thai: string | null; tong_tien: number }[]) {
+  const m = new Map<string, { so_don: number; don_huy: number; doanh_thu: number }>();
+  for (const d of dons) {
+    const x = m.get(d.ngay) ?? { so_don: 0, don_huy: 0, doanh_thu: 0 };
+    if (donHuyShopee(d.trang_thai)) x.don_huy++; else { x.so_don++; x.doanh_thu += d.tong_tien; }
+    m.set(d.ngay, x);
+  }
+  return [...m].map(([ngay, x]) => ({ ngay, ...x, doanh_thu: Math.round(x.doanh_thu * 100) / 100 }));
+}
+
+/** Một dòng báo cáo quảng cáo theo ngày của Shopee (ngày dạng dd-mm-yyyy). */
+export function anhXaShopeeQuangCaoNgay(r: Obj, gianHangId: string) {
+  const [d, m, y] = String(r.date).split("-");
+  return { gian_hang_id: gianHangId, ngay: `${y}-${m}-${d}`, chi_phi_qc: n(r.expense), hien_thi_qc: Math.round(n(r.impression)), nhap_qc: Math.round(n(r.clicks)), don_tu_qc: Math.round(n(r.broad_order)), doanh_thu_tu_qc: n(r.broad_gmv) };
+}

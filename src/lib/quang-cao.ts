@@ -45,5 +45,21 @@ export function khoangNgay(homNay: string): KhoangNgay[] {
 /** Khoá API đã khai trong biến môi trường chưa — chỉ trả có/không, không bao giờ trả giá trị khoá. */
 export function trangThaiKhoa(env: Record<string, string | undefined>) {
   const co = (...k: string[]) => k.every((x) => !!env[x]?.trim());
-  return { facebook: co("META_ADS_ACCESS_TOKEN"), tiktok: co("TIKTOK_ADS_APP_ID", "TIKTOK_ADS_APP_SECRET", "TIKTOK_ADS_ACCESS_TOKEN") };
+  return { facebook: co("META_ADS_ACCESS_TOKEN"), tiktok: co("TIKTOK_ADS_APP_ID", "TIKTOK_ADS_APP_SECRET", "TIKTOK_ADS_ACCESS_TOKEN"), shopee: co("SHOPEE_PARTNER_ID", "SHOPEE_PARTNER_KEY", "SHOPEE_SHOP_ID", "SHOPEE_ACCESS_TOKEN") };
+}
+
+/** Chi phí / doanh thu (%); null khi chưa có doanh thu (không chia cho 0). Dưới 100% là quảng cáo còn lời trên doanh thu. */
+export const tiLeChiPhi = (chiTieu: number, doanhThu: number): number | null => (doanhThu > 0 ? Math.round((chiTieu / doanhThu) * 1000) / 10 : null);
+
+export type DongNenTang = { ten: string; chiTieu: number; don: number; doanhThu: number; tiLe: number | null };
+/** Hàng tổng của bảng so sánh các nền tảng. */
+export function tongNenTang(ds: readonly Omit<DongNenTang, "tiLe">[]): DongNenTang {
+  const t = ds.reduce((a, x) => ({ chiTieu: a.chiTieu + x.chiTieu, don: a.don + x.don, doanhThu: a.doanhThu + x.doanhThu }), { chiTieu: 0, don: 0, doanhThu: 0 });
+  return { ten: "Tổng", ...t, tiLe: tiLeChiPhi(t.chiTieu, t.doanhThu) };
+}
+
+/** Chữ ký Shopee Open Platform v2 (HMAC-SHA256 hex) cho API cấp shop: partner_id + đường dẫn + timestamp + access_token + shop_id. */
+export async function kyShopee(khoaDoiTac: string, o: { doiTacId: string; duongDan: string; thoiGian: number; accessToken: string; shopId: string }): Promise<string> {
+  const { createHmac } = await import("node:crypto");
+  return createHmac("sha256", khoaDoiTac).update(`${o.doiTacId}${o.duongDan}${o.thoiGian}${o.accessToken}${o.shopId}`).digest("hex");
 }

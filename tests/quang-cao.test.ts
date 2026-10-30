@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chiTieuTheoNgay, gopTheo, khoangNgay, tongHop, trangThaiKhoa } from "@/lib/quang-cao";
+import { kyShopee, tiLeChiPhi, tongNenTang, chiTieuTheoNgay, gopTheo, khoangNgay, tongHop, trangThaiKhoa } from "@/lib/quang-cao";
 
 const d = (chiTieu: number, hienThi: number, nhap: number, ketQua = 0) => ({ chiTieu, hienThi, nhap, ketQua });
 
@@ -38,8 +38,28 @@ describe("gopTheo, chiTieuTheoNgay, khoảng ngày, khoá", () => {
     expect(k[2].tu).toBe("2026-10-01");
   });
   it("trạng thái khoá chỉ trả có/không", () => {
-    expect(trangThaiKhoa({})).toEqual({ facebook: false, tiktok: false });
-    expect(trangThaiKhoa({ META_ADS_ACCESS_TOKEN: "x", TIKTOK_ADS_APP_ID: "a", TIKTOK_ADS_APP_SECRET: "b" })).toEqual({ facebook: true, tiktok: false });
+    expect(trangThaiKhoa({})).toEqual({ facebook: false, tiktok: false, shopee: false });
+    expect(trangThaiKhoa({ META_ADS_ACCESS_TOKEN: "x", TIKTOK_ADS_APP_ID: "a", TIKTOK_ADS_APP_SECRET: "b" })).toEqual({ facebook: true, tiktok: false, shopee: false });
     expect(JSON.stringify(trangThaiKhoa({ META_ADS_ACCESS_TOKEN: "bí-mật" }))).not.toContain("bí-mật");
+  });
+});
+
+describe("so sánh nền tảng + chữ ký Shopee", () => {
+  it("chi phí/doanh thu: null khi chưa có doanh thu, làm tròn 1 số lẻ", () => {
+    expect(tiLeChiPhi(100, 0)).toBeNull();
+    expect(tiLeChiPhi(250, 1000)).toBe(25);
+    expect(tiLeChiPhi(1, 3)).toBe(33.3);
+  });
+  it("hàng tổng cộng đủ và tính tỉ lệ từ tổng, không trung bình tỉ lệ", () => {
+    const t = tongNenTang([{ ten: "A", chiTieu: 100, don: 1, doanhThu: 100 }, { ten: "B", chiTieu: 300, don: 5, doanhThu: 1900 }]);
+    expect(t).toEqual({ ten: "Tổng", chiTieu: 400, don: 6, doanhThu: 2000, tiLe: 20 });
+  });
+  it("chữ ký Shopee: HMAC-SHA256 hex ổn định, đổi bất kỳ thành phần nào là đổi chữ ký", async () => {
+    const o = { doiTacId: "1", duongDan: "/api/v2/order/get_order_list", thoiGian: 1700000000, accessToken: "tok", shopId: "9" };
+    const k = await kyShopee("khoa", o);
+    expect(k).toMatch(/^[0-9a-f]{64}$/);
+    expect(await kyShopee("khoa", o)).toBe(k);
+    expect(await kyShopee("khoa", { ...o, shopId: "10" })).not.toBe(k);
+    expect(await kyShopee("khac", o)).not.toBe(k);
   });
 });

@@ -5,28 +5,40 @@ import { ChevronRight } from "lucide-react";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { yeuCauVaiTro } from "@/lib/auth";
-import { chiTieuTheoNgay, khoangNgay } from "@/lib/quang-cao";
-import { bangQuangCao, type NenTang } from "@/lib/quang-cao-data";
+import { chiTieuTheoNgay, khoangNgay, tiLeChiPhi, tongNenTang } from "@/lib/quang-cao";
+import { bangQuangCao, bangShopee, tongQuanNenTang, type NenTang } from "@/lib/quang-cao-data";
 import { homNayHcm } from "@/lib/kpi-data";
 
 const TIEN = (n: number | null) => (n === null ? "—" : `${n.toLocaleString("vi-VN", { maximumFractionDigits: 0 })} đ`);
 const SO = (n: number | null, du = 0) => (n === null ? "—" : n.toLocaleString("vi-VN", { maximumFractionDigits: du }));
-const TEN_NT = { facebook: "Facebook", tiktok: "TikTok" } as const;
+const TEN_NT = { facebook: "Facebook", tiktok: "TikTok", shopee: "Shopee", "tat-ca": "Tất cả" } as const;
+type Che = keyof typeof TEN_NT;
 
 /** Quảng cáo Facebook + TikTok: số kéo về mỗi ngày, xem theo chiến dịch → nhóm → quảng cáo. Quản trị/Kỹ thuật. */
 export default async function TrangQuangCao({ searchParams }: { searchParams: Promise<{ nt?: string; k?: string; cd?: string; nhom?: string }> }) {
   await yeuCauVaiTro(["admin", "ky_thuat"]);
   const sp = await searchParams;
-  const nt: NenTang = sp.nt === "tiktok" ? "tiktok" : "facebook";
+  const che: Che = sp.nt === "facebook" || sp.nt === "tiktok" || sp.nt === "shopee" ? sp.nt : "tat-ca";
+  const nt: NenTang = che === "tiktok" ? "tiktok" : "facebook";
   const homNay = homNayHcm();
   const cacKhoang = khoangNgay(homNay);
   const kh = cacKhoang.find((x) => x.ma === sp.k) ?? cacKhoang[1];
-  const lienKet = (o: { nt?: NenTang; k?: string; cd?: string | null; nhom?: string | null }) => {
-    const q = new URLSearchParams({ nt: o.nt ?? nt, k: o.k ?? kh.ma });
+  const lienKet = (o: { nt?: Che; k?: string; cd?: string | null; nhom?: string | null }) => {
+    const q = new URLSearchParams({ nt: o.nt ?? che, k: o.k ?? kh.ma });
     if (o.cd) q.set("cd", o.cd);
     if (o.nhom) q.set("nhom", o.nhom);
     return `/quang-cao?${q}`;
   };
+  const phuDe = `${TEN_NT[che]} · ${kh.tu.split("-").reverse().join("/")} đến ${kh.den.split("-").reverse().join("/")}`;
+  const thanhChon = (
+    <nav aria-label="Nền tảng và kỳ" className="mb-5 flex flex-wrap gap-2">
+      {(["tat-ca", "facebook", "tiktok", "shopee"] as const).map((n) => <Link key={n} href={lienKet({ nt: n })} aria-current={n === che ? "page" : undefined} className={`rounded-tag px-3 py-1.5 text-[13px] font-medium ${n === che ? "nut-vang" : "border border-vien-dam text-muc-2 hover:bg-giay-tram"}`}>{TEN_NT[n]}</Link>)}
+      <span className="mx-1 w-px bg-vien-dam" aria-hidden />
+      {cacKhoang.map((x) => <Link key={x.ma} href={lienKet({ k: x.ma })} aria-current={x.ma === kh.ma ? "page" : undefined} className={`rounded-tag px-3 py-1.5 text-[13px] font-medium ${x.ma === kh.ma ? "nut-vang" : "border border-vien-dam text-muc-2 hover:bg-giay-tram"}`}>{x.nhan}</Link>)}
+    </nav>
+  );
+  if (che === "tat-ca") return <TongQuan phuDe={phuDe} thanhChon={thanhChon} d={await tongQuanNenTang(kh.tu, kh.den)} lienKet={lienKet} />;
+  if (che === "shopee") return <ShopeeView phuDe={phuDe} thanhChon={thanhChon} b={await bangShopee(kh.tu, kh.den)} tu={kh.tu} den={kh.den} />;
   const b = await bangQuangCao(nt, kh.tu, kh.den, { chienDich: sp.cd, nhom: sp.nhom });
   const ngay = chiTieuTheoNgay(b.soLieu, kh.tu, kh.den);
   const max = Math.max(1, ...ngay.map((x) => x.chiTieu));
@@ -39,12 +51,8 @@ export default async function TrangQuangCao({ searchParams }: { searchParams: Pr
   ];
   return (
     <>
-      <TieuDeTrang tieuDe="Quảng cáo" phu={`${TEN_NT[nt]} · ${kh.tu.split("-").reverse().join("/")} đến ${kh.den.split("-").reverse().join("/")}`} />
-      <nav aria-label="Nền tảng và kỳ" className="mb-5 flex flex-wrap gap-2">
-        {(["facebook", "tiktok"] as const).map((n) => <Link key={n} href={lienKet({ nt: n })} aria-current={n === nt ? "page" : undefined} className={`rounded-tag px-3 py-1.5 text-[13px] font-medium ${n === nt ? "nut-vang" : "border border-vien-dam text-muc-2 hover:bg-giay-tram"}`}>{TEN_NT[n]}</Link>)}
-        <span className="mx-1 w-px bg-vien-dam" aria-hidden />
-        {cacKhoang.map((x) => <Link key={x.ma} href={lienKet({ k: x.ma })} aria-current={x.ma === kh.ma ? "page" : undefined} className={`rounded-tag px-3 py-1.5 text-[13px] font-medium ${x.ma === kh.ma ? "nut-vang" : "border border-vien-dam text-muc-2 hover:bg-giay-tram"}`}>{x.nhan}</Link>)}
-      </nav>
+      <TieuDeTrang tieuDe="Quảng cáo" phu={phuDe} />
+      {thanhChon}
 
       {!coKhoa && <p role="status" className="mb-5 rounded-nho border border-vien bg-canh-bao-nen p-3.5 text-[14px] text-canh-bao">Chưa nối khoá {TEN_NT[nt]}. Khung kéo số đã sẵn sàng; có khoá (khai ở biến môi trường, không lưu trong cơ sở dữ liệu) là số tự về mỗi đêm.</p>}
       {b.lanCuoi && <p className="mb-5 text-[13px] text-muc-3">Lần kéo số gần nhất: <NhanTrangThai kieu={b.lanCuoi.trang_thai === "Thành công" ? "tot" : b.lanCuoi.trang_thai === "Lỗi" ? "loi" : "tram"}>{b.lanCuoi.trang_thai}</NhanTrangThai> {new Date(b.lanCuoi.bat_dau).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })} · {b.lanCuoi.so_dong} dòng{b.lanCuoi.ghi_chu ? ` · ${b.lanCuoi.ghi_chu}` : ""}</p>}
@@ -80,6 +88,70 @@ export default async function TrangQuangCao({ searchParams }: { searchParams: Pr
               );
               return <li key={d.id}>{noi ? <Link href={noi} className="flex items-center gap-3 px-3.5 py-3 hover:bg-giay-tram">{noiDung}<ChevronRight className="h-4 w-4 shrink-0 text-muc-3" aria-hidden /></Link> : <div className="flex items-center gap-3 px-3.5 py-3">{noiDung}</div>}</li>;
             })}
+          </ul>
+        )}
+      </section>
+    </>
+  );
+}
+
+function TongQuan({ phuDe, thanhChon, d, lienKet }: { phuDe: string; thanhChon: React.ReactNode; d: Awaited<ReturnType<typeof tongQuanNenTang>>; lienKet: (o: { nt?: Che }) => string }) {
+  const dong = [
+    { nt: "facebook" as const, co: d.khoa.facebook, ...d.facebook }, { nt: "tiktok" as const, co: d.khoa.tiktok, ...d.tiktok }, { nt: "shopee" as const, co: d.khoa.shopee, ...d.shopee },
+  ];
+  const tong = tongNenTang(dong.map((x) => ({ ten: TEN_NT[x.nt], chiTieu: x.chiTieu, don: x.don, doanhThu: x.doanhThu })));
+  return (
+    <>
+      <TieuDeTrang tieuDe="Quảng cáo" phu={phuDe} />
+      {thanhChon}
+      <ul className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-3">
+        {dong.map((x) => { const tl = tiLeChiPhi(x.chiTieu, x.doanhThu); return (
+          <li key={x.nt}>
+            <Link href={lienKet({ nt: x.nt })} className="the-noi block rounded-nho border border-vien bg-giay-sang p-4 hover:[box-shadow:var(--bong-2)]">
+              <div className="flex items-center justify-between"><span className="text-[15px] font-semibold text-muc">{TEN_NT[x.nt]}</span>{!x.co && <NhanTrangThai kieu="cho">Chưa nối khoá</NhanTrangThai>}</div>
+              <div className="chu-tieu-de mt-2 text-[26px] leading-tight text-nhan-dam">{TIEN(x.doanhThu)}</div>
+              <div className="text-[12px] text-muc-3">doanh thu từ quảng cáo</div>
+              <dl className="mt-3 grid grid-cols-3 gap-2 text-[13px]">
+                <div><dt className="text-muc-3">Chi tiêu</dt><dd className="font-medium text-muc">{TIEN(x.chiTieu)}</dd></div>
+                <div><dt className="text-muc-3">Đơn</dt><dd className="font-medium text-muc">{SO(x.don)}</dd></div>
+                <div><dt className="text-muc-3">Chi phí / doanh thu</dt><dd className="font-medium text-muc">{tl === null ? "—" : `${SO(tl, 1)}%`}</dd></div>
+              </dl>
+            </Link>
+          </li>
+        ); })}
+      </ul>
+      <p className="rounded-nho border border-vien bg-giay-sang p-3.5 text-[14px] text-muc-2">Tổng cả ba: chi tiêu {TIEN(tong.chiTieu)} · {SO(tong.don)} đơn · doanh thu {TIEN(tong.doanhThu)} · chi phí/doanh thu {tong.tiLe === null ? "—" : `${SO(tong.tiLe, 1)}%`}. Doanh thu và đơn tính phần do quảng cáo mang về, để ba nền tảng so sánh cùng một thước.</p>
+      {d.shopeeCaGianHang.don > 0 && <p className="mt-3 text-[13px] text-muc-3">Riêng Shopee cả gian hàng (kể cả đơn không từ quảng cáo): {SO(d.shopeeCaGianHang.don)} đơn, {TIEN(d.shopeeCaGianHang.doanhThu)}.</p>}
+    </>
+  );
+}
+
+function ShopeeView({ phuDe, thanhChon, b, tu, den }: { phuDe: string; thanhChon: React.ReactNode; b: Awaited<ReturnType<typeof bangShopee>>; tu: string; den: string }) {
+  const t = b.tong;
+  const ngay = chiTieuTheoNgay(b.theoNgay.map((x) => ({ ngay: x.ngay, chiTieu: x.doanhThu })), tu, den);
+  const max = Math.max(1, ...ngay.map((x) => x.chiTieu));
+  const tl = tiLeChiPhi(t.chiPhiQc, t.doanhThuQc);
+  const the = [["Doanh thu", TIEN(t.doanhThu)], ["Đơn", SO(t.soDon)], ["Đơn huỷ", SO(t.donHuy)], ["Chi phí quảng cáo", TIEN(t.chiPhiQc)], ["Chi phí / doanh thu QC", tl === null ? "—" : `${SO(tl, 1)}%`], ["Lượt nhấp QC", SO(t.nhap)]];
+  return (
+    <>
+      <TieuDeTrang tieuDe="Quảng cáo" phu={phuDe} />
+      {thanhChon}
+      {!b.khoa.shopee && <p role="status" className="mb-5 rounded-nho border border-vien bg-canh-bao-nen p-3.5 text-[14px] text-canh-bao">Chưa nối khoá Shopee. Khung kéo số đã sẵn sàng; có khoá (khai ở biến môi trường, không lưu trong cơ sở dữ liệu) là số tự về mỗi đêm.</p>}
+      {b.lanCuoi && <p className="mb-5 text-[13px] text-muc-3">Lần kéo số gần nhất: <NhanTrangThai kieu={b.lanCuoi.trang_thai === "Thành công" ? "tot" : b.lanCuoi.trang_thai === "Lỗi" ? "loi" : "tram"}>{b.lanCuoi.trang_thai}</NhanTrangThai> {new Date(b.lanCuoi.bat_dau).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })} · {b.lanCuoi.so_dong} dòng{b.lanCuoi.ghi_chu ? ` · ${b.lanCuoi.ghi_chu}` : ""}</p>}
+      <ul className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+        {the.map(([n, v]) => <li key={n} className="the-noi rounded-nho border border-vien bg-giay-sang p-3.5"><div className="text-[12px] text-muc-3">{n}</div><div className="chu-tieu-de mt-1 text-[22px] leading-tight text-nhan-dam">{v}</div></li>)}
+      </ul>
+      <section aria-label="Doanh thu theo ngày" className="mb-8">
+        <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">Doanh thu theo ngày</h2>
+        <div className="flex h-28 items-end gap-[3px] rounded-nho border border-vien bg-giay-sang p-3" role="img" aria-label={`Biểu đồ doanh thu ${ngay.length} ngày, cao nhất ${TIEN(max)}`}>
+          {ngay.map((x) => <div key={x.ngay} title={`${x.ngay.split("-").reverse().join("/")}: ${TIEN(x.chiTieu)}`} className="min-w-[2px] flex-1 rounded-t-tag bg-nhan" style={{ height: `${Math.max(2, (x.chiTieu / max) * 100)}%`, opacity: x.chiTieu ? 1 : 0.2 }} />)}
+        </div>
+      </section>
+      <section aria-label="Gian hàng">
+        <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">Gian hàng</h2>
+        {b.theoGianHang.length === 0 ? <p className="rounded-nho border border-vien bg-giay-sang p-4 text-[14px] text-muc-3">Chưa có gian hàng Shopee nào.</p> : (
+          <ul className="divide-y divide-vien rounded-nho border border-vien bg-giay-sang">
+            {b.theoGianHang.map((g) => <li key={g.id} className="flex items-center gap-3 px-3.5 py-3"><span className="min-w-0 flex-1 truncate text-[14px] font-medium text-muc">{g.ten}</span><span className="hidden w-20 shrink-0 text-right text-[13px] text-muc-2 sm:block">{SO(g.soDon)}<span className="block text-[11px] text-muc-3">đơn</span></span><span className="w-32 shrink-0 text-right text-[14px] font-semibold text-nhan-dam">{TIEN(g.doanhThu)}</span></li>)}
           </ul>
         )}
       </section>
