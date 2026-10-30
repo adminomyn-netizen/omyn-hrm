@@ -17,6 +17,7 @@ import {
   Briefcase,
   Trophy,
   Megaphone,
+  ListChecks,
   type LucideIcon,
 } from "lucide-react";
 import type { VaiTro } from "@/lib/auth";
@@ -49,6 +50,7 @@ export const menuChinh: MucMenu[] = [
   { ten: "Thi đua KPI", duong_dan: "/kpi", nhom: "Con người", icon: Trophy, moTa: "Bảng xếp hạng phòng và cá nhân theo ngày, tháng, quý; nhập kết quả KPI hằng ngày." },
   { ten: "Quảng cáo", duong_dan: "/quang-cao", nhom: "Quản trị", icon: Megaphone, chiVaiTro: CHI_QUAN_LY, moTa: "Số quảng cáo Facebook và TikTok kéo về mỗi ngày: chi tiêu, hiển thị, nhấp, theo chiến dịch, nhóm, quảng cáo." },
   { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia", nhom: "Con người", icon: BarChart3, chiVaiTro: CHI_QUAN_LY, moTa: "Điểm và xếp loại hiệu suất theo kỳ." },
+  { ten: "Công việc", duong_dan: "/cong-viec", nhom: "Hằng ngày", icon: ListChecks, moTa: "Việc của bạn và của nhóm: thêm nhanh một dòng, ghi số lượng đã làm, theo dõi việc quá hạn." },
   { ten: "Chấm công", duong_dan: "/cham-cong", nhom: "Hằng ngày", icon: Clock, moTa: "Chấm công vào/ra và xem lịch công của bạn." },
   { ten: "Bảng công tháng", duong_dan: "/bang-cong", nhom: "Hằng ngày", icon: CalendarDays, chiVaiTro: CHI_QUAN_LY, moTa: "Bảng chấm công cả tháng theo mã công (X, N, CT, P, L…) và ngày nghỉ lễ." },
   { ten: "Đơn từ và phê duyệt", duong_dan: "/don-tu", nhom: "Hằng ngày", icon: Inbox, moTa: "Nộp đơn nghỉ, công tác, tạm ứng và theo dõi kết quả duyệt." },
