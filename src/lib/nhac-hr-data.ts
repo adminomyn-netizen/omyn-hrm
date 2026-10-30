@@ -4,6 +4,8 @@ import { chiTieuApCho, docKy } from "@/lib/kpi";
 import { docKetQua, docNen, tinhBang } from "@/lib/kpi-data";
 import { congNgay, danhGiaCanNhac, hopDongCanNhac, kyCanBaoXepHang, nhanHan, offerCanNhac, phutToiPhongVan, tinXepHang, tomTatHcns, type TinHr } from "@/lib/nhac-hr";
 import { ngayLamViecTruoc } from "@/lib/nhac-cong";
+import { tinLichHomNay } from "@/lib/lich-nhan-su";
+import { suKienDeNhac } from "@/lib/lich-nhan-su-data";
 
 type Gui = (userId: string, khung: string, tin: Omit<TinHr, "khung">) => Promise<void>;
 export type NgCanh = { hom: string; phut: number; nowMs: number; gui: Gui; layQuanLy: () => Promise<string[]> };
@@ -54,6 +56,8 @@ export async function nhacHr(c: NgCanh): Promise<number> {
     const dgNhac = (onb.data ?? []).flatMap((o) => danhGiaCanNhac(o.ngay_bat_dau, c.hom, daCo.get(o.id) ?? [], o.so_ngay_thu_viec).map((d) => ({ ...d, onbId: o.id, ten: o.ho_ten, mentorId: o.mentor_id as string | null })));
     const tt = tomTatHcns({ phongVanHomNay: pvHom.count ?? 0, offerCanNhac: offerNhac.length, danhGiaCanNhac: dgNhac.length, deXuatCho: dx.count ?? 0, hopDongSapHan: hdNhac.length });
     if (tt) for (const u of await c.layQuanLy()) await gui(u, tt.khung, { tieuDe: tt.tieuDe, noiDung: tt.noiDung, url: tt.url });
+    const lich = tinLichHomNay(await suKienDeNhac(c.hom), c.hom);
+    if (lich) for (const u of await c.layQuanLy()) await gui(u, lich.khung, { tieuDe: lich.tieuDe, noiDung: lich.noiDung, url: lich.url });
     const uMentor = await userCua(dgNhac.map((d) => d.mentorId));
     for (const d of dgNhac) {
       const u = d.mentorId ? uMentor.get(d.mentorId) : undefined;

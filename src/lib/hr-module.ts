@@ -329,6 +329,22 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "ly_do", nhan: "Lý do", kieu: "chu", rong: true },
     ],
   },
+  {
+    ma: "han-bao-cao-nha-nuoc", ten: "Hạn báo cáo nhà nước", nhom: "Lịch & báo cáo nhà nước", bang: "han_bao_cao_nha_nuoc", tieuDe: "ten",
+    moTa: "Các hạn báo cáo cơ quan nhà nước (biến động lao động, sử dụng lao động, nội quy lao động…). Mốc ngày để trống đến khi kế toán/luật sư xác nhận; nhập hạn rồi mới hiện trên Lịch nhân sự và nhắc HCNS.",
+    sapXep: { cot: "tao_luc" }, trong: "Chưa có hạn nào.",
+    cot: [
+      { k: "ten", nhan: "Tên báo cáo", kieu: "chu", batBuoc: true, the: true },
+      { k: "co_quan", nhan: "Cơ quan nhận", kieu: "chu", the: true },
+      { k: "chu_ky", nhan: "Chu kỳ", kieu: "chon", luaChon: ["Hằng tháng", "Hằng quý", "6 tháng", "Hằng năm", "Một lần"], mac: "Hằng năm", the: true },
+      { k: "han_ngay", nhan: "Hạn: ngày trong tháng (1-31)", kieu: "so", khoang: [1, 31], coTheTrong: true, the: true },
+      { k: "han_thang", nhan: "Hạn: tháng (1-12; với quý/6 tháng là tháng của lần đầu)", kieu: "so", khoang: [1, 12], coTheTrong: true, the: true },
+      { k: "han_mot_lan", nhan: "Hạn (khi chu kỳ là “Một lần”)", kieu: "ngay" },
+      { k: "dang_bat", nhan: "Đang theo dõi", kieu: "co", mac: true },
+      { k: "xac_nhan_boi", nhan: "Ai đã xác nhận mốc (kế toán/luật sư)", kieu: "chu" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
 ];
 
 export const timMucHr = (ma: string) => HR_MUC.find((m) => m.ma === ma);
