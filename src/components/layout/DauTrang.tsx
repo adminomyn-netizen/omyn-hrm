@@ -482,11 +482,13 @@ export function DauTrang({
   email,
   vaiTro,
   viTri,
+  duocMo,
 }: {
   hoTen: string;
   email: string;
   vaiTro: VaiTro;
   viTri: string;
+  duocMo?: string[];
 }) {
   const pathname = usePathname();
   const router = useRouter();
@@ -527,7 +529,7 @@ export function DauTrang({
             style={{ background: "var(--gradient-vang)", borderRadius: 9999 }}
           />
         </Link>
-        <TimKiem vaiTro={vaiTro} />
+        <TimKiem vaiTro={vaiTro} duocMo={duocMo} />
       </div>
       <div className="flex shrink-0 items-center gap-1">
         <Link

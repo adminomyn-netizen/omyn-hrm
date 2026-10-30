@@ -18,9 +18,9 @@ export const SU_KIEN_MO_MENU = "omyn-mo-menu";
 
 /** Bảng "Thêm chức năng" cho điện thoại và máy tính bảng dọc: kéo từ dưới lên, các mục xếp lưới biểu tượng theo nhóm (không còn ngăn kéo dọc bên trái).
  *  Nút mở là tab "Thêm" ở thanh tab dưới, bắn sự kiện SU_KIEN_MO_MENU. Đổi trang thì tự đóng. */
-export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
+export function MobileNav({ vaiTro, duocMo }: { vaiTro: VaiTro | null; duocMo?: string[] }) {
   const pathname = usePathname();
-  const menu = locMenuTheoVaiTro(vaiTro);
+  const menu = locMenuTheoVaiTro(vaiTro, false, duocMo);
   const nhom = gomTheoNhom(menu);
   const chonDuong = duongDanDangChon(pathname, menu);
   const dem = useDemMenu();

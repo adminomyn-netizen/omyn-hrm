@@ -26,6 +26,7 @@ import {
   GraduationCap,
   BadgeCheck,
   ShieldAlert,
+  ShieldCheck,
   Layers,
   ArrowUpRight,
   FileSpreadsheet,
@@ -100,6 +101,14 @@ export const menuChinh: MucMenu[] = [
     icon: Layers,
     chiVaiTro: CHI_QUAN_LY,
     moTa: "Mỗi loại phiếu một khối: ô nào của phiếu hiện danh sách chọn nào (đơn vị, phòng ban, khoản chi…), và nơi sửa danh sách.",
+  },
+  {
+    ten: "Phân quyền màn nghiệp vụ",
+    duong_dan: "/phan-quyen-nghiep-vu",
+    nhom: "Tổ chức & phê duyệt",
+    icon: ShieldCheck,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Chọn khối nào được xem hoặc nhập các màn Marketing, Kinh doanh, Sản phẩm, Pháp lý, Tài chính và Kho, Chiến lược.",
   },
   {
     ten: "Trang chủ Nhân sự",
@@ -767,11 +776,13 @@ export function duongDanDangChon(
 export function locMenuTheoVaiTro(
   vaiTro: VaiTro | null,
   boMucDiDong = false,
+  /** Đường dẫn nghiệp vụ nhân viên được mở theo khối (xem lib/quyen-nghiep-vu.ts); quản lý thì không cần. */
+  duocMo?: readonly string[],
 ): MucMenu[] {
   return menuChinh.filter(
     (m) =>
       !m.an &&
-      (!m.chiVaiTro || (vaiTro && m.chiVaiTro.includes(vaiTro))) &&
+      (!m.chiVaiTro || (vaiTro && m.chiVaiTro.includes(vaiTro)) || duocMo?.includes(m.duong_dan)) &&
       !(boMucDiDong && m.chiDiDong),
   );
 }

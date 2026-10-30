@@ -2,8 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
+import { quyenTrenSo } from "@/lib/quyen-nghiep-vu";
 import { dbHr, laGiamDocTaiKhoan } from "@/lib/hr-db";
-import { chuanHoaGiaTri, timMucHr } from "@/lib/hr-module";
+import { chuanHoaGiaTri, timMucHr, type MucHr } from "@/lib/hr-module";
 import { cotDoi, ghiLichSuNhanSu } from "@/lib/nhan-su-lich-su";
 
 export type KetQuaHr = { loi?: string; ok?: boolean };
@@ -11,17 +12,21 @@ const KHONG_QUYEN: KetQuaHr = {
   loi: "Bạn không có quyền thực hiện thao tác này.",
 };
 
-/** Chỉ Quản trị/Kỹ thuật (phòng HCNS) được sửa dữ liệu vận hành HCNS. Cột lấy từ cấu hình, không nhận cột lạ từ trình duyệt. */
-async function nguoiQuanTri(chiGiamDoc = false) {
+/** Quản trị/Kỹ thuật (phòng HCNS) sửa được mọi sổ. Nhân viên chỉ sửa sổ nghiệp vụ mà khối của họ được mở quyền "nhập" (xoá thì từ Trưởng bộ phận trở lên).
+ * Cột lấy từ cấu hình, không nhận cột lạ từ trình duyệt. */
+async function nguoiQuanTri(muc: MucHr, xoa = false) {
   const nd = await layNguoiDungHienTai();
-  if (!nd || !(nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat")) return null;
-  return chiGiamDoc && !(await laGiamDocTaiKhoan(nd.id)) ? null : nd;
+  if (!nd || nd.phaiDoiMatKhau) return null;
+  if (nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat") return muc.chiGiamDocSua && !(await laGiamDocTaiKhoan(nd.id)) ? null : nd;
+  if (muc.chiGiamDocSua || nd.vaiTro !== "nhan_vien") return null;
+  const q = await quyenTrenSo(nd, muc.nhom);
+  return q.muc === "nhap" && (!xoa || q.xoa) ? nd : null;
 }
 
 export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
   const muc = timMucHr(String(fd.get("ma") ?? ""));
   if (!muc) return { loi: "Không tìm thấy mục này." };
-  const nd = await nguoiQuanTri(muc.chiGiamDocSua);
+  const nd = await nguoiQuanTri(muc);
   if (!nd)
     return muc.chiGiamDocSua
       ? { loi: "Chỉ giám đốc được nhập hoặc sửa mục này." }
@@ -72,7 +77,7 @@ export async function xoaBanGhiHr(ma: string, id: string): Promise<KetQuaHr> {
   const muc = timMucHr(ma);
   if (!muc || !/^[0-9a-f-]{36}$/i.test(id))
     return { loi: "Bản ghi không hợp lệ." };
-  const nd = await nguoiQuanTri(muc.chiGiamDocSua);
+  const nd = await nguoiQuanTri(muc, true);
   if (!nd)
     return muc.chiGiamDocSua
       ? { loi: "Chỉ giám đốc được xoá mục này." }
