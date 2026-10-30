@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { ChevronDown, ChevronsLeft, ChevronsRight } from "lucide-react";
-import { gomTheoNhom, locMenuTheoVaiTro } from "@/lib/nav";
+import { duongDanDangChon, gomTheoNhom, locMenuTheoVaiTro } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
 import { useLuuTru } from "@/lib/luu-tru";
 import { useDemMenu } from "@/lib/dem-menu";
@@ -21,11 +21,13 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
   const [tg, ghiTg] = useLuuTru(KHOA_THU_GON, "0");
   const dem = useDemMenu();
   const thuGon = tg === "1";
-  const nhom = gomTheoNhom(locMenuTheoVaiTro(vaiTro, true));
+  const menu = locMenuTheoVaiTro(vaiTro, true);
+  const nhom = gomTheoNhom(menu);
+  const chonDuong = duongDanDangChon(pathname, menu);
   // Nhóm gọn lại cho đỡ rối: bấm tiêu đề nhóm nào cũng mở/đóng được (nhớ lại cho lần sau). Chưa chọn gì thì chỉ "Chung" và nhóm đang đứng trong đó mở.
   const [moRaw, ghiMo] = useLuuTru(KHOA_MO_NHOM, "{}");
   const mo = useMemo<Record<string, boolean>>(() => { try { return JSON.parse(moRaw); } catch { return {}; } }, [moRaw]);
-  const coMucDangChon = (g: (typeof nhom)[number]) => g.muc.some((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"));
+  const coMucDangChon = (g: (typeof nhom)[number]) => g.muc.some((m) => m.duong_dan === chonDuong);
   const dangMo = (g: (typeof nhom)[number]) => thuGon || g.nhom === "Chung" || (g.nhom in mo ? mo[g.nhom] : coMucDangChon(g));
 
   return (
@@ -73,7 +75,7 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
             )}
             <ul className={`space-y-0.5 ${dangMo(g) ? "" : "hidden"}`}>
               {g.muc.map((muc) => {
-                const dangChon = pathname === muc.duong_dan || pathname.startsWith(muc.duong_dan + "/");
+                const dangChon = muc.duong_dan === chonDuong;
                 const Icon = muc.icon;
                 const so = dem[muc.duong_dan] ?? 0;
                 return (

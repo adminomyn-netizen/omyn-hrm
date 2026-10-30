@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { X } from "lucide-react";
-import { gomTheoNhom, locMenuTheoVaiTro } from "@/lib/nav";
+import { duongDanDangChon, gomTheoNhom, locMenuTheoVaiTro } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
 import { useDemMenu } from "@/lib/dem-menu";
 
@@ -14,7 +14,9 @@ export const SU_KIEN_MO_MENU = "omyn-mo-menu";
  *  Nút mở là tab "Thêm" ở thanh tab dưới, bắn sự kiện SU_KIEN_MO_MENU. Đổi trang thì tự đóng. */
 export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
   const pathname = usePathname();
-  const nhom = gomTheoNhom(locMenuTheoVaiTro(vaiTro));
+  const menu = locMenuTheoVaiTro(vaiTro);
+  const nhom = gomTheoNhom(menu);
+  const chonDuong = duongDanDangChon(pathname, menu);
   const dem = useDemMenu();
   const [moTai, setMoTai] = useState<string | null>(null);
   const mo = moTai === pathname;
@@ -49,7 +51,7 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
             <h3 className="mb-2 text-[11px] font-medium uppercase tracking-[0.12em] text-muc-3">{g.nhom}</h3>
             <ul className="grid grid-cols-3 gap-2.5 sm:grid-cols-4 md:grid-cols-5">
               {g.muc.map((muc) => {
-                const dangChon = pathname === muc.duong_dan || pathname.startsWith(muc.duong_dan + "/");
+                const dangChon = muc.duong_dan === chonDuong;
                 const Icon = muc.icon;
                 const so = dem[muc.duong_dan] ?? 0;
                 return (
