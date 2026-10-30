@@ -1,4 +1,5 @@
 import {
+  ClipboardCheck,
   Activity,
   BookOpen,
   Building2,
@@ -56,6 +57,7 @@ export const menuChinh: MucMenu[] = [
   { ten: "Chấm công", duong_dan: "/cham-cong", nhom: "Nhân sự", icon: Clock, moTa: "Chấm công vào/ra và xem lịch công của bạn." },
   { ten: "Bảng công tháng", duong_dan: "/bang-cong", nhom: "Nhân sự", icon: CalendarDays, chiVaiTro: CHI_QUAN_LY, moTa: "Bảng chấm công cả tháng theo mã công (X, N, CT, P, L…) và ngày nghỉ lễ." },
   { ten: "Đơn từ và phê duyệt", duong_dan: "/don-tu", nhom: "Nhân sự", icon: Inbox, moTa: "Nộp đơn nghỉ, công tác, tạm ứng và theo dõi kết quả duyệt." },
+  { ten: "Phê duyệt", duong_dan: "/phe-duyet", nhom: "Nhân sự", icon: ClipboardCheck, moTa: "19 loại phiếu (nhân sự, tài chính, marketing, hành chính): nộp, duyệt nhiều bước, lịch sử, tệp đính kèm." },
   { ten: "Bảng lương", duong_dan: "/luong", nhom: "Nhân sự", icon: Wallet, chiVaiTro: ["admin", "ky_thuat", "nhan_vien"], moTa: "Quản trị và Kỹ thuật: kỳ lương, thỏa thuận lương, tham số. Nhân viên: phiếu lương của mình." },
   { ten: "Báo cáo và biểu mẫu", duong_dan: "/bao-cao", nhom: "Quản trị", icon: FileBarChart, chiVaiTro: CHI_QUAN_LY, moTa: "Báo cáo tổng hợp và biểu mẫu." },
   { ten: "Kỹ thuật", duong_dan: "/ky-thuat", nhom: "Quản trị", icon: Activity, chiVaiTro: ["ky_thuat"], moTa: "Tình trạng hệ thống và số dòng dữ liệu. Chỉ tài khoản Kỹ thuật xem được." },

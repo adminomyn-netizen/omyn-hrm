@@ -6,6 +6,7 @@ import Link from "next/link";
 import {
   Bell,
   CalendarClock,
+  ClipboardCheck,
   ChevronDown,
   ChevronLeft,
   Clock,
@@ -35,7 +36,7 @@ import type { VaiTro } from "@/lib/auth";
 
 export type ThongBao = {
   id: string;
-  loai: "tai_khoan" | "don_tu" | "ung_vien" | "tin" | "cham_cong" | "he_thong";
+  loai: "phe_duyet" | "tai_khoan" | "don_tu" | "ung_vien" | "tin" | "cham_cong" | "he_thong";
   tieuDe: string;
   noiDung: string;
   thoiDiem: string;
@@ -44,6 +45,7 @@ export type ThongBao = {
 
 const KHOA_DA_DOC = "omyn-hrm-tb-da-doc";
 const ICON: Record<ThongBao["loai"], LucideIcon> = {
+  phe_duyet: ClipboardCheck,
   tai_khoan: UserCheck,
   don_tu: Inbox,
   ung_vien: UserPlus,
