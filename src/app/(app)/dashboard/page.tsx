@@ -11,6 +11,7 @@ import { DuongXuHuong } from "@/components/dashboard/DuongXuHuong";
 import { layDuLieuTongQuan, layHoSoChuaGanTaiKhoan, layTaiKhoanChoDuyet } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { ToanCanhKyThuat } from "@/components/dashboard/ToanCanhKyThuat";
+import { TabTongQuan } from "@/components/dashboard/TabTongQuan";
 import { ToanCanhDieuHanh } from "@/components/dashboard/ToanCanhDieuHanh";
 import { BieuDoLuong } from "@/components/dashboard/BieuDoLuong";
 import { TongQuanCuaToi } from "@/components/dashboard/TongQuanCuaToi";
@@ -154,7 +155,12 @@ export default async function TrangTongQuan() {
         })}
       </section>
 
-      {/* khối + tuyển dụng */}
+      <TabTongQuan
+        tabs={[
+          { ma: "dieu-hanh", ten: "Điều hành", noiDung: <ToanCanhDieuHanh /> },
+          {
+            ma: "nhan-su", ten: "Nhân sự", noiDung: (
+              <>
       <section className="grid gap-x-12 gap-y-10 lg:grid-cols-12">
         <div className="min-w-0 lg:col-span-7">
           <MucTrang tieuDe="Nhân sự theo khối">
@@ -188,12 +194,13 @@ export default async function TrangTongQuan() {
           </MucTrang>
         </div>
       </section>
-
-      <ToanCanhDieuHanh />
-
-      <BieuDoLuong />
-
-      {laKyThuat && <ToanCanhKyThuat />}
+              </>
+            ),
+          },
+          { ma: "luong", ten: "Lương", noiDung: <BieuDoLuong /> },
+          ...(laKyThuat ? [{ ma: "he-thong", ten: "Hệ thống", noiDung: <ToanCanhKyThuat /> }] : []),
+        ]}
+      />
     </div>
   );
 }
