@@ -41,7 +41,7 @@ function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string
 }
 
 /** Thẻ danh sách + hộp thoại thêm/sửa cho mọi mục HR khai trong hr-module.ts. Thẻ gọn trên điện thoại, 2–3 cột trên máy tính. */
-export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]>; chiXem?: boolean }) {
+export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khongXoa = false }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]>; chiXem?: boolean; khongXoa?: boolean }) {
   const [tim, setTim] = useState("");
   const [loc, setLoc] = useState("");
   const [sua, setSua] = useState<Dong | "moi" | null>(null);
@@ -111,13 +111,13 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false }: { m
         </ul>
       )}
       <Hop mo={sua !== null} dong={() => setSua(null)} tieuDe={sua === "moi" ? `Thêm: ${muc.ten}` : `Sửa: ${muc.ten}`} rong="rong">
-        {sua !== null && <FormHr key={sua === "moi" ? "moi" : sua.id} muc={muc} coSan={sua === "moi" ? undefined : sua} nv={nv} khoi={khoi} tc={tc} xong={() => setSua(null)} />}
+        {sua !== null && <FormHr key={sua === "moi" ? "moi" : sua.id} muc={muc} coSan={sua === "moi" ? undefined : sua} nv={nv} khoi={khoi} tc={tc} khongXoa={khongXoa} xong={() => setSua(null)} />}
       </Hop>
     </div>
   );
 }
 
-function FormHr({ muc, coSan, nv, khoi, tc, xong }: { muc: MucHr; coSan?: Dong; nv: Tra[]; khoi: Tra[]; tc: Record<string, Tra[]>; xong: () => void }) {
+function FormHr({ muc, coSan, nv, khoi, tc, khongXoa, xong }: { khongXoa: boolean; muc: MucHr; coSan?: Dong; nv: Tra[]; khoi: Tra[]; tc: Record<string, Tra[]>; xong: () => void }) {
   const [loi, setLoi] = useState<string | undefined>();
   const [dang, bat] = useTransition();
   const ref = useRef<HTMLFormElement>(null);
@@ -157,7 +157,7 @@ function FormHr({ muc, coSan, nv, khoi, tc, xong }: { muc: MucHr; coSan?: Dong; 
       </div>
       {loi && <p role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</p>}
       <div className="flex items-center justify-between gap-3 pt-1">
-        <div>{coSan && <button type="button" onClick={xoa} disabled={dang} className={NUT_CHU_NGUY}>Xoá</button>}</div>
+        <div>{coSan && !khongXoa && <button type="button" onClick={xoa} disabled={dang} className={NUT_CHU_NGUY}>Xoá</button>}</div>
         <div className="flex gap-2.5"><button type="button" onClick={xong} className={NUT_PHU}>Huỷ</button><button type="button" onClick={gui} disabled={dang} className={NUT_CHINH}>{dang ? "Đang lưu" : "Lưu"}</button></div>
       </div>
     </form>

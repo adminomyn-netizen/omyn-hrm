@@ -23,7 +23,7 @@ type Muc = {
 };
 
 /** Hộp tìm nhanh (⌘K / Ctrl+K): nhảy tới trang, nhân viên, ứng viên, tin tuyển dụng. Quản lý tìm cả dữ liệu; nhân viên chỉ nhảy trang. */
-export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
+export function TimKiem({ vaiTro, duocMo }: { vaiTro: VaiTro; duocMo?: string[] }) {
   const router = useRouter();
   const laQuanLy = vaiTro === "admin" || vaiTro === "ky_thuat";
   const [mo, setMo] = useState(false);
@@ -82,7 +82,7 @@ export function TimKiem({ vaiTro }: { vaiTro: VaiTro }) {
   type KetQua = KetQuaTim[];
   const muc = useMemo<Muc[]>(() => {
     const k = q.trim().toLowerCase();
-    const trang: Muc[] = locMenuTheoVaiTro(vaiTro)
+    const trang: Muc[] = locMenuTheoVaiTro(vaiTro, false, duocMo)
       .filter((m) => !k || m.ten.toLowerCase().includes(k))
       .slice(0, k ? 5 : 6)
       .map((m) => ({

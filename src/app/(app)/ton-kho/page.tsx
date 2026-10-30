@@ -1,14 +1,14 @@
 export const dynamic = "force-dynamic";
 
 import Link from "next/link";
-import { yeuCauVaiTro } from "@/lib/auth";
+import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { dbHr } from "@/lib/hr-db";
 import { tinhTonKho } from "@/lib/ton-kho";
 
 /** Tồn kho theo sản phẩm, tính từ phiếu nhập xuất. Không nhập tay. Chỉ Quản trị/Kỹ thuật. */
 export default async function TrangTonKho() {
-  await yeuCauVaiTro(["admin", "ky_thuat"]);
+  await yeuCauQuyenSo("Tài chính & Kho");
   const db = dbHr();
   const [sp, nx] = await Promise.all([
     db.from("sp_san_pham").select("id, ma_sp, ten").limit(5000),

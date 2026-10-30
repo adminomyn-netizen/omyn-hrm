@@ -22,12 +22,12 @@ const KHOA_MO_NHOM = "omyn-hrm-menu-nhom-mo";
 
 /** Menu trái nền espresso (cả khi giao diện sáng): mục đang mở nền sáng nhẹ + biểu tượng vàng; số đếm dải vàng.
  * Thu gọn còn cột biểu tượng 72 px; rê chuột/focus hiện tên và mô tả. */
-export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
+export function Sidebar({ vaiTro, duocMo }: { vaiTro: VaiTro | null; duocMo?: string[] }) {
   const pathname = usePathname();
   const [tg, ghiTg] = useLuuTru(KHOA_THU_GON, "0");
   const dem = useDemMenu();
   const thuGon = tg === "1";
-  const menu = locMenuTheoVaiTro(vaiTro, true);
+  const menu = locMenuTheoVaiTro(vaiTro, true, duocMo);
   const nhom = gomTheoNhom(menu);
   const chonDuong = duongDanDangChon(pathname, menu);
   // Nhóm gọn lại cho đỡ rối: bấm tiêu đề nhóm nào cũng mở/đóng được (nhớ lại cho lần sau). Chưa chọn gì thì chỉ "Chung" và nhóm đang đứng trong đó mở.

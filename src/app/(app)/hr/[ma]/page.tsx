@@ -4,7 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DanhSachHr } from "@/components/hr/DanhSachHr";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
-import { yeuCauVaiTro } from "@/lib/auth";
+import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
 import { timMucHr } from "@/lib/hr-module";
 import { dbHr, laGiamDocTaiKhoan } from "@/lib/hr-db";
 
@@ -27,9 +27,9 @@ export default async function TrangMucHr({
   const { ma } = await params;
   const muc = timMucHr(ma);
   if (!muc) notFound();
-  const nd = await yeuCauVaiTro(["admin", "ky_thuat"]);
+  const { nd, chiXem: chiXemTheoKhoi, xoa } = await yeuCauQuyenSo(muc.nhom);
   const goc = muc.quayVe ?? (ma === "pd-danh-muc" ? { href: "/phe-duyet/lua-chon", nhan: "Lựa chọn trong phiếu" } : GOC_NHOM[muc.nhom]) ?? { href: "/trang-chu-nhan-su", nhan: "Trang chủ Nhân sự" };
-  const chiXem = !!muc.chiGiamDocSua && !(await laGiamDocTaiKhoan(nd.id));
+  const chiXem = chiXemTheoKhoi || (!!muc.chiGiamDocSua && !(await laGiamDocTaiKhoan(nd.id)));
   const db = dbHr();
   const [dong, nv, khoi] = await Promise.all([
     db
@@ -80,6 +80,7 @@ export default async function TrangMucHr({
         khoi={(khoi.data ?? []).map((x) => ({ id: x.id, ten: x.ten }))}
         tc={tc}
         chiXem={chiXem}
+        khongXoa={!xoa}
       />
     </>
   );
