@@ -1,7 +1,7 @@
 /** Cấu hình các mục vận hành HCNS chuyển từ Lark (docs/mapping-lark-hr.md). Một khai báo → bảng/thẻ danh sách, biểu mẫu thêm/sửa, kiểm tra ở máy chủ.
  * Thêm mục mới = thêm một khối vào HR_MUC (+ migration cho bảng); không cần viết thêm trang. Không dùng hàm trong cấu hình để truyền được sang trình duyệt. */
 
-export type KieuCot = "chu" | "nhieu" | "so" | "tien" | "ngay" | "gio" | "chon" | "co" | "nv" | "khoi";
+export type KieuCot = "chu" | "nhieu" | "so" | "tien" | "ngay" | "gio" | "chon" | "co" | "nv" | "khoi" | "tc";
 
 export type CotHr = {
   k: string;
@@ -16,6 +16,8 @@ export type CotHr = {
   /** Chiếm cả hàng trong biểu mẫu. */
   rong?: boolean;
   goiY?: string;
+  /** Với kieu "tc": bảng được tham chiếu (có cột id, ten) — chọn trong danh sách bảng đó. */
+  bangTc?: string;
   /** Cột số được để trống (lưu null thay vì 0). */
   coTheTrong?: boolean;
   /** Khoảng giá trị hợp lệ [nhỏ nhất, lớn nhất] cho cột số. */
@@ -193,6 +195,74 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "nhan_xet", nhan: "Nhận xét và đề xuất", kieu: "nhieu", rong: true },
     ],
   },
+  {
+    ma: "bsc-goc-nhin", ten: "Góc nhìn BSC", nhom: "BSC & mục tiêu", bang: "bsc_goc_nhin", tieuDe: "ten",
+    moTa: "Bốn góc nhìn chuẩn: Tài chính, Khách hàng, Quy trình nội bộ, Học hỏi và phát triển. Đổi tên hoặc thêm bớt nếu cần.",
+    sapXep: { cot: "sap_xep" }, trong: "Chưa có góc nhìn nào.",
+    cot: [
+      { k: "ten", nhan: "Tên góc nhìn", kieu: "chu", batBuoc: true },
+      { k: "sap_xep", nhan: "Thứ tự hiện", kieu: "so", mac: 1, the: true },
+      { k: "hoat_dong", nhan: "Đang dùng", kieu: "co", mac: true },
+    ],
+  },
+  {
+    ma: "bsc-muc-tieu", ten: "Mục tiêu chiến lược", nhom: "BSC & mục tiêu", bang: "bsc_muc_tieu", tieuDe: "ten",
+    moTa: "Mục tiêu của từng góc nhìn (dùng chung nhiều năm); số liệu theo năm nằm ở chỉ số.",
+    sapXep: { cot: "sap_xep" }, trong: "Chưa có mục tiêu. Thêm mục tiêu đầu tiên cho một góc nhìn.",
+    cot: [
+      { k: "ten", nhan: "Tên mục tiêu", kieu: "chu", batBuoc: true, goiY: "Tăng doanh thu bán lẻ" },
+      { k: "goc_nhin_id", nhan: "Góc nhìn", kieu: "tc", bangTc: "bsc_goc_nhin", batBuoc: true, the: true },
+      { k: "bat_dau", nhan: "Bắt đầu", kieu: "ngay", the: true },
+      { k: "ket_thuc", nhan: "Kết thúc", kieu: "ngay", the: true },
+      { k: "sap_xep", nhan: "Thứ tự hiện", kieu: "so", mac: 1 },
+      { k: "hoat_dong", nhan: "Đang dùng", kieu: "co", mac: true },
+      { k: "mo_ta", nhan: "Mô tả", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "bsc-chi-so", ten: "Chỉ số BSC theo năm", nhom: "BSC & mục tiêu", bang: "bsc_chi_so", tieuDe: "ten",
+    moTa: "Chỉ số đo từng mục tiêu: đơn vị, cách gộp, trọng số. Kế hoạch và thực tế từng tháng nhập ở “Số liệu BSC”.",
+    sapXep: { cot: "sap_xep" }, trong: "Chưa có chỉ số. Thêm chỉ số cho một mục tiêu.",
+    cot: [
+      { k: "ten", nhan: "Tên chỉ số", kieu: "chu", batBuoc: true, goiY: "Doanh thu" },
+      { k: "nam", nhan: "Năm", kieu: "so", batBuoc: true, mac: 2026, khoang: [2020, 2100], the: true },
+      { k: "muc_tieu_id", nhan: "Mục tiêu", kieu: "tc", bangTc: "bsc_muc_tieu", batBuoc: true, the: true },
+      { k: "don_vi", nhan: "Đơn vị", kieu: "chu", the: true, goiY: "triệu đồng / đơn / %" },
+      { k: "cach_gop", nhan: "Cách gộp các tháng", kieu: "chon", luaChon: ["Cộng dồn", "Trung bình", "Cuối kỳ"], mac: "Cộng dồn", the: true },
+      { k: "trong_so", nhan: "Trọng số (%, tương đối)", kieu: "so", mac: 0, the: true },
+      { k: "sap_xep", nhan: "Thứ tự hiện", kieu: "so", mac: 1 },
+      { k: "hoat_dong", nhan: "Đang dùng", kieu: "co", mac: true },
+      { k: "duong_dan_bao_cao", nhan: "Đường dẫn báo cáo nguồn", kieu: "chu", rong: true },
+      { k: "mo_ta", nhan: "Mô tả", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "bsc-giao-chi-so", ten: "Giao chỉ số cho nhân sự", nhom: "BSC & mục tiêu", bang: "bsc_chi_so_nguoi", tieuDe: "chi_so_id",
+    moTa: "Chỉ số nào giao cho ai làm mục tiêu cá nhân. Người được giao tự nhập thực tế hằng tháng ở “Mục tiêu của tôi”.",
+    sapXep: { cot: "id" }, trong: "Chưa giao chỉ số cho ai.",
+    cot: [
+      { k: "chi_so_id", nhan: "Chỉ số", kieu: "tc", bangTc: "bsc_chi_so", batBuoc: true },
+      { k: "nhan_vien_id", nhan: "Nhân sự", kieu: "nv", batBuoc: true, the: true },
+    ],
+  },
+  {
+    ma: "bsc-ke-hoach-hanh-dong", ten: "Kế hoạch hành động", nhom: "BSC & mục tiêu", bang: "bsc_ke_hoach_hanh_dong", tieuDe: "ten", trangThai: "uu_tien",
+    moTa: "Việc cụ thể để đạt chỉ số: ai làm, ai giao, ai giám sát, ưu tiên P0 (gấp nhất) đến P3, thời gian và tiến độ.",
+    sapXep: { cot: "ket_thuc" }, canhBao: { cot: "ket_thuc", ngay: 7, nhan: "Sắp đến hạn" }, trong: "Chưa có kế hoạch hành động.",
+    cot: [
+      { k: "ten", nhan: "Tên việc", kieu: "chu", batBuoc: true },
+      { k: "chi_so_id", nhan: "Chỉ số", kieu: "tc", bangTc: "bsc_chi_so", batBuoc: true, the: true },
+      { k: "nguoi_thuc_hien_id", nhan: "Người thực hiện", kieu: "nv", batBuoc: true, the: true },
+      { k: "nguoi_giao_id", nhan: "Người giao", kieu: "nv" },
+      { k: "nguoi_giam_sat_id", nhan: "Người giám sát", kieu: "nv" },
+      { k: "uu_tien", nhan: "Ưu tiên", kieu: "chon", luaChon: ["P0", "P1", "P2", "P3"], mac: "P2" },
+      { k: "bat_dau", nhan: "Bắt đầu", kieu: "ngay", batBuoc: true, the: true },
+      { k: "ket_thuc", nhan: "Kết thúc", kieu: "ngay", batBuoc: true, the: true },
+      { k: "tien_do", nhan: "Tiến độ (0-100%)", kieu: "so", mac: 0, khoang: [0, 100], the: true },
+      { k: "ket_qua", nhan: "Kết quả", kieu: "nhieu", rong: true },
+      { k: "mo_ta", nhan: "Mô tả", kieu: "nhieu", rong: true },
+    ],
+  },
 ];
 
 export const timMucHr = (ma: string) => HR_MUC.find((m) => m.ma === ma);
@@ -219,6 +289,6 @@ export function chuanHoaGiaTri(c: CotHr, tho: string): { v: string | number | bo
     }
     case "chon": return !s ? { v: null } : c.luaChon?.includes(s) ? { v: s } : { loi: `“${c.nhan}” chưa hợp lệ.` };
     case "co": return { v: s === "1" || s === "on" || s === "true" };
-    case "nv": case "khoi": return !s ? { v: null } : /^[0-9a-f-]{36}$/i.test(s) ? { v: s } : { loi: `“${c.nhan}” chưa hợp lệ.` };
+    case "nv": case "khoi": case "tc": return !s ? { v: null } : /^[0-9a-f-]{36}$/i.test(s) ? { v: s } : { loi: `“${c.nhan}” chưa hợp lệ.` };
   }
 }

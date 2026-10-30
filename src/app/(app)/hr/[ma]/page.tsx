@@ -20,10 +20,13 @@ export default async function TrangMucHr({ params }: { params: Promise<{ ma: str
     db.from("nhan_vien").select("id, ho_ten, ma_nhan_vien").neq("trang_thai", "Đã nghỉ").order("ho_ten"),
     db.from("khoi").select("id, ten").order("ten"),
   ]);
+  const bangTc = [...new Set(muc.cot.flatMap((c) => (c.kieu === "tc" && c.bangTc ? [c.bangTc] : [])))];
+  const tc: Record<string, { id: string; ten: string }[]> = {};
+  await Promise.all(bangTc.map(async (b) => { tc[b] = ((await db.from(b).select("id, ten").order("ten").limit(1000)).data ?? []) as { id: string; ten: string }[]; }));
   return (
     <>
       <TieuDeTrang tieuDe={muc.ten} phu={<><Link href="/hr" className="text-nhan-dam hover:underline">← Vận hành HCNS</Link><span className="mx-2 text-vien-dam">·</span>{muc.moTa}</>} />
-      <DanhSachHr muc={muc} dong={(dong.data ?? []) as never} nv={(nv.data ?? []).map((x) => ({ id: x.id, ten: x.ma_nhan_vien ? `${x.ho_ten} (${x.ma_nhan_vien})` : x.ho_ten }))} khoi={(khoi.data ?? []).map((x) => ({ id: x.id, ten: x.ten }))} />
+      <DanhSachHr muc={muc} dong={(dong.data ?? []) as never} nv={(nv.data ?? []).map((x) => ({ id: x.id, ten: x.ma_nhan_vien ? `${x.ho_ten} (${x.ma_nhan_vien})` : x.ho_ten }))} khoi={(khoi.data ?? []).map((x) => ({ id: x.id, ten: x.ten }))} tc={tc} />
     </>
   );
 }

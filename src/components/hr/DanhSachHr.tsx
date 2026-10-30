@@ -25,7 +25,7 @@ const SO_NGAY = (s: unknown) => (typeof s === "string" && s ? Math.round((new Da
 const KIEU_NHAN = (v: string): "tot" | "cho" | "loi" | "tram" =>
   /^(Đạt|Đủ người|Đồng ý|Đã duyệt|Đang dùng|Đang tuyển|Đang hiệu lực|Ký tiếp|Ký không)/.test(v) ? "tot" : /^(Chờ|Soạn|Kế hoạch|Thương lượng|Cần theo dõi|Hoãn|Gia hạn)/.test(v) ? "cho" : /^(Không đạt|Từ chối|Huỷ|Vắng|Tạm dừng|Đã hết hạn|Đã chấm dứt|Không tái ký)/.test(v) ? "loi" : "tram";
 
-function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string, string>): string {
+function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string, string>, tc: Map<string, string>): string {
   const v = d[c.k];
   if (v === null || v === undefined || v === "") return "";
   switch (c.kieu) {
@@ -34,18 +34,20 @@ function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string
     case "tien": return TIEN(v);
     case "nv": return nv.get(String(v)) ?? "";
     case "khoi": return khoi.get(String(v)) ?? "";
+    case "tc": return tc.get(String(v)) ?? "";
     case "co": return v ? "Có" : "Không";
     default: return String(v);
   }
 }
 
 /** Thẻ danh sách + hộp thoại thêm/sửa cho mọi mục HR khai trong hr-module.ts. Thẻ gọn trên điện thoại, 2–3 cột trên máy tính. */
-export function DanhSachHr({ muc, dong, nv, khoi }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[] }) {
+export function DanhSachHr({ muc, dong, nv, khoi, tc = {} }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]> }) {
   const [tim, setTim] = useState("");
   const [loc, setLoc] = useState("");
   const [sua, setSua] = useState<Dong | "moi" | null>(null);
   const nvMap = useMemo(() => new Map(nv.map((x) => [x.id, x.ten])), [nv]);
   const khoiMap = useMemo(() => new Map(khoi.map((x) => [x.id, x.ten])), [khoi]);
+  const tcMap = useMemo(() => new Map(Object.values(tc).flat().map((x) => [x.id, x.ten])), [tc]);
   const cotTT = muc.cot.find((c) => c.k === muc.trangThai);
   const dem = useMemo(() => {
     const m = new Map<string, number>();
@@ -56,7 +58,7 @@ export function DanhSachHr({ muc, dong, nv, khoi }: { muc: MucHr; dong: Dong[]; 
     if (loc && muc.trangThai && d[muc.trangThai] !== loc) return false;
     if (!tim.trim()) return true;
     const q = tim.trim().toLowerCase();
-    return muc.cot.some((c) => hienGiaTri(c, d, nvMap, khoiMap).toLowerCase().includes(q));
+    return muc.cot.some((c) => hienGiaTri(c, d, nvMap, khoiMap, tcMap).toLowerCase().includes(q));
   });
   const cotTieuDe = muc.cot.find((c) => c.k === muc.tieuDe)!;
 
@@ -89,7 +91,7 @@ export function DanhSachHr({ muc, dong, nv, khoi }: { muc: MucHr; dong: Dong[]; 
               <li key={d.id}>
                 <button type="button" onClick={() => setSua(d)} className="the-noi group flex h-full w-full flex-col gap-3 rounded-nho border border-vien bg-giay-sang p-4 text-left transition-shadow hover:[box-shadow:var(--bong-2)]">
                   <div className="flex items-start justify-between gap-3">
-                    <h3 className="min-w-0 text-[16px] font-semibold leading-snug text-muc">{hienGiaTri(cotTieuDe, d, nvMap, khoiMap) || "(chưa đặt tên)"}</h3>
+                    <h3 className="min-w-0 text-[16px] font-semibold leading-snug text-muc">{hienGiaTri(cotTieuDe, d, nvMap, khoiMap, tcMap) || "(chưa đặt tên)"}</h3>
                     <Pencil strokeWidth={1.6} className="mt-1 h-4 w-4 shrink-0 text-muc-3 opacity-0 transition-opacity group-hover:opacity-100" />
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
@@ -98,7 +100,7 @@ export function DanhSachHr({ muc, dong, nv, khoi }: { muc: MucHr; dong: Dong[]; 
                   </div>
                   <dl className="grid grid-cols-2 gap-x-4 gap-y-2 text-[13px]">
                     {muc.cot.filter((c) => c.the && c.k !== muc.trangThai && c.k !== muc.tieuDe).map((c) => {
-                      const g = hienGiaTri(c, d, nvMap, khoiMap);
+                      const g = hienGiaTri(c, d, nvMap, khoiMap, tcMap);
                       return g ? <div key={c.k} className="min-w-0"><dt className="text-muc-3">{c.nhan}</dt><dd className="truncate font-medium text-muc">{g}</dd></div> : null;
                     })}
                   </dl>
@@ -109,13 +111,13 @@ export function DanhSachHr({ muc, dong, nv, khoi }: { muc: MucHr; dong: Dong[]; 
         </ul>
       )}
       <Hop mo={sua !== null} dong={() => setSua(null)} tieuDe={sua === "moi" ? `Thêm: ${muc.ten}` : `Sửa: ${muc.ten}`} rong="rong">
-        {sua !== null && <FormHr key={sua === "moi" ? "moi" : sua.id} muc={muc} coSan={sua === "moi" ? undefined : sua} nv={nv} khoi={khoi} xong={() => setSua(null)} />}
+        {sua !== null && <FormHr key={sua === "moi" ? "moi" : sua.id} muc={muc} coSan={sua === "moi" ? undefined : sua} nv={nv} khoi={khoi} tc={tc} xong={() => setSua(null)} />}
       </Hop>
     </div>
   );
 }
 
-function FormHr({ muc, coSan, nv, khoi, xong }: { muc: MucHr; coSan?: Dong; nv: Tra[]; khoi: Tra[]; xong: () => void }) {
+function FormHr({ muc, coSan, nv, khoi, tc, xong }: { muc: MucHr; coSan?: Dong; nv: Tra[]; khoi: Tra[]; tc: Record<string, Tra[]>; xong: () => void }) {
   const [loi, setLoi] = useState<string | undefined>();
   const [dang, bat] = useTransition();
   const ref = useRef<HTMLFormElement>(null);
@@ -146,6 +148,7 @@ function FormHr({ muc, coSan, nv, khoi, xong }: { muc: MucHr; coSan?: Dong; nv: 
               case "chon": return <Chon id={id} ten={c.k} trong="Chọn" giaTriMacDinh={macDinh(c)} luaChon={(c.luaChon ?? []).map((x) => ({ gia_tri: x, nhan: x }))} />;
               case "nv": return <Chon id={id} ten={c.k} trong="Chọn nhân viên" giaTriMacDinh={macDinh(c)} luaChon={nv.map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;
               case "khoi": return <Chon id={id} ten={c.k} trong="Chọn khối" giaTriMacDinh={macDinh(c)} luaChon={khoi.map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;
+              case "tc": return <Chon id={id} ten={c.k} trong="Chọn" giaTriMacDinh={macDinh(c)} luaChon={(tc[c.bangTc ?? ""] ?? []).map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;
               default: return <input id={id} name={c.k} required={c.batBuoc} placeholder={c.goiY} defaultValue={macDinh(c)} className={O_NHAP} />;
             }
           })();
