@@ -28,6 +28,9 @@ import {
   ShieldAlert,
   Layers,
   ArrowUpRight,
+  FileSpreadsheet,
+  PiggyBank,
+  HeartPulse,
   type LucideIcon,
 } from "lucide-react";
 import type { VaiTro } from "@/lib/auth";
@@ -264,6 +267,33 @@ export const menuChinh: MucMenu[] = [
     moTa: "Mỗi lần thăng chức, điều chuyển, bổ nhiệm của từng người.",
   },
   {
+    ten: "Báo cáo công lương",
+    duong_dan: "/bao-cao-cong-luong",
+    nhom: "Nhân sự",
+    phan: 7,
+    icon: FileSpreadsheet,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Tổng từng kỳ lương và quỹ lương theo khối.",
+  },
+  {
+    ten: "Quản lý chi phí",
+    duong_dan: "/quan-ly-chi-phi",
+    nhom: "Nhân sự",
+    phan: 7,
+    icon: PiggyBank,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Lương, bảo hiểm công ty, đào tạo, tuyển dụng theo kỳ.",
+  },
+  {
+    ten: "BHXH và phụ cấp",
+    duong_dan: "/bhxh-phu-cap",
+    nhom: "Nhân sự",
+    phan: 7,
+    icon: HeartPulse,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Mức đóng bảo hiểm và phụ cấp từng người, kèm tỷ lệ đang dùng.",
+  },
+  {
     ten: "Biến động nhân sự",
     duong_dan: "/bien-dong-nhan-su",
     nhom: "Nhân sự",
@@ -462,11 +492,7 @@ export const NHOM_NHAN_SU: readonly { so: number; ten: string }[] = [
 ];
 
 /** Màn chưa có: hiện nhãn "Sắp có" ở đúng nhóm, chưa bấm vào được. */
-export const SAP_CO_NHAN_SU: readonly { phan: number; ten: string }[] = [
-  { phan: 7, ten: "Báo cáo công lương" },
-  { phan: 7, ten: "Quản lý chi phí" },
-  { phan: 7, ten: "BHXH và phụ cấp" },
-];
+export const SAP_CO_NHAN_SU: readonly { phan: number; ten: string }[] = [];
 
 export type NhomNhanSu = {
   so: number;
