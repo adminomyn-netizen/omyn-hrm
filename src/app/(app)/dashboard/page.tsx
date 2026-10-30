@@ -11,6 +11,7 @@ import { DuongXuHuong } from "@/components/dashboard/DuongXuHuong";
 import { layDuLieuTongQuan, layHoSoChuaGanTaiKhoan, layTaiKhoanChoDuyet } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { ToanCanhKyThuat } from "@/components/dashboard/ToanCanhKyThuat";
+import { ToanCanhDieuHanh } from "@/components/dashboard/ToanCanhDieuHanh";
 import { BieuDoLuong } from "@/components/dashboard/BieuDoLuong";
 import { TongQuanCuaToi } from "@/components/dashboard/TongQuanCuaToi";
 import { gioMayChu, ngayVN, trieuVN } from "@/lib/dinh-dang";
@@ -187,6 +188,8 @@ export default async function TrangTongQuan() {
           </MucTrang>
         </div>
       </section>
+
+      <ToanCanhDieuHanh />
 
       <BieuDoLuong />
 
