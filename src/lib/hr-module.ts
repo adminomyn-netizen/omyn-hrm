@@ -124,7 +124,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "de-xuat-phe-duyet", ten: "Đề xuất cần phê duyệt", nhom: "Tuyển dụng", bang: "de_xuat_phe_duyet", tieuDe: "tieu_de", trangThai: "trang_thai",
+    ma: "de-xuat-phe-duyet", ten: "Đề xuất nhân sự cần duyệt", nhom: "Hợp đồng & thăng tiến", bang: "de_xuat_phe_duyet", tieuDe: "tieu_de", trangThai: "trang_thai",
     moTa: "Đề xuất tuyển người, ngân sách, offer hoặc điều chỉnh nhân sự gửi lãnh đạo duyệt.",
     sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có đề xuất nào.",
     cot: [

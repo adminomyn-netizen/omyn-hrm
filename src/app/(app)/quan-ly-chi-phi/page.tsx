@@ -10,7 +10,7 @@ const TIEN = (v: number) => `${Math.round(v).toLocaleString("vi-VN")} đ`;
 const so = (v: unknown) => Number(v ?? 0) || 0;
 const thangKy = (k: { thang: number; nam: number }) => `${k.nam}-${String(k.thang).padStart(2, "0")}`;
 
-/** Chi phí nhân sự: mỗi kỳ lương gồm lương + bảo hiểm công ty đóng + đào tạo cùng tháng; thêm thực chi tuyển dụng đã ghi ở Kế hoạch tuyển dụng. Chỉ Quản trị/Kỹ thuật. */
+/** Chi phí nhân sự: mỗi kỳ lương gồm lương + bảo hiểm công ty đóng + đào tạo cùng tháng; thêm thực chi tuyển dụng đã ghi ở Sổ tuyển dụng. Chỉ Quản trị/Kỹ thuật. */
 export default async function TrangQuanLyChiPhi() {
   await yeuCauVaiTro(["admin", "ky_thuat"]);
   const db = dbHr();
@@ -56,7 +56,7 @@ export default async function TrangQuanLyChiPhi() {
             <div className="flex justify-between"><dt className="text-muc-3">Thực chi</dt><dd className="mau-chu font-semibold tabular-nums">{TIEN(tuyenDung.thuc)}</dd></div>
             {daoTaoNgoaiKy > 0 && <div className="flex justify-between border-t border-vien pt-2"><dt className="text-muc-3">Đào tạo ngoài các kỳ lương</dt><dd className="tabular-nums">{TIEN(daoTaoNgoaiKy)}</dd></div>}
           </dl>
-          <p className="px-4 pb-4 text-[12.5px] text-muc-3">Tuyển dụng ghi theo hạng mục ở Kế hoạch tuyển dụng, chưa chia theo tháng.</p>
+          <p className="px-4 pb-4 text-[12.5px] text-muc-3">Tuyển dụng ghi theo hạng mục ở Sổ tuyển dụng, chưa chia theo tháng.</p>
         </section>
       </div>
     </>
