@@ -275,6 +275,36 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "thu_tu", nhan: "Thứ tự", kieu: "so", mac: 0 },
     ],
   },
+  {
+    ma: "hop-dong-phu-luc", ten: "Phụ lục hợp đồng", nhom: "Hồ sơ & hợp đồng", bang: "hop_dong_phu_luc", tieuDe: "nhan_vien_id", trangThai: "trang_thai",
+    moTa: "Phụ lục gia hạn, điều chỉnh lương, chức danh hoặc địa điểm của hợp đồng đang có. Gia hạn thì nhập ngày hết hạn mới.",
+    sapXep: { cot: "ngay_hieu_luc", giam: true }, trong: "Chưa có phụ lục nào.",
+    cot: [
+      { k: "nhan_vien_id", nhan: "Nhân sự", kieu: "nv", batBuoc: true, the: true },
+      { k: "so_hop_dong", nhan: "Thuộc hợp đồng số", kieu: "chu", the: true },
+      { k: "so_phu_luc", nhan: "Số phụ lục", kieu: "chu", the: true },
+      { k: "loai_thay_doi", nhan: "Nội dung thay đổi", kieu: "chon", luaChon: ["Gia hạn", "Điều chỉnh lương", "Điều chỉnh chức danh", "Điều chỉnh địa điểm", "Khác"], mac: "Khác", the: true },
+      { k: "ngay_hieu_luc", nhan: "Hiệu lực từ", kieu: "ngay", batBuoc: true, the: true },
+      { k: "den_ngay_moi", nhan: "Hết hạn mới (khi gia hạn)", kieu: "ngay" },
+      { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Chờ ký", "Đã ký"], mac: "Chờ ký" },
+      { k: "noi_dung", nhan: "Nội dung phụ lục", kieu: "nhieu", batBuoc: true, rong: true },
+    ],
+  },
+  {
+    ma: "tai-san-cap-phat", ten: "Tài sản cấp phát", nhom: "Hồ sơ & hợp đồng", bang: "tai_san_cap_phat", tieuDe: "ten_tai_san", trangThai: "tinh_trang",
+    moTa: "Tài sản công ty cấp cho từng người (máy, điện thoại, thẻ, đồng phục…) và ngày trả. Đây là danh sách dùng khi bàn giao lúc nghỉ việc: còn “Đang giữ” là chưa bàn giao xong.",
+    sapXep: { cot: "ngay_cap", giam: true }, trong: "Chưa cấp tài sản nào.",
+    cot: [
+      { k: "nhan_vien_id", nhan: "Người nhận", kieu: "nv", batBuoc: true, the: true },
+      { k: "ten_tai_san", nhan: "Tài sản", kieu: "chu", batBuoc: true, goiY: "Laptop Dell" },
+      { k: "ma_tai_san", nhan: "Mã / số seri", kieu: "chu", the: true },
+      { k: "so_luong", nhan: "Số lượng", kieu: "so", batBuoc: true, mac: 1, khoang: [1, 1000], the: true },
+      { k: "ngay_cap", nhan: "Ngày cấp", kieu: "ngay", batBuoc: true, the: true },
+      { k: "ngay_tra", nhan: "Ngày trả", kieu: "ngay" },
+      { k: "tinh_trang", nhan: "Tình trạng", kieu: "chon", luaChon: ["Đang giữ", "Đã trả", "Mất/hỏng"], mac: "Đang giữ" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
 ];
 
 export const timMucHr = (ma: string) => HR_MUC.find((m) => m.ma === ma);

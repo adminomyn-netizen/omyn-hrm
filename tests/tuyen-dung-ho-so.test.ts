@@ -57,7 +57,7 @@ describe("hồ sơ nhân viên", () => {
       { loai: "CCCD mặt sau", da_go: true, trang_thai: "Chờ xác nhận" },
       { loai: "Sơ yếu lý lịch", da_go: false, trang_thai: "Cần bổ sung" },
     ];
-    expect(giayToConThieu(ds)).toEqual(["CCCD mặt sau", "Sơ yếu lý lịch", "Hợp đồng lao động", "Cam kết bảo mật (NDA)"]);
+    expect(giayToConThieu(ds)).toEqual(["CCCD mặt sau", "Sơ yếu lý lịch", "Bằng cấp", "Giấy khám sức khoẻ", "Sổ BHXH", "Hợp đồng lao động", "Cam kết bảo mật (NDA)"]);
   });
   it("kiểm tệp: chỉ PDF/JPG/PNG ≤ 10 MB", () => {
     expect(kiemTraTep("application/pdf", 1000)).toBeNull();

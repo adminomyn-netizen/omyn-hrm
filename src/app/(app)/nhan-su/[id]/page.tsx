@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { HopDongTaiSan } from "@/components/nhan-su/HopDongTaiSan";
 import { HoSoNhanVien } from "@/components/nhan-su/HoSoNhanVien";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { yeuCauVaiTro } from "@/lib/auth";
@@ -18,6 +19,7 @@ export default async function TrangHoSo({ params }: { params: Promise<{ id: stri
     <>
       <TieuDeTrang tieuDe={du.nhanVien.ho_ten} phu={<Link href="/nhan-su" className="text-nhan-dam hover:underline">← Về danh sách hồ sơ nhân sự</Link>} />
       <HoSoNhanVien du={du} quanTri />
+      <HopDongTaiSan nhanVienId={du.nhanVien.id} hoSo={du.hoSo as Record<string, unknown> | null} dangLam={du.nhanVien.trang_thai !== "Đã nghỉ"} />
     </>
   );
 }
