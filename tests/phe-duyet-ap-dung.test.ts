@@ -18,5 +18,13 @@ describe("đổ phiếu đã duyệt vào hồ sơ", () => {
     expect(lenKeHoachDo("de-xuat-dieu-chinh-nhan-su", { loai: "Luân chuyển", phong_ban_moi: "Phòng Kế Toán", chuc_vu_moi: "Kế toán" }, LE)).toEqual([{ kieu: "luan_chuyen", phongBan: "Phòng Kế Toán", chucVu: "Kế toán" }]);
     expect(lenKeHoachDo("de-xuat-dieu-chinh-nhan-su", { loai: "Thăng chức", chuc_vu_moi: "Trưởng phòng" }, LE)).toEqual([{ kieu: "luan_chuyen", phongBan: null, chucVu: "Trưởng phòng" }]);
   });
+  it("xin nghỉ việc → mở hồ sơ nghỉ việc; phiếu bàn giao → tick đúng nhóm checklist", () => {
+    expect(lenKeHoachDo("xin-nghi-viec", { thoi_gian_lam_don: "2026-11-01", ngay_lam_viec_cuoi: "2026-12-15", loai_nghi_viec: "Trước hạn", ly_do: "Lương, thưởng không phù hợp", ly_do_khac: "x" }, LE))
+      .toEqual([{ kieu: "nghi_viec", loai: "Trước hạn", ngayNop: "2026-11-01", ngayCuoi: "2026-12-15", lyDo: "Lương, thưởng không phù hợp — x" }]);
+    expect(lenKeHoachDo("xin-nghi-viec", { ngay_lam_viec_cuoi: "hỏng" }, LE)).toEqual([]);
+    expect(lenKeHoachDo("ban-giao-tai-san", {}, LE)).toEqual([{ kieu: "ban_giao", nhom: "Bàn giao tài sản" }]);
+    expect(lenKeHoachDo("ban-giao-cong-viec", {}, LE)).toEqual([{ kieu: "ban_giao", nhom: "Bàn giao công việc" }]);
+    expect(lenKeHoachDo("ban-giao-nghia-vu-tai-chinh", {}, LE)).toEqual([{ kieu: "ban_giao", nhom: "Bàn giao nghĩa vụ tài chính" }]);
+  });
   it("phiếu khác không có việc", () => { expect(lenKeHoachDo("de-nghi-thanh-toan", {}, LE)).toEqual([]); });
 });

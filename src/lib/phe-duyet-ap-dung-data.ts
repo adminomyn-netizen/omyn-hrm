@@ -4,6 +4,7 @@ import { GIO_COI_LA_DI_MUON } from "@/lib/don-tu";
 import { lenKeHoachDo } from "@/lib/phe-duyet-ap-dung";
 import { GIOI_HAN_MAC_DINH, tachTangCa, viPhamGioiHan, type GioDaCo } from "@/lib/tang-ca";
 import { ghiLichSuNhanSu, type NguoiSua } from "@/lib/nhan-su-lich-su";
+import { moHoSoNghiViec, tickBanGiaoTuPhieu } from "@/lib/nghi-viec-data";
 import type { DuLieu } from "@/lib/phe-duyet";
 
 async function docNgayLe(): Promise<Set<string>> {
@@ -71,6 +72,11 @@ export async function apDungPhieuDaDuyet(phieuId: string, nguoi: NguoiSua): Prom
         const { error } = await db.from("luong_thoa_thuan").update({ luong_thoa_thuan: v.luongMoi, cap_nhat_luc: new Date().toISOString() }).eq("nhan_vien_id", nv);
         ghi.push(error ? "chưa đổi được lương" : "đổi lương thỏa thuận theo phiếu");
         if (!error) await ls("Lương thỏa thuận", "Điều chỉnh lương", { truoc: cu, sau: { luong_thoa_thuan: v.luongMoi } });
+      } else if (v.kieu === "nghi_viec") {
+        const r = await moHoSoNghiViec({ nhanVienId: nv, phieuId: p.id, loai: v.loai, ngayNop: v.ngayNop, ngayCuoi: v.ngayCuoi, lyDo: v.lyDo }, nguoi);
+        ghi.push(r.id ? "mở hồ sơ nghỉ việc kèm checklist bàn giao" : (r.loi ?? "chưa mở được hồ sơ nghỉ việc"));
+      } else if (v.kieu === "ban_giao") {
+        ghi.push(await tickBanGiaoTuPhieu(nv, v.nhom, p.so_phieu, nguoi));
       } else {
         const dong: Record<string, string | null> = {};
         if (v.chucVu) dong.chuc_danh = v.chucVu;
