@@ -7,6 +7,8 @@ import { gomTheoNhom, locMenuTheoVaiTro } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
 import { useLuuTru } from "@/lib/luu-tru";
 import { useDemMenu } from "@/lib/dem-menu";
+import Image from "next/image";
+import { Logo } from "@/components/brand/Logo";
 
 export const KHOA_THU_GON = "omyn-hrm-sidebar-thu-gon";
 
@@ -25,7 +27,11 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
         thuGon ? "w-[72px]" : "w-[248px]"
       }`}
     >
-      <div className={`flex shrink-0 px-3 pt-3 ${thuGon ? "justify-center" : "justify-end"}`}>
+      <div className={`flex shrink-0 items-center px-3 pt-3 ${thuGon ? "flex-col gap-2" : "justify-between"}`}>
+        {/* Chỗ logo: đang dùng logo chữ OMYN tạm; khi có file logo chính thức chỉ cần thay các tệp trong public/brand (giữ nguyên tên, cùng tỉ lệ). */}
+        <Link href="/dashboard" aria-label="Omyn — Tổng quan" className="flex h-10 items-center px-1.5">
+          {thuGon ? <Image src="/brand/bieu-tuong-sang.svg" alt="Omyn" width={28} height={28} unoptimized /> : <Logo size="md" nenToi />}
+        </Link>
         <button
           type="button"
           onClick={() => ghiTg(thuGon ? "0" : "1")}

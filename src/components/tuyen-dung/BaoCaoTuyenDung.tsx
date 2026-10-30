@@ -2,7 +2,7 @@ import { tienVN } from "@/lib/dinh-dang";
 import type { tinhBaoCaoTuyenDung } from "@/lib/tuyen-dung";
 
 type BaoCao = ReturnType<typeof tinhBaoCaoTuyenDung>;
-const MAU = ["#D7E3E1", "#A7E3D6", "#5FD0BD", "#2AA898", "#14938A", "#0F766E", "#8AA09D"];
+const MAU = ["#E6D8DA", "#D9A7B0", "#B8475A", "#8B2635", "#C9826F", "#6B1A27", "#96797E"];
 
 function The({ nhan, so, phu }: { nhan: string; so: string; phu?: string }) {
   return (
