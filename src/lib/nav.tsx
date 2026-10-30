@@ -94,12 +94,12 @@ export const menuChinh: MucMenu[] = [
     moTa: "Thêm, sửa, xoá khối; xem mỗi khối có bao nhiêu người.",
   },
   {
-    ten: "Danh mục lựa chọn của phiếu",
-    duong_dan: "/hr/pd-danh-muc",
+    ten: "Lựa chọn trong phiếu",
+    duong_dan: "/phe-duyet/lua-chon",
     nhom: "Tổ chức & phê duyệt",
     icon: Layers,
     chiVaiTro: CHI_QUAN_LY,
-    moTa: "Các danh sách chọn trong phiếu phê duyệt: đơn vị, phòng ban, chức vụ, khoản chi, loại nghỉ…",
+    moTa: "Mỗi loại phiếu một khối: ô nào của phiếu hiện danh sách chọn nào (đơn vị, phòng ban, khoản chi…), và nơi sửa danh sách.",
   },
   {
     ten: "Trang chủ Nhân sự",
