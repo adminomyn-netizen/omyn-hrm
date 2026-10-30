@@ -8,25 +8,25 @@
  * Giao diện chỉ có bản sáng. Các tên --omyn-* giữ lại để các trang cũ chưa
  * làm lại vẫn chạy; giá trị trỏ về bảng màu mới. */
 :root {
-  /* Xanh lục đậm + teal (chủ dự án chốt 24/10: đổi giao diện theo phần mềm chấm công mẫu — menu lục đậm, nút teal, nền sáng lạnh).
-   * Tên token giữ nguyên (vang = màu nhấn chính, nay là teal) để không phải sửa từng thành phần. */
-  --giay: #f4f7f7;
+  /* Đỏ trầm kiểu rượu vang (chị Linh + chị Lâm chốt 30/10/2026): nền sáng dịu hơi ấm, đỏ mận làm màu nhấn, menu burgundy đậm, mục đang mở màu vàng nhạt.
+   * Tên token giữ nguyên (vang = màu nhấn chính, nay là đỏ rượu vang) để không phải sửa từng thành phần. */
+  --giay: #faf6f6;
   --giay-sang: #ffffff;
-  --giay-tram: #e8f0f0;
-  --muc: #12302d;
-  --muc-2: #3f5653;
-  --muc-3: #566b68;
-  --vien: #d7e3e1;
-  --vien-dam: #7a908d;
-  --nhan: #0f766e;
-  --nhan-dam: #0b5a54;
-  --nhan-nhat: #d6f2e8;
-  --chu-tren-vang: #ffffff; /* chữ trên nền teal: luôn trắng, cả chế độ tối */
-  --vang-sang: #0e8074;
-  --vang: #0f766e;
-  --vang-tram: #0b5f58;
-  --espresso: #07332e;
-  --espresso-sau: #04201c;
+  --giay-tram: #f2e8e9;
+  --muc: #2a1a1d;
+  --muc-2: #594348;
+  --muc-3: #6e5a5f;
+  --vien: #e6d8da;
+  --vien-dam: #96797e;
+  --nhan: #8b2635;
+  --nhan-dam: #6b1a27;
+  --nhan-nhat: #f5e4e6;
+  --chu-tren-vang: #ffffff; /* chữ trên nền đỏ rượu vang: luôn trắng, cả chế độ tối */
+  --vang-sang: #9d3040;
+  --vang: #8b2635;
+  --vang-tram: #701d2b;
+  --espresso: #2f0d14;
+  --espresso-sau: #1e070c;
   --loi: #b42318;
   --loi-nen: #fdecea;
   --canh-bao: #a8520c;
@@ -40,9 +40,9 @@
   --sac-hong: #be123c; --sac-hong-nen: #ffe3ea; --sac-hong-mau: #f43f5e; --sac-hong-1: #e11d48; --sac-hong-2: #be123c;
 
   /* Menu trái luôn nền lục đậm (cả khi giao diện sáng) — điểm tựa của bố cục. */
-  --menu: #00453d;
-  --menu-chu: #cfe5e1;
-  --menu-chu-phu: #93bab3;
+  --menu: #4e1621;
+  --menu-chu: #f1dde0;
+  --menu-chu-phu: #cfa6ac;
   --menu-sang: #ffffff;
   --menu-nhan: #fbbf24;
   --menu-chon: rgba(255, 255, 255, 0.13);
@@ -50,22 +50,22 @@
   --menu-vien: rgba(255, 255, 255, 0.12);
 
   /* Chiều sâu (chủ yêu cầu 27/10/2026, theo AMIA OS): nhiều lớp bóng mềm + vệt sáng viền trên; không mờ kính, không bóng nặng. */
-  --the-1: #ffffff; --the-2: #fbfdfd; --the-vien-nang: #b7cfcb;
-  --bong-1: 0 1px 2px rgb(7 51 46 / 0.07), 0 4px 10px -2px rgb(7 51 46 / 0.07);
-  --bong-2: 0 1px 2px rgb(7 51 46 / 0.06), 0 8px 18px -4px rgb(7 51 46 / 0.11), 0 22px 40px -16px rgb(7 51 46 / 0.14);
-  --bong-3: 0 2px 4px rgb(7 51 46 / 0.07), 0 14px 26px -6px rgb(7 51 46 / 0.16), 0 34px 56px -20px rgb(7 51 46 / 0.2);
+  --the-1: #ffffff; --the-2: #fffdfd; --the-vien-nang: #d6bcc0;
+  --bong-1: 0 1px 2px rgb(51 13 21 / 0.07), 0 4px 10px -2px rgb(51 13 21 / 0.07);
+  --bong-2: 0 1px 2px rgb(51 13 21 / 0.06), 0 8px 18px -4px rgb(51 13 21 / 0.11), 0 22px 40px -16px rgb(51 13 21 / 0.14);
+  --bong-3: 0 2px 4px rgb(51 13 21 / 0.07), 0 14px 26px -6px rgb(51 13 21 / 0.16), 0 34px 56px -20px rgb(51 13 21 / 0.2);
   --sang-vien: inset 0 1px 0 rgb(255 255 255 / 0.95);
 
-  --gradient-vang: linear-gradient(135deg, #0e8074 0%, #0f766e 48%, #0b5f58 100%);
-  --gradient-vang-hover: linear-gradient(135deg, #12917f 0%, #108178 48%, #0d6c64 100%);
-  --gradient-toi: linear-gradient(155deg, #0b5a50 0%, #00453d 45%, #002b26 100%);
-  --gradient-nen: linear-gradient(180deg, #ffffff 0%, #f4f7f7 55%, #e8f0f0 100%);
-  --gradient-dau-trang: linear-gradient(90deg, #e3f1ee 0%, #f4f7f7 60%, #f4f7f7 100%);
+  --gradient-vang: linear-gradient(135deg, #9d3040 0%, #8b2635 48%, #701d2b 100%);
+  --gradient-vang-hover: linear-gradient(135deg, #a93a4b 0%, #963044 48%, #7c2332 100%);
+  --gradient-toi: linear-gradient(155deg, #62202c 0%, #4e1621 45%, #330d15 100%);
+  --gradient-nen: linear-gradient(180deg, #ffffff 0%, #faf6f6 55%, #f2e8e9 100%);
+  --gradient-dau-trang: linear-gradient(90deg, #f6e3e5 0%, #faf6f6 60%, #faf6f6 100%);
 
   /* Thang "slate" của Tailwind cho các trang cũ chưa làm lại: tông xám lục đồng bộ với bảng màu. */
-  --color-slate-50: #f4f7f7; --color-slate-100: #e8f0f0; --color-slate-200: #d7e3e1; --color-slate-300: #b7c9c6;
-  --color-slate-400: #8aa09d; --color-slate-500: #566b68; --color-slate-600: #3f5653; --color-slate-700: #2f4543;
-  --color-slate-800: #1f3331; --color-slate-900: #12302d; --color-slate-950: #0a1f1d;
+  --color-slate-50: #faf6f6; --color-slate-100: #f2e8e9; --color-slate-200: #e6d8da; --color-slate-300: #cbb4b8;
+  --color-slate-400: #a58a90; --color-slate-500: #6e5a5f; --color-slate-600: #594348; --color-slate-700: #43303a;
+  --color-slate-800: #32222a; --color-slate-900: #2a1a1d; --color-slate-950: #190e11;
 
   --background: var(--giay);
   --foreground: var(--muc);
@@ -77,22 +77,22 @@
   --omyn-border: var(--vien);
 }
 
-/* Chế độ tối: lục rất đậm + teal sáng. Bật bằng class .dark trên <html> (nút ở đầu trang,
+/* Chế độ tối: nâu mận rất đậm + hồng rượu sáng. Bật bằng class .dark trên <html> (nút ở đầu trang,
  * nhớ lựa chọn trong localStorage; mặc định luôn là sáng). */
 .dark {
   color-scheme: dark;
-  --giay: #0a1716;
-  --giay-sang: #102321;
-  --giay-tram: #17302d;
-  --muc: #e3f2ef;
-  --muc-2: #b5cdc9;
-  --muc-3: #8fada8;
-  --vien: #1f3a36;
-  --vien-dam: #5f8b84;
-  --nhan: #4cc2b1;
-  --nhan-dam: #7fdccf;
-  --nhan-nhat: #123b36;
-  --menu: #03211d;
+  --giay: #1a0f12;
+  --giay-sang: #261619;
+  --giay-tram: #331f23;
+  --muc: #f6ebec;
+  --muc-2: #d9c2c6;
+  --muc-3: #bda4a9;
+  --vien: #45292f;
+  --vien-dam: #8b6a71;
+  --nhan: #e58a9a;
+  --nhan-dam: #f2b0bb;
+  --nhan-nhat: #4a1d27;
+  --menu: #2a0e14;
   --loi: #f5a097;
   --loi-nen: #3b1c19;
   --canh-bao: #f0b36a;
@@ -104,17 +104,17 @@
   --sac-cam: #fdc982; --sac-cam-nen: #3d2a0e;
   --sac-hong: #ffadc0; --sac-hong-nen: #44131f;
 
-  --the-1: #17302d; --the-2: #102321; --the-vien-nang: #34584f;
+  --the-1: #331f23; --the-2: #261619; --the-vien-nang: #5a3a42;
   --bong-1: 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 10px -2px rgb(0 0 0 / 0.35);
   --bong-2: 0 1px 2px rgb(0 0 0 / 0.35), 0 8px 18px -4px rgb(0 0 0 / 0.45), 0 22px 40px -16px rgb(0 0 0 / 0.5);
   --bong-3: 0 2px 4px rgb(0 0 0 / 0.4), 0 14px 26px -6px rgb(0 0 0 / 0.5), 0 34px 56px -20px rgb(0 0 0 / 0.55);
   --sang-vien: inset 0 1px 0 rgb(255 255 255 / 0.06);
-  --gradient-nen: linear-gradient(180deg, #102321 0%, #0a1716 55%, #071210 100%);
-  --gradient-dau-trang: linear-gradient(90deg, #12302c 0%, #0d1f1d 60%, #0a1716 100%);
+  --gradient-nen: linear-gradient(180deg, #261619 0%, #1a0f12 55%, #120a0c 100%);
+  --gradient-dau-trang: linear-gradient(90deg, #351b20 0%, #211215 60%, #1a0f12 100%);
 
-  --color-slate-50: #102321; --color-slate-100: #17302d; --color-slate-200: #1f3a36; --color-slate-300: #34584f;
-  --color-slate-400: #6b918a; --color-slate-500: #8fada8; --color-slate-600: #a9c4bf; --color-slate-700: #c4dad6;
-  --color-slate-800: #d8e8e5; --color-slate-900: #e3f2ef; --color-slate-950: #f1faf8;
+  --color-slate-50: #261619; --color-slate-100: #331f23; --color-slate-200: #45292f; --color-slate-300: #5a3a42;
+  --color-slate-400: #9a737b; --color-slate-500: #bda4a9; --color-slate-600: #d0b8bd; --color-slate-700: #e0ccd0;
+  --color-slate-800: #eddcdf; --color-slate-900: #f6ebec; --color-slate-950: #fff6f7;
 }
 
 @theme inline {
@@ -175,21 +175,21 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-/* Nút chính: dải teal, chữ trắng (tương phản ≥ 4,5:1). */
+/* Nút chính: dải đỏ rượu vang, chữ trắng (tương phản ≥ 4,5:1). */
 .nut-vang {
   background: var(--gradient-vang);
   color: var(--chu-tren-vang);
   font-weight: 600;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(15 118 110 / 0.28);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.45), 0 1px 2px rgb(139 38 53 / 0.28);
   transition: filter 150ms ease-out, box-shadow 150ms ease-out;
 }
 .nut-vang:hover:not(:disabled) {
   background: var(--gradient-vang-hover);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 2px 8px rgb(15 118 110 / 0.34);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.55), 0 2px 8px rgb(139 38 53 / 0.34);
 }
 /* position nằm trong @layer base để lớp tiện ích (absolute/fixed) thắng được; ngoài layer nó đè mất và menu thả xuống bị lệch chỗ. */
 @layer base { .the-noi { position: relative; } }
-/* Thẻ nổi: nền chuyển nhẹ, vệt teal mảnh ở mép trên, bóng nhiều lớp. Dùng cho thẻ, hộp thoại, bảng thả xuống; thêm .the-noi-nang nếu thẻ bấm được (nhấc nhẹ khi rê chuột). */
+/* Thẻ nổi: nền chuyển nhẹ, vệt đỏ mảnh ở mép trên, bóng nhiều lớp. Dùng cho thẻ, hộp thoại, bảng thả xuống; thêm .the-noi-nang nếu thẻ bấm được (nhấc nhẹ khi rê chuột). */
 .the-noi {
   background: linear-gradient(180deg, var(--the-1) 0%, var(--the-2) 100%);
   border: 1px solid var(--vien);
@@ -203,7 +203,7 @@ body {
   inset: 0 0 auto 0;
   height: 3px;
   border-radius: var(--radius-the) var(--radius-the) 0 0;
-  background: linear-gradient(90deg, var(--vang-sang) 0%, var(--vang) 60%, #2aa898 100%);
+  background: linear-gradient(90deg, var(--vang-sang) 0%, var(--vang) 60%, #b8475a 100%);
   opacity: 0.85;
   pointer-events: none;
 }
@@ -213,10 +213,10 @@ body {
 .the-noi-hop::before { border-radius: var(--radius-hop) var(--radius-hop) 0 0; }
 .vao { animation: nang-len 480ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @keyframes nang-len { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
-/* Bảng dữ liệu tự nằm trong thẻ nổi (trừ khi đã ở trong một thẻ): vệt teal mảnh trên cùng, hàng tiêu đề nền nhạt, lề 20 px hai đầu. */
+/* Bảng dữ liệu tự nằm trong thẻ nổi (trừ khi đã ở trong một thẻ): vệt đỏ mảnh trên cùng, hàng tiêu đề nền nhạt, lề 20 px hai đầu. */
 .overflow-x-auto:has(> table) {
   background:
-    linear-gradient(90deg, var(--vang-sang) 0%, var(--vang) 60%, #2aa898 100%) top / 100% 3px no-repeat,
+    linear-gradient(90deg, var(--vang-sang) 0%, var(--vang) 60%, #b8475a 100%) top / 100% 3px no-repeat,
     linear-gradient(180deg, var(--the-1) 0%, var(--the-2) 100%);
   border: 1px solid var(--vien);
   border-radius: var(--radius-the);
@@ -237,10 +237,10 @@ body {
 .bang-nho { animation: hien-nhanh 140ms ease-out both; border-color: var(--the-vien-nang); box-shadow: var(--sang-vien), var(--bong-3); }
 @keyframes hien-nhanh { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 /* Đầu trang: bóng mỏng dưới đường kẻ để tách khỏi nội dung khi cuộn. */
-.dau-trang-omyn { background: linear-gradient(180deg, var(--the-1), var(--the-2)); box-shadow: 0 1px 0 var(--vien), 0 6px 14px -10px rgb(7 51 46 / 0.25); }
+.dau-trang-omyn { background: linear-gradient(180deg, var(--the-1), var(--the-2)); box-shadow: 0 1px 0 var(--vien), 0 6px 14px -10px rgb(51 13 21 / 0.25); }
 .cuon-an-thanh { scrollbar-width: none; -ms-overflow-style: none; }
 .cuon-an-thanh::-webkit-scrollbar { display: none; }
-.thanh-ben-omyn { background: radial-gradient(120% 60% at 0% 0%, rgb(45 190 170 / 0.25) 0%, transparent 55%), var(--gradient-toi); box-shadow: 0 18px 40px -18px rgb(7 51 46 / 0.6); }
+.thanh-ben-omyn { background: radial-gradient(120% 60% at 0% 0%, rgb(190 90 110 / 0.25) 0%, transparent 55%), var(--gradient-toi); box-shadow: 0 18px 40px -18px rgb(51 13 21 / 0.6); }
 .muc-menu-omyn { color: var(--menu-chu); font-weight: 450; transition: background-color 160ms ease-out, color 160ms ease-out; }
 .muc-menu-omyn svg { color: var(--menu-chu-phu); }
 .muc-menu-omyn:hover { background: var(--menu-chon); color: var(--menu-sang); }
@@ -249,10 +249,10 @@ body {
 .muc-menu-omyn-dang svg { color: #2a1d00; }
 .muc-bang-nho { transition: background-color 120ms ease-out, color 120ms ease-out; }
 
-/* Mảng lục đậm có ánh teal, dùng cho panel thương hiệu. */
+/* Mảng burgundy đậm, dùng cho panel thương hiệu. */
 .nen-toi {
   background:
-    radial-gradient(120% 80% at 100% 0%, rgb(45 190 170 / 0.22) 0%, transparent 55%),
+    radial-gradient(120% 80% at 100% 0%, rgb(190 90 110 / 0.22) 0%, transparent 55%),
     var(--gradient-toi);
 }
 .nen-trang {
@@ -263,7 +263,7 @@ body {
 }
 /* Chữ gradient mint cho dòng nhấn trên nền tối. */
 .chu-vang {
-  background: linear-gradient(135deg, #b9f2e4 0%, #5fd0bd 60%, #2aa898 100%);
+  background: linear-gradient(135deg, #b9f2e4 0%, #5fd0bd 60%, #b8475a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -330,7 +330,7 @@ body {
   .khong-in { display: none !important; }
   body { background: #fff !important; }
   /* In luôn bằng bảng màu sáng, kể cả khi đang bật chế độ tối. */
-  .dark { --giay-sang: #fff; --muc: #12302d; --muc-2: #3f5653; --muc-3: #566b68; --vien: #d7e3e1; }
+  .dark { --giay-sang: #fff; --muc: #2a1a1d; --muc-2: #594348; --muc-3: #6e5a5f; --vien: #e6d8da; }
   @page { size: A4; margin: 16mm; }
   .the-noi, .overflow-x-auto:has(> table) { box-shadow: none !important; background: none !important; }
   .the-noi::before { display: none; }
@@ -386,12 +386,12 @@ body {
   .tula-nut:active { transform: none; }
 }
 
-/* Ảnh đại diện tròn theo AMIA: nền dải teal, viền trắng + vòng teal mảnh, bóng nhẹ. */
+/* Ảnh đại diện tròn theo AMIA: nền dải đỏ rượu vang, viền trắng + vòng đỏ mảnh, bóng nhẹ. */
 .vong-anh {
   display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
   border-radius: 50%; overflow: hidden; font-weight: 600; color: var(--chu-tren-vang);
   background: var(--gradient-vang);
-  box-shadow: 0 0 0 2px var(--giay-sang), 0 0 0 3.5px #0f766e, 0 6px 12px -3px rgb(15 118 110 / 0.45);
+  box-shadow: 0 0 0 2px var(--giay-sang), 0 0 0 3.5px #8b2635, 0 6px 12px -3px rgb(139 38 53 / 0.45);
 }
 .vong-anh img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
