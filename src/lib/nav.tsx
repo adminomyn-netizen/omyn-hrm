@@ -294,6 +294,15 @@ export const menuChinh: MucMenu[] = [
     moTa: "Mức đóng bảo hiểm và phụ cấp từng người, kèm tỷ lệ đang dùng.",
   },
   {
+    ten: "Báo cáo HR",
+    duong_dan: "/bao-cao-hr",
+    nhom: "Nhân sự",
+    phan: 10,
+    icon: BarChart3,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "10 nhóm chỉ số HR: tuyển dụng, thử việc, hồ sơ, đào tạo, hiệu suất, thăng tiến, công lương, lịch, nghỉ việc, biến động.",
+  },
+  {
     ten: "Biến động nhân sự",
     duong_dan: "/bien-dong-nhan-su",
     nhom: "Nhân sự",
