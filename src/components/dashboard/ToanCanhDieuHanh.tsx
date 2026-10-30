@@ -108,7 +108,7 @@ export async function ToanCanhDieuHanh() {
         </div>
       </div>
 
-      <MucTrang tieuDe="Nhân sự cần chú ý" phai={<Xem href="/hr" nhan="Vận hành HCNS" />}>
+      <MucTrang tieuDe="Nhân sự cần chú ý" phai={<Xem href="/hr" nhan="Kế hoạch tuyển dụng" />}>
         {!hr ? <Loi ten="việc nhân sự" /> : (
           <div className="grid gap-x-12 gap-y-6 lg:grid-cols-2">
             <div>
