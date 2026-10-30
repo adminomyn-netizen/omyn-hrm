@@ -31,7 +31,7 @@ import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 import { dangXuat } from "@/lib/actions";
 import { capNhatThongTinCaNhan } from "@/app/ca-nhan-actions";
 import { useLuuTru } from "@/lib/luu-tru";
-import { menuChinh } from "@/lib/nav";
+import { duongDanDangChon, menuChinh } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
 
 export type ThongBao = {
@@ -327,7 +327,7 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
 export function DauTrang({ hoTen, email, vaiTro, viTri }: { hoTen: string; email: string; vaiTro: VaiTro; viTri: string }) {
   const pathname = usePathname();
   const router = useRouter();
-  const tieuDe = menuChinh.find((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"))?.ten ?? "OMYN";
+  const tieuDe = menuChinh.find((m) => m.duong_dan === duongDanDangChon(pathname, menuChinh))?.ten ?? "OMYN";
   return (
     <header className="dau-trang-omyn sticky top-0 z-30 flex h-[60px] shrink-0 items-center justify-between gap-3 px-3 lg:h-[68px] lg:px-8">
       <div className="flex min-w-0 items-center gap-1.5">

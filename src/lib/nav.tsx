@@ -64,6 +64,15 @@ export const menuChinh: MucMenu[] = [
   { ten: "Kỹ thuật", duong_dan: "/ky-thuat", nhom: "Quản trị", icon: Activity, chiVaiTro: ["ky_thuat"], moTa: "Tình trạng hệ thống và số dòng dữ liệu. Chỉ tài khoản Kỹ thuật xem được." },
 ];
 
+/** Đường dẫn menu khớp trang hiện tại nhất (dài nhất): /ky-thuat/luong-phieu chỉ làm sáng "Setup luồng phiếu", không làm sáng cả "Kỹ thuật". */
+export function duongDanDangChon(pathname: string, menu: readonly { duong_dan: string }[]): string | null {
+  let tot: string | null = null;
+  for (const m of menu) {
+    if ((pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/")) && (tot === null || m.duong_dan.length > tot.length)) tot = m.duong_dan;
+  }
+  return tot;
+}
+
 export function locMenuTheoVaiTro(vaiTro: VaiTro | null, boMucDiDong = false): MucMenu[] {
   return menuChinh.filter((m) => (!m.chiVaiTro || (vaiTro && m.chiVaiTro.includes(vaiTro))) && !(boMucDiDong && m.chiDiDong));
 }
