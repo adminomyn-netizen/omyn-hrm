@@ -2,7 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Clock, FolderOpen, Grid2x2, Inbox, LayoutDashboard, UserPlus, Users, type LucideIcon } from "lucide-react";
+import {
+  Clock,
+  FolderOpen,
+  Grid2x2,
+  Inbox,
+  LayoutDashboard,
+  UserPlus,
+  Users,
+  type LucideIcon,
+} from "lucide-react";
 import type { VaiTro } from "@/lib/auth";
 import { useDemMenu } from "@/lib/dem-menu";
 import { SU_KIEN_MO_MENU } from "./MobileNav";
@@ -37,17 +46,33 @@ export function ThanhTabDuoi({ vaiTro }: { vaiTro: VaiTro }) {
       className="relative z-40 shrink-0 border-t border-vien bg-giay-sang lg:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="grid" style={{ gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))` }}>
+      <ul
+        className="grid"
+        style={{
+          gridTemplateColumns: `repeat(${tabs.length}, minmax(0, 1fr))`,
+        }}
+      >
         {tabs.map((t) => {
-          const dangChon = !!t.href && (pathname === t.href || pathname.startsWith(t.href + "/"));
+          const dangChon =
+            !!t.href &&
+            (pathname === t.href || pathname.startsWith(t.href + "/"));
           const so = t.href ? (dem[t.href] ?? 0) : 0;
           const noiDung = (
             <>
-              {dangChon && <span aria-hidden className="absolute left-1/2 top-0 h-[2px] w-8 -translate-x-1/2" style={{ background: "var(--gradient-vang)" }} />}
+              {dangChon && (
+                <span
+                  aria-hidden
+                  className="absolute left-1/2 top-0 h-[2px] w-8 -translate-x-1/2"
+                  style={{ background: "var(--gradient-vang)" }}
+                />
+              )}
               <span className="relative">
                 <t.Icon strokeWidth={1.6} className="h-[22px] w-[22px]" />
                 {so > 0 && (
-                  <span className="nut-vang absolute -right-2.5 -top-1.5 min-w-[16px] rounded-[8px] px-1 text-center text-[10px] leading-4" aria-label={`${so} mục mới`}>
+                  <span
+                    className="nut-vang absolute -right-2.5 -top-1.5 min-w-[16px] rounded-[8px] px-1 text-center text-[10px] leading-4"
+                    aria-label={`${so} mục mới`}
+                  >
                     {so > 9 ? "9+" : so}
                   </span>
                 )}
@@ -59,11 +84,19 @@ export function ThanhTabDuoi({ vaiTro }: { vaiTro: VaiTro }) {
           return (
             <li key={t.ten}>
               {t.href ? (
-                <Link href={t.href} aria-current={dangChon ? "page" : undefined} className={lop}>
+                <Link
+                  href={t.href}
+                  aria-current={dangChon ? "page" : undefined}
+                  className={lop}
+                >
                   {noiDung}
                 </Link>
               ) : (
-                <button type="button" onClick={() => window.dispatchEvent(new Event(t.sk!))} className={lop}>
+                <button
+                  type="button"
+                  onClick={() => window.dispatchEvent(new Event(t.sk!))}
+                  className={lop}
+                >
                   {noiDung}
                 </button>
               )}

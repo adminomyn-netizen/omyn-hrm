@@ -36,7 +36,14 @@ import type { VaiTro } from "@/lib/auth";
 
 export type ThongBao = {
   id: string;
-  loai: "phe_duyet" | "tai_khoan" | "don_tu" | "ung_vien" | "tin" | "cham_cong" | "he_thong";
+  loai:
+    | "phe_duyet"
+    | "tai_khoan"
+    | "don_tu"
+    | "ung_vien"
+    | "tin"
+    | "cham_cong"
+    | "he_thong";
   tieuDe: string;
   noiDung: string;
   thoiDiem: string;
@@ -66,7 +73,8 @@ function useDongKhiBamNgoai(mo: boolean, dong: () => void) {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!mo) return;
-    const click = (e: MouseEvent) => ref.current && !ref.current.contains(e.target as Node) && dong();
+    const click = (e: MouseEvent) =>
+      ref.current && !ref.current.contains(e.target as Node) && dong();
     const esc = (e: KeyboardEvent) => e.key === "Escape" && dong();
     document.addEventListener("mousedown", click);
     document.addEventListener("keydown", esc);
@@ -89,7 +97,10 @@ function useThongBao() {
       try {
         const r = await fetch("/api/thong-bao", { cache: "no-store" });
         if (!r.ok || !r.headers.get("content-type")?.includes("json")) return;
-        const j = (await r.json()) as { thongBao: ThongBao[]; dem?: Record<string, number> };
+        const j = (await r.json()) as {
+          thongBao: ThongBao[];
+          dem?: Record<string, number>;
+        };
         if (!huy) {
           setDs(j.thongBao);
           datDemMenu(j.dem ?? {});
@@ -136,7 +147,8 @@ function Chuong() {
     return () => window.removeEventListener(SU_KIEN_MO_THONG_BAO, moChuong);
   }, []);
 
-  const danhDau = (ids: string[]) => ghi(JSON.stringify([...new Set([...daDoc, ...ids])].slice(-300)));
+  const danhDau = (ids: string[]) =>
+    ghi(JSON.stringify([...new Set([...daDoc, ...ids])].slice(-300)));
 
   return (
     <div ref={ref} className="relative">
@@ -159,9 +171,15 @@ function Chuong() {
       {mo && (
         <div className="the-noi bang-nho absolute right-0 top-full z-40 mt-2.5 w-[min(380px,calc(100vw-2rem))] overflow-hidden">
           <div className="flex items-center justify-between border-b border-vien px-4 py-3">
-            <span className="text-[14px] font-semibold text-muc">Thông báo</span>
+            <span className="text-[14px] font-semibold text-muc">
+              Thông báo
+            </span>
             {chuaDoc > 0 && (
-              <button type="button" onClick={() => danhDau(thongBao.map((t) => t.id))} className="text-[12px] font-medium text-nhan-dam underline-offset-4 hover:underline">
+              <button
+                type="button"
+                onClick={() => danhDau(thongBao.map((t) => t.id))}
+                className="text-[12px] font-medium text-nhan-dam underline-offset-4 hover:underline"
+              >
                 Đánh dấu đã đọc hết
               </button>
             )}
@@ -180,26 +198,55 @@ function Chuong() {
                     }}
                     className="flex gap-3 px-4 py-3 hover:bg-giay-tram/70"
                   >
-                    <Icon strokeWidth={1.5} className={`mt-0.5 h-[18px] w-[18px] shrink-0 ${moi ? "text-nhan" : "text-muc-3"}`} />
+                    <Icon
+                      strokeWidth={1.5}
+                      className={`mt-0.5 h-[18px] w-[18px] shrink-0 ${moi ? "text-nhan" : "text-muc-3"}`}
+                    />
                     <span className="min-w-0 flex-1">
-                      <span className={`block text-[13px] ${moi ? "font-semibold text-muc" : "font-medium text-muc-2"}`}>{t.tieuDe}</span>
-                      <span className="mt-0.5 block text-[13px] leading-snug text-muc-2">{t.noiDung}</span>
-                      <span className="mt-1 block text-[12px] text-muc-3">{tuongDoi(t.thoiDiem, bayGio)}</span>
+                      <span
+                        className={`block text-[13px] ${moi ? "font-semibold text-muc" : "font-medium text-muc-2"}`}
+                      >
+                        {t.tieuDe}
+                      </span>
+                      <span className="mt-0.5 block text-[13px] leading-snug text-muc-2">
+                        {t.noiDung}
+                      </span>
+                      <span className="mt-1 block text-[12px] text-muc-3">
+                        {tuongDoi(t.thoiDiem, bayGio)}
+                      </span>
                     </span>
-                    {moi && <span aria-hidden className="mt-1.5 h-2 w-2 shrink-0 bg-nhan" style={{ borderRadius: 2 }} />}
+                    {moi && (
+                      <span
+                        aria-hidden
+                        className="mt-1.5 h-2 w-2 shrink-0 bg-nhan"
+                        style={{ borderRadius: 2 }}
+                      />
+                    )}
                   </Link>
                 </li>
               );
             })}
           </ul>
-          {thongBao.length === 0 && <p className="px-4 py-10 text-center text-[14px] text-muc-3">Chưa có thông báo nào. Khi có việc cần bạn, nó sẽ hiện ở đây.</p>}
+          {thongBao.length === 0 && (
+            <p className="px-4 py-10 text-center text-[14px] text-muc-3">
+              Chưa có thông báo nào. Khi có việc cần bạn, nó sẽ hiện ở đây.
+            </p>
+          )}
         </div>
       )}
     </div>
   );
 }
 
-function FormCaNhan({ hoTen, xong, huy }: { hoTen: string; xong: () => void; huy: () => void }) {
+function FormCaNhan({
+  hoTen,
+  xong,
+  huy,
+}: {
+  hoTen: string;
+  xong: () => void;
+  huy: () => void;
+}) {
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
@@ -215,39 +262,108 @@ function FormCaNhan({ hoTen, xong, huy }: { hoTen: string; xong: () => void; huy
   };
 
   return (
-    <form ref={formRef} className="space-y-4" onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}>
+    <form
+      ref={formRef}
+      className="space-y-4"
+      onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
+    >
       <div>
-        <label htmlFor="cn-ten" className={NHAN_O}>Họ và tên hiển thị</label>
-        <input id="cn-ten" name="ho_ten" required defaultValue={hoTen} className={O_NHAP} />
+        <label htmlFor="cn-ten" className={NHAN_O}>
+          Họ và tên hiển thị
+        </label>
+        <input
+          id="cn-ten"
+          name="ho_ten"
+          required
+          defaultValue={hoTen}
+          className={O_NHAP}
+        />
       </div>
       <fieldset className="space-y-4 border-t border-vien pt-4">
-        <legend className="nhan-muc pr-2">Đổi mật khẩu (bỏ trống nếu không đổi)</legend>
+        <legend className="nhan-muc pr-2">
+          Đổi mật khẩu (bỏ trống nếu không đổi)
+        </legend>
         <div>
-          <label htmlFor="cn-mk-cu" className={NHAN_O}>Mật khẩu hiện tại</label>
-          <input id="cn-mk-cu" name="mat_khau_hien_tai" type="password" autoComplete="current-password" className={O_NHAP} />
+          <label htmlFor="cn-mk-cu" className={NHAN_O}>
+            Mật khẩu hiện tại
+          </label>
+          <input
+            id="cn-mk-cu"
+            name="mat_khau_hien_tai"
+            type="password"
+            autoComplete="current-password"
+            className={O_NHAP}
+          />
         </div>
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <label htmlFor="cn-mk-moi" className={NHAN_O}>Mật khẩu mới</label>
-            <input id="cn-mk-moi" name="mat_khau_moi" type="password" autoComplete="new-password" className={O_NHAP} />
+            <label htmlFor="cn-mk-moi" className={NHAN_O}>
+              Mật khẩu mới
+            </label>
+            <input
+              id="cn-mk-moi"
+              name="mat_khau_moi"
+              type="password"
+              autoComplete="new-password"
+              className={O_NHAP}
+            />
           </div>
           <div>
-            <label htmlFor="cn-mk-lai" className={NHAN_O}>Nhập lại mật khẩu mới</label>
-            <input id="cn-mk-lai" name="mat_khau_nhap_lai" type="password" autoComplete="new-password" className={O_NHAP} />
+            <label htmlFor="cn-mk-lai" className={NHAN_O}>
+              Nhập lại mật khẩu mới
+            </label>
+            <input
+              id="cn-mk-lai"
+              name="mat_khau_nhap_lai"
+              type="password"
+              autoComplete="new-password"
+              className={O_NHAP}
+            />
           </div>
         </div>
-        <p className="text-[12px] text-muc-3">Tối thiểu 8 ký tự, có chữ in hoa và ký tự đặc biệt.</p>
+        <p className="text-[12px] text-muc-3">
+          Tối thiểu 8 ký tự, có chữ in hoa và ký tự đặc biệt.
+        </p>
       </fieldset>
-      {loi && <div role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</div>}
+      {loi && (
+        <div
+          role="alert"
+          className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi"
+        >
+          {loi}
+        </div>
+      )}
       <div className="flex justify-end gap-2 border-t border-vien pt-4">
-        <button type="button" onClick={huy} disabled={dangXuLy} className={NUT_PHU}>Huỷ</button>
-        <button type="button" onClick={gui} disabled={dangXuLy} className={NUT_CHINH}>{dangXuLy ? "Đang lưu" : "Lưu thay đổi"}</button>
+        <button
+          type="button"
+          onClick={huy}
+          disabled={dangXuLy}
+          className={NUT_PHU}
+        >
+          Huỷ
+        </button>
+        <button
+          type="button"
+          onClick={gui}
+          disabled={dangXuLy}
+          className={NUT_CHINH}
+        >
+          {dangXuLy ? "Đang lưu" : "Lưu thay đổi"}
+        </button>
       </div>
     </form>
   );
 }
 
-function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viTri: string }) {
+function MenuAvatar({
+  hoTen,
+  email,
+  viTri,
+}: {
+  hoTen: string;
+  email: string;
+  viTri: string;
+}) {
   const router = useRouter();
   const [mo, setMo] = useState(false);
   const [suaHoSo, setSuaHoSo] = useState(false);
@@ -258,7 +374,9 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
     window.addEventListener(SU_KIEN_MO_TAI_KHOAN, moMenu);
     return () => window.removeEventListener(SU_KIEN_MO_TAI_KHOAN, moMenu);
   }, []);
-  const chuDau = (hoTen.trim().split(/\s+/).pop() ?? "?").charAt(0).toUpperCase();
+  const chuDau = (hoTen.trim().split(/\s+/).pop() ?? "?")
+    .charAt(0)
+    .toUpperCase();
 
   return (
     <div ref={ref} className="relative">
@@ -269,24 +387,35 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
         aria-expanded={mo}
         className="flex items-center gap-2.5 rounded-nho py-1 pl-1 pr-2 hover:bg-giay-tram"
       >
-        <span className="vong-anh h-8 w-8 text-[13px]">
-          {chuDau}
+        <span className="vong-anh h-8 w-8 text-[13px]">{chuDau}</span>
+        <span className="hidden max-w-[160px] truncate text-[14px] font-medium text-muc sm:block">
+          {hoTen}
         </span>
-        <span className="hidden max-w-[160px] truncate text-[14px] font-medium text-muc sm:block">{hoTen}</span>
-        <ChevronDown strokeWidth={1.8} className={`hidden h-4 w-4 text-muc-3 transition-transform sm:block ${mo ? "rotate-180" : ""}`} />
+        <ChevronDown
+          strokeWidth={1.8}
+          className={`hidden h-4 w-4 text-muc-3 transition-transform sm:block ${mo ? "rotate-180" : ""}`}
+        />
       </button>
       {mo && (
-        <div role="menu" aria-label="Tài khoản" className="the-noi bang-nho absolute right-0 top-full z-40 mt-2.5 w-[300px] max-w-[calc(100vw-1.5rem)] overflow-hidden">
+        <div
+          role="menu"
+          aria-label="Tài khoản"
+          className="the-noi bang-nho absolute right-0 top-full z-40 mt-2.5 w-[300px] max-w-[calc(100vw-1.5rem)] overflow-hidden"
+        >
           <div className="flex items-center gap-3.5 px-5 pb-4 pt-6">
             <span className="vong-anh h-12 w-12 text-[18px]">{chuDau}</span>
             <div className="min-w-0">
-              <div className="truncate text-[15px] font-semibold text-muc">{hoTen}</div>
+              <div className="truncate text-[15px] font-semibold text-muc">
+                {hoTen}
+              </div>
               <div className="mt-0.5 text-[13px] text-nhan-dam">{viTri}</div>
             </div>
           </div>
           <div className="border-t border-vien px-5 py-3">
             <div className="nhan-muc">Email đăng nhập</div>
-            <div className="mt-0.5 break-all text-[13px] text-muc-2">{email}</div>
+            <div className="mt-0.5 break-all text-[13px] text-muc-2">
+              {email}
+            </div>
           </div>
           <BatThongBao />
           <ChuyenCheDo />
@@ -300,7 +429,12 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
               }}
               className="muc-bang-nho flex w-full items-center gap-3 rounded-nho px-3 py-2.5 text-left text-[14px] text-muc hover:bg-giay-tram"
             >
-              <UserCog strokeWidth={1.6} className="h-[18px] w-[18px] text-muc-3" aria-hidden />Chỉnh sửa thông tin
+              <UserCog
+                strokeWidth={1.6}
+                className="h-[18px] w-[18px] text-muc-3"
+                aria-hidden
+              />
+              Chỉnh sửa thông tin
             </button>
           </div>
           <div className="border-t border-vien p-2">
@@ -311,41 +445,102 @@ function MenuAvatar({ hoTen, email, viTri }: { hoTen: string; email: string; viT
               onClick={() => startXuat(() => dangXuat())}
               className="muc-bang-nho flex w-full items-center gap-3 rounded-nho px-3 py-2.5 text-left text-[14px] text-loi hover:bg-loi-nen disabled:opacity-50"
             >
-              <LogOut strokeWidth={1.6} className="h-[18px] w-[18px]" aria-hidden />Đăng xuất
+              <LogOut
+                strokeWidth={1.6}
+                className="h-[18px] w-[18px]"
+                aria-hidden
+              />
+              Đăng xuất
             </button>
           </div>
         </div>
       )}
-      <Hop mo={suaHoSo} dong={() => setSuaHoSo(false)} tieuDe="Thông tin của bạn" moTa={email}>
-        {suaHoSo && <FormCaNhan hoTen={hoTen} huy={() => setSuaHoSo(false)} xong={() => { setSuaHoSo(false); router.refresh(); }} />}
+      <Hop
+        mo={suaHoSo}
+        dong={() => setSuaHoSo(false)}
+        tieuDe="Thông tin của bạn"
+        moTa={email}
+      >
+        {suaHoSo && (
+          <FormCaNhan
+            hoTen={hoTen}
+            huy={() => setSuaHoSo(false)}
+            xong={() => {
+              setSuaHoSo(false);
+              router.refresh();
+            }}
+          />
+        )}
       </Hop>
     </div>
   );
 }
 
 /** Đầu trang mỏng 56 px: tiêu đề trang bên trái; bên phải: sáng/tối, thông báo, avatar + tên (bấm vào để sửa thông tin / đăng xuất). */
-export function DauTrang({ hoTen, email, vaiTro, viTri }: { hoTen: string; email: string; vaiTro: VaiTro; viTri: string }) {
+export function DauTrang({
+  hoTen,
+  email,
+  vaiTro,
+  viTri,
+}: {
+  hoTen: string;
+  email: string;
+  vaiTro: VaiTro;
+  viTri: string;
+}) {
   const pathname = usePathname();
   const router = useRouter();
-  const tieuDe = menuChinh.find((m) => m.duong_dan === duongDanDangChon(pathname, menuChinh))?.ten ?? "OMYN";
+  const tieuDe =
+    menuChinh.find((m) => m.duong_dan === duongDanDangChon(pathname, menuChinh))
+      ?.ten ?? "OMYN";
   return (
     <header className="dau-trang-omyn sticky top-0 z-30 flex h-[60px] shrink-0 items-center justify-between gap-3 px-3 lg:h-[68px] lg:px-8">
       <div className="flex min-w-0 items-center gap-1.5">
         {pathname !== "/dashboard" && (
-          <button type="button" onClick={() => router.back()} aria-label="Quay lại" className="mr-1 flex h-10 w-10 shrink-0 items-center justify-center border border-vien bg-giay-sang text-muc-2 lg:hidden" style={{ borderRadius: 12 }}>
+          <button
+            type="button"
+            onClick={() => router.back()}
+            aria-label="Quay lại"
+            className="mr-1 flex h-10 w-10 shrink-0 items-center justify-center border border-vien bg-giay-sang text-muc-2 lg:hidden"
+            style={{ borderRadius: 12 }}
+          >
             <ChevronLeft strokeWidth={1.8} className="h-5 w-5" aria-hidden />
           </button>
         )}
-        <Link href="/dashboard" className="truncate text-[16px] font-semibold text-muc lg:hidden">{tieuDe}</Link>
-        <Link href="/dashboard" className="mr-6 hidden shrink-0 items-center gap-2 lg:flex" aria-label="OMYN, về Tổng quan">
-          <span className="chu-tieu-de text-[28px] leading-none tracking-[0.2em] text-muc">OMYN</span>
-          <span aria-hidden className="h-2 w-2" style={{ background: "var(--gradient-vang)", borderRadius: 9999 }} />
+        <Link
+          href="/dashboard"
+          className="truncate text-[16px] font-semibold text-muc lg:hidden"
+        >
+          {tieuDe}
+        </Link>
+        <Link
+          href="/dashboard"
+          className="mr-6 hidden shrink-0 items-center gap-2 lg:flex"
+          aria-label="OMYN, về Tổng quan"
+        >
+          <span className="chu-tieu-de text-[28px] leading-none tracking-[0.2em] text-muc">
+            OMYN
+          </span>
+          <span
+            aria-hidden
+            className="h-2 w-2"
+            style={{ background: "var(--gradient-vang)", borderRadius: 9999 }}
+          />
         </Link>
         <TimKiem vaiTro={vaiTro} />
       </div>
       <div className="flex shrink-0 items-center gap-1">
-        <Link href="/huong-dan" title="Hướng dẫn sử dụng" className="hidden items-center gap-2 rounded-nho px-3 py-2 text-[14px] text-muc-2 hover:bg-giay-tram hover:text-muc lg:flex">
-          <CircleHelp strokeWidth={1.6} className="h-[18px] w-[18px]" aria-hidden /><span className="hidden xl:inline">Hướng dẫn sử dụng</span>
+        <Link
+          href="/huong-dan"
+          title="Hướng dẫn sử dụng"
+          className="hidden items-center gap-2 rounded-nho px-3 py-2 text-[14px] text-muc-2 hover:bg-giay-tram hover:text-muc lg:flex"
+        >
+          <CircleHelp
+            strokeWidth={1.6}
+            className="h-[18px] w-[18px]"
+            aria-hidden
+          />
+          <span className="hidden xl:inline">Hướng dẫn sử dụng</span>
         </Link>
         <Chuong />
         <MenuAvatar hoTen={hoTen} email={email} viTri={viTri} />
