@@ -94,9 +94,9 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
                   </ul>
                 )}
                 {cacNhom.map((c) => (
-                  <div key={c.so} className="mb-3">
-                    <h4 className="mb-1.5 text-[12px] font-medium text-muc-2">
-                      <span className="mr-1.5 tabular-nums text-muc-3">
+                  <div key={c.so} data-m={c.so} className="mau-nhom mb-3">
+                    <h4 className="mau-chu mb-1.5 flex items-center text-[12.5px] font-semibold">
+                      <span className="mau-chip mr-2 flex h-5 w-5 items-center justify-center rounded-tag text-[11.5px] tabular-nums">
                         {c.so}
                       </span>
                       {c.ten}
@@ -113,11 +113,11 @@ export function MobileNav({ vaiTro }: { vaiTro: VaiTro | null }) {
                       {c.sapCo.map((ten) => (
                         <li
                           key={ten}
-                          className="flex min-h-[84px] flex-col items-center justify-center gap-1.5 border border-dashed border-vien px-1.5 py-2 text-center text-[12.5px] leading-tight text-muc-3"
+                          className="mau-vien flex min-h-[84px] flex-col items-center justify-center gap-1.5 border border-dashed px-1.5 py-2 text-center text-[12.5px] leading-tight text-muc-3"
                           style={{ borderRadius: 12 }}
                         >
                           {ten}
-                          <span className="rounded-tag bg-giay-tram px-1.5 text-[10.5px] leading-[16px]">
+                          <span className="mau-chip rounded-tag px-1.5 text-[10.5px] leading-[16px]">
                             Sắp có
                           </span>
                         </li>
@@ -168,10 +168,10 @@ function O({
       <Link
         href={muc.duong_dan}
         aria-current={dangChon ? "page" : undefined}
-        className={`relative flex h-full min-h-[84px] flex-col items-center justify-center gap-2 border px-1.5 py-2 text-center text-[12.5px] font-medium leading-tight ${dangChon ? "border-nhan bg-nhan-nhat text-nhan-dam" : "border-vien bg-giay text-muc-2"}`}
+        className={`relative flex h-full min-h-[84px] flex-col items-center justify-center gap-2 border px-1.5 py-2 text-center text-[12.5px] font-medium leading-tight ${dangChon ? "border-nhan bg-nhan-nhat text-nhan-dam" : "mau-nen mau-vien text-muc"}`}
         style={{ borderRadius: 12 }}
       >
-        <Icon strokeWidth={1.6} className="h-6 w-6" />
+        <Icon strokeWidth={1.7} className={`h-6 w-6 ${dangChon ? "" : "mau-chu"}`} />
         {muc.ten}
         {so > 0 && (
           <span

@@ -242,9 +242,10 @@ function NhanSuCon({
               type="button"
               aria-expanded={mocua}
               onClick={() => ghiMo(khoa, !mocua)}
-              className="flex w-full items-center gap-2 rounded-nho px-2.5 py-1.5 text-left text-[12.5px] font-medium text-menu-chu-phu hover:bg-menu-hover hover:text-menu-chu"
+              data-m={g.so}
+              className="mau-nhom flex w-full items-center gap-2 rounded-nho px-2.5 py-1.5 text-left text-[12.5px] font-medium text-menu-chu-phu hover:bg-menu-hover hover:text-menu-chu"
             >
-              <span className="w-4 shrink-0 text-center tabular-nums">
+              <span className="mau-chip flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-tag text-[11px] font-semibold tabular-nums">
                 {g.so}
               </span>
               <span className="flex-1 truncate">{g.ten}</span>
