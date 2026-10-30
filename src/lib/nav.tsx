@@ -137,13 +137,13 @@ export const menuChinh: MucMenu[] = [
     moTa: "Trưởng bộ phận gửi yêu cầu tuyển người và theo dõi HCNS xử lý.",
   },
   {
-    ten: "Vận hành HCNS",
+    ten: "Kế hoạch tuyển dụng",
     duong_dan: "/hr",
     nhom: "Nhân sự",
     phan: 1,
     icon: Briefcase,
     chiVaiTro: CHI_QUAN_LY,
-    moTa: "Sổ riêng của phòng HCNS: kế hoạch và ngân sách tuyển dụng, kênh, phỏng vấn, offer, onboarding, hạn báo cáo nhà nước. KPI, BSC, công việc, công lương nằm ở màn riêng của chúng.",
+    moTa: "Mục tiêu và ngân sách tuyển dụng, kênh đăng tin, lịch phỏng vấn, offer. Cuối trang có các sổ HR khác chưa có menu riêng.",
   },
   {
     ten: "Mục tiêu BSC",

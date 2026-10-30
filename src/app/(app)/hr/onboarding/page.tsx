@@ -61,7 +61,7 @@ export default async function TrangOnboarding() {
         phu={
           <>
             <Link href="/hr" className="text-nhan-dam hover:underline">
-              ← Vận hành HCNS
+              ← Kế hoạch tuyển dụng
             </Link>
             <span className="mx-2 text-vien-dam">·</span>Từ ngày nhận offer tới
             hết 60 ngày thử việc

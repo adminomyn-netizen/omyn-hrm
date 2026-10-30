@@ -95,8 +95,8 @@ export default async function TrangHr() {
   return (
     <>
       <TieuDeTrang
-        tieuDe="Vận hành HCNS"
-        phu="Sổ riêng của phòng HCNS: tuyển dụng, phỏng vấn, offer, onboarding, hạn báo cáo nhà nước. KPI, BSC, công việc và công lương ở màn riêng."
+        tieuDe="Kế hoạch tuyển dụng"
+        phu="Mục tiêu, ngân sách, kênh, phỏng vấn, offer của tuyển dụng. Các sổ HR khác ở phần cuối trang."
       />
       <ul className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {can.map((c) => (
@@ -152,7 +152,8 @@ export default async function TrangHr() {
           />
         </ul>
       </section>
-      <section aria-label="Hợp đồng" data-m="3" className="mau-nhom mt-8">
+      <p className="mt-10 border-t border-vien pt-5 text-[13px] font-medium text-muc-3">Sổ HR khác (chưa có menu riêng)</p>
+      <section aria-label="Hợp đồng" data-m="3" className="mau-nhom mt-4">
         <h2 className="mau-chu mb-3 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] before:h-4 before:w-1 before:rounded-tag before:bg-[var(--m-chu)] before:content-['']">
           4 · Hợp đồng & thăng tiến
         </h2>
