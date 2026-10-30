@@ -32,7 +32,7 @@ const NHAN_VIEN: HuongDan = {
       tieuDe: "Khi cần nghỉ hoặc làm khác thường",
       sac: "xanh",
       buoc: [
-        { tieuDe: "Nộp đơn", noiDung: <><p>Vào <b>Đơn từ và phê duyệt</b> → <b>Nộp đơn mới</b>. Tên người nộp là tên của bạn và không đổi được. Chọn loại đơn: nghỉ phép năm, nghỉ không lương, nghỉ ốm, nghỉ chế độ (thai sản…), làm remote, công tác, chấm công ngoài công ty, tạm ứng lương, đi trễ, về sớm.</p><p>Phép năm là 12 ngày mỗi năm; số ngày còn lại hiện ngay trong form.</p></> },
+        { tieuDe: "Nộp đơn", noiDung: <><p>Vào <b>Đơn nghỉ và giải trình công</b> → <b>Nộp đơn mới</b>. Tên người nộp là tên của bạn và không đổi được. Chọn loại đơn: nghỉ phép năm, nghỉ không lương, nghỉ ốm, nghỉ chế độ (thai sản…), làm remote, công tác, chấm công ngoài công ty, tạm ứng lương, đi trễ, về sớm.</p><p>Phép năm là 12 ngày mỗi năm; số ngày còn lại hiện ngay trong form.</p></> },
         { tieuDe: "Nghỉ một buổi hoặc vài tiếng", noiDung: <p>Với nghỉ phép năm, không lương, ốm: chọn &quot;Một buổi / theo giờ&quot;, chọn ngày rồi giờ bắt đầu – kết thúc. Nghỉ không quá 4 tiếng tính nửa ngày, lâu hơn tính một ngày.</p> },
         { tieuDe: "Theo dõi kết quả", noiDung: <p>Đơn được duyệt hay bị từ chối đều báo ở biểu tượng chuông phía trên. Đơn cũng hiện trong danh sách của bạn ở mục Đơn từ.</p> },
       ],
@@ -69,7 +69,7 @@ const QUAN_TRI: HuongDan = {
       sac: "xanh",
       buoc: [
         { tieuDe: "Nắm tình hình ở Tổng quan và Chấm công", noiDung: <p><b>Tổng quan</b> tóm tắt số người, đơn chờ duyệt, ứng viên mới và quỹ lương. <b>Chấm công</b> cho thấy ai đã chấm hôm nay, ai đi muộn, ai vắng, kèm lịch cả công ty. Tổng giám đốc và Giám đốc không phải chấm công; người còn lại trong nhóm Quản trị vẫn tự chấm công như mọi người.</p> },
-        { tieuDe: "Duyệt đơn", noiDung: <p>Vào <b>Đơn từ và phê duyệt</b>, mở đơn chờ duyệt rồi bấm Duyệt hoặc Từ chối. Không duyệt được đơn của chính mình. Duyệt đơn <b>Giải trình công</b> thì chấm công ngày đó tự sửa về giờ người nộp ghi. Đơn Đi trễ, Về sớm, Chấm công ngoài công ty khi duyệt chỉ đổi trạng thái đơn, chưa tự sửa chấm công.</p> },
+        { tieuDe: "Duyệt đơn", noiDung: <p>Vào <b>Đơn nghỉ và giải trình công</b>, mở đơn chờ duyệt rồi bấm Duyệt hoặc Từ chối. Không duyệt được đơn của chính mình. Duyệt đơn <b>Giải trình công</b> thì chấm công ngày đó tự sửa về giờ người nộp ghi. Đơn Đi trễ, Về sớm, Chấm công ngoài công ty khi duyệt chỉ đổi trạng thái đơn, chưa tự sửa chấm công.</p> },
       ],
     },
     {

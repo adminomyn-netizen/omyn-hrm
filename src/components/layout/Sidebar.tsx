@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronsLeft, ChevronsRight } from "lucide-react";
+import { useMemo } from "react";
+import { ChevronDown, ChevronsLeft, ChevronsRight } from "lucide-react";
 import { gomTheoNhom, locMenuTheoVaiTro } from "@/lib/nav";
 import type { VaiTro } from "@/lib/auth";
 import { useLuuTru } from "@/lib/luu-tru";
@@ -11,6 +12,7 @@ import Image from "next/image";
 import { Logo } from "@/components/brand/Logo";
 
 export const KHOA_THU_GON = "omyn-hrm-sidebar-thu-gon";
+const KHOA_MO_NHOM = "omyn-hrm-menu-nhom-mo";
 
 /** Menu trái nền espresso (cả khi giao diện sáng): mục đang mở nền sáng nhẹ + biểu tượng vàng; số đếm dải vàng.
  * Thu gọn còn cột biểu tượng 72 px; rê chuột/focus hiện tên và mô tả. */
@@ -20,6 +22,11 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
   const dem = useDemMenu();
   const thuGon = tg === "1";
   const nhom = gomTheoNhom(locMenuTheoVaiTro(vaiTro, true));
+  // Nhóm gọn lại cho đỡ rối: chỉ "Chung" và nhóm đang đứng trong đó luôn mở; nhóm khác bấm tiêu đề để mở/đóng (nhớ lại cho lần sau).
+  const [moRaw, ghiMo] = useLuuTru(KHOA_MO_NHOM, "{}");
+  const mo = useMemo<Record<string, boolean>>(() => { try { return JSON.parse(moRaw); } catch { return {}; } }, [moRaw]);
+  const coMucDangChon = (g: (typeof nhom)[number]) => g.muc.some((m) => pathname === m.duong_dan || pathname.startsWith(m.duong_dan + "/"));
+  const dangMo = (g: (typeof nhom)[number]) => thuGon || g.nhom === "Chung" || coMucDangChon(g) || mo[g.nhom] === true;
 
   return (
     <aside
@@ -49,9 +56,23 @@ export function Sidebar({ vaiTro }: { vaiTro: VaiTro | null }) {
             {thuGon ? (
               <div className="mx-2 mb-2 h-px bg-menu-vien" aria-hidden />
             ) : (
-              <div className="px-2.5 pb-2 text-[11px] font-medium uppercase tracking-[0.12em] text-menu-chu-phu">{g.nhom}</div>
+              g.nhom === "Chung" ? (
+                <div className="px-2.5 pb-2 text-[11px] font-medium uppercase tracking-[0.12em] text-menu-chu-phu">{g.nhom}</div>
+              ) : (
+                <button
+                  type="button"
+                  aria-expanded={dangMo(g)}
+                  disabled={coMucDangChon(g)}
+                  onClick={() => ghiMo(JSON.stringify({ ...mo, [g.nhom]: !dangMo(g) }))}
+                  className="flex w-full items-center gap-2 rounded-nho px-2.5 pb-2 pt-1 text-left text-[11px] font-medium uppercase tracking-[0.12em] text-menu-chu-phu hover:text-menu-chu disabled:cursor-default"
+                >
+                  <span className="flex-1">{g.nhom}</span>
+                  {!dangMo(g) && g.muc.some((m) => (dem[m.duong_dan] ?? 0) > 0) && <span aria-label="Có mục mới" className="h-2 w-2" style={{ background: "var(--gradient-vang)", borderRadius: 9999 }} />}
+                  {!coMucDangChon(g) && <ChevronDown strokeWidth={1.6} className={`h-3.5 w-3.5 transition-transform ${dangMo(g) ? "" : "-rotate-90"}`} />}
+                </button>
+              )
             )}
-            <ul className="space-y-0.5">
+            <ul className={`space-y-0.5 ${dangMo(g) ? "" : "hidden"}`}>
               {g.muc.map((muc) => {
                 const dangChon = pathname === muc.duong_dan || pathname.startsWith(muc.duong_dan + "/");
                 const Icon = muc.icon;

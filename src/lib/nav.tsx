@@ -57,7 +57,7 @@ export const menuChinh: MucMenu[] = [
   { ten: "Công việc", duong_dan: "/cong-viec", nhom: "Nhân sự", icon: ListChecks, moTa: "Việc của bạn và của nhóm: thêm nhanh một dòng, ghi số lượng đã làm, theo dõi việc quá hạn." },
   { ten: "Chấm công", duong_dan: "/cham-cong", nhom: "Nhân sự", icon: Clock, moTa: "Chấm công vào/ra và xem lịch công của bạn." },
   { ten: "Bảng công tháng", duong_dan: "/bang-cong", nhom: "Nhân sự", icon: CalendarDays, chiVaiTro: CHI_QUAN_LY, moTa: "Bảng chấm công cả tháng theo mã công (X, N, CT, P, L…) và ngày nghỉ lễ." },
-  { ten: "Đơn từ và phê duyệt", duong_dan: "/don-tu", nhom: "Nhân sự", icon: Inbox, moTa: "Nộp đơn nghỉ, công tác, tạm ứng và theo dõi kết quả duyệt." },
+  { ten: "Đơn nghỉ và giải trình công", duong_dan: "/don-tu", nhom: "Nhân sự", icon: Inbox, moTa: "Nộp đơn nghỉ phép, giải trình chấm công và theo dõi kết quả duyệt. Phiếu đề nghị khác (tạm ứng, thanh toán, tuyển dụng…) ở mục Phê duyệt." },
   { ten: "Bảng lương", duong_dan: "/luong", nhom: "Nhân sự", icon: Wallet, chiVaiTro: ["admin", "ky_thuat", "nhan_vien"], moTa: "Quản trị và Kỹ thuật: kỳ lương, thỏa thuận lương, tham số. Nhân viên: phiếu lương của mình." },
   { ten: "Báo cáo và biểu mẫu", duong_dan: "/bao-cao", nhom: "Quản trị", icon: FileBarChart, chiVaiTro: CHI_QUAN_LY, moTa: "Báo cáo tổng hợp và biểu mẫu." },
   { ten: "Setup luồng phiếu", duong_dan: "/ky-thuat/luong-phieu", nhom: "Quản trị", icon: ClipboardCheck, chiVaiTro: ["ky_thuat"], moTa: "Chỉnh bước duyệt, người duyệt, điều kiện hiện ô, nhóm mã và thông báo của từng loại phiếu; có lịch sử sửa." },
