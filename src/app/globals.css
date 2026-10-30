@@ -402,3 +402,24 @@ body {
   .noi-dung-cuon { overflow-y: auto; overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
 }
 @media print { .khung-di-dong { height: auto; overflow: visible; } .noi-dung-cuon { overflow: visible; } }
+
+/* Màu nhận dạng cho 10 nhóm Nhân sự (và các màn danh mục dạng thẻ): mỗi nhóm một cặp nền nhạt + chữ đậm, cùng tông ấm với đỏ rượu vang.
+   Dùng: đặt data-m="1".."10" lên phần tử cha có class .mau-nhom, rồi dùng .mau-chip / .mau-chu / .mau-vien / .mau-nen bên trong. */
+.mau-nhom { --m-nen: #f6e3e5; --m-chu: #8b2635; --m-vien: #e3b8be; }
+.mau-nhom[data-m="1"] { --m-nen: #f6e3e5; --m-chu: #8b2635; --m-vien: #e3b8be; }
+.mau-nhom[data-m="2"] { --m-nen: #dcefec; --m-chu: #1f6b66; --m-vien: #a9d3ce; }
+.mau-nhom[data-m="3"] { --m-nen: #f8ecd2; --m-chu: #8a5a10; --m-vien: #e6cf99; }
+.mau-nhom[data-m="4"] { --m-nen: #e7efd6; --m-chu: #4d6b1f; --m-vien: #c4d6a0; }
+.mau-nhom[data-m="5"] { --m-nen: #fae4d6; --m-chu: #a2491b; --m-vien: #eec1a5; }
+.mau-nhom[data-m="6"] { --m-nen: #efe0ea; --m-chu: #7a2f5f; --m-vien: #d9b8cb; }
+.mau-nhom[data-m="7"] { --m-nen: #dfe8f0; --m-chu: #35566f; --m-vien: #b3c7d8; }
+.mau-nhom[data-m="8"] { --m-nen: #eceed2; --m-chu: #66661a; --m-vien: #d1d39a; }
+.mau-nhom[data-m="9"] { --m-nen: #ebe3e0; --m-chu: #6e5a5f; --m-vien: #cdbdb9; }
+.mau-nhom[data-m="10"] { --m-nen: #dcebe2; --m-chu: #2d6a4f; --m-vien: #a8cdb8; }
+.dark .mau-nhom { --m-nen: #3d2429; --m-chu: #f0b8c0; --m-vien: #5a3a42; }
+.mau-chip { background: var(--m-nen); color: var(--m-chu); }
+.mau-chu { color: var(--m-chu); }
+.mau-nen { background: var(--m-nen); }
+.mau-vien { border-color: var(--m-vien); }
+.mau-vach { border-top: 3px solid var(--m-chu); }
+.mau-hover:hover { background: var(--m-nen); }

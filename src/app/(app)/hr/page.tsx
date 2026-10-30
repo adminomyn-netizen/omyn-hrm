@@ -71,21 +71,25 @@ export default async function TrangHr() {
       n: pv.count ?? 0,
       nhan: "buổi phỏng vấn sắp tới",
       href: "/hr/lich-phong-van",
+      m: 1,
     },
     {
       n: offerCho.count ?? 0,
       nhan: "offer đang chờ",
       href: "/hr/offer-tuyen-dung",
+      m: 3,
     },
     {
       n: dxCho.count ?? 0,
       nhan: "đề xuất chờ duyệt",
       href: "/hr/de-xuat-phe-duyet",
+      m: 5,
     },
     {
       n: onb.count ?? 0,
       nhan: "người đang onboarding",
       href: "/hr/onboarding",
+      m: 2,
     },
   ];
   return (
@@ -96,12 +100,12 @@ export default async function TrangHr() {
       />
       <ul className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
         {can.map((c) => (
-          <li key={c.nhan}>
+          <li key={c.nhan} data-m={c.m} className="mau-nhom">
             <Link
               href={c.href}
-              className="the-noi block rounded-nho border border-vien bg-giay-sang p-4 transition-shadow hover:[box-shadow:var(--bong-2)]"
+              className="the-noi mau-vach mau-nen block rounded-nho p-4 transition-shadow hover:[box-shadow:var(--bong-2)]"
             >
-              <div className="chu-tieu-de text-[32px] leading-none text-nhan-dam">
+              <div className="chu-tieu-de mau-chu text-[32px] leading-none">
                 {c.n}
               </div>
               <div className="mt-1.5 text-[13px] text-muc-2">{c.nhan}</div>
@@ -109,8 +113,8 @@ export default async function TrangHr() {
           </li>
         ))}
       </ul>
-      <section aria-label="Tuyển dụng">
-        <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">
+      <section aria-label="Tuyển dụng" data-m="1" className="mau-nhom">
+        <h2 className="mau-chu mb-3 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] before:h-4 before:w-1 before:rounded-tag before:bg-[var(--m-chu)] before:content-['']">
           1 · Tuyển dụng
         </h2>
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -134,8 +138,8 @@ export default async function TrangHr() {
           )}
         </ul>
       </section>
-      <section aria-label="Onboarding" className="mt-8">
-        <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">
+      <section aria-label="Onboarding" data-m="2" className="mau-nhom mt-8">
+        <h2 className="mau-chu mb-3 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] before:h-4 before:w-1 before:rounded-tag before:bg-[var(--m-chu)] before:content-['']">
           2 · Onboarding & thử việc 60 ngày
         </h2>
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -148,8 +152,8 @@ export default async function TrangHr() {
           />
         </ul>
       </section>
-      <section aria-label="Hợp đồng" className="mt-8">
-        <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">
+      <section aria-label="Hợp đồng" data-m="3" className="mau-nhom mt-8">
+        <h2 className="mau-chu mb-3 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] before:h-4 before:w-1 before:rounded-tag before:bg-[var(--m-chu)] before:content-['']">
           4 · Hợp đồng & thăng tiến
         </h2>
         <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -168,8 +172,8 @@ export default async function TrangHr() {
         </ul>
       </section>
       {NHOM_KHAC.map((nhom, k) => (
-        <section key={nhom} aria-label={nhom} className="mt-8">
-          <h2 className="mb-3 text-[13px] font-medium uppercase tracking-[0.08em] text-muc-3">
+        <section key={nhom} aria-label={nhom} data-m={MAU_NHOM_KHAC[nhom] ?? 9} className="mau-nhom mt-8">
+          <h2 className="mau-chu mb-3 flex items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.08em] before:h-4 before:w-1 before:rounded-tag before:bg-[var(--m-chu)] before:content-['']">
             {5 + k} · {nhom}
           </h2>
           <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
@@ -204,6 +208,7 @@ export default async function TrangHr() {
 /** Màn đã có chỗ riêng trong menu Nhân sự thì không nhắc lại ở đây (mỗi mục chỉ một chỗ). */
 const coMucMenu = (ma: string) =>
   menuChinh.some((m) => m.duong_dan === `/hr/${ma}`);
+const MAU_NHOM_KHAC: Record<string, number> = { "Lịch & báo cáo nhà nước": 8, "Phê duyệt": 6, "Hồ sơ & hợp đồng": 3, "Công, lương & bảo hiểm": 7 };
 const NHOM_DA_CO = [
   "Tuyển dụng",
   "Hợp đồng & thăng tiến",
@@ -260,16 +265,16 @@ function Muc({
     <li>
       <Link
         href={href}
-        className="the-noi group flex h-full items-start gap-3.5 rounded-nho border border-vien bg-giay-sang p-4 transition-shadow hover:[box-shadow:var(--bong-2)]"
+        className="the-noi mau-hover group flex h-full items-start gap-3.5 rounded-nho border border-vien bg-giay-sang p-4 transition-shadow hover:[box-shadow:var(--bong-2)]"
       >
-        <span className="nut-vang flex h-10 w-10 shrink-0 items-center justify-center rounded-nho">
+        <span className="mau-chip flex h-10 w-10 shrink-0 items-center justify-center rounded-nho">
           <Icon strokeWidth={1.7} className="h-5 w-5" />
         </span>
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2 text-[15px] font-semibold text-muc">
             {ten}
             {so !== undefined && (
-              <span className="rounded-tag bg-giay-tram px-2 py-0.5 text-[12px] font-medium text-muc-2">
+              <span className="mau-chip rounded-tag px-2 py-0.5 text-[12px] font-medium">
                 {so}
               </span>
             )}
