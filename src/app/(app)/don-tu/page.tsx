@@ -3,12 +3,15 @@ export const dynamic = "force-dynamic";
 import { DanhSachDonTu, type ThongTinNop } from "@/components/don-tu/DanhSachDonTu";
 import { layDanhSachNhanVien, layDonTu, layDonTuCuaToi, layHoSoChamCong, layPhepNamDaDung, thangHienTaiHCM } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
-import { PHEP_NAM_MOI_NAM, loaiDonChoPhep } from "@/lib/don-tu";
+import { loaiDonChoPhep } from "@/lib/don-tu";
+import { phepNamDuoc } from "@/lib/quy-phep";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function TrangDonTu() {
   const nguoiDung = await layNguoiDungDaDuyet();
   const { nhanVienId, canChamCong, hoTen, chucDanh } = await layHoSoChamCong(nguoiDung.id, nguoiDung.vaiTro);
   const { nam } = thangHienTaiHCM();
+  const ngayVao = nhanVienId ? ((await createAdminClient().from("nhan_vien").select("ngay_vao_lam").eq("id", nhanVienId).maybeSingle()).data as { ngay_vao_lam: string | null } | null)?.ngay_vao_lam : null;
   // Ai có hồ sơ nhân sự cũng nộp được đơn cho chính mình — kể cả Quản trị/Hành chính nhân sự.
   // Kỹ thuật thì luôn nộp được MỌI loại đơn và có thể nộp thay cho bất kỳ nhân viên nào đang làm.
   const laKyThuat = nguoiDung.vaiTro === "ky_thuat";
@@ -17,7 +20,7 @@ export default async function TrangDonTu() {
     nhanVienId || laKyThuat
       ? {
           loaiChoPhep: [...(laKyThuat ? loaiDonChoPhep(true) : loaiDonChoPhep(canChamCong))],
-          phepNam: { daDung: nhanVienId ? await layPhepNamDaDung(nhanVienId, nam) : 0, moiNam: PHEP_NAM_MOI_NAM, nam },
+          phepNam: { daDung: nhanVienId ? await layPhepNamDaDung(nhanVienId, nam) : 0, moiNam: phepNamDuoc(ngayVao, nam), nam },
           nhanVienChon,
           macDinhNopCho: nhanVienId ?? "",
           // Không phải Kỹ thuật thì đơn luôn mang tên chính người đăng nhập, hiện cố định để không nộp nhầm người.

@@ -101,3 +101,33 @@ describe("Migration 0022: hồ sơ + hợp đồng", () => {
     expect((await db.query(`select 1 from public.nhan_su_lich_su`)).rows).toHaveLength(1);
   });
 });
+
+describe("Migration 0023: tăng ca, thưởng, sổ đổ phiếu", () => {
+  let db: PGlite;
+  const NV = u(601);
+  beforeAll(async () => { db = await taoDbVoiMigration(); await db.exec(`insert into auth.users (id) values ('${u(1)}'); insert into public.nhan_vien (id, ho_ten) values ('${NV}','A')`); });
+  it("trình duyệt/khách không đọc được; tham số giới hạn tăng ca có sẵn và chưa xác nhận", async () => {
+    for (const b of ["tang_ca", "thuong_hoa_hong", "pd_ap_dung"]) {
+      expect(await loiMa(chayVoiTu(db, { sub: u(1) }, `select * from public.${b}`)), b).toBe("42501");
+      expect(await loiMa(chayVoiKhach(db, `select * from public.${b}`)), b).toBe("42501");
+    }
+    const r = (await db.query<{ khoa: string; gia_tri: string; xac_nhan_boi: string | null }>(`select khoa, gia_tri, xac_nhan_boi from public.tham_so_luong where khoa like 'ot_gioi_han%' order by khoa`)).rows;
+    expect(r.map((x) => [x.khoa, Number(x.gia_tri), x.xac_nhan_boi])).toEqual([["ot_gioi_han_nam", 200, null], ["ot_gioi_han_ngay_tong", 12, null], ["ot_gioi_han_thang", 40, null]]);
+  });
+  it("tăng ca: số giờ 0-12, loại ngày hợp lệ; một phiếu chỉ đổ một lần mỗi ngày", async () => {
+    await db.query(`insert into public.tang_ca (nhan_vien_id, ngay, so_gio) values ($1,'2026-10-30',2)`, [NV]);
+    expect(await loiMa(db.query(`insert into public.tang_ca (nhan_vien_id, ngay, so_gio) values ($1,'2026-10-30',0)`, [NV]))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.tang_ca (nhan_vien_id, ngay, so_gio) values ($1,'2026-10-30',13)`, [NV]))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.tang_ca (nhan_vien_id, ngay, so_gio, loai_ngay) values ($1,'2026-10-30',1,'Lạ')`, [NV]))).toBe("23514");
+    const p = (await db.query<{ id: string }>(`insert into public.pd_phieu (so_phieu, ma_phieu, nhom_ma) values ('HR-2610-0099','x','HR') returning id`)).rows[0].id;
+    await db.query(`insert into public.tang_ca (nhan_vien_id, ngay, so_gio, phieu_id) values ($1,'2026-10-31',1,$2)`, [NV, p]);
+    expect(await loiMa(db.query(`insert into public.tang_ca (nhan_vien_id, ngay, so_gio, phieu_id) values ($1,'2026-10-31',1,$2)`, [NV, p]))).toBe("23505");
+    await db.query(`insert into public.pd_ap_dung (phieu_id, ket_qua) values ($1,'ok')`, [p]);
+    expect(await loiMa(db.query(`insert into public.pd_ap_dung (phieu_id, ket_qua) values ($1,'ok')`, [p]))).toBe("23505");
+  });
+  it("thưởng/hoa hồng: loại hợp lệ, số tiền không âm", async () => {
+    await db.query(`insert into public.thuong_hoa_hong (nhan_vien_id, ngay, loai, so_tien) values ($1,'2026-10-30','Hoa hồng',500000)`, [NV]);
+    expect(await loiMa(db.query(`insert into public.thuong_hoa_hong (nhan_vien_id, ngay, loai, so_tien) values ($1,'2026-10-30','Lạ',1)`, [NV]))).toBe("23514");
+    expect(await loiMa(db.query(`insert into public.thuong_hoa_hong (nhan_vien_id, ngay, so_tien) values ($1,'2026-10-30',-1)`, [NV]))).toBe("23514");
+  });
+});

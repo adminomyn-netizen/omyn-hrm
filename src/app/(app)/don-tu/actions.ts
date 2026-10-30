@@ -13,7 +13,6 @@ import {
   LOAI_DON_CHAM_CONG,
   LOAI_NGHI_THEO_GIO,
   NGUONG_RA_MUON,
-  PHEP_NAM_MOI_NAM,
   gioNgan,
   ngayLamViec,
   phatHienSaiPham,
@@ -21,6 +20,7 @@ import {
   type SaiPham,
 } from "@/lib/don-tu";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { phepNamDuoc } from "@/lib/quy-phep";
 import { guiChoNguoiDung } from "@/lib/push";
 import { layNguoiQuanLy } from "@/lib/nhac-cong";
 
@@ -127,9 +127,12 @@ export async function taoDonTu(formData: FormData): Promise<KetQuaDonTu> {
   if (loai === "Nghỉ phép năm") {
     if (tuNgay.slice(0, 4) !== denNgay.slice(0, 4)) return { loi: "Đơn nghỉ phép năm không được nằm vắt qua hai năm, hãy tách thành hai đơn." };
     const xin = soNgayNghi(tuNgay, denNgay, dongThem.gio_tu, dongThem.gio_den);
-    const daDung = await layPhepNamDaDung(nhanVienId, Number(tuNgay.slice(0, 4)));
-    if (daDung + xin > PHEP_NAM_MOI_NAM) {
-      return { loi: `Năm ${tuNgay.slice(0, 4)} còn ${Math.max(0, PHEP_NAM_MOI_NAM - daDung)}/${PHEP_NAM_MOI_NAM} ngày phép, đơn này xin ${xin} ngày (không tính Chủ nhật; nghỉ theo giờ tối đa 4 tiếng tính nửa ngày).` };
+    const namXin = Number(tuNgay.slice(0, 4));
+    const daDung = await layPhepNamDaDung(nhanVienId, namXin);
+    const { data: nvVao } = await supabase.from("nhan_vien").select("ngay_vao_lam").eq("id", nhanVienId).maybeSingle();
+    const quy = phepNamDuoc((nvVao as { ngay_vao_lam: string | null } | null)?.ngay_vao_lam, namXin);
+    if (daDung + xin > quy) {
+      return { loi: `Năm ${tuNgay.slice(0, 4)} còn ${Math.max(0, quy - daDung)}/${quy} ngày phép, đơn này xin ${xin} ngày (không tính Chủ nhật; nghỉ theo giờ tối đa 4 tiếng tính nửa ngày).` };
     }
   }
 
