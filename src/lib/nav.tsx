@@ -900,6 +900,9 @@ export const CUM_TAB: readonly CumTab[] = [
   { ma: "cong-no-ncc", ten: "Công nợ nhà cung cấp", moTa: "Ghi phải trả nhà cung cấp; số còn phải trả và quá hạn tự tính.", icon: PiggyBank, chinh: "/hr/cong-no-nha-cung-cap", tabs: [{ ten: "Ghi công nợ", duong_dan: "/hr/cong-no-nha-cung-cap" }, { ten: "Số dư phải trả", duong_dan: "/tai-chinh/cong-no-ncc" }] },
   // Cụm 2: Tuyển dụng. Nhân viên thường chỉ thấy tab Yêu cầu tuyển dụng nên thanh tab tự ẩn.
   { ma: "tuyen-dung", ten: "Tuyển dụng", moTa: "Yêu cầu tuyển dụng, tin đăng và ứng viên, sổ tuyển dụng (mục tiêu, ngân sách, kênh, phỏng vấn, offer) và đề xuất nhân sự cần duyệt.", icon: UserPlus, chinh: "/tuyen-dung", tabs: [{ ten: "Tin và ứng viên", duong_dan: "/tuyen-dung" }, { ten: "Yêu cầu tuyển dụng", duong_dan: "/yeu-cau-tuyen-dung" }, { ten: "Sổ tuyển dụng", duong_dan: "/hr" }, { ten: "Đề xuất cần duyệt", duong_dan: "/hr/de-xuat-phe-duyet" }] },
+  // Cụm 3: Hiệu suất.
+  { ma: "bsc-cong-viec", ten: "Mục tiêu BSC và công việc", moTa: "Bản đồ chiến lược BSC, kế hoạch hành động cho từng chỉ số, và việc của bạn và của nhóm.", icon: Target, chinh: "/bsc", tabs: [{ ten: "Mục tiêu BSC", duong_dan: "/bsc" }, { ten: "Kế hoạch hành động", duong_dan: "/hr/bsc-ke-hoach-hanh-dong" }, { ten: "Công việc", duong_dan: "/cong-viec" }] },
+  { ma: "kpi-thi-dua", ten: "KPI và thi đua", moTa: "Chấm KPI hằng ngày, xếp hạng thi đua, đánh giá hiệu suất theo kỳ và mức khen thưởng.", icon: Trophy, chinh: "/kpi", tabs: [{ ten: "KPI", duong_dan: "/kpi" }, { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia" }, { ten: "Khen thưởng thi đua", duong_dan: "/hr/kpi-thuong" }] },
   { ma: "doanh-so", ten: "Chỉ tiêu và doanh số", moTa: "Doanh số tháng theo kênh tự tính, so với chỉ tiêu; nơi giao chỉ tiêu.", icon: TrendingUp, chinh: "/kinh-doanh/doanh-so", tabs: [{ ten: "Doanh số so chỉ tiêu", duong_dan: "/kinh-doanh/doanh-so" }, { ten: "Giao chỉ tiêu", duong_dan: "/hr/chi-tieu-doanh-so" }] },
 ];
 
