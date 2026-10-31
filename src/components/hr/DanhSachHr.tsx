@@ -23,7 +23,7 @@ const TIEN = (n: unknown) => (typeof n === "number" ? `${n.toLocaleString("vi-VN
 const SO_NGAY = (s: unknown) => (typeof s === "string" && s ? Math.round((new Date(s.slice(0, 10)).getTime() - Date.now()) / 86400000) : null);
 
 const KIEU_NHAN = (v: string): "tot" | "cho" | "loi" | "tram" =>
-  /^(Đạt|Đủ người|Đồng ý|Đã duyệt|Đang dùng|Đang tuyển|Đang hiệu lực|Ký tiếp|Ký không)/.test(v) ? "tot" : /^(Chờ|Soạn|Kế hoạch|Thương lượng|Cần theo dõi|Hoãn|Gia hạn)/.test(v) ? "cho" : /^(Không đạt|Từ chối|Huỷ|Vắng|Tạm dừng|Đã hết hạn|Đã chấm dứt|Không tái ký)/.test(v) ? "loi" : "tram";
+  /^(Đạt|Đã chốt|Đủ người|Đồng ý|Đã duyệt|Đang dùng|Đang tuyển|Đang hiệu lực|Ký tiếp|Ký không)/.test(v) ? "tot" : /^(Chờ|Soạn|Kế hoạch|Thương lượng|Cần theo dõi|Hoãn|Gia hạn)/.test(v) ? "cho" : /^(Không đạt|Từ chối|Huỷ|Vắng|Tạm dừng|Đã hết hạn|Đã chấm dứt|Không tái ký)/.test(v) ? "loi" : "tram";
 
 function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string, string>, tc: Map<string, string>): string {
   const v = d[c.k];
