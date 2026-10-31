@@ -54,3 +54,12 @@ describe("cụm Tuyển dụng", () => {
     expect(cumCuaDuongDan("/tuyen-dung/abc-123")?.ma).toBe("tuyen-dung");
   });
 });
+
+describe("cụm Lương", () => {
+  const c = CUM_TAB.find((x) => x.ma === "luong")!;
+  it("quản trị thấy đủ 8 tab; nhân viên chỉ thấy Bảng lương (phiếu lương của mình) nên không có thanh tab; giữ riêng Chấm công, Bảng công, Quỹ phép", () => {
+    expect(tabCuaCum(c, "admin")).toHaveLength(8);
+    expect(tabCuaCum(c, "nhan_vien").map((t) => t.duong_dan)).toEqual(["/luong"]);
+    for (const p of ["/cham-cong", "/bang-cong", "/quy-phep"]) expect(cumCuaDuongDan(p), p).toBeNull();
+  });
+});
