@@ -4,13 +4,14 @@ export type DaiLyNo = { id: string; ten: string; hanMuc: number | null };
 export type DongNo = { daiLyId: string; ngay: string; loai: string; soTien: number; hanThanhToan: string | null };
 export type CongNo = { id: string; ten: string; phatSinh: number; daThu: number; soDu: number; hanMuc: number | null; vuotHanMuc: boolean; quaHan: number };
 
-/** Số dư = tổng phát sinh − tổng đã thu (có thể âm khi thu dư). Quá hạn: trừ tiền đã thu vào khoản phát sinh CŨ NHẤT trước (FIFO), phần còn nợ của khoản đã quá hạn thanh toán (hạn < hôm nay) cộng lại. */
-export function tinhCongNo(daiLy: readonly DaiLyNo[], dong: readonly DongNo[], homNay: string): CongNo[] {
+/** `loaiThu` là tên dòng trả nợ: "Đã thu" với đại lý (họ trả mình), "Đã trả" với nhà cung cấp (mình trả họ).
+ * Số dư = tổng phát sinh − tổng đã thu (có thể âm khi thu dư). Quá hạn: trừ tiền đã thu vào khoản phát sinh CŨ NHẤT trước (FIFO), phần còn nợ của khoản đã quá hạn thanh toán (hạn < hôm nay) cộng lại. */
+export function tinhCongNo(daiLy: readonly DaiLyNo[], dong: readonly DongNo[], homNay: string, loaiThu = "Đã thu"): CongNo[] {
   return daiLy
     .map((d) => {
       const ds = dong.filter((x) => x.daiLyId === d.id);
       const phatSinh = ds.filter((x) => x.loai === "Phát sinh").reduce((a, x) => a + x.soTien, 0);
-      const daThu = ds.filter((x) => x.loai === "Đã thu").reduce((a, x) => a + x.soTien, 0);
+      const daThu = ds.filter((x) => x.loai === loaiThu).reduce((a, x) => a + x.soTien, 0);
       const soDu = phatSinh - daThu;
       let thu = daThu;
       let quaHan = 0;
@@ -45,4 +46,29 @@ export function tinhDoanhSo(
     const co = chiTieu.some((c) => c.kenh === kenh) && ct > 0;
     return { kenh, chiTieu: co ? ct : null, thucDat: thuc[kenh], phanTram: co ? Math.round((thuc[kenh] / ct) * 100) : null };
   });
+}
+
+export type DongTheoNguoi = { nguoiId: string; ten: string; san: number; si: number; soDonSi: number; live: number; coHoiChot: number };
+
+/** Doanh số tháng của từng người: Sàn = doanh thu (trừ hoàn) của các gian hàng người đó vận hành; Sỉ = đơn đã chốt trở đi người đó phụ trách;
+ * Live = phiên đã live người đó làm host; cơ hội chốt = số cơ hội ở giai đoạn Đã chốt. KHÔNG cộng các cột lại vì live bán qua sàn đã nằm trong cột Sàn. */
+export function tinhDoanhSoTheoNguoi(d: {
+  ten: ReadonlyMap<string, string>;
+  sanTheoGianHang: readonly { nguoiVanHanhId: string | null; doanhThu: number; hoan: number }[];
+  donSi: readonly { nguoiId: string | null; trangThai: string; giaTri: number }[];
+  live: readonly { hostId: string | null; doanhThu: number }[];
+  coHoi: readonly { nguoiId: string | null; giaiDoan: string }[];
+}): DongTheoNguoi[] {
+  const ra = new Map<string, DongTheoNguoi>();
+  const lay = (id: string | null) => {
+    if (!id) return null;
+    let r = ra.get(id);
+    if (!r) { r = { nguoiId: id, ten: d.ten.get(id) ?? "Nhân viên đã xoá", san: 0, si: 0, soDonSi: 0, live: 0, coHoiChot: 0 }; ra.set(id, r); }
+    return r;
+  };
+  for (const s of d.sanTheoGianHang) { const r = lay(s.nguoiVanHanhId); if (r) r.san += Math.max(0, s.doanhThu - s.hoan); }
+  for (const o of d.donSi) { const r = lay(o.nguoiId); if (r && ["Đã chốt", "Đang giao", "Đã giao", "Đã thu đủ"].includes(o.trangThai)) { r.si += o.giaTri; r.soDonSi += 1; } }
+  for (const l of d.live) { const r = lay(l.hostId); if (r) r.live += l.doanhThu; }
+  for (const c of d.coHoi) { const r = lay(c.nguoiId); if (r && c.giaiDoan === "Đã chốt") r.coHoiChot += 1; }
+  return [...ra.values()].filter((r) => r.san || r.si || r.live || r.coHoiChot).sort((a, b) => b.san + b.si - (a.san + a.si));
 }

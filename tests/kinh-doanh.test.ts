@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tinhCongNo, tinhDoanhSo } from "@/lib/kinh-doanh";
+import { tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
 
 describe("công nợ đại lý", () => {
   it("số dư, vượt hạn mức, quá hạn theo thứ tự trừ khoản cũ nhất trước", () => {
@@ -38,5 +38,35 @@ describe("doanh số so chỉ tiêu", () => {
     expect(lay("Sỉ và đại lý")).toMatchObject({ thucDat: 30_000_000, chiTieu: null, phanTram: null });
     expect(lay("Tổng")).toMatchObject({ thucDat: 130_000_000, phanTram: 65 });
     expect(lay("Livestream").thucDat).toBe(40_000_000);
+  });
+});
+
+describe("công nợ nhà cung cấp dùng chung hàm, dòng trả là 'Đã trả'", () => {
+  it("trừ khoản đã trả vào nợ cũ nhất", () => {
+    const r = tinhCongNo(
+      [{ id: "Cty A", ten: "Cty A", hanMuc: null }],
+      [
+        { daiLyId: "Cty A", ngay: "2026-09-01", loai: "Phát sinh", soTien: 100, hanThanhToan: "2026-10-01" },
+        { daiLyId: "Cty A", ngay: "2026-10-01", loai: "Đã trả", soTien: 40, hanThanhToan: null },
+      ],
+      "2026-10-31",
+      "Đã trả",
+    );
+    expect(r[0]).toMatchObject({ soDu: 60, quaHan: 60 });
+  });
+});
+
+describe("doanh số theo người", () => {
+  it("gom sàn theo người vận hành, sỉ theo người phụ trách, live theo host, đếm cơ hội chốt; không cộng các cột", () => {
+    const r = tinhDoanhSoTheoNguoi({
+      ten: new Map([["n1", "An"], ["n2", "Bình"]]),
+      sanTheoGianHang: [{ nguoiVanHanhId: "n1", doanhThu: 100, hoan: 10 }, { nguoiVanHanhId: null, doanhThu: 999, hoan: 0 }],
+      donSi: [{ nguoiId: "n2", trangThai: "Đã giao", giaTri: 50 }, { nguoiId: "n2", trangThai: "Báo giá", giaTri: 70 }, { nguoiId: "n1", trangThai: "Huỷ", giaTri: 5 }],
+      live: [{ hostId: "n1", doanhThu: 30 }],
+      coHoi: [{ nguoiId: "n2", giaiDoan: "Đã chốt" }, { nguoiId: "n2", giaiDoan: "Mất" }],
+    });
+    expect(r.map((x) => x.nguoiId)).toEqual(["n1", "n2"]);
+    expect(r[0]).toMatchObject({ san: 90, si: 0, live: 30, soDonSi: 0 });
+    expect(r[1]).toMatchObject({ san: 0, si: 50, soDonSi: 1, coHoiChot: 1 });
   });
 });
