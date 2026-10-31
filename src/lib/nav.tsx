@@ -262,6 +262,14 @@ export const menuChinh: MucMenu[] = [
     moTa: "Khuyến mãi trên sàn và cho đại lý: hình thức, mức giảm, thời gian.",
   },
   {
+    ten: "Thư viện tài sản nội dung",
+    duong_dan: "/hr/tai-san-noi-dung",
+    nhom: "Marketing & Thương hiệu",
+    icon: FolderOpen,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Ảnh, video, mẫu thiết kế kèm nguồn gốc và bản quyền.",
+  },
+  {
     ten: "Gian hàng sàn",
     duong_dan: "/hr/gian-hang-san",
     nhom: "Kinh doanh",
@@ -484,6 +492,14 @@ export const menuChinh: MucMenu[] = [
     icon: PiggyBank,
     chiVaiTro: CHI_QUAN_LY,
     moTa: "Còn phải trả và quá hạn của từng nhà cung cấp, tự tính.",
+  },
+  {
+    ten: "Thống kê đóng gói",
+    duong_dan: "/kho/dong-goi",
+    nhom: "Tài chính & Kho",
+    icon: Activity,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Số đơn đóng gói theo trạng thái, kênh, người đóng và tỷ lệ hoàn.",
   },
   {
     ten: "Lô hàng và hạn sử dụng",
