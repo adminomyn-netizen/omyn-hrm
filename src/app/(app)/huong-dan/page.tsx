@@ -60,7 +60,7 @@ const NHAN_VIEN: HuongDan = {
 
 const QUAN_TRI: HuongDan = {
   vaiTro: "Quản trị · Hành chính nhân sự",
-  loiNoi: "Giữ hồ sơ, theo dõi công, duyệt đơn và chốt lương mỗi tháng. Quyền Quản trị tự có theo vị trí (khối Hành chính nhân sự, Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc).",
+  loiNoi: "Giữ hồ sơ, theo dõi công, duyệt đơn và chốt lương mỗi tháng. Quyền Quản trị tự có theo vị trí (khối Hành chính nhân sự, Giám đốc, Phó giám đốc, Giám đốc, Phó giám đốc).",
   sac: "xanh",
   Icon: ShieldCheck,
   phan: [
@@ -68,7 +68,7 @@ const QUAN_TRI: HuongDan = {
       tieuDe: "Mỗi ngày",
       sac: "xanh",
       buoc: [
-        { tieuDe: "Nắm tình hình ở Tổng quan và Chấm công", noiDung: <p><b>Tổng quan</b> tóm tắt số người, đơn chờ duyệt, ứng viên mới và quỹ lương. <b>Chấm công</b> cho thấy ai đã chấm hôm nay, ai đi muộn, ai vắng, kèm lịch cả công ty. Tổng giám đốc và Giám đốc không phải chấm công; người còn lại trong nhóm Quản trị vẫn tự chấm công như mọi người.</p> },
+        { tieuDe: "Nắm tình hình ở Tổng quan và Chấm công", noiDung: <p><b>Tổng quan</b> tóm tắt số người, đơn chờ duyệt, ứng viên mới và quỹ lương. <b>Chấm công</b> cho thấy ai đã chấm hôm nay, ai đi muộn, ai vắng, kèm lịch cả công ty. Giám đốc và người được giữ quyền giám đốc không phải chấm công; người còn lại trong nhóm Quản trị vẫn tự chấm công như mọi người.</p> },
         { tieuDe: "Duyệt đơn", noiDung: <p>Vào <b>Đơn nghỉ và giải trình công</b>, mở đơn chờ duyệt rồi bấm Duyệt hoặc Từ chối. Không duyệt được đơn của chính mình. Duyệt đơn <b>Giải trình công</b> thì chấm công ngày đó tự sửa về giờ người nộp ghi. Đơn Đi trễ, Về sớm, Chấm công ngoài công ty khi duyệt chỉ đổi trạng thái đơn, chưa tự sửa chấm công.</p> },
       ],
     },
@@ -129,7 +129,7 @@ const KY_THUAT: HuongDan = {
       tieuDe: "Quyền chỉ riêng bạn có",
       sac: "xanh",
       buoc: [
-        { tieuDe: "Đưa người vào vị trí Quản trị", noiDung: <p>Khi thêm hoặc sửa hồ sơ, chỉ bạn được đặt người vào khối Hành chính nhân sự hoặc chức vụ Tổng giám đốc, Phó tổng giám đốc, Giám đốc, Phó giám đốc (các vị trí tự có quyền Quản trị). Quản trị làm việc này sẽ bị chặn.</p> },
+        { tieuDe: "Đưa người vào vị trí Quản trị", noiDung: <p>Khi thêm hoặc sửa hồ sơ, chỉ bạn được đặt người vào khối Hành chính nhân sự hoặc chức vụ Giám đốc, Phó giám đốc (các vị trí tự có quyền Quản trị). Quản trị làm việc này sẽ bị chặn.</p> },
         { tieuDe: "Nộp đơn thay mọi người", noiDung: <p>Khi nộp đơn, ô <b>Nộp cho</b> cho phép chọn bất kỳ nhân viên nào; mọi loại đơn đều nộp được. Dùng để hỗ trợ nhập hộ khi người đó chưa tự làm được.</p> },
         { tieuDe: "Xem mọi thứ, kể cả lương", noiDung: <p>Bạn làm được mọi việc của Quản trị: Hồ sơ, Khối, Tuyển dụng, Bảng công tháng, Bảng lương (kỳ, thỏa thuận, tham số, thuế và bảo hiểm), xuất Excel và in phiếu. Hướng dẫn chi tiết các việc này nằm ở bản dành cho Quản trị.</p> },
       ],

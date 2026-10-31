@@ -107,7 +107,7 @@ export function BangCongThang({ nam, thang, hienTai, dong, ngayLe, soNgay, homNa
             </li>
           ))}
         </ul>
-        <p className="mt-3 text-[13px] text-muc-3">Chủ nhật không tính (công ty làm thứ Hai đến thứ Bảy). Người miễn chấm công (Tổng giám đốc, Giám đốc) mặc định đủ công các ngày làm việc đã qua. Cùng bộ quy tắc này được dùng khi lập bảng lương.</p>
+        <p className="mt-3 text-[13px] text-muc-3">Chủ nhật không tính (công ty làm thứ Hai đến thứ Bảy). Người miễn chấm công (Giám đốc và người được giữ quyền giám đốc) mặc định đủ công các ngày làm việc đã qua. Cùng bộ quy tắc này được dùng khi lập bảng lương.</p>
       </details>
 
       <div className="overflow-x-auto rounded-the border border-vien">

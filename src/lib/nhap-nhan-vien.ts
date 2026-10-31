@@ -65,7 +65,7 @@ export function kiemTraDongNhap(
     const ma = d.maNhanVien.trim();
     if (ma && (maTrongTep.has(ma.toLowerCase()) || daCo.ma.has(ma.toLowerCase()))) return bao(`Mã nhân viên "${ma}" bị trùng.`);
     if (email && (emailTrongTep.has(email) || daCo.email.has(email))) return bao(`Email "${email}" bị trùng.`);
-    if (!laKyThuat && nenLaQuanTri(d.chucDanh.trim(), k.ten)) return bao("Vị trí này (Hành chính nhân sự, Tổng giám đốc, Giám đốc…) tự có quyền Quản trị nên chỉ tài khoản Kỹ thuật được nhập.");
+    if (!laKyThuat && nenLaQuanTri(d.chucDanh.trim(), k.ten)) return bao("Vị trí này (Hành chính nhân sự, Giám đốc, Phó giám đốc…) tự có quyền Quản trị nên chỉ tài khoản Kỹ thuật được nhập.");
     if (ma) maTrongTep.add(ma.toLowerCase());
     if (email) emailTrongTep.add(email);
     hopLe.push({ ma_nhan_vien: ma || null, ho_ten: hoTen, chuc_danh: d.chucDanh.trim() || null, khoi_id: k.id, email: email || null, ngay_vao_lam: ngay, trang_thai: tt as DongHopLe["trang_thai"] });

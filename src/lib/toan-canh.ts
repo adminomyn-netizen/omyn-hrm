@@ -163,7 +163,7 @@ export async function layToanCanhKyThuat(): Promise<ToanCanh> {
       {
         ten: "Chấm công",
         chiSo: [
-          { nhan: "Phải chấm công", so: so(phaiChamCong.length), phu: "Trừ Giám đốc, Tổng giám đốc, Kỹ thuật" },
+          { nhan: "Phải chấm công", so: so(phaiChamCong.length), phu: "Trừ Giám đốc, người giữ quyền giám đốc, Kỹ thuật" },
           { nhan: "Đã chấm công hôm nay", so: `${ccHomNay.filter((c) => phaiChamCongIds.has(c.nhan_vien_id)).length}/${phaiChamCong.length}`, tyLe: phanTram(ccHomNay.filter((c) => phaiChamCongIds.has(c.nhan_vien_id)).length, phaiChamCong.length) },
           { nhan: "Đi muộn hôm nay", so: so(muonHomNay) },
           { nhan: "Vào nhưng chưa ra", so: so(chuaRa) },

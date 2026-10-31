@@ -54,7 +54,7 @@ async function chanNangQuyen(khoiId: string, chucDanh: string, hoSoCu?: { khoi_i
   const tenKhoi = async (id: string | null) => (id ? (await db.from("khoi").select("ten").eq("id", id).maybeSingle()).data?.ten : null);
   if (!nenLaQuanTri(chucDanh, await tenKhoi(khoiId))) return null;
   if (hoSoCu && nenLaQuanTri(hoSoCu.chuc_danh, await tenKhoi(hoSoCu.khoi_id))) return null;
-  return "Vị trí này (Hành chính nhân sự, Tổng giám đốc, Giám đốc…) tự có quyền Quản trị nên chỉ tài khoản Kỹ thuật được gán.";
+  return "Vị trí này (Hành chính nhân sự, Giám đốc, Phó giám đốc…) tự có quyền Quản trị nên chỉ tài khoản Kỹ thuật được gán.";
 }
 
 export async function themNhanVien(formData: FormData): Promise<KetQuaNhanVien> {
