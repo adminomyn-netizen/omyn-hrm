@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo, useRef, useState, useTransition } from "react";
-import { CalendarClock, Pencil, Plus, Search } from "lucide-react";
+import { CalendarClock, Paperclip, Pencil, Plus, Search } from "lucide-react";
 import { luuBanGhiHr, xoaBanGhiHr } from "@/app/(app)/hr/actions";
 import { Chon } from "@/components/ui/Chon";
 import { Hop } from "@/components/ui/Hop";
 import { nhomDong } from "@/lib/nhom-danh-sach";
 import { NgayChon } from "@/components/ui/NgayChon";
+import { TepDinhKem } from "@/components/hr/TepDinhKem";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { NHAN_O, NUT_CHINH, NUT_CHU_NGUY, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import type { CotHr, MucHr } from "@/lib/hr-module";
@@ -42,12 +43,14 @@ function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string
 }
 
 /** Thẻ danh sách + hộp thoại thêm/sửa cho mọi mục HR khai trong hr-module.ts. Thẻ gọn trên điện thoại, 2–3 cột trên máy tính. */
-export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khongXoa = false }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]>; chiXem?: boolean; khongXoa?: boolean }) {
+export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khongXoa = false, coTep = false, xoaTep = false, soTep = {} }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]>; chiXem?: boolean; khongXoa?: boolean; coTep?: boolean; xoaTep?: boolean; soTep?: Record<string, number> }) {
   const [tim, setTim] = useState("");
   const [loc, setLoc] = useState("");
   const [locCot, setLocCot] = useState<Record<string, string>>({});
   const [chiSap, setChiSap] = useState(false);
   const [sua, setSua] = useState<Dong | "moi" | null>(null);
+  const [xemTep, setXemTep] = useState<Dong | null>(null);
+  const hienTep = muc.dinhKem && coTep;
   const nvMap = useMemo(() => new Map(nv.map((x) => [x.id, x.ten])), [nv]);
   const khoiMap = useMemo(() => new Map(khoi.map((x) => [x.id, x.ten])), [khoi]);
   const tcMap = useMemo(() => new Map(Object.values(tc).flat().map((x) => [x.id, x.ten])), [tc]);
@@ -76,8 +79,10 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khong
     const tt = muc.trangThai ? String(d[muc.trangThai] ?? "") : "";
     const ngayCB = muc.canhBao ? SO_NGAY(d[muc.canhBao.cot]) : null;
     const sapDen = sapHetCua(d);
+    const nTep = soTep[d.id] ?? 0;
     return (
-      <button type="button" onClick={() => !chiXem && setSua(d)} disabled={chiXem} className={`the-noi group flex h-full w-full flex-col gap-3 rounded-nho border border-vien bg-giay-sang p-4 text-left transition-shadow hover:[box-shadow:var(--bong-2)] ${chiXem ? "cursor-default" : ""}`}>
+      <div className="the-noi flex h-full flex-col rounded-nho border border-vien bg-giay-sang transition-shadow hover:[box-shadow:var(--bong-2)]">
+      <button type="button" onClick={() => !chiXem && setSua(d)} disabled={chiXem} className={`group flex w-full flex-1 flex-col gap-3 p-4 text-left ${chiXem ? "cursor-default" : ""}`}>
         <div className="flex items-start justify-between gap-3">
           <h3 className="min-w-0 text-[16px] font-semibold leading-snug text-muc">{hienGiaTri(cotTieuDe, d, nvMap, khoiMap, tcMap) || "(chưa đặt tên)"}</h3>
           <Pencil strokeWidth={1.6} className="mt-1 h-4 w-4 shrink-0 text-muc-3 opacity-0 transition-opacity group-hover:opacity-100" />
@@ -93,6 +98,10 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khong
           })}
         </dl>
       </button>
+      {hienTep && (
+        <button type="button" onClick={() => setXemTep(d)} className="flex items-center gap-1.5 border-t border-vien px-4 py-2.5 text-left text-[13px] font-medium text-nhan-dam hover:underline"><Paperclip strokeWidth={1.8} className="h-3.5 w-3.5" />{nTep ? `${nTep} tệp đính kèm` : "Tệp đính kèm"}</button>
+      )}
+      </div>
     );
   };
 
@@ -163,6 +172,14 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khong
       )}
       <Hop mo={sua !== null} dong={() => setSua(null)} tieuDe={sua === "moi" ? `Thêm: ${muc.ten}` : `Sửa: ${muc.ten}`} rong="rong">
         {sua !== null && <FormHr key={sua === "moi" ? "moi" : sua.id} muc={muc} coSan={sua === "moi" ? undefined : sua} nv={nv} khoi={khoi} tc={tc} khongXoa={khongXoa} xong={() => setSua(null)} />}
+        {hienTep && sua !== null && (
+          <div className="mt-5 border-t border-vien pt-4">
+            {sua === "moi" ? <p className="text-[13px] text-muc-3">Lưu dòng này xong sẽ đính kèm được tệp.</p> : <TepDinhKem man={muc.ma} dongId={sua.id} duocXoa={xoaTep} />}
+          </div>
+        )}
+      </Hop>
+      <Hop mo={xemTep !== null} dong={() => setXemTep(null)} tieuDe={xemTep ? `Tệp đính kèm: ${hienGiaTri(cotTieuDe, xemTep, nvMap, khoiMap, tcMap) || muc.ten}` : "Tệp đính kèm"} rong="rong">
+        {xemTep !== null && <TepDinhKem man={muc.ma} dongId={xemTep.id} duocXoa={xoaTep} />}
       </Hop>
     </div>
   );

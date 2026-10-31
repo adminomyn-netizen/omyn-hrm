@@ -50,6 +50,8 @@ export type MucHr = {
   nhomTheo?: readonly string[];
   /** Các cột cho ô lọc thả xuống (giá trị lấy từ chính dữ liệu đang có). */
   locTheo?: readonly string[];
+  /** Cho đính kèm tệp thật (PDF, ảnh, giấy tờ) vào từng dòng; xem tep-dinh-kem.ts. */
+  dinhKem?: boolean;
 };
 
 const UU_TIEN = ["Cao", "Trung bình", "Thấp"] as const;
@@ -728,7 +730,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "san-pham", ten: "Danh mục sản phẩm", nhom: "Sản phẩm & Giá", bang: "sp_san_pham", tieuDe: "ten", trangThai: "trang_thai",
+    ma: "san-pham", dinhKem: true, ten: "Danh mục sản phẩm", nhom: "Sản phẩm & Giá", bang: "sp_san_pham", tieuDe: "ten", trangThai: "trang_thai",
     moTa: "Mỗi sản phẩm một dòng với mã riêng: nhà sản xuất, nguồn gốc, quy cách. Mã sản phẩm dùng chung cho giá, kiểm lô, bao bì và hồ sơ công bố.",
     sapXep: { cot: "ma_sp" }, trong: "Chưa có sản phẩm nào.",
     cot: [
@@ -790,7 +792,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "duyet-bao-bi", ten: "Duyệt bao bì và nhãn", nhom: "Sản phẩm & Giá", bang: "sp_duyet_bao_bi", tieuDe: "tieu_de", trangThai: "trang_thai",
+    ma: "duyet-bao-bi", dinhKem: true, ten: "Duyệt bao bì và nhãn", nhom: "Sản phẩm & Giá", bang: "sp_duyet_bao_bi", tieuDe: "tieu_de", trangThai: "trang_thai",
     moTa: "Bao bì và nhãn gửi duyệt trước khi in (Đã chốt thiết kế = thiết kế xong nhưng chưa kiểm pháp lý; Đạt = đã duyệt đủ): đủ thông tin bắt buộc, không ghi công dụng như thuốc, khớp hồ sơ công bố. Danh sách thông tin bắt buộc chính thức chờ chị Lâm hoặc luật sư xác nhận.",
     sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có bao bì nào gửi duyệt.",
     cot: [
@@ -806,7 +808,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "ho-so-san-pham", ten: "Hồ sơ theo sản phẩm", nhom: "Pháp lý & Hồ sơ", bang: "pl_ho_so_san_pham", tieuDe: "san_pham_id",
+    ma: "ho-so-san-pham", dinhKem: true, ten: "Hồ sơ theo sản phẩm", nhom: "Pháp lý & Hồ sơ", bang: "pl_ho_so_san_pham", tieuDe: "san_pham_id",
     moTa: "Danh sách kiểm hồ sơ của từng mã sản phẩm: đã có phiếu công bố, hoá đơn nhập, phiếu kiểm nghiệm, nhãn phụ, hợp đồng nhà máy, biên bản giao nhận hồ sơ gốc chưa. Cần xuất trình trong 24 giờ nên phải đủ trước khi bán.",
     sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa lập hồ sơ cho sản phẩm nào. Thêm sản phẩm ở màn Danh mục sản phẩm trước.",
     cot: [
@@ -821,7 +823,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "so-cong-bo", ten: "Sổ công bố sản phẩm", nhom: "Pháp lý & Hồ sơ", bang: "pl_so_cong_bo", tieuDe: "san_pham_id", trangThai: "trang_thai",
+    ma: "so-cong-bo", dinhKem: true, ten: "Sổ công bố sản phẩm", nhom: "Pháp lý & Hồ sơ", bang: "pl_so_cong_bo", tieuDe: "san_pham_id", trangThai: "trang_thai",
     moTa: "Số công bố, cơ quan, ngày công bố và ngày hết hạn của từng sản phẩm. Báo trước 90 ngày khi sắp hết hạn. Mốc báo chờ luật sư xác nhận.",
     sapXep: { cot: "ngay_het_han" }, canhBao: { cot: "ngay_het_han", ngay: 90, nhan: "Sắp hết hạn công bố" }, trong: "Chưa ghi công bố nào.",
     cot: [
@@ -836,7 +838,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "so-hop-dong", ten: "Sổ hợp đồng", nhom: "Pháp lý & Hồ sơ", bang: "pl_so_hop_dong", tieuDe: "ten", trangThai: "trang_thai",
+    ma: "so-hop-dong", dinhKem: true, ten: "Sổ hợp đồng", nhom: "Pháp lý & Hồ sơ", bang: "pl_so_hop_dong", tieuDe: "ten", trangThai: "trang_thai",
     moTa: "Hợp đồng với nhà máy, đại lý, dịch vụ, mặt bằng, KOL/KOC: đối tác, ngày ký, ngày hết hạn, giá trị, người phụ trách. Hợp đồng gửi ra ngoài phải có chị Lâm đồng ý trước, ô đánh dấu để ghi nhận điều đó. Báo trước 45 ngày khi sắp hết hạn.",
     sapXep: { cot: "ngay_het_han" }, canhBao: { cot: "ngay_het_han", ngay: 45, nhan: "Sắp hết hạn" }, trong: "Chưa ghi hợp đồng nào.",
     nhomTheo: ["doi_tac_nhom", "lo_hang"], locTheo: ["doi_tac_nhom", "lo_hang", "loai_giay"],
@@ -963,7 +965,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "nha-cung-cap", ten: "Nhà cung cấp", nhom: "Tài chính & Kho", bang: "tc_nha_cung_cap", tieuDe: "ten", trangThai: "trang_thai",
+    ma: "nha-cung-cap", dinhKem: true, ten: "Nhà cung cấp", nhom: "Tài chính & Kho", bang: "tc_nha_cung_cap", tieuDe: "ten", trangThai: "trang_thai",
     moTa: "Danh sách nhà cung cấp hàng nhập (chủ yếu Hàn Quốc): liên hệ, điều khoản thanh toán. Lô hàng, phiếu nhập kho và công nợ chọn nhà cung cấp từ danh sách này.",
     sapXep: { cot: "ten" }, trong: "Chưa có nhà cung cấp nào.",
     cot: [
