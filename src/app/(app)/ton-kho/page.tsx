@@ -4,20 +4,24 @@ import Link from "next/link";
 import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { dbHr } from "@/lib/hr-db";
-import { tinhTonKho } from "@/lib/ton-kho";
+import { ngayVN } from "@/lib/dinh-dang";
+import { chenhLechKiemKe, tinhTonKho } from "@/lib/ton-kho";
 
 /** Tồn kho theo sản phẩm, tính từ phiếu nhập xuất. Không nhập tay. Chỉ Quản trị/Kỹ thuật. */
 export default async function TrangTonKho() {
   await yeuCauQuyenSo("Tài chính & Kho");
   const db = dbHr();
-  const [sp, nx] = await Promise.all([
+  const [sp, nx, kk] = await Promise.all([
     db.from("sp_san_pham").select("id, ma_sp, ten").limit(5000),
-    db.from("kho_nhap_xuat").select("san_pham_id, loai, so_luong").limit(100000),
+    db.from("kho_nhap_xuat").select("san_pham_id, loai, so_luong, ngay").limit(100000),
+    db.from("kho_kiem_ke").select("san_pham_id, ngay, ton_thuc_te").limit(100000),
   ]);
-  const ds = tinhTonKho(
-    ((sp.data ?? []) as { id: string; ma_sp: string; ten: string }[]).map((s) => ({ id: s.id, ma: s.ma_sp, ten: s.ten })),
-    ((nx.data ?? []) as { san_pham_id: string; loai: string; so_luong: number }[]).map((d) => ({ sanPhamId: d.san_pham_id, loai: d.loai, soLuong: d.so_luong })),
-  );
+  const dsSp = ((sp.data ?? []) as { id: string; ma_sp: string; ten: string }[]).map((s) => ({ id: s.id, ma: s.ma_sp, ten: s.ten }));
+  const dong = ((nx.data ?? []) as { san_pham_id: string; loai: string; so_luong: number; ngay: string }[]).map((d) => ({ sanPhamId: d.san_pham_id, loai: d.loai, soLuong: d.so_luong, ngay: d.ngay }));
+  const ds = tinhTonKho(dsSp, dong);
+  const tenSp = new Map(dsSp.map((s) => [s.id, `${s.ten} (${s.ma})`]));
+  const lech = chenhLechKiemKe(dong, ((kk.data ?? []) as { san_pham_id: string; ngay: string; ton_thuc_te: number }[]).map((k) => ({ sanPhamId: k.san_pham_id, ngay: k.ngay, thucTe: k.ton_thuc_te })));
+  const soLech = lech.filter((l) => l.chenh !== 0).length;
   const am = ds.filter((d) => d.ton < 0).length;
   return (
     <>
@@ -47,6 +51,31 @@ export default async function TrangTonKho() {
           </table>
         )}
       </section>
+      {lech.length > 0 && (
+        <section data-m="7" className="mau-nhom mt-8" aria-label="Kiểm kê gần nhất">
+          <div className="mb-3 flex flex-wrap items-center gap-3">
+            <h2 className="mau-chu text-[17px] font-semibold">Kiểm kê gần nhất</h2>
+            <span className="text-[13px] text-muc-3">{soLech > 0 ? `${soLech} sản phẩm lệch so với sổ` : "Tất cả khớp với sổ"} · chênh = đếm thực tế − sổ tính đến ngày kiểm kê</span>
+            <Link href="/hr/kiem-ke-kho" className="ml-auto text-[13px] font-medium text-nhan-dam underline-offset-4 hover:underline">Ghi kiểm kê</Link>
+          </div>
+          <div className="the-noi the-noi-thap mau-vach overflow-x-auto">
+            <table className="w-full min-w-[560px] text-[14px]">
+              <thead><tr className="text-left text-[12px] font-medium text-muc-3"><th className="px-4 py-3">Sản phẩm</th><th className="px-4 py-3">Ngày</th><th className="px-4 py-3 text-right">Sổ</th><th className="px-4 py-3 text-right">Đếm thực tế</th><th className="px-4 py-3 text-right">Chênh</th></tr></thead>
+              <tbody>
+                {lech.map((l) => (
+                  <tr key={l.sanPhamId} className="border-t border-vien">
+                    <td className="px-4 py-3 font-medium text-muc">{tenSp.get(l.sanPhamId) ?? "Sản phẩm đã xoá"}</td>
+                    <td className="px-4 py-3 text-muc-2">{ngayVN(l.ngay)}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{l.soSach}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{l.thucTe}</td>
+                    <td className={`px-4 py-3 text-right font-semibold tabular-nums ${l.chenh === 0 ? "text-muc-3" : "text-loi"}`}>{l.chenh > 0 ? "+" : ""}{l.chenh}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
     </>
   );
 }
