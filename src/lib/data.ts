@@ -769,6 +769,6 @@ export async function layViTriChamCong(): Promise<CauHinhViTri> {
   const { data, error } = await createAdminClient().from("vi_tri_cham_cong").select("ten, dia_chi, vi_do, kinh_do, ban_kinh_m, da_xac_nhan").eq("id", 1).maybeSingle();
   // Bảng chưa được tạo (migration 0011 chưa áp lên DB) = chưa khoá vị trí, để chấm công không hỏng. Mọi lỗi khác vẫn ném ra.
   if (error && !["42P01", "PGRST205"].includes(error.code)) throw error;
-  if (!data) return { ten: "Văn phòng", diaChi: "", viDo: 0, kinhDo: 0, banKinhM: 100, daXacNhan: false };
+  if (!data) return { ten: "Văn phòng", diaChi: "", viDo: 0, kinhDo: 0, banKinhM: 30, daXacNhan: false };
   return { ten: data.ten, diaChi: data.dia_chi, viDo: data.vi_do, kinhDo: data.kinh_do, banKinhM: data.ban_kinh_m, daXacNhan: data.da_xac_nhan };
 }

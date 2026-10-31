@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { khoangCachMet, kiemViTri, type CauHinhViTri } from "@/lib/dinh-vi";
+import { BAN_KINH_CHAM_CONG_M, khoangCachMet, kiemViTri, type CauHinhViTri } from "@/lib/dinh-vi";
 
 const VP: CauHinhViTri = { ten: "VP", diaChi: "x", viDo: 20.9555, kinhDo: 105.794, banKinhM: 100, daXacNhan: true };
 // 1 độ vĩ ≈ 111.195 m → 0,0009° ≈ 100,1 m về phía Bắc.
@@ -34,6 +34,12 @@ describe("kiemViTri", () => {
   it("chưa xác nhận vị trí văn phòng thì chưa chặn ai", () => {
     expect(kiemViTri({ ...VP, daXacNhan: false }, null)).toEqual({ ok: true, khoangCachM: null });
     expect(kiemViTri({ ...VP, daXacNhan: false }, lech(5000))).toEqual({ ok: true, khoangCachM: null });
+  });
+  it("bán kính quy định 30 m: 29 m vào được, 32 m và 60 m thì không", () => {
+    expect(BAN_KINH_CHAM_CONG_M).toBe(30);
+    expect(kiemViTri({ ...VP, banKinhM: 30 }, lech(29))).toMatchObject({ ok: true });
+    expect(kiemViTri({ ...VP, banKinhM: 30 }, lech(32))).toMatchObject({ ok: false, ngoaiVung: true });
+    expect(kiemViTri({ ...VP, banKinhM: 30 }, lech(60))).toMatchObject({ ok: false, ngoaiVung: true });
   });
   it("bán kính đổi được", () => {
     expect(kiemViTri({ ...VP, banKinhM: 300 }, lech(250))).toMatchObject({ ok: true });

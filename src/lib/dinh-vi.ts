@@ -3,6 +3,9 @@
 export type ToaDo = { viDo: number; kinhDo: number; doChinhXac: number | null };
 export type CauHinhViTri = { ten: string; diaChi: string; viDo: number; kinhDo: number; banKinhM: number; daXacNhan: boolean };
 
+/** Bán kính chấm công quanh văn phòng (mét): chị Lâm chốt 31/10/2026 = 30 m. Được ghi vào DB khi Quản trị chốt lại toạ độ văn phòng. */
+export const BAN_KINH_CHAM_CONG_M = 30;
+
 /** Độ chính xác GPS tối đa (mét) chấp nhận được; kém hơn thì không đủ tin để so với bán kính chấm công. */
 export const DO_CHINH_XAC_TOI_DA_M = 100;
 

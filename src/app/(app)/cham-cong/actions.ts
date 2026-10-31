@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { coVaiTro, layNguoiDungHienTai } from "@/lib/auth";
 import { layHoSoChamCong, ngayHomNayHCM, gioHienTaiHCM, layViTriChamCong } from "@/lib/data";
-import { kiemViTri, khoangCachMet, toaDoHopLe } from "@/lib/dinh-vi";
+import { BAN_KINH_CHAM_CONG_M, kiemViTri, khoangCachMet, toaDoHopLe } from "@/lib/dinh-vi";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { GIO_COI_LA_DI_MUON } from "@/lib/don-tu";
 
@@ -75,13 +75,13 @@ export async function chamCongRa(toaDo: unknown) {
   return {};
 }
 
-/** Chốt vị trí văn phòng = chỗ người bấm đang đứng (Quản trị/Kỹ thuật). Cần GPS đủ chính xác (≤ 50 m); chốt xong giữ nguyên bán kính đang cài (hiện 300 m). */
+/** Chốt vị trí văn phòng = chỗ người bấm đang đứng (Quản trị/Kỹ thuật). Cần GPS đủ chính xác (≤ 50 m); chốt xong bán kính chấm công về đúng 30 m (chị Lâm chốt 31/10/2026: GPS không quá 30 m). Hạ 30 m làm CÙNG LÚC với chốt toạ độ vì điểm cũ lệch văn phòng ~250 m: hạ trước thì cả công ty bị chặn. */
 export async function datViTriChamCong(toaDo: unknown): Promise<{ ok?: true; loi?: string }> {
   if (!(await coVaiTro(["admin", "ky_thuat"]))) return { loi: "Chỉ Quản trị và Kỹ thuật mới đặt được vị trí chấm công." };
   if (!toaDoHopLe(toaDo)) return { loi: "Chưa lấy được vị trí. Bật định vị (GPS) cho trình duyệt rồi thử lại." };
   if (toaDo.doChinhXac === null || toaDo.doChinhXac > 50) return { loi: `Định vị sai lệch ${toaDo.doChinhXac === null ? "chưa rõ" : `khoảng ${Math.round(toaDo.doChinhXac)} m`}, chưa đủ chính xác để chốt vị trí (cần ≤ 50 m). Ra chỗ thoáng hoặc bật "vị trí chính xác" rồi thử lại.` };
   const nguoi = await layNguoiDungHienTai();
-  const { error } = await createAdminClient().from("vi_tri_cham_cong").update({ vi_do: toaDo.viDo, kinh_do: toaDo.kinhDo, da_xac_nhan: true, cap_nhat_luc: new Date().toISOString(), cap_nhat_boi: nguoi?.id ?? null }).eq("id", 1);
+  const { error } = await createAdminClient().from("vi_tri_cham_cong").update({ vi_do: toaDo.viDo, kinh_do: toaDo.kinhDo, ban_kinh_m: BAN_KINH_CHAM_CONG_M, da_xac_nhan: true, cap_nhat_luc: new Date().toISOString(), cap_nhat_boi: nguoi?.id ?? null }).eq("id", 1);
   if (error) return { loi: "Chưa lưu được vị trí. Thử lại sau." };
   revalidatePath("/cham-cong");
   return { ok: true };

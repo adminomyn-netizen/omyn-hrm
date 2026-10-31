@@ -6,12 +6,12 @@ import { MapPin } from "lucide-react";
 import { datViTriChamCong, khoangCachToiVanPhong, tatKhoaViTri } from "@/app/(app)/cham-cong/actions";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { layToaDo } from "./layToaDo";
-import type { ToaDo } from "@/lib/dinh-vi";
+import { BAN_KINH_CHAM_CONG_M, type ToaDo } from "@/lib/dinh-vi";
 
 const NUT = "inline-flex h-10 items-center rounded-nho border border-vien-dam px-4 text-[14px] font-medium text-muc hover:bg-giay-tram disabled:opacity-60";
 const NUT_CHINH = "nut-vang inline-flex h-10 items-center rounded-nho px-4 text-[14px] disabled:opacity-60";
 
-/** Dành cho Quản trị/Kỹ thuật: đứng tại văn phòng bấm để chốt toạ độ thật; bán kính chỉ 100 m nên toạ độ ước lượng theo tên khu là chưa đủ. */
+/** Dành cho Quản trị/Kỹ thuật: đứng tại văn phòng bấm để chốt toạ độ thật; bán kính chỉ 30 m nên toạ độ ước lượng theo tên khu là chưa đủ. */
 export function DatViTriVanPhong({ ten, diaChi, banKinhM, daXacNhan }: { ten: string; diaChi: string; banKinhM: number; daXacNhan: boolean }) {
   const router = useRouter();
   const [dang, batDau] = useTransition();
@@ -49,6 +49,9 @@ export function DatViTriVanPhong({ ten, diaChi, banKinhM, daXacNhan }: { ten: st
           ? `Nhân viên chỉ chấm công vào/ra được khi đang ở trong phạm vi ${banKinhM} m quanh điểm đã đặt. Ngoài phạm vi phải nộp phiếu "Chấm công ngoài công ty".`
           : "Chưa có toạ độ chính xác của văn phòng nên hiện CHƯA chặn ai. Người đang đứng tại văn phòng bấm nút dưới đây để chốt vị trí; từ đó mới áp dụng khoá."}
       </p>
+      {daXacNhan && banKinhM > BAN_KINH_CHAM_CONG_M && (
+        <p className="mt-2 rounded-nho bg-canh-bao-nen px-3 py-2 text-[14px] text-canh-bao">Quy định là {BAN_KINH_CHAM_CONG_M} m. Điểm đang lưu lệch văn phòng nên tạm để {banKinhM} m. Người đang đứng tại văn phòng bấm &quot;Đặt vị trí = chỗ tôi đang đứng&quot; rồi &quot;Lưu làm vị trí văn phòng&quot; một lần để chốt lại đúng chỗ, bán kính sẽ về {BAN_KINH_CHAM_CONG_M} m.</p>
+      )}
       {cho ? (
         <div className="mt-4 rounded-nho border border-vien bg-giay-tram px-4 py-3 text-[14px]">
           <p>
