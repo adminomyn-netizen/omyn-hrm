@@ -12,17 +12,18 @@ export default async function TrangTonKho() {
   await yeuCauQuyenSo("Tài chính & Kho");
   const db = dbHr();
   const [sp, nx, kk] = await Promise.all([
-    db.from("sp_san_pham").select("id, ma_sp, ten").limit(5000),
+    db.from("sp_san_pham").select("id, ma_sp, ten, ton_toi_thieu").limit(5000),
     db.from("kho_nhap_xuat").select("san_pham_id, loai, so_luong, ngay").limit(100000),
     db.from("kho_kiem_ke").select("san_pham_id, ngay, ton_thuc_te").limit(100000),
   ]);
-  const dsSp = ((sp.data ?? []) as { id: string; ma_sp: string; ten: string }[]).map((s) => ({ id: s.id, ma: s.ma_sp, ten: s.ten }));
+  const dsSp = ((sp.data ?? []) as { id: string; ma_sp: string; ten: string; ton_toi_thieu: number | null }[]).map((s) => ({ id: s.id, ma: s.ma_sp, ten: s.ten, tonToiThieu: s.ton_toi_thieu }));
   const dong = ((nx.data ?? []) as { san_pham_id: string; loai: string; so_luong: number; ngay: string }[]).map((d) => ({ sanPhamId: d.san_pham_id, loai: d.loai, soLuong: d.so_luong, ngay: d.ngay }));
   const ds = tinhTonKho(dsSp, dong);
   const tenSp = new Map(dsSp.map((s) => [s.id, `${s.ten} (${s.ma})`]));
   const lech = chenhLechKiemKe(dong, ((kk.data ?? []) as { san_pham_id: string; ngay: string; ton_thuc_te: number }[]).map((k) => ({ sanPhamId: k.san_pham_id, ngay: k.ngay, thucTe: k.ton_thuc_te })));
   const soLech = lech.filter((l) => l.chenh !== 0).length;
   const am = ds.filter((d) => d.ton < 0).length;
+  const sapHet = ds.filter((d) => d.sapHet && d.ton >= 0).length;
   return (
     <>
       <TieuDeTrang tieuDe="Tồn kho" phu="Tồn của từng sản phẩm = nhập + điều chỉnh tăng − xuất − điều chỉnh giảm. Số lấy từ phiếu nhập xuất, không nhập tay.">
@@ -30,6 +31,9 @@ export default async function TrangTonKho() {
       </TieuDeTrang>
       {am > 0 && (
         <p role="alert" className="mb-4 rounded-nho bg-loi-nen px-3 py-2.5 text-[13px] text-loi">{am} sản phẩm đang tồn âm: xuất nhiều hơn nhập. Kiểm lại phiếu nhập xuất của các sản phẩm này.</p>
+      )}
+      {sapHet > 0 && (
+        <p role="status" className="mb-4 rounded-nho bg-giay-tram px-3 py-2.5 text-[13px] text-muc-2">{sapHet} sản phẩm sắp hết hàng (tồn bằng hoặc dưới mức tối thiểu, đánh dấu ở cột Tồn). Mức tối thiểu đặt ở màn Danh mục sản phẩm.</p>
       )}
       <section data-m="7" className="mau-nhom the-noi the-noi-thap mau-vach overflow-x-auto">
         {ds.length === 0 ? (
@@ -44,7 +48,7 @@ export default async function TrangTonKho() {
                   <td className="px-4 py-3 text-right tabular-nums">{d.nhap}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{d.xuat}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{d.dieuChinh > 0 ? "+" : ""}{d.dieuChinh}</td>
-                  <td className={`px-4 py-3 text-right font-semibold tabular-nums ${d.ton < 0 ? "text-loi" : "mau-chu"}`}>{d.ton}</td>
+                  <td className={`px-4 py-3 text-right font-semibold tabular-nums ${d.ton < 0 ? "text-loi" : "mau-chu"}`}>{d.ton}{d.sapHet && d.ton >= 0 ? <span className="ml-2 text-[12px] font-medium text-muc-3">sắp hết</span> : null}</td>
                 </tr>
               ))}
             </tbody>
