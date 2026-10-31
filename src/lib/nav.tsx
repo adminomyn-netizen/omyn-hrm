@@ -246,6 +246,14 @@ export const menuChinh: MucMenu[] = [
     moTa: "Mỗi chiến dịch: mục tiêu, thời gian, ngân sách, kết quả.",
   },
   {
+    ten: "Hiệu quả marketing",
+    duong_dan: "/marketing/hieu-qua",
+    nhom: "Marketing & Thương hiệu",
+    icon: TrendingUp,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Tổng chi quảng cáo và KOL trong tháng so với doanh thu, tự tính.",
+  },
+  {
     ten: "Chương trình khuyến mãi",
     duong_dan: "/hr/khuyen-mai",
     nhom: "Marketing & Thương hiệu",

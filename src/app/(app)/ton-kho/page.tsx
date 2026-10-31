@@ -3,24 +3,23 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
-import { dbHr } from "@/lib/hr-db";
+import { docTatCa } from "@/lib/hr-db";
 import { ngayVN } from "@/lib/dinh-dang";
 import { chenhLechKiemKe, tinhTonKho } from "@/lib/ton-kho";
 
 /** Tồn kho theo sản phẩm, tính từ phiếu nhập xuất. Không nhập tay. Chỉ Quản trị/Kỹ thuật. */
 export default async function TrangTonKho() {
   await yeuCauQuyenSo("Tài chính & Kho");
-  const db = dbHr();
   const [sp, nx, kk] = await Promise.all([
-    db.from("sp_san_pham").select("id, ma_sp, ten, ton_toi_thieu").limit(5000),
-    db.from("kho_nhap_xuat").select("san_pham_id, loai, so_luong, ngay").limit(100000),
-    db.from("kho_kiem_ke").select("san_pham_id, ngay, ton_thuc_te").limit(100000),
+    docTatCa<{ id: string; ma_sp: string; ten: string; ton_toi_thieu: number | null }>("sp_san_pham", "id, ma_sp, ten, ton_toi_thieu"),
+    docTatCa<{ san_pham_id: string; loai: string; so_luong: number; ngay: string }>("kho_nhap_xuat", "id, san_pham_id, loai, so_luong, ngay"),
+    docTatCa<{ san_pham_id: string; ngay: string; ton_thuc_te: number }>("kho_kiem_ke", "id, san_pham_id, ngay, ton_thuc_te"),
   ]);
-  const dsSp = ((sp.data ?? []) as { id: string; ma_sp: string; ten: string; ton_toi_thieu: number | null }[]).map((s) => ({ id: s.id, ma: s.ma_sp, ten: s.ten, tonToiThieu: s.ton_toi_thieu }));
-  const dong = ((nx.data ?? []) as { san_pham_id: string; loai: string; so_luong: number; ngay: string }[]).map((d) => ({ sanPhamId: d.san_pham_id, loai: d.loai, soLuong: d.so_luong, ngay: d.ngay }));
+  const dsSp = sp.map((s) => ({ id: s.id, ma: s.ma_sp, ten: s.ten, tonToiThieu: s.ton_toi_thieu }));
+  const dong = nx.map((d) => ({ sanPhamId: d.san_pham_id, loai: d.loai, soLuong: d.so_luong, ngay: d.ngay }));
   const ds = tinhTonKho(dsSp, dong);
   const tenSp = new Map(dsSp.map((s) => [s.id, `${s.ten} (${s.ma})`]));
-  const lech = chenhLechKiemKe(dong, ((kk.data ?? []) as { san_pham_id: string; ngay: string; ton_thuc_te: number }[]).map((k) => ({ sanPhamId: k.san_pham_id, ngay: k.ngay, thucTe: k.ton_thuc_te })));
+  const lech = chenhLechKiemKe(dong, kk.map((k) => ({ sanPhamId: k.san_pham_id, ngay: k.ngay, thucTe: k.ton_thuc_te })));
   const soLech = lech.filter((l) => l.chenh !== 0).length;
   const am = ds.filter((d) => d.ton < 0).length;
   const sapHet = ds.filter((d) => d.sapHet && d.ton >= 0).length;
