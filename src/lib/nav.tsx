@@ -903,6 +903,8 @@ export const CUM_TAB: readonly CumTab[] = [
   // Cụm 3: Hiệu suất.
   { ma: "bsc-cong-viec", ten: "Mục tiêu BSC và công việc", moTa: "Bản đồ chiến lược BSC, kế hoạch hành động cho từng chỉ số, và việc của bạn và của nhóm.", icon: Target, chinh: "/bsc", tabs: [{ ten: "Mục tiêu BSC", duong_dan: "/bsc" }, { ten: "Kế hoạch hành động", duong_dan: "/hr/bsc-ke-hoach-hanh-dong" }, { ten: "Công việc", duong_dan: "/cong-viec" }] },
   { ma: "kpi-thi-dua", ten: "KPI và thi đua", moTa: "Chấm KPI hằng ngày, xếp hạng thi đua, đánh giá hiệu suất theo kỳ và mức khen thưởng.", icon: Trophy, chinh: "/kpi", tabs: [{ ten: "KPI", duong_dan: "/kpi" }, { ten: "Đánh giá hiệu suất", duong_dan: "/danh-gia" }, { ten: "Khen thưởng thi đua", duong_dan: "/hr/kpi-thuong" }] },
+  // Cụm 4: Báo cáo HR. "Tổng hợp" (việc cần xử lý trong ngày) và "Báo cáo và biểu mẫu" (biểu mẫu, quy định hành chính nhân sự) làm việc khác nên không gộp.
+  { ma: "bao-cao-hr", ten: "Báo cáo HR", moTa: "10 nhóm chỉ số HR, biến động nhân sự 12 tháng và tỷ lệ nghỉ việc.", icon: FileBarChart, chinh: "/bao-cao-hr", tabs: [{ ten: "Chỉ số HR", duong_dan: "/bao-cao-hr" }, { ten: "Biến động nhân sự", duong_dan: "/bien-dong-nhan-su" }, { ten: "Tỷ lệ nghỉ việc", duong_dan: "/ty-le-nghi-viec" }] },
   { ma: "doanh-so", ten: "Chỉ tiêu và doanh số", moTa: "Doanh số tháng theo kênh tự tính, so với chỉ tiêu; nơi giao chỉ tiêu.", icon: TrendingUp, chinh: "/kinh-doanh/doanh-so", tabs: [{ ten: "Doanh số so chỉ tiêu", duong_dan: "/kinh-doanh/doanh-so" }, { ten: "Giao chỉ tiêu", duong_dan: "/hr/chi-tieu-doanh-so" }] },
 ];
 
