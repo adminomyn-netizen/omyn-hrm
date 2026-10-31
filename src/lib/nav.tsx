@@ -52,11 +52,13 @@ export type MucMenu = {
   phan?: number;
   /** Ẩn khỏi menu nhưng vẫn giữ trang (đường dẫn cũ còn chạy, dùng cho tiêu đề trang và tìm kiếm). */
   an?: boolean;
+  /** Mã cụm tab mà mục thuộc về (gán tự động từ CUM_TAB bên dưới, không khai tay). */
+  cum?: string;
 };
 
 const CHI_QUAN_LY: ("admin" | "ky_thuat")[] = ["admin", "ky_thuat"];
 
-export const menuChinh: MucMenu[] = [
+const menuGoc: MucMenu[] = [
   {
     ten: "Tổng quan",
     duong_dan: "/dashboard",
@@ -886,11 +888,56 @@ export const menuChinh: MucMenu[] = [
   },
 ];
 
+/** Cụm tab (chị Lâm chốt 31/10/2026): các màn chồng chéo gộp thành MỘT mục trong menu, trong trang có thanh tab chuyển giữa các màn.
+ * Mỗi màn vẫn là trang riêng với đường dẫn, dữ liệu và quyền cũ (mở thẳng đường dẫn cũ vẫn vào đúng màn). Tab chỉ hiện cho người đủ quyền với màn đó;
+ * mục menu của cụm dẫn tới màn đầu tiên người đó được xem. `tabs` theo thứ tự hiển thị; `chinh` là màn mà mục menu của cụm ngồi vào vị trí và nhóm của nó. */
+export type CumTab = { ma: string; ten: string; moTa: string; icon: LucideIcon; chinh: string; tabs: readonly { ten: string; duong_dan: string }[] };
+export const CUM_TAB: readonly CumTab[] = [
+  // Cụm 1: các cặp màn trùng nhau.
+  { ma: "lo-hang", ten: "Lô hàng", moTa: "Số lô và hạn dùng từng lô nhập; kiểm nghiệm, lưu mẫu và kết quả kiểm lô.", icon: CalendarDays, chinh: "/hr/lo-hang-han-dung", tabs: [{ ten: "Lô và hạn dùng", duong_dan: "/hr/lo-hang-han-dung" }, { ten: "Kiểm lô nhập", duong_dan: "/hr/kiem-lo-nhap" }] },
+  { ma: "dong-goi", ten: "Đóng gói và giao hàng", moTa: "Từng đơn đóng gói, vận chuyển, mã vận đơn và thống kê theo trạng thái, kênh, người đóng.", icon: Activity, chinh: "/hr/dong-goi-giao-hang", tabs: [{ ten: "Đơn đóng gói", duong_dan: "/hr/dong-goi-giao-hang" }, { ten: "Thống kê", duong_dan: "/kho/dong-goi" }] },
+  { ma: "cong-no-dai-ly", ten: "Công nợ đại lý", moTa: "Ghi phát sinh và đã thu của đại lý, khách sỉ; số dư, quá hạn, vượt hạn mức tự tính.", icon: Wallet, chinh: "/hr/cong-no-dai-ly", tabs: [{ ten: "Ghi công nợ", duong_dan: "/hr/cong-no-dai-ly" }, { ten: "Số dư", duong_dan: "/kinh-doanh/cong-no" }] },
+  { ma: "cong-no-ncc", ten: "Công nợ nhà cung cấp", moTa: "Ghi phải trả nhà cung cấp; số còn phải trả và quá hạn tự tính.", icon: PiggyBank, chinh: "/hr/cong-no-nha-cung-cap", tabs: [{ ten: "Ghi công nợ", duong_dan: "/hr/cong-no-nha-cung-cap" }, { ten: "Số dư phải trả", duong_dan: "/tai-chinh/cong-no-ncc" }] },
+  { ma: "doanh-so", ten: "Chỉ tiêu và doanh số", moTa: "Doanh số tháng theo kênh tự tính, so với chỉ tiêu; nơi giao chỉ tiêu.", icon: TrendingUp, chinh: "/kinh-doanh/doanh-so", tabs: [{ ten: "Doanh số so chỉ tiêu", duong_dan: "/kinh-doanh/doanh-so" }, { ten: "Giao chỉ tiêu", duong_dan: "/hr/chi-tieu-doanh-so" }] },
+];
+
+/** Một mục menu có thấy được với người này không (vai trò, hoặc được mở quyền theo khối). */
+const thayMuc = (m: MucMenu, vaiTro: VaiTro | null, duocMo?: readonly string[]) =>
+  !m.chiVaiTro || !!(vaiTro && m.chiVaiTro.includes(vaiTro)) || !!duocMo?.includes(m.duong_dan);
+
+/** Menu đầy đủ: mục `chinh` của mỗi cụm đổi tên thành tên cụm; các màn còn lại của cụm ẩn khỏi menu (vẫn chạy bằng đường dẫn cũ, vẫn có tab). */
+export const menuChinh: MucMenu[] = menuGoc.map((m) => {
+  const c = CUM_TAB.find((x) => x.tabs.some((t) => t.duong_dan === m.duong_dan));
+  if (!c) return m;
+  return c.chinh === m.duong_dan ? { ...m, ten: c.ten, moTa: c.moTa, icon: c.icon, cum: c.ma } : { ...m, an: true, cum: c.ma };
+});
+
+const mucTheoDuong = new Map(menuChinh.map((m) => [m.duong_dan, m]));
+
+/** Cụm mà một đường dẫn thuộc về: lấy mục menu khớp DÀI NHẤT trong toàn bộ menu (kể cả mục ẩn); "/hr" chỉ khớp đúng nó, không khớp mọi trang /hr/… */
+export function cumCuaDuongDan(pathname: string): CumTab | null {
+  let tot: MucMenu | null = null;
+  for (const m of menuChinh) {
+    const khop = pathname === m.duong_dan || (m.duong_dan !== "/hr" && pathname.startsWith(m.duong_dan + "/"));
+    if (khop && (tot === null || m.duong_dan.length > tot.duong_dan.length)) tot = m;
+  }
+  return tot?.cum ? (CUM_TAB.find((c) => c.ma === tot.cum) ?? null) : null;
+}
+
+/** Các tab của cụm mà người này được xem, đúng quyền của từng màn gốc. */
+export function tabCuaCum(c: CumTab, vaiTro: VaiTro | null, duocMo?: readonly string[]) {
+  return c.tabs.filter((t) => { const m = mucTheoDuong.get(t.duong_dan); return !!m && thayMuc(m, vaiTro, duocMo); });
+}
+
+
 /** Đường dẫn menu khớp trang hiện tại nhất (dài nhất): /ky-thuat/luong-phieu chỉ làm sáng "Setup luồng phiếu", không làm sáng cả "Kỹ thuật". */
 export function duongDanDangChon(
   pathname: string,
-  menu: readonly { duong_dan: string }[],
+  menu: readonly { duong_dan: string; cum?: string; an?: boolean }[],
 ): string | null {
+  const c = cumCuaDuongDan(pathname);
+  const mucCum = c && menu.find((m) => m.cum === c.ma && !m.an);
+  if (mucCum) return mucCum.duong_dan;
   let tot: string | null = null;
   for (const m of menu) {
     if (
@@ -908,12 +955,18 @@ export function locMenuTheoVaiTro(
   /** Đường dẫn nghiệp vụ nhân viên được mở theo khối (xem lib/quyen-nghiep-vu.ts); quản lý thì không cần. */
   duocMo?: readonly string[],
 ): MucMenu[] {
-  return menuChinh.filter(
-    (m) =>
-      !m.an &&
-      (!m.chiVaiTro || (vaiTro && m.chiVaiTro.includes(vaiTro)) || duocMo?.includes(m.duong_dan)) &&
-      !(boMucDiDong && m.chiDiDong),
-  );
+  return menuChinh
+    .filter((m) => {
+      if (m.an || (boMucDiDong && m.chiDiDong)) return false;
+      const c = m.cum ? CUM_TAB.find((x) => x.ma === m.cum) : undefined;
+      return c ? tabCuaCum(c, vaiTro, duocMo).length > 0 : thayMuc(m, vaiTro, duocMo);
+    })
+    .map((m) => {
+      // Mục cụm dẫn tới màn đầu tiên người này được xem (nhân viên và quản lý có thể vào cụm bằng màn khác nhau).
+      const c = m.cum ? CUM_TAB.find((x) => x.ma === m.cum) : undefined;
+      const dau = c && tabCuaCum(c, vaiTro, duocMo)[0];
+      return dau ? { ...m, duong_dan: dau.duong_dan } : m;
+    });
 }
 
 /** Gom mục menu theo nhóm, giữ thứ tự xuất hiện đầu tiên của nhóm. */
