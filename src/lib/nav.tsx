@@ -334,6 +334,14 @@ export const menuChinh: MucMenu[] = [
     moTa: "Số dư, quá hạn, vượt hạn mức của từng đại lý, khách sỉ.",
   },
   {
+    ten: "Doanh số theo người",
+    duong_dan: "/kinh-doanh/theo-nguoi",
+    nhom: "Kinh doanh",
+    icon: Users,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Doanh số tháng của từng người: sàn, sỉ, live, cơ hội chốt.",
+  },
+  {
     ten: "Doanh thu sàn theo ngày",
     duong_dan: "/hr/doanh-thu-ngay",
     nhom: "Kinh doanh",
@@ -468,6 +476,14 @@ export const menuChinh: MucMenu[] = [
     icon: ClipboardCheck,
     chiVaiTro: CHI_QUAN_LY,
     moTa: "Đếm thực tế từng sản phẩm, đối chiếu với tồn trên sổ.",
+  },
+  {
+    ten: "Số dư phải trả nhà cung cấp",
+    duong_dan: "/tai-chinh/cong-no-ncc",
+    nhom: "Tài chính & Kho",
+    icon: PiggyBank,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Còn phải trả và quá hạn của từng nhà cung cấp, tự tính.",
   },
   {
     ten: "Lô hàng và hạn sử dụng",
