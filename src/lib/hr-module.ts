@@ -844,6 +844,19 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
+    ma: "kiem-ke-kho", ten: "Kiểm kê kho", nhom: "Tài chính & Kho", bang: "kho_kiem_ke", tieuDe: "san_pham_id", trangThai: "trang_thai",
+    moTa: "Mỗi lần đếm thực tế một sản phẩm là một dòng: ngày, số đếm được, người kiểm. Chênh lệch so với sổ tự tính ở màn Tồn kho; lệch thì ghi phiếu điều chỉnh rồi đổi trạng thái.",
+    sapXep: { cot: "ngay", giam: true }, trong: "Chưa kiểm kê lần nào. Thêm sản phẩm ở màn Danh mục sản phẩm trước.",
+    cot: [
+      { k: "ngay", nhan: "Ngày kiểm kê", kieu: "ngay", batBuoc: true, the: true },
+      { k: "san_pham_id", nhan: "Sản phẩm", kieu: "tc", bangTc: "sp_san_pham", batBuoc: true, the: true },
+      { k: "ton_thuc_te", nhan: "Số đếm thực tế", kieu: "so", batBuoc: true, mac: 0, khoang: [0, 10000000], the: true },
+      { k: "nguoi_kiem_id", nhan: "Người kiểm", kieu: "nv", the: true },
+      { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Chờ xử lý chênh lệch", "Đã điều chỉnh", "Khớp"], mac: "Chờ xử lý chênh lệch" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
     ma: "dong-goi-giao-hang", ten: "Đóng gói và giao hàng", nhom: "Tài chính & Kho", bang: "kho_dong_goi_giao", tieuDe: "ma_don", trangThai: "trang_thai",
     moTa: "Từng đơn đóng gói: mã đơn, kênh, người đóng, đơn vị vận chuyển, mã vận đơn, đã giao hay hoàn trả.",
     sapXep: { cot: "ngay", giam: true }, trong: "Chưa có đơn nào.",

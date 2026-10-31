@@ -438,6 +438,14 @@ export const menuChinh: MucMenu[] = [
     moTa: "Tồn từng sản phẩm tự tính từ phiếu nhập xuất.",
   },
   {
+    ten: "Kiểm kê kho",
+    duong_dan: "/hr/kiem-ke-kho",
+    nhom: "Tài chính & Kho",
+    icon: ClipboardCheck,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Đếm thực tế từng sản phẩm, đối chiếu với tồn trên sổ.",
+  },
+  {
     ten: "Đóng gói và giao hàng",
     duong_dan: "/hr/dong-goi-giao-hang",
     nhom: "Tài chính & Kho",
