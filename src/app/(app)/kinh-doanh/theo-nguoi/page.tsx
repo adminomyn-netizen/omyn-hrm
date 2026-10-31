@@ -6,6 +6,7 @@ import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { docTatCa } from "@/lib/hr-db";
 import { tienVN } from "@/lib/dinh-dang";
 import { ngayChotCuaCoHoi, tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
+import { docDoanhThuSan } from "@/lib/kinh-doanh-data";
 
 const THANG = /^\d{4}-(0[1-9]|1[0-2])$/;
 const thangKe = (t: string, n: number) => new Date(Date.UTC(Number(t.slice(0, 4)), Number(t.slice(5)) - 1 + n, 1)).toISOString().slice(0, 7);
@@ -17,25 +18,30 @@ export default async function TrangDoanhSoTheoNguoi({ searchParams }: { searchPa
   const thang = t && THANG.test(t) ? t : new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }).slice(0, 7);
   const dau = `${thang}-01`;
   const cuoi = `${thangKe(thang, 1)}-01`;
-  const [nv, gh, san, si, live, ch] = await Promise.all([
+  const [nv, san, si, live, ch] = await Promise.all([
     docTatCa<{ id: string; ho_ten: string }>("nhan_vien", "id, ho_ten"),
-    docTatCa<{ id: string; nguoi_van_hanh_id: string | null }>("kd_gian_hang", "id, nguoi_van_hanh_id"),
-    docTatCa<{ gian_hang_id: string; doanh_thu: number | null; doanh_thu_hoan: number | null }>("kd_doanh_thu_ngay", "id, gian_hang_id, doanh_thu, doanh_thu_hoan", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
+    docDoanhThuSan(dau, cuoi),
     docTatCa<{ nguoi_phu_trach_id: string | null; trang_thai: string; gia_tri: number }>("kd_don_si", "id, nguoi_phu_trach_id, trang_thai, gia_tri", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
     docTatCa<{ host_id: string | null; doanh_thu: number | null }>("kd_phien_live", "id, host_id, doanh_thu", (q) => q.eq("trang_thai", "Đã live").gte("ngay", dau).lt("ngay", cuoi)),
     docTatCa<{ nguoi_phu_trach_id: string | null; giai_doan: string; ngay_chot: string | null; tao_luc: string }>("kd_co_hoi", "id, nguoi_phu_trach_id, giai_doan, ngay_chot, tao_luc", (q) => q.eq("giai_doan", "Đã chốt")),
   ]);
-  const vanHanh = new Map(gh.map((g) => [g.id, g.nguoi_van_hanh_id]));
+  const vanHanh = new Map(san.gianHang.map((g) => [g.id, g.nguoi_van_hanh_id]));
+  // Số Shopee tự kéo về không có gian hàng của hệ thống: chỉ gán được cho người vận hành khi có đúng MỘT gian hàng Shopee.
+  const shopee = san.gianHang.filter((g) => g.nen_tang === "Shopee");
+  const sanTheoGianHang = [
+    ...san.dongTay.filter((d) => !(d.nenTang === "Shopee" && san.ngayShopeeKeo.has(d.ngay))).map((s) => ({ nguoiVanHanhId: vanHanh.get(s.gianHangId) ?? null, doanhThu: s.doanhThu, hoan: s.hoan })),
+    ...(shopee.length === 1 && san.shopeeKeoTong > 0 ? [{ nguoiVanHanhId: shopee[0].nguoi_van_hanh_id, doanhThu: san.shopeeKeoTong, hoan: 0 }] : []),
+  ];
   const ds = tinhDoanhSoTheoNguoi({
     ten: new Map(nv.map((n) => [n.id, n.ho_ten])),
-    sanTheoGianHang: san.map((s) => ({ nguoiVanHanhId: vanHanh.get(s.gian_hang_id) ?? null, doanhThu: s.doanh_thu ?? 0, hoan: s.doanh_thu_hoan ?? 0 })),
+    sanTheoGianHang,
     donSi: si.map((o) => ({ nguoiId: o.nguoi_phu_trach_id, trangThai: o.trang_thai, giaTri: o.gia_tri })),
     live: live.map((l) => ({ hostId: l.host_id, doanhThu: l.doanh_thu ?? 0 })),
     coHoi: ch.filter((c) => { const n = ngayChotCuaCoHoi(c.ngay_chot, c.tao_luc); return n >= dau && n < cuoi; }).map((c) => ({ nguoiId: c.nguoi_phu_trach_id, giaiDoan: c.giai_doan })),
   });
   return (
     <>
-      <TieuDeTrang tieuDe="Doanh số theo người" phu="Sàn: doanh thu (trừ hoàn) các gian hàng người đó vận hành. Sỉ: đơn đã chốt trở đi người đó phụ trách. Live: phiên người đó làm host. Không cộng các cột vì live bán qua sàn đã nằm trong cột Sàn. Cơ hội chốt tính theo ngày chốt (chưa điền thì lấy ngày tạo cơ hội). Số tự tính, dùng để đối chiếu KPI và hoa hồng.">
+      <TieuDeTrang tieuDe="Doanh số theo người" phu="Sàn: doanh thu (trừ hoàn) các gian hàng người đó vận hành, gồm cả số Shopee tự kéo về khi chỉ có một gian hàng Shopee. Sỉ: đơn đã chốt trở đi người đó phụ trách. Live: phiên người đó làm host. Không cộng các cột vì live bán qua sàn đã nằm trong cột Sàn. Cơ hội chốt tính theo ngày chốt (chưa điền thì lấy ngày tạo cơ hội). Số tự tính, dùng để đối chiếu KPI và hoa hồng.">
         <Link href="/kinh-doanh/doanh-so" className="nut-vang rounded-nho px-3.5 py-2 text-[14px] font-medium">Doanh số so chỉ tiêu</Link>
       </TieuDeTrang>
       <nav aria-label="Chọn tháng" className="mb-5 flex items-center gap-3 text-[14px]">

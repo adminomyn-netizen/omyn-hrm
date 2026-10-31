@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
+import { gopDoanhThuSan, ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
 
 describe("công nợ đại lý", () => {
   it("số dư, vượt hạn mức, quá hạn theo thứ tự trừ khoản cũ nhất trước", () => {
@@ -75,5 +75,27 @@ describe("ngày chốt của cơ hội", () => {
   it("dùng ngày chốt nếu có, không thì ngày tạo theo giờ Việt Nam", () => {
     expect(ngayChotCuaCoHoi("2026-10-15", "2026-09-01T10:00:00Z")).toBe("2026-10-15");
     expect(ngayChotCuaCoHoi(null, "2026-09-30T18:00:00Z")).toBe("2026-10-01");
+  });
+});
+
+describe("doanh thu sàn 3 nguồn", () => {
+  const tay = [
+    { ngay: "2026-10-01", nenTang: "Shopee", doanhThu: 100, hoan: 10 },
+    { ngay: "2026-10-02", nenTang: "Shopee", doanhThu: 50, hoan: 0 },
+    { ngay: "2026-10-01", nenTang: "TikTok Shop", doanhThu: 30, hoan: 5 },
+    { ngay: "2026-10-01", nenTang: "Facebook", doanhThu: 20, hoan: 0 },
+  ];
+  it("chưa có số Shopee tự kéo thì dùng hết số nhập tay, đủ 3 nguồn", () => {
+    const { theoNguon } = gopDoanhThuSan(tay, []);
+    expect(theoNguon.map((x) => x.nguon)).toEqual(["Shopee", "TikTok Shop", "Facebook"]);
+    expect(theoNguon[0]).toMatchObject({ doanhThu: 150, hoan: 10, rong: 140, tuKeo: false });
+    expect(theoNguon[1].rong).toBe(25);
+  });
+  it("ngày Shopee đã kéo về thì số tự kéo thay số nhập tay ngày đó; ngày chưa kéo giữ số nhập tay; nguồn khác không đổi", () => {
+    const { theoNguon, ngayShopeeKeo } = gopDoanhThuSan(tay, [{ ngay: "2026-10-01", doanhThu: 120, soDon: 3 }, { ngay: "2026-10-03", doanhThu: 0, soDon: 0 }]);
+    expect([...ngayShopeeKeo]).toEqual(["2026-10-01"]);
+    expect(theoNguon[0]).toMatchObject({ doanhThu: 170, hoan: 0, rong: 170, tuKeo: true });
+    expect(theoNguon[1].rong).toBe(25);
+    expect(theoNguon[2].rong).toBe(20);
   });
 });

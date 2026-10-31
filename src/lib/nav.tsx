@@ -486,6 +486,14 @@ export const menuChinh: MucMenu[] = [
     moTa: "Đếm thực tế từng sản phẩm, đối chiếu với tồn trên sổ.",
   },
   {
+    ten: "Nhà cung cấp",
+    duong_dan: "/hr/nha-cung-cap",
+    nhom: "Tài chính & Kho",
+    icon: Building2,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Danh sách nhà cung cấp hàng nhập, chủ yếu Hàn Quốc.",
+  },
+  {
     ten: "Số dư phải trả nhà cung cấp",
     duong_dan: "/tai-chinh/cong-no-ncc",
     nhom: "Tài chính & Kho",

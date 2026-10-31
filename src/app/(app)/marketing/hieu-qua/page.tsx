@@ -6,6 +6,7 @@ import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { docTatCa } from "@/lib/hr-db";
 import { tienVN } from "@/lib/dinh-dang";
 import { tinhDoanhSo } from "@/lib/kinh-doanh";
+import { docDoanhThuSan } from "@/lib/kinh-doanh-data";
 import { tinhHieuQuaMkt } from "@/lib/hieu-qua-mkt";
 
 const THANG = /^\d{4}-(0[1-9]|1[0-2])$/;
@@ -26,10 +27,10 @@ export default async function TrangHieuQuaMkt({ searchParams }: { searchParams: 
     docTatCa<Record<string, number>>("qc_shopee_so_lieu_ngay", "chi_phi_qc", trongThang, ["ngay", "gian_hang_id"]),
     docTatCa<Record<string, number>>("mkt_kol_koc", "id, chi_phi_thuc_te", (q) => q.in("trang_thai", ["Đã đăng", "Đã nghiệm thu", "Đã thanh toán"]).gte("ngay_dang", dau).lt("ngay_dang", cuoi)),
     docTatCa<Record<string, number>>("mkt_ngan_sach_qc", "id, ngan_sach_duyet", (q) => q.eq("thang", dau).in("trang_thai", ["Đã duyệt", "Đã quyết toán"])),
-    docTatCa<Record<string, number | null>>("kd_doanh_thu_ngay", "id, doanh_thu, doanh_thu_hoan", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
+    docDoanhThuSan(dau, cuoi),
     docTatCa<{ trang_thai: string; gia_tri: number }>("kd_don_si", "id, trang_thai, gia_tri", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
   ]);
-  const doanhThu = tinhDoanhSo([], tong(san, "doanh_thu"), tong(san, "doanh_thu_hoan"), si.map((d) => ({ trangThai: d.trang_thai, giaTri: d.gia_tri })), 0).find((k) => k.kenh === "Tổng")?.thucDat ?? 0;
+  const doanhThu = tinhDoanhSo([], san.tongRong, 0, si.map((d) => ({ trangThai: d.trang_thai, giaTri: d.gia_tri })), 0).find((k) => k.kenh === "Tổng")?.thucDat ?? 0;
   const r = tinhHieuQuaMkt({ chiMeta: tong(meta, "chi_tieu"), chiTikTok: tong(tiktok, "chi_tieu"), chiShopee: tong(shopee, "chi_phi_qc"), chiKol: tong(kol, "chi_phi_thuc_te"), nganSachDuyet: tong(ns, "ngan_sach_duyet"), doanhThu });
   const dong = [
     ["Quảng cáo Facebook, Instagram", r.chiMeta],

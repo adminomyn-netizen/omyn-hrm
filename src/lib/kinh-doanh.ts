@@ -76,3 +76,26 @@ export function tinhDoanhSoTheoNguoi(d: {
 /** Ngày tính một cơ hội đã chốt vào tháng nào: ngày chốt nếu đã điền, chưa điền thì ngày tạo cơ hội (giờ Việt Nam). */
 export const ngayChotCuaCoHoi = (ngayChot: string | null, taoLuc: string): string =>
   ngayChot ?? new Date(taoLuc).toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
+
+/** Ba nguồn doanh thu sàn của Omyn (chị Lâm chốt). */
+export const NGUON_SAN = ["Shopee", "TikTok Shop", "Facebook"] as const;
+export type DongSanTay = { ngay: string; nenTang: string; doanhThu: number; hoan: number };
+export type DongShopeeKeo = { ngay: string; doanhThu: number; soDon: number };
+export type SanTheoNguon = { nguon: string; doanhThu: number; hoan: number; rong: number; tuKeo: boolean };
+
+/** Doanh thu sàn theo 3 nguồn. Shopee: ngày nào đã có số tự kéo về (có đơn hoặc có doanh thu) thì dùng số đó và bỏ số nhập tay của các gian hàng Shopee ngày ấy; ngày chưa có thì dùng số nhập tay.
+ * Số Shopee tự kéo về chưa tách được tiền hoàn nên tính hoàn = 0. TikTok Shop và Facebook chỉ có số nhập tay. `ngayShopeeKeo` là các ngày đã dùng số tự kéo, để màn khác loại đúng các dòng nhập tay. */
+export function gopDoanhThuSan(tay: readonly DongSanTay[], shopeeKeo: readonly DongShopeeKeo[]): { theoNguon: SanTheoNguon[]; ngayShopeeKeo: Set<string> } {
+  const ngayShopeeKeo = new Set(shopeeKeo.filter((d) => d.doanhThu > 0 || d.soDon > 0).map((d) => d.ngay));
+  const ra = new Map<string, SanTheoNguon>(NGUON_SAN.map((n) => [n, { nguon: n, doanhThu: 0, hoan: 0, rong: 0, tuKeo: false }]));
+  const lay = (n: string) => { let r = ra.get(n); if (!r) { r = { nguon: n, doanhThu: 0, hoan: 0, rong: 0, tuKeo: false }; ra.set(n, r); } return r; };
+  for (const d of tay) {
+    if (d.nenTang === "Shopee" && ngayShopeeKeo.has(d.ngay)) continue;
+    const r = lay(d.nenTang);
+    r.doanhThu += d.doanhThu; r.hoan += d.hoan;
+  }
+  const sp = lay("Shopee");
+  for (const d of shopeeKeo) if (ngayShopeeKeo.has(d.ngay)) { sp.doanhThu += d.doanhThu; sp.tuKeo = true; }
+  const theoNguon = [...ra.values()].map((r) => ({ ...r, rong: Math.max(0, r.doanhThu - r.hoan) }));
+  return { theoNguon, ngayShopeeKeo };
+}

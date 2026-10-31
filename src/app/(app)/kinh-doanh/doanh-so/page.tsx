@@ -6,6 +6,7 @@ import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { dbHr, docTatCa } from "@/lib/hr-db";
 import { tienVN } from "@/lib/dinh-dang";
 import { tinhDoanhSo } from "@/lib/kinh-doanh";
+import { docDoanhThuSan } from "@/lib/kinh-doanh-data";
 
 const THANG = /^\d{4}-(0[1-9]|1[0-2])$/;
 const thangKe = (t: string, n: number) => {
@@ -24,15 +25,15 @@ export default async function TrangDoanhSo({ searchParams }: { searchParams: Pro
   const db = dbHr();
   const [ct, san, si, live] = await Promise.all([
     db.from("kd_chi_tieu").select("kenh, chi_tieu").eq("thang", dau),
-    docTatCa<Record<string, number | null>>("kd_doanh_thu_ngay", "id, doanh_thu, doanh_thu_hoan", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
+    docDoanhThuSan(dau, cuoi),
     docTatCa<{ trang_thai: string; gia_tri: number }>("kd_don_si", "id, trang_thai, gia_tri", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
     docTatCa<Record<string, number | null>>("kd_phien_live", "id, doanh_thu", (q) => q.eq("trang_thai", "Đã live").gte("ngay", dau).lt("ngay", cuoi)),
   ]);
   const tong = (r: Record<string, number | null>[], c: string) => r.reduce((a, d) => a + (d[c] ?? 0), 0);
   const kq = tinhDoanhSo(
     ((ct.data ?? []) as { kenh: string; chi_tieu: number }[]).map((c) => ({ kenh: c.kenh, chiTieu: c.chi_tieu })),
-    tong(san, "doanh_thu"),
-    tong(san, "doanh_thu_hoan"),
+    san.tongRong,
+    0,
     si.map((d) => ({ trangThai: d.trang_thai, giaTri: d.gia_tri })),
     tong(live, "doanh_thu"),
   );
@@ -55,6 +56,21 @@ export default async function TrangDoanhSo({ searchParams }: { searchParams: Pro
           </li>
         ))}
       </ul>
+      <section data-m="1" className="mau-nhom mt-8" aria-label="Doanh thu sàn theo nguồn">
+        <h2 className="mau-chu mb-1 text-[17px] font-semibold">Doanh thu sàn theo nguồn</h2>
+        <p className="mb-3 text-[13px] text-muc-3">
+          {san.shopeeDaNoi ? "Shopee đã nối API: ngày nào đã kéo về thì dùng số tự kéo." : "Shopee chưa nối API (chưa khai khoá): đang dùng số nhập tay. Khi nối xong, số tự kéo về sẽ thay số nhập tay theo từng ngày."} TikTok Shop và Facebook nhập tay ở màn Doanh thu sàn theo ngày.
+        </p>
+        <ul className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+          {san.theoNguon.map((n) => (
+            <li key={n.nguon} className="the-noi mau-vach mau-nen rounded-nho p-4">
+              <div className="text-[13px] font-medium text-muc-2">{n.nguon}</div>
+              <div className="chu-tieu-de mau-chu mt-1 text-[22px] leading-none">{tienVN(n.rong)}</div>
+              <div className="mt-2 text-[13px] text-muc-3">{n.tuKeo ? "Có số tự kéo về" : n.rong > 0 || n.hoan > 0 ? "Nhập tay" : "Chưa có số"}</div>
+            </li>
+          ))}
+        </ul>
+      </section>
     </>
   );
 }
