@@ -72,3 +72,7 @@ export function tinhDoanhSoTheoNguoi(d: {
   for (const c of d.coHoi) { const r = lay(c.nguoiId); if (r && c.giaiDoan === "Đã chốt") r.coHoiChot += 1; }
   return [...ra.values()].filter((r) => r.san || r.si || r.live || r.coHoiChot).sort((a, b) => b.san + b.si - (a.san + a.si));
 }
+
+/** Ngày tính một cơ hội đã chốt vào tháng nào: ngày chốt nếu đã điền, chưa điền thì ngày tạo cơ hội (giờ Việt Nam). */
+export const ngayChotCuaCoHoi = (ngayChot: string | null, taoLuc: string): string =>
+  ngayChot ?? new Date(taoLuc).toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
