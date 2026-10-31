@@ -5,7 +5,7 @@ import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { docTatCa } from "@/lib/hr-db";
 import { tienVN } from "@/lib/dinh-dang";
-import { tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
+import { ngayChotCuaCoHoi, tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
 
 const THANG = /^\d{4}-(0[1-9]|1[0-2])$/;
 const thangKe = (t: string, n: number) => new Date(Date.UTC(Number(t.slice(0, 4)), Number(t.slice(5)) - 1 + n, 1)).toISOString().slice(0, 7);
@@ -23,7 +23,7 @@ export default async function TrangDoanhSoTheoNguoi({ searchParams }: { searchPa
     docTatCa<{ gian_hang_id: string; doanh_thu: number | null; doanh_thu_hoan: number | null }>("kd_doanh_thu_ngay", "id, gian_hang_id, doanh_thu, doanh_thu_hoan", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
     docTatCa<{ nguoi_phu_trach_id: string | null; trang_thai: string; gia_tri: number }>("kd_don_si", "id, nguoi_phu_trach_id, trang_thai, gia_tri", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
     docTatCa<{ host_id: string | null; doanh_thu: number | null }>("kd_phien_live", "id, host_id, doanh_thu", (q) => q.eq("trang_thai", "Đã live").gte("ngay", dau).lt("ngay", cuoi)),
-    docTatCa<{ nguoi_phu_trach_id: string | null; giai_doan: string }>("kd_co_hoi", "id, nguoi_phu_trach_id, giai_doan", (q) => q.eq("giai_doan", "Đã chốt").gte("tao_luc", `${dau}T00:00:00+07:00`).lt("tao_luc", `${cuoi}T00:00:00+07:00`)),
+    docTatCa<{ nguoi_phu_trach_id: string | null; giai_doan: string; ngay_chot: string | null; tao_luc: string }>("kd_co_hoi", "id, nguoi_phu_trach_id, giai_doan, ngay_chot, tao_luc", (q) => q.eq("giai_doan", "Đã chốt")),
   ]);
   const vanHanh = new Map(gh.map((g) => [g.id, g.nguoi_van_hanh_id]));
   const ds = tinhDoanhSoTheoNguoi({
@@ -31,11 +31,11 @@ export default async function TrangDoanhSoTheoNguoi({ searchParams }: { searchPa
     sanTheoGianHang: san.map((s) => ({ nguoiVanHanhId: vanHanh.get(s.gian_hang_id) ?? null, doanhThu: s.doanh_thu ?? 0, hoan: s.doanh_thu_hoan ?? 0 })),
     donSi: si.map((o) => ({ nguoiId: o.nguoi_phu_trach_id, trangThai: o.trang_thai, giaTri: o.gia_tri })),
     live: live.map((l) => ({ hostId: l.host_id, doanhThu: l.doanh_thu ?? 0 })),
-    coHoi: ch.map((c) => ({ nguoiId: c.nguoi_phu_trach_id, giaiDoan: c.giai_doan })),
+    coHoi: ch.filter((c) => { const n = ngayChotCuaCoHoi(c.ngay_chot, c.tao_luc); return n >= dau && n < cuoi; }).map((c) => ({ nguoiId: c.nguoi_phu_trach_id, giaiDoan: c.giai_doan })),
   });
   return (
     <>
-      <TieuDeTrang tieuDe="Doanh số theo người" phu="Sàn: doanh thu (trừ hoàn) các gian hàng người đó vận hành. Sỉ: đơn đã chốt trở đi người đó phụ trách. Live: phiên người đó làm host. Không cộng các cột vì live bán qua sàn đã nằm trong cột Sàn. Cơ hội chốt tính theo tháng tạo cơ hội (sổ chưa ghi ngày chốt). Số tự tính, dùng để đối chiếu KPI và hoa hồng.">
+      <TieuDeTrang tieuDe="Doanh số theo người" phu="Sàn: doanh thu (trừ hoàn) các gian hàng người đó vận hành. Sỉ: đơn đã chốt trở đi người đó phụ trách. Live: phiên người đó làm host. Không cộng các cột vì live bán qua sàn đã nằm trong cột Sàn. Cơ hội chốt tính theo ngày chốt (chưa điền thì lấy ngày tạo cơ hội). Số tự tính, dùng để đối chiếu KPI và hoa hồng.">
         <Link href="/kinh-doanh/doanh-so" className="nut-vang rounded-nho px-3.5 py-2 text-[14px] font-medium">Doanh số so chỉ tiêu</Link>
       </TieuDeTrang>
       <nav aria-label="Chọn tháng" className="mb-5 flex items-center gap-3 text-[14px]">

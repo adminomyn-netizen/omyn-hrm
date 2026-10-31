@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
+import { ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
 
 describe("công nợ đại lý", () => {
   it("số dư, vượt hạn mức, quá hạn theo thứ tự trừ khoản cũ nhất trước", () => {
@@ -68,5 +68,12 @@ describe("doanh số theo người", () => {
     expect(r.map((x) => x.nguoiId)).toEqual(["n1", "n2"]);
     expect(r[0]).toMatchObject({ san: 90, si: 0, live: 30, soDonSi: 0 });
     expect(r[1]).toMatchObject({ san: 0, si: 50, soDonSi: 1, coHoiChot: 1 });
+  });
+});
+
+describe("ngày chốt của cơ hội", () => {
+  it("dùng ngày chốt nếu có, không thì ngày tạo theo giờ Việt Nam", () => {
+    expect(ngayChotCuaCoHoi("2026-10-15", "2026-09-01T10:00:00Z")).toBe("2026-10-15");
+    expect(ngayChotCuaCoHoi(null, "2026-09-30T18:00:00Z")).toBe("2026-10-01");
   });
 });

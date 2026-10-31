@@ -692,7 +692,7 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "co-hoi-khach-si", ten: "Cơ hội khách sỉ", nhom: "Kinh doanh", bang: "kd_co_hoi", tieuDe: "ten_khach", trangThai: "giai_doan",
-    moTa: "Khách sỉ, đại lý tiềm năng từ lần liên hệ đầu tới khi chốt hoặc mất: nguồn, nhu cầu, giá trị dự kiến, ngày liên hệ tiếp. Báo trước 2 ngày khi tới hẹn liên hệ. Chốt xong thì thêm vào màn Đại lý và khách sỉ.",
+    moTa: "Khách sỉ, đại lý tiềm năng từ lần liên hệ đầu tới khi chốt hoặc mất: nguồn, nhu cầu, giá trị dự kiến, ngày liên hệ tiếp. Báo trước 2 ngày khi tới hẹn liên hệ. Chốt xong thì điền ngày chốt (doanh số theo người tính theo ngày này) và thêm vào màn Đại lý và khách sỉ.",
     sapXep: { cot: "tao_luc", giam: true }, canhBao: { cot: "lien_he_tiep", ngay: 2, nhan: "Sắp tới hẹn liên hệ" }, trong: "Chưa có cơ hội nào.",
     cot: [
       { k: "ten_khach", nhan: "Tên khách", kieu: "chu", batBuoc: true },
@@ -702,6 +702,7 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "gia_tri_du_kien", nhan: "Giá trị dự kiến (đ)", kieu: "tien", coTheTrong: true, the: true },
       { k: "giai_doan", nhan: "Giai đoạn", kieu: "chon", luaChon: ["Mới", "Đã liên hệ", "Đã báo giá", "Thương lượng", "Đã chốt", "Mất"], mac: "Mới" },
       { k: "lien_he_tiep", nhan: "Liên hệ tiếp ngày", kieu: "ngay", the: true },
+      { k: "ngay_chot", nhan: "Ngày chốt (điền khi giai đoạn là Đã chốt)", kieu: "ngay", the: true },
       { k: "nguoi_phu_trach_id", nhan: "Người phụ trách", kieu: "nv" },
       { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
     ],
