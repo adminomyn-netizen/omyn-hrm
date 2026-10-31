@@ -13,6 +13,13 @@ describe("tồn kho", () => {
     expect(r[0]).toMatchObject({ nhap: 100, xuat: 30, dieuChinh: -3, ton: 67 });
     expect(r[1].ton).toBe(-4);
   });
+  it("báo sắp hết khi tồn bằng hoặc thấp hơn mức tối thiểu; không đặt mức thì không báo", () => {
+    const r = tinhTonKho(
+      [{ id: "a", ma: "A", ten: "A", tonToiThieu: 20 }, { id: "b", ma: "B", ten: "B", tonToiThieu: 20 }, { id: "c", ma: "C", ten: "C" }],
+      [{ sanPhamId: "a", loai: "Nhập", soLuong: 20 }, { sanPhamId: "b", loai: "Nhập", soLuong: 21 }, { sanPhamId: "c", loai: "Nhập", soLuong: 1 }],
+    );
+    expect(r.map((x) => x.sapHet)).toEqual([true, false, false]);
+  });
 });
 
 describe("kiểm kê kho", () => {

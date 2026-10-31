@@ -446,6 +446,14 @@ export const menuChinh: MucMenu[] = [
     moTa: "Đếm thực tế từng sản phẩm, đối chiếu với tồn trên sổ.",
   },
   {
+    ten: "Lô hàng và hạn sử dụng",
+    duong_dan: "/hr/lo-hang-han-dung",
+    nhom: "Tài chính & Kho",
+    icon: CalendarDays,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Số lô, hạn dùng từng lô nhập, báo trước khi sắp hết hạn.",
+  },
+  {
     ten: "Đóng gói và giao hàng",
     duong_dan: "/hr/dong-goi-giao-hang",
     nhom: "Tài chính & Kho",
