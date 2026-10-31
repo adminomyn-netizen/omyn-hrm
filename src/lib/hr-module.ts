@@ -1066,6 +1066,8 @@ export const HR_MUC: readonly MucHr[] = [
 ];
 
 export const timMucHr = (ma: string) => HR_MUC.find((m) => m.ma === ma);
+/** Sổ nhận tệp thật: màn khai dinhKem, hoặc có ô "Link …" (cho tải tệp lên thay vì chỉ dán link). */
+export const coTepDinhKem = (m: MucHr) => !!m.dinhKem || m.cot.some((c) => /^link/.test(c.k));
 
 /** Giá trị gửi lên → giá trị lưu, theo kiểu cột. Trả { loi } khi sai. */
 export function chuanHoaGiaTri(c: CotHr, tho: string): { v: string | number | boolean | null } | { loi: string } {

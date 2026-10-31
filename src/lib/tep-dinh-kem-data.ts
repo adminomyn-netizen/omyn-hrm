@@ -2,28 +2,42 @@ import "server-only";
 import { createHash, randomUUID } from "node:crypto";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { dbHr } from "@/lib/hr-db";
-import { timMucHr } from "@/lib/hr-module";
+import { coTepDinhKem, timMucHr } from "@/lib/hr-module";
 import { quyenTrenSo } from "@/lib/quyen-nghiep-vu";
-import { duongDanHopLe, duongDanTrongKho, kiemTep, KHO_TEP, laLoaiGiay, laManTep, laUuid, type ManTep } from "@/lib/tep-dinh-kem";
+import { duongDanHopLe, duongDanTrongKho, kiemTep, KHO_TEP, laLoaiGiay, laManTep, laUuid, MAN_PHAP_LY, MAN_UNG_VIEN } from "@/lib/tep-dinh-kem";
 
 export type Nguoi = { ten: string; nguon: "Trong app" | "Lệnh tải từ máy khác" };
 export type TepInfo = { id: string; loai_giay: string; ten_tep: string; kich_thuoc: number; kieu: string | null; nguoi_tai: string; nguon: string; tao_luc: string };
 type Loi = { loi: string };
 
-/** Quyền với tệp đính kèm: Quản trị/Kỹ thuật đủ quyền; người khác theo quyền khối ở mảng Pháp lý & Hồ sơ (xem hoặc nhập). Trả null nếu không được vào. */
-export async function quyenTep(nd: { id: string; vaiTro: string }): Promise<"nhap" | "xem" | null> {
-  if (nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat") return "nhap";
-  return (await quyenTrenSo(nd, "Pháp lý & Hồ sơ")).muc;
+/** Màn nhận tệp: 6 màn pháp lý/sản phẩm, hồ sơ ứng viên, và mọi sổ có ô "Link …". Trả tên hiển thị + nhóm quyền khối (null = chỉ Quản trị/Kỹ thuật). */
+export function thongTinMan(man: string): { ten: string; nhom: string | null } | null {
+  if (!laManTep(man)) return null;
+  if (man === MAN_UNG_VIEN) return { ten: "Ứng viên", nhom: null };
+  const muc = timMucHr(man);
+  if (!muc || !coTepDinhKem(muc)) return null;
+  return { ten: muc.ten, nhom: (MAN_PHAP_LY as readonly string[]).includes(man) ? "Pháp lý & Hồ sơ" : muc.nhom };
+}
+
+/** Quyền với tệp của một màn: Quản trị/Kỹ thuật đủ quyền; người khác theo quyền khối của mảng đó (xem hoặc nhập). null = không được vào. */
+export async function quyenTep(nd: { id: string; vaiTro: string }, man: string): Promise<{ muc: "nhap" | "xem" | null; xoa: boolean }> {
+  const tt = thongTinMan(man);
+  if (!tt) return { muc: null, xoa: false };
+  if (nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat") return { muc: "nhap", xoa: true };
+  if (!tt.nhom) return { muc: null, xoa: false };
+  const q = await quyenTrenSo(nd, tt.nhom);
+  return { muc: q.muc, xoa: q.xoa };
 }
 
 const kho = () => createAdminClient().storage.from(KHO_TEP);
 
-/** Dòng này có thật trong sổ không (tránh gắn tệp vào dòng không tồn tại). */
-async function dongTonTai(man: ManTep, dongId: string) {
-  const muc = timMucHr(man);
-  if (!muc) return null;
-  const { data } = await dbHr().from(muc.bang).select("id").eq("id", dongId).maybeSingle();
-  return data ? muc : null;
+/** Dòng này có thật không (tránh gắn tệp vào dòng không tồn tại); trả tên màn để ghi lịch sử. */
+async function dongTonTai(man: string, dongId: string) {
+  const tt = thongTinMan(man);
+  if (!tt) return null;
+  const bang = man === MAN_UNG_VIEN ? "ung_vien" : timMucHr(man)!.bang;
+  const { data } = await dbHr().from(bang).select("id").eq("id", dongId).maybeSingle();
+  return data ? { ten: tt.ten } : null;
 }
 
 /** Lịch sử của dòng: ai gắn/gỡ tệp nào. Tải từ máy khác không có tài khoản nên user_id để trống, tên người ghi là "Flora (tải từ máy khác)". */
@@ -40,9 +54,9 @@ export async function layTepCuaDong(man: string, dongId: string): Promise<TepInf
 
 /** Bước 1 của tải lên: kiểm tra rồi xin link ký để tải THẲNG vào kho (file không đi qua máy chủ web nên không vướng giới hạn 4,5 MB). */
 export async function taoLinkTaiLen(v: { man: string; dongId: string; loai: string; tenTep: string; kichThuoc: number }): Promise<Loi | { duongDan: string; token: string; linkTai: string }> {
-  if (!laManTep(v.man)) return { loi: "Màn không hợp lệ." };
+  if (!thongTinMan(v.man)) return { loi: "Màn này chưa nhận tệp đính kèm." };
   if (!laUuid(v.dongId)) return { loi: "Mã dòng không hợp lệ." };
-  if (!laLoaiGiay(v.loai)) return { loi: "Loại giấy không hợp lệ." };
+  if (!laLoaiGiay(v.loai, v.man)) return { loi: "Loại giấy không hợp lệ." };
   const l = kiemTep(v.tenTep, v.kichThuoc);
   if (l) return { loi: l };
   if (!(await dongTonTai(v.man, v.dongId))) return { loi: "Không tìm thấy dòng cần gắn tệp." };
@@ -54,7 +68,7 @@ export async function taoLinkTaiLen(v: { man: string; dongId: string; loai: stri
 
 /** Bước 2: tệp đã nằm trong kho thì ghi vào bảng (dung lượng lấy từ kho, không tin số khách khai). */
 export async function xacNhanTep(nguoi: Nguoi, nguoiId: string | null, v: { man: string; dongId: string; loai: string; tenTep: string; kieu: string | null; duongDan: string }): Promise<Loi | { ok: true; id: string }> {
-  if (!laManTep(v.man) || !laUuid(v.dongId) || !laLoaiGiay(v.loai)) return { loi: "Thông tin không hợp lệ." };
+  if (!thongTinMan(v.man) || !laUuid(v.dongId) || !laLoaiGiay(v.loai, v.man)) return { loi: "Thông tin không hợp lệ." };
   if (!duongDanHopLe(v.man, v.dongId, v.duongDan)) return { loi: "Đường dẫn tệp không hợp lệ." };
   const muc = await dongTonTai(v.man, v.dongId);
   if (!muc) return { loi: "Không tìm thấy dòng cần gắn tệp." };
@@ -70,6 +84,13 @@ export async function xacNhanTep(nguoi: Nguoi, nguoiId: string | null, v: { man:
   if (error || !data) return { loi: "Chưa lưu được thông tin tệp." };
   await ghiLichSu(muc, v.dongId, `thêm ${v.loai} - ${v.tenTep}`, nguoiId, nguoi.ten);
   return { ok: true, id: data.id as string };
+}
+
+/** Màn của một tệp (để kiểm quyền theo màn đó). */
+export async function manCuaTep(tepId: string): Promise<string | null> {
+  if (!laUuid(tepId)) return null;
+  const { data } = await dbHr().from("tep_dinh_kem").select("man").eq("id", tepId).maybeSingle();
+  return (data?.man as string | undefined) ?? null;
 }
 
 /** Link xem hoặc tải xuống có chữ ký, hết hạn sau 2 phút. */
@@ -103,18 +124,24 @@ export async function khoaHopLe(khoa: string | null | undefined): Promise<boolea
 
 /** Tìm dòng để gắn tệp: nhận mã dòng, hoặc đoạn tên (phải ra đúng 1 dòng, nhiều dòng thì trả danh sách để chọn). */
 export async function timDong(man: string, q: string): Promise<Loi | { ds: { id: string; ten: string }[] }> {
-  if (!laManTep(man)) return { loi: "Màn không hợp lệ." };
-  const muc = timMucHr(man)!;
-  const cot = muc.cot.find((c) => c.k === muc.tieuDe)!;
-  const { data } = await dbHr().from(muc.bang).select("*").limit(1000);
-  let ten = (r: Record<string, unknown>) => String(r[muc.tieuDe] ?? "");
-  if (cot.kieu === "tc" && cot.bangTc) {
-    const { data: ds } = await dbHr().from(cot.bangTc).select("id, ten").limit(2000);
-    const m = new Map((ds ?? []).map((x) => [x.id as string, x.ten as string]));
-    ten = (r) => m.get(String(r[muc.tieuDe])) ?? "";
-  }
-  let ds = ((data ?? []) as Record<string, unknown>[]).map((r) => ({ id: String(r.id), ten: ten(r) }));
+  if (!thongTinMan(man)) return { loi: "Màn này chưa nhận tệp đính kèm." };
   const k = q.trim().toLowerCase();
+  let ds: { id: string; ten: string }[];
+  if (man === MAN_UNG_VIEN) {
+    const { data } = await dbHr().from("ung_vien").select("id, ho_ten").order("ho_ten").limit(2000);
+    ds = (data ?? []).map((r) => ({ id: String(r.id), ten: String(r.ho_ten ?? "") }));
+  } else {
+    const muc = timMucHr(man)!;
+    const cot = muc.cot.find((c) => c.k === muc.tieuDe)!;
+    const { data } = await dbHr().from(muc.bang).select("*").limit(1000);
+    let ten = (r: Record<string, unknown>) => String(r[muc.tieuDe] ?? "");
+    if (cot.kieu === "tc" && cot.bangTc) {
+      const { data: tc } = await dbHr().from(cot.bangTc).select("id, ten").limit(2000);
+      const m = new Map((tc ?? []).map((x) => [x.id as string, x.ten as string]));
+      ten = (r) => m.get(String(r[muc.tieuDe])) ?? "";
+    }
+    ds = ((data ?? []) as Record<string, unknown>[]).map((r) => ({ id: String(r.id), ten: ten(r) }));
+  }
   if (k) ds = ds.filter((x) => x.id === k || x.ten.toLowerCase().includes(k));
   return { ds };
 }

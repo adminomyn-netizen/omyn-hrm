@@ -1,15 +1,25 @@
 /** Phần dùng chung (không chạm DB) của chức năng đính kèm file: loại giấy, giới hạn, kiểm tên tệp, đường dẫn trong kho. */
-export const MAN_TEP = ["ho-so-san-pham", "so-cong-bo", "so-hop-dong", "duyet-bao-bi", "nha-cung-cap", "san-pham"] as const;
-export type ManTep = (typeof MAN_TEP)[number];
-export const LOAI_GIAY_TEP = ["Giấy uỷ quyền (LOA)", "CFS", "Phiếu công bố", "PIF", "Hợp đồng", "Chứng từ thanh toán", "Giấy đăng ký doanh nghiệp (ĐKDN)", "Artwork", "Khác"] as const;
+/** 6 màn pháp lý/sản phẩm gắn tệp ngay từ đầu (loại giấy riêng) + hồ sơ ứng viên. Mọi sổ khác có ô "Link …" cũng nhận tệp (xem coTepDinhKem ở hr-module.ts). */
+export const MAN_PHAP_LY = ["ho-so-san-pham", "so-cong-bo", "so-hop-dong", "duyet-bao-bi", "nha-cung-cap", "san-pham"] as const;
+export const MAN_UNG_VIEN = "ung-vien";
+export type ManTep = string;
+const CHUNG = ["Tài liệu", "Bài thuyết trình (slide)", "Hình ảnh", "Khác"];
+const LOAI_PHAP_LY = ["Giấy uỷ quyền (LOA)", "CFS", "Phiếu công bố", "PIF", "Hợp đồng", "Chứng từ thanh toán", "Giấy đăng ký doanh nghiệp (ĐKDN)", "Artwork", ...CHUNG];
+const LOAI_UNG_VIEN = ["CV", "Bằng cấp / chứng chỉ", ...CHUNG];
+const LOAI_KHAC = ["Tài liệu", "Bài thuyết trình (slide)", "Hình ảnh", "Bằng chứng", "Báo cáo", "Khác"];
+/** Mọi loại giấy hợp lệ (khớp ràng buộc trong DB, migration 0051). */
+export const LOAI_GIAY_TEP = [...new Set([...LOAI_PHAP_LY, ...LOAI_UNG_VIEN, ...LOAI_KHAC])] as readonly string[];
+/** Loại giấy chọn được ở từng màn. */
+export const loaiTheoMan = (man: string): readonly string[] => ((MAN_PHAP_LY as readonly string[]).includes(man) ? LOAI_PHAP_LY : man === MAN_UNG_VIEN ? LOAI_UNG_VIEN : LOAI_KHAC);
 export const GIOI_HAN_TEP = 25 * 1024 * 1024;
 export const KHO_TEP = "tai-lieu-omyn";
-/** Đuôi tệp cho phép: PDF, ảnh, Word, Excel, nén. */
-export const DUOI_TEP = ["pdf", "png", "jpg", "jpeg", "webp", "gif", "doc", "docx", "xls", "xlsx", "zip"];
+/** Đuôi tệp cho phép: PDF, ảnh, Word/Excel/PowerPoint (và bản mở), văn bản, nén. Không nhận .svg/.html/chương trình chạy được. */
+export const DUOI_TEP = ["pdf", "png", "jpg", "jpeg", "webp", "gif", "bmp", "heic", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "csv", "txt", "rtf", "odt", "ods", "odp", "zip", "rar", "7z"];
 
 export const duoiTep = (ten: string) => (ten.includes(".") ? ten.slice(ten.lastIndexOf(".") + 1).toLowerCase() : "");
-export const laManTep = (v: string): v is ManTep => (MAN_TEP as readonly string[]).includes(v);
-export const laLoaiGiay = (v: string) => (LOAI_GIAY_TEP as readonly string[]).includes(v);
+/** Chỉ kiểm HÌNH DẠNG tên màn (an toàn khi ghép đường dẫn); màn có thật và có nhận tệp do máy chủ kiểm (tep-dinh-kem-data.ts). */
+export const laManTep = (v: string) => /^[a-z0-9-]{2,60}$/.test(v);
+export const laLoaiGiay = (v: string, man?: string) => (man ? loaiTheoMan(man) : LOAI_GIAY_TEP).includes(v);
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 export const laUuid = (v: string) => UUID.test(v);
 
