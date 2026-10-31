@@ -46,6 +46,10 @@ export type MucHr = {
   trong: string;
   /** Link "← …" ở đầu trang chi tiết; mặc định theo nhóm (Tuyển dụng → Sổ tuyển dụng, còn lại → Trang chủ Nhân sự). */
   quayVe?: { href: string; nhan: string };
+  /** Màn danh sách chia cụm 2 tầng theo các cột này (vd đối tác → lô hàng), mỗi cụm hiện số dòng và dòng sắp hết hạn trước. */
+  nhomTheo?: readonly string[];
+  /** Các cột cho ô lọc thả xuống (giá trị lấy từ chính dữ liệu đang có). */
+  locTheo?: readonly string[];
 };
 
 const UU_TIEN = ["Cao", "Trung bình", "Thấp"] as const;
@@ -835,8 +839,12 @@ export const HR_MUC: readonly MucHr[] = [
     ma: "so-hop-dong", ten: "Sổ hợp đồng", nhom: "Pháp lý & Hồ sơ", bang: "pl_so_hop_dong", tieuDe: "ten", trangThai: "trang_thai",
     moTa: "Hợp đồng với nhà máy, đại lý, dịch vụ, mặt bằng, KOL/KOC: đối tác, ngày ký, ngày hết hạn, giá trị, người phụ trách. Hợp đồng gửi ra ngoài phải có chị Lâm đồng ý trước, ô đánh dấu để ghi nhận điều đó. Báo trước 45 ngày khi sắp hết hạn.",
     sapXep: { cot: "ngay_het_han" }, canhBao: { cot: "ngay_het_han", ngay: 45, nhan: "Sắp hết hạn" }, trong: "Chưa ghi hợp đồng nào.",
+    nhomTheo: ["doi_tac_nhom", "lo_hang"], locTheo: ["doi_tac_nhom", "lo_hang", "loai_giay"],
     cot: [
       { k: "ten", nhan: "Tên hợp đồng", kieu: "chu", batBuoc: true },
+      { k: "doi_tac_nhom", nhan: "Nhóm đối tác (để gom cụm)", kieu: "chu", goiY: "ONE M GLOBAL" },
+      { k: "lo_hang", nhan: "Lô hàng, sản phẩm (để gom cụm)", kieu: "chu", goiY: "HUSKIN SUN CREAM" },
+      { k: "loai_giay", nhan: "Loại giấy", kieu: "chon", luaChon: ["Giấy uỷ quyền (LOA)", "CFS", "Hợp đồng sản xuất", "Chứng từ thanh toán", "Giấy đăng ký doanh nghiệp (ĐKDN)", "Hợp đồng khác", "Giấy tờ khác"], the: true },
       { k: "doi_tac", nhan: "Đối tác", kieu: "chu", the: true },
       { k: "loai", nhan: "Loại", kieu: "chon", luaChon: ["Nhà máy", "Đại lý", "Dịch vụ", "Thuê mặt bằng", "KOL/KOC", "Khác"], mac: "Khác", the: true },
       { k: "so_hop_dong", nhan: "Số hợp đồng", kieu: "chu" },
