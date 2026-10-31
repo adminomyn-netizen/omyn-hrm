@@ -546,6 +546,22 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
+    ma: "tai-san-noi-dung", ten: "Thư viện tài sản nội dung", nhom: "Marketing & Thương hiệu", bang: "mkt_tai_san", tieuDe: "ten", trangThai: "nguon_goc",
+    moTa: "Ảnh, video, mẫu thiết kế dùng cho nội dung: link lưu trữ, sản phẩm liên quan, nguồn gốc và bản quyền. Ảnh hoặc video có người thật phải có đồng ý bằng văn bản. Báo trước 30 ngày khi hết hạn sử dụng.",
+    sapXep: { cot: "tao_luc", giam: true }, canhBao: { cot: "han_su_dung", ngay: 30, nhan: "Sắp hết hạn sử dụng" }, trong: "Chưa có tài sản nào.",
+    quayVe: { href: "/quang-cao", nhan: "Quảng cáo" },
+    cot: [
+      { k: "ten", nhan: "Tên", kieu: "chu", batBuoc: true },
+      { k: "loai", nhan: "Loại", kieu: "chon", luaChon: ["Ảnh sản phẩm", "Video", "Logo và nhận diện", "Mẫu thiết kế", "Tài liệu thương hiệu", "Khác"], mac: "Ảnh sản phẩm", the: true },
+      { k: "link", nhan: "Link lưu trữ", kieu: "chu", batBuoc: true, the: true },
+      { k: "san_pham_id", nhan: "Sản phẩm liên quan", kieu: "tc", bangTc: "sp_san_pham", the: true },
+      { k: "nguon_goc", nhan: "Nguồn gốc, bản quyền", kieu: "chon", luaChon: ["Của công ty", "Đã mua bản quyền", "Có đồng ý bằng văn bản của người xuất hiện", "Chưa rõ nguồn"], mac: "Chưa rõ nguồn" },
+      { k: "han_su_dung", nhan: "Hạn sử dụng (nếu có)", kieu: "ngay" },
+      { k: "nguoi_tao_id", nhan: "Người tạo", kieu: "nv" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
     ma: "gian-hang-san", ten: "Gian hàng sàn", nhom: "Kinh doanh", bang: "kd_gian_hang", tieuDe: "ten", trangThai: "trang_thai",
     moTa: "Các gian hàng bán trên sàn thương mại điện tử: nền tảng, link, người vận hành, đang bán hay tạm dừng.",
     sapXep: { cot: "tao_luc" }, trong: "Chưa khai báo gian hàng nào.",
