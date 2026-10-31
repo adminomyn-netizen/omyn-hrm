@@ -535,7 +535,7 @@ export const HR_MUC: readonly MucHr[] = [
     quayVe: { href: "/quang-cao", nhan: "Quảng cáo" },
     cot: [
       { k: "ten", nhan: "Tên chương trình", kieu: "chu", batBuoc: true },
-      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: ["Shopee", "TikTok Shop", "Lazada", "Facebook Shop", "Sỉ và đại lý", "Tất cả kênh"], mac: "Shopee", the: true },
+      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: ["Shopee", "TikTok Shop", "Facebook", "Sỉ và đại lý", "Tất cả kênh"], mac: "Shopee", the: true },
       { k: "hinh_thuc", nhan: "Hình thức", kieu: "chon", luaChon: ["Giảm giá", "Mã giảm giá", "Quà tặng kèm", "Mua nhiều giảm sâu", "Flash sale", "Khác"], mac: "Giảm giá", the: true },
       { k: "muc_giam", nhan: "Mức giảm hoặc ưu đãi", kieu: "chu", the: true, goiY: "Giảm 10% đơn từ 500.000 đ" },
       { k: "tu_ngay", nhan: "Từ ngày", kieu: "ngay", batBuoc: true, the: true },
@@ -563,11 +563,11 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "gian-hang-san", ten: "Gian hàng sàn", nhom: "Kinh doanh", bang: "kd_gian_hang", tieuDe: "ten", trangThai: "trang_thai",
-    moTa: "Các gian hàng bán trên sàn thương mại điện tử: nền tảng, link, người vận hành, đang bán hay tạm dừng.",
+    moTa: "Các gian hàng bán trực tuyến của Omyn trên 3 nguồn: Shopee, TikTok Shop, Facebook. Ghi nền tảng, link, người vận hành, đang bán hay tạm dừng.",
     sapXep: { cot: "tao_luc" }, trong: "Chưa khai báo gian hàng nào.",
     cot: [
       { k: "ten", nhan: "Tên gian hàng", kieu: "chu", batBuoc: true },
-      { k: "nen_tang", nhan: "Nền tảng", kieu: "chon", luaChon: ["Shopee", "TikTok Shop", "Lazada", "Facebook Shop", "Website", "Khác"], mac: "Shopee", the: true },
+      { k: "nen_tang", nhan: "Nền tảng", kieu: "chon", luaChon: ["Shopee", "TikTok Shop", "Facebook"], mac: "Shopee", the: true },
       { k: "link", nhan: "Link gian hàng", kieu: "chu" },
       { k: "nguoi_van_hanh_id", nhan: "Người vận hành", kieu: "nv", the: true },
       { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Đang bán", "Tạm dừng", "Đóng"], mac: "Đang bán" },
@@ -663,7 +663,7 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "doanh-thu-ngay", ten: "Doanh thu sàn theo ngày", nhom: "Kinh doanh", bang: "kd_doanh_thu_ngay", tieuDe: "gian_hang_id",
-    moTa: "Mỗi ngày và gian hàng một dòng: số đơn, doanh thu, đơn huỷ, tiền hoàn. Là số gốc để so với chỉ tiêu và đối soát tiền sàn cuối tháng.",
+    moTa: "Mỗi ngày và gian hàng một dòng: số đơn, doanh thu, đơn huỷ, tiền hoàn. Doanh thu sàn có 3 nguồn: Shopee, TikTok Shop, Facebook. TikTok Shop và Facebook nhập tay; Shopee tự kéo về khi nối khoá API, ngày nào Shopee đã kéo về thì số tự kéo thay số nhập tay của gian hàng Shopee ngày đó.",
     sapXep: { cot: "ngay", giam: true }, trong: "Chưa nhập ngày nào. Thêm gian hàng ở màn Gian hàng sàn trước.",
     cot: [
       { k: "ngay", nhan: "Ngày", kieu: "ngay", batBuoc: true, the: true },
@@ -713,7 +713,7 @@ export const HR_MUC: readonly MucHr[] = [
     sapXep: { cot: "ngay", giam: true }, trong: "Chưa có đơn đổi trả nào.",
     cot: [
       { k: "ngay", nhan: "Ngày", kieu: "ngay", batBuoc: true, the: true },
-      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: ["Shopee", "TikTok Shop", "Lazada", "Facebook Shop", "Sỉ và đại lý", "Khác"], mac: "Shopee", the: true },
+      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: ["Shopee", "TikTok Shop", "Facebook", "Sỉ và đại lý", "Khác"], mac: "Shopee", the: true },
       { k: "ma_don", nhan: "Mã đơn", kieu: "chu", the: true },
       { k: "loai", nhan: "Hình thức", kieu: "chon", luaChon: ["Hoàn tiền", "Đổi hàng"], mac: "Hoàn tiền" },
       { k: "ly_do", nhan: "Lý do", kieu: "chon", luaChon: ["Lỗi sản phẩm", "Giao sai hàng", "Hư hỏng khi vận chuyển", "Khách đổi ý", "Khác"], mac: "Khác", the: true },
@@ -889,7 +889,8 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "san_pham_id", nhan: "Sản phẩm", kieu: "tc", batBuoc: true, bangTc: "sp_san_pham", the: true },
       { k: "so_luong", nhan: "Số lượng", kieu: "so", batBuoc: true, mac: 1, khoang: [1, 10000000], the: true },
       { k: "so_lo", nhan: "Số lô", kieu: "chu" },
-      { k: "doi_tuong", nhan: "Nhà cung cấp hoặc nơi nhận", kieu: "chu" },
+      { k: "nha_cung_cap_id", nhan: "Nhà cung cấp (khi nhập hàng)", kieu: "tc", bangTc: "tc_nha_cung_cap" },
+      { k: "doi_tuong", nhan: "Nơi nhận (khi xuất hàng)", kieu: "chu" },
       { k: "chung_tu", nhan: "Số chứng từ", kieu: "chu" },
       { k: "nguoi_lap_id", nhan: "Người lập", kieu: "nv" },
       { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
@@ -915,6 +916,7 @@ export const HR_MUC: readonly MucHr[] = [
     cot: [
       { k: "san_pham_id", nhan: "Sản phẩm", kieu: "tc", bangTc: "sp_san_pham", batBuoc: true, the: true },
       { k: "so_lo", nhan: "Số lô", kieu: "chu", batBuoc: true, the: true },
+      { k: "nha_cung_cap_id", nhan: "Nhà cung cấp", kieu: "tc", bangTc: "tc_nha_cung_cap", the: true },
       { k: "ngay_san_xuat", nhan: "Ngày sản xuất", kieu: "ngay" },
       { k: "han_dung", nhan: "Hạn sử dụng", kieu: "ngay", batBuoc: true, the: true },
       { k: "so_luong_nhap", nhan: "Số lượng nhập", kieu: "so", coTheTrong: true, khoang: [0, 10000000], the: true },
@@ -953,11 +955,26 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "cong-no-nha-cung-cap", ten: "Công nợ nhà cung cấp", nhom: "Tài chính & Kho", bang: "tc_cong_no_ncc", tieuDe: "nha_cung_cap", trangThai: "loai",
-    moTa: "Phải trả nhà cung cấp: mỗi lần phát sinh hoặc đã trả là một dòng, kèm hạn thanh toán. Công nợ đại lý, khách sỉ nằm ở nhóm Kinh doanh.",
+    ma: "nha-cung-cap", ten: "Nhà cung cấp", nhom: "Tài chính & Kho", bang: "tc_nha_cung_cap", tieuDe: "ten", trangThai: "trang_thai",
+    moTa: "Danh sách nhà cung cấp hàng nhập (chủ yếu Hàn Quốc): liên hệ, điều khoản thanh toán. Lô hàng, phiếu nhập kho và công nợ chọn nhà cung cấp từ danh sách này.",
+    sapXep: { cot: "ten" }, trong: "Chưa có nhà cung cấp nào.",
+    cot: [
+      { k: "ten", nhan: "Tên nhà cung cấp", kieu: "chu", batBuoc: true },
+      { k: "quoc_gia", nhan: "Quốc gia", kieu: "chon", luaChon: ["Hàn Quốc", "Việt Nam", "Khác"], mac: "Hàn Quốc", the: true },
+      { k: "nguoi_lien_he", nhan: "Người liên hệ", kieu: "chu", the: true },
+      { k: "dien_thoai", nhan: "Điện thoại", kieu: "chu" },
+      { k: "email", nhan: "Email", kieu: "chu" },
+      { k: "dieu_khoan_thanh_toan", nhan: "Điều khoản thanh toán", kieu: "chu", the: true, goiY: "Thanh toán 30 ngày sau khi nhận hàng" },
+      { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Đang hợp tác", "Tạm dừng", "Ngừng"], mac: "Đang hợp tác" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "cong-no-nha-cung-cap", ten: "Công nợ nhà cung cấp", nhom: "Tài chính & Kho", bang: "tc_cong_no_ncc", tieuDe: "nha_cung_cap_id", trangThai: "loai",
+    moTa: "Phải trả nhà cung cấp (hàng nhập từ Hàn Quốc): mỗi lần phát sinh hoặc đã trả là một dòng, kèm hạn thanh toán, số tiền ghi bằng đồng. Chọn nhà cung cấp ở danh sách Nhà cung cấp. Công nợ đại lý, khách sỉ nằm ở nhóm Kinh doanh.",
     sapXep: { cot: "ngay", giam: true }, trong: "Chưa có khoản công nợ nào.",
     cot: [
-      { k: "nha_cung_cap", nhan: "Nhà cung cấp", kieu: "chu", batBuoc: true },
+      { k: "nha_cung_cap_id", nhan: "Nhà cung cấp", kieu: "tc", bangTc: "tc_nha_cung_cap", batBuoc: true, the: true },
       { k: "ngay", nhan: "Ngày", kieu: "ngay", batBuoc: true, the: true },
       { k: "loai", nhan: "Loại", kieu: "chon", luaChon: ["Phát sinh", "Đã trả"], mac: "Phát sinh", the: true },
       { k: "so_tien", nhan: "Số tiền (đ)", kieu: "tien", batBuoc: true, the: true },
