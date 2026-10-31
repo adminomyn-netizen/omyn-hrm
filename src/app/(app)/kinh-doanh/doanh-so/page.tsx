@@ -3,7 +3,7 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
-import { dbHr } from "@/lib/hr-db";
+import { dbHr, docTatCa } from "@/lib/hr-db";
 import { tienVN } from "@/lib/dinh-dang";
 import { tinhDoanhSo } from "@/lib/kinh-doanh";
 
@@ -24,16 +24,16 @@ export default async function TrangDoanhSo({ searchParams }: { searchParams: Pro
   const db = dbHr();
   const [ct, san, si, live] = await Promise.all([
     db.from("kd_chi_tieu").select("kenh, chi_tieu").eq("thang", dau),
-    db.from("kd_doanh_thu_ngay").select("doanh_thu, doanh_thu_hoan").gte("ngay", dau).lt("ngay", cuoi).limit(50000),
-    db.from("kd_don_si").select("trang_thai, gia_tri").gte("ngay", dau).lt("ngay", cuoi).limit(50000),
-    db.from("kd_phien_live").select("doanh_thu").eq("trang_thai", "Đã live").gte("ngay", dau).lt("ngay", cuoi).limit(50000),
+    docTatCa<Record<string, number | null>>("kd_doanh_thu_ngay", "id, doanh_thu, doanh_thu_hoan", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
+    docTatCa<{ trang_thai: string; gia_tri: number }>("kd_don_si", "id, trang_thai, gia_tri", (q) => q.gte("ngay", dau).lt("ngay", cuoi)),
+    docTatCa<Record<string, number | null>>("kd_phien_live", "id, doanh_thu", (q) => q.eq("trang_thai", "Đã live").gte("ngay", dau).lt("ngay", cuoi)),
   ]);
-  const tong = (r: { data: unknown }, c: string) => ((r.data ?? []) as Record<string, number | null>[]).reduce((a, d) => a + (d[c] ?? 0), 0);
+  const tong = (r: Record<string, number | null>[], c: string) => r.reduce((a, d) => a + (d[c] ?? 0), 0);
   const kq = tinhDoanhSo(
     ((ct.data ?? []) as { kenh: string; chi_tieu: number }[]).map((c) => ({ kenh: c.kenh, chiTieu: c.chi_tieu })),
     tong(san, "doanh_thu"),
     tong(san, "doanh_thu_hoan"),
-    ((si.data ?? []) as { trang_thai: string; gia_tri: number }[]).map((d) => ({ trangThai: d.trang_thai, giaTri: d.gia_tri })),
+    si.map((d) => ({ trangThai: d.trang_thai, giaTri: d.gia_tri })),
     tong(live, "doanh_thu"),
   );
   return (

@@ -3,22 +3,21 @@ export const dynamic = "force-dynamic";
 import Link from "next/link";
 import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
-import { dbHr } from "@/lib/hr-db";
+import { docTatCa } from "@/lib/hr-db";
 import { tienVN } from "@/lib/dinh-dang";
 import { tinhCongNo } from "@/lib/kinh-doanh";
 
 /** Số dư công nợ từng đại lý, khách sỉ, tính từ các dòng phát sinh và đã thu. Không nhập tay. */
 export default async function TrangCongNo() {
   await yeuCauQuyenSo("Kinh doanh");
-  const db = dbHr();
   const homNay = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
   const [dl, cn] = await Promise.all([
-    db.from("kd_dai_ly").select("id, ten, han_muc_cong_no").limit(5000),
-    db.from("kd_cong_no_dai_ly").select("dai_ly_id, ngay, loai, so_tien, han_thanh_toan").limit(100000),
+    docTatCa<{ id: string; ten: string; han_muc_cong_no: number | null }>("kd_dai_ly", "id, ten, han_muc_cong_no"),
+    docTatCa<{ dai_ly_id: string; ngay: string; loai: string; so_tien: number; han_thanh_toan: string | null }>("kd_cong_no_dai_ly", "id, dai_ly_id, ngay, loai, so_tien, han_thanh_toan"),
   ]);
   const ds = tinhCongNo(
-    ((dl.data ?? []) as { id: string; ten: string; han_muc_cong_no: number | null }[]).map((d) => ({ id: d.id, ten: d.ten, hanMuc: d.han_muc_cong_no })),
-    ((cn.data ?? []) as { dai_ly_id: string; ngay: string; loai: string; so_tien: number; han_thanh_toan: string | null }[]).map((d) => ({ daiLyId: d.dai_ly_id, ngay: d.ngay, loai: d.loai, soTien: d.so_tien, hanThanhToan: d.han_thanh_toan })),
+    dl.map((d) => ({ id: d.id, ten: d.ten, hanMuc: d.han_muc_cong_no })),
+    cn.map((d) => ({ daiLyId: d.dai_ly_id, ngay: d.ngay, loai: d.loai, soTien: d.so_tien, hanThanhToan: d.han_thanh_toan })),
     homNay,
   );
   const tongNo = ds.reduce((a, d) => a + Math.max(0, d.soDu), 0);
