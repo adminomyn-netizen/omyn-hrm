@@ -238,6 +238,22 @@ export const menuChinh: MucMenu[] = [
     moTa: "Ngân sách duyệt trước theo tháng và kênh, quyết toán sau.",
   },
   {
+    ten: "Chiến dịch marketing",
+    duong_dan: "/hr/chien-dich-marketing",
+    nhom: "Marketing & Thương hiệu",
+    icon: Megaphone,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Mỗi chiến dịch: mục tiêu, thời gian, ngân sách, kết quả.",
+  },
+  {
+    ten: "Chương trình khuyến mãi",
+    duong_dan: "/hr/khuyen-mai",
+    nhom: "Marketing & Thương hiệu",
+    icon: BadgeCheck,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Khuyến mãi trên sàn và cho đại lý: hình thức, mức giảm, thời gian.",
+  },
+  {
     ten: "Gian hàng sàn",
     duong_dan: "/hr/gian-hang-san",
     nhom: "Kinh doanh",
