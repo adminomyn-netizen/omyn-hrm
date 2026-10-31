@@ -5,17 +5,36 @@ import { Download, Eye, Paperclip, Trash2 } from "lucide-react";
 import { dsTepAction, linkTepAction, taoLinkTaiLenAction, xacNhanTepAction, xoaTepAction } from "@/app/(app)/hr/tep-actions";
 import { Chon } from "@/components/ui/Chon";
 import { NUT_CHINH, NUT_PHU } from "@/components/ui/dinh-dang";
-import { DUOI_TEP, GIOI_HAN_TEP, LOAI_GIAY_TEP, dungLuong, kiemTep } from "@/lib/tep-dinh-kem";
+import { DUOI_TEP, GIOI_HAN_TEP, dungLuong, kiemTep, loaiTheoMan } from "@/lib/tep-dinh-kem";
 import type { TepInfo } from "@/lib/tep-dinh-kem-data";
 
 const NGAY = (s: string) => new Date(s).toLocaleDateString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" });
+export const CHON_TEP_ACCEPT = DUOI_TEP.map((d) => `.${d}`).join(",");
 
-/** Danh sách tệp của một dòng: Xem / Tải xuống cho người có quyền xem, thêm tệp cho người có quyền nhập, gỡ tệp cho Trưởng bộ phận trở lên. */
-export function TepDinhKem({ man, dongId, duocXoa, khiDoi }: { man: string; dongId: string; duocXoa: boolean; khiDoi?: () => void }) {
+/** Đẩy 1 tệp từ máy lên kho riêng rồi gắn vào dòng (tải thẳng lên link ký, không qua máy chủ web nên không vướng giới hạn 4,5 MB). Trả chữ lỗi hoặc null nếu xong. */
+export async function taiTepLen(v: { man: string; dongId: string; loai: string; file: File }): Promise<string | null> {
+  const l = kiemTep(v.file.name, v.file.size);
+  if (l) return l;
+  try {
+    const lk = await taoLinkTaiLenAction({ man: v.man, dongId: v.dongId, loai: v.loai, tenTep: v.file.name, kichThuoc: v.file.size });
+    if ("loi" in lk) return lk.loi;
+    const r = await fetch(lk.linkTai, { method: "PUT", body: v.file, headers: { "Content-Type": v.file.type || "application/octet-stream", "x-upsert": "false" } });
+    if (!r.ok) return "Tải lên chưa được. Thử lại sau.";
+    const xn = await xacNhanTepAction({ man: v.man, dongId: v.dongId, loai: v.loai, tenTep: v.file.name, kieu: v.file.type || null, duongDan: lk.duongDan });
+    return "loi" in xn ? xn.loi : null;
+  } catch {
+    return "Tải lên chưa được. Kiểm tra mạng rồi thử lại.";
+  }
+}
+
+/** Danh sách tệp của một dòng: Xem / Tải xuống cho người có quyền xem, thêm tệp cho người có quyền nhập, gỡ tệp cho Trưởng bộ phận trở lên (máy chủ quyết định, không tin trình duyệt). */
+export function TepDinhKem({ man, dongId, khiDoi, tieuDe = "Tệp đính kèm" }: { man: string; dongId: string; khiDoi?: () => void; tieuDe?: string }) {
+  const loaiDs = loaiTheoMan(man);
   const [ds, setDs] = useState<TepInfo[] | null>(null);
   const [nhap, setNhap] = useState(false);
+  const [duocXoa, setDuocXoa] = useState(false);
   const [loi, setLoi] = useState<string | undefined>();
-  const [loai, setLoai] = useState<string>(LOAI_GIAY_TEP[0]);
+  const [loai, setLoai] = useState<string>(loaiDs[0]);
   const [tien, setTien] = useState<string | undefined>();
   const [dang, bat] = useTransition();
   const o = useRef<HTMLInputElement>(null);
@@ -24,6 +43,7 @@ export function TepDinhKem({ man, dongId, duocXoa, khiDoi }: { man: string; dong
     if ("loi" in kq) return setLoi(kq.loi);
     setDs(kq.ds);
     setNhap(kq.nhap);
+    setDuocXoa(kq.xoa);
   };
   const tai = async () => ap(await dsTepAction(man, dongId));
   useEffect(() => {
@@ -40,37 +60,26 @@ export function TepDinhKem({ man, dongId, duocXoa, khiDoi }: { man: string; dong
 
   const guiTep = (f: File) => bat(async () => {
     setLoi(undefined);
-    const l = kiemTep(f.name, f.size);
-    if (l) return setLoi(l);
     setTien(`Đang tải ${f.name}…`);
-    try {
-      const lk = await taoLinkTaiLenAction({ man, dongId, loai, tenTep: f.name, kichThuoc: f.size });
-      if ("loi" in lk) return setLoi(lk.loi);
-      const r = await fetch(lk.linkTai, { method: "PUT", body: f, headers: { "Content-Type": f.type || "application/octet-stream", "x-upsert": "false" } });
-      if (!r.ok) return setLoi("Tải lên chưa được. Thử lại sau.");
-      const xn = await xacNhanTepAction({ man, dongId, loai, tenTep: f.name, kieu: f.type || null, duongDan: lk.duongDan });
-      if ("loi" in xn) return setLoi(xn.loi);
-      await tai();
-      khiDoi?.();
-    } catch {
-      setLoi("Tải lên chưa được. Kiểm tra mạng rồi thử lại.");
-    } finally {
-      setTien(undefined);
-      if (o.current) o.current.value = "";
-    }
+    const e = await taiTepLen({ man, dongId, loai, file: f });
+    setTien(undefined);
+    if (o.current) o.current.value = "";
+    if (e) return setLoi(e);
+    await tai();
+    khiDoi?.();
   });
 
   const go = (t: TepInfo) => {
     if (!window.confirm(`Gỡ tệp "${t.ten_tep}"? Không khôi phục được.`)) return;
     bat(async () => {
-      const kq = await xoaTepAction(t.id, man);
+      const kq = await xoaTepAction(t.id);
       if ("loi" in kq) setLoi(kq.loi); else { await tai(); khiDoi?.(); }
     });
   };
 
   return (
-    <section aria-label="Tệp đính kèm" className="space-y-3">
-      <h4 className="flex items-center gap-1.5 text-[14px] font-semibold text-muc"><Paperclip strokeWidth={1.8} className="h-4 w-4" />Tệp đính kèm{ds ? ` (${ds.length})` : ""}</h4>
+    <section aria-label={tieuDe} className="space-y-3">
+      <h4 className="flex items-center gap-1.5 text-[14px] font-semibold text-muc"><Paperclip strokeWidth={1.8} className="h-4 w-4" />{tieuDe}{ds ? ` (${ds.length})` : ""}</h4>
       {ds === null && !loi && <p className="text-[13px] text-muc-3">Đang tải…</p>}
       {ds && ds.length === 0 && <p className="text-[13px] text-muc-3">Chưa có tệp nào.</p>}
       {ds && ds.length > 0 && (
@@ -90,12 +99,14 @@ export function TepDinhKem({ man, dongId, duocXoa, khiDoi }: { man: string; dong
       )}
       {nhap && (
         <div className="flex flex-wrap items-end gap-2.5">
-          <div className="min-w-[200px] flex-1 sm:max-w-[320px]">
-            <Chon ariaLabel="Loại giấy" trong="Loại giấy" giaTri={loai} luaChon={LOAI_GIAY_TEP.map((x) => ({ gia_tri: x, nhan: x }))} onDoi={(v) => setLoai(v || LOAI_GIAY_TEP[0])} />
-          </div>
-          <input ref={o} type="file" accept={DUOI_TEP.map((d) => `.${d}`).join(",")} className="sr-only" id={`tep-${dongId}`} onChange={(e) => e.target.files?.[0] && guiTep(e.target.files[0])} />
-          <label htmlFor={`tep-${dongId}`} className={`${NUT_CHINH} cursor-pointer ${dang ? "pointer-events-none opacity-60" : ""}`}>{tien ?? "Chọn tệp để tải lên"}</label>
-          <p className="w-full text-[12px] text-muc-3">Tối đa {Math.round(GIOI_HAN_TEP / 1048576)} MB mỗi tệp: PDF, ảnh, Word, Excel, zip. Tệp để riêng tư, link xem hết hạn sau 2 phút.</p>
+          {loaiDs.length > 1 && (
+            <div className="min-w-[200px] flex-1 sm:max-w-[320px]">
+              <Chon ariaLabel="Loại giấy" trong="Loại giấy" giaTri={loai} luaChon={loaiDs.map((x) => ({ gia_tri: x, nhan: x }))} onDoi={(v) => setLoai(v || loaiDs[0])} />
+            </div>
+          )}
+          <input ref={o} type="file" accept={CHON_TEP_ACCEPT} className="sr-only" id={`tep-${man}-${dongId}`} onChange={(e) => e.target.files?.[0] && guiTep(e.target.files[0])} />
+          <label htmlFor={`tep-${man}-${dongId}`} className={`${NUT_CHINH} cursor-pointer ${dang ? "pointer-events-none opacity-60" : ""}`}>{tien ?? "Chọn tệp từ máy để tải lên"}</label>
+          <p className="w-full text-[12px] text-muc-3">Tối đa {Math.round(GIOI_HAN_TEP / 1048576)} MB mỗi tệp: PDF, ảnh, Word, Excel, PowerPoint (slide), văn bản, nén. Tệp để riêng tư, link xem hết hạn sau 2 phút.</p>
         </div>
       )}
       {loi && <p role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</p>}

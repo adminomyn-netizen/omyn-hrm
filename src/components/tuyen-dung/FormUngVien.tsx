@@ -5,7 +5,9 @@ import { luuUngVien } from "@/app/(app)/tuyen-dung/actions";
 import { Chon } from "@/components/ui/Chon";
 import { NgayChon } from "@/components/ui/NgayChon";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
+import { CHON_TEP_ACCEPT, TepDinhKem, taiTepLen } from "@/components/hr/TepDinhKem";
 import { BUOC_UNG_VIEN, NGUON_UNG_VIEN } from "@/lib/tuyen-dung";
+import { MAN_UNG_VIEN } from "@/lib/tep-dinh-kem";
 
 export type UngVien = {
   id: string;
@@ -25,6 +27,8 @@ export type UngVien = {
 export function FormUngVien({ tinId, coSan, xong, huy }: { tinId: string; coSan?: UngVien; xong: () => void; huy: () => void }) {
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
+  const [tepCho, setTepCho] = useState<File | null>(null);
+  const [daLuuId, setDaLuuId] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const homNay = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
 
@@ -33,14 +37,22 @@ export function FormUngVien({ tinId, coSan, xong, huy }: { tinId: string; coSan?
     const fd = new FormData(formRef.current);
     startXuLy(async () => {
       const kq = await luuUngVien(fd);
-      if (kq.loi) setLoi(kq.loi);
-      else xong();
+      if (kq.loi) return setLoi(kq.loi);
+      if (tepCho && kq.id) {
+        const e = await taiTepLen({ man: MAN_UNG_VIEN, dongId: kq.id, loai: "CV", file: tepCho });
+        if (e) {
+          // Ứng viên đã lưu: giữ form ở chế độ tải tệp để không thêm trùng.
+          setDaLuuId(kq.id);
+          return setLoi(`Đã lưu ứng viên nhưng tệp CV chưa tải lên được: ${e} Bấm chọn tệp bên dưới để tải lại.`);
+        }
+      }
+      xong();
     });
   };
 
   return (
     <form ref={formRef} className="space-y-4" onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA" && e.preventDefault()}>
-      {coSan && <input type="hidden" name="id" value={coSan.id} />}
+      {(coSan || daLuuId) && <input type="hidden" name="id" value={coSan?.id ?? daLuuId ?? ""} />}
       <input type="hidden" name="tin_tuyen_dung_id" value={tinId} />
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
@@ -64,7 +76,17 @@ export function FormUngVien({ tinId, coSan, xong, huy }: { tinId: string; coSan?
           <Chon id="u-nguon" ten="nguon" trong="Chưa rõ" giaTriMacDinh={coSan?.nguon ?? ""} luaChon={[{ gia_tri: "", nhan: "Chưa rõ" }, ...NGUON_UNG_VIEN.map((n) => ({ gia_tri: n, nhan: n }))]} />
         </div>
         <div className="sm:col-span-2">
-          <label htmlFor="u-cv" className={NHAN_O}>Link CV</label>
+          <p className={NHAN_O}>CV của ứng viên</p>
+          {coSan || daLuuId ? (
+            <TepDinhKem man={MAN_UNG_VIEN} dongId={(coSan?.id ?? daLuuId)!} tieuDe="Tệp CV và giấy tờ (đẩy từ máy lên)" />
+          ) : (
+            <div className="space-y-1.5">
+              <input id="u-cv-tep" type="file" accept={CHON_TEP_ACCEPT} className="sr-only" onChange={(e) => setTepCho(e.target.files?.[0] ?? null)} />
+              <label htmlFor="u-cv-tep" className={`${NUT_PHU} inline-flex cursor-pointer items-center`}>{tepCho ? `Đã chọn: ${tepCho.name}` : "Chọn tệp CV từ máy (PDF, Word, ảnh, slide…)"}</label>
+              <p className="text-[12px] text-muc-3">Tệp được tải lên khi bấm Thêm ứng viên. Tối đa 25 MB.</p>
+            </div>
+          )}
+          <label htmlFor="u-cv" className={`${NHAN_O} mt-3`}>Link CV (nếu CV nằm trên mạng)</label>
           <input id="u-cv" name="link_cv" type="url" placeholder="https://" defaultValue={coSan?.link_cv ?? ""} className={O_NHAP} />
         </div>
         <div>
@@ -88,7 +110,7 @@ export function FormUngVien({ tinId, coSan, xong, huy }: { tinId: string; coSan?
       <div className="flex justify-end gap-2 border-t border-vien pt-4">
         <button type="button" onClick={huy} disabled={dangXuLy} className={NUT_PHU}>Quay lại danh sách</button>
         <button type="button" onClick={gui} disabled={dangXuLy} className={NUT_CHINH}>
-          {dangXuLy ? "Đang lưu" : coSan ? "Lưu thay đổi" : "Thêm ứng viên"}
+          {dangXuLy ? "Đang lưu" : coSan || daLuuId ? "Lưu thay đổi" : "Thêm ứng viên"}
         </button>
       </div>
     </form>

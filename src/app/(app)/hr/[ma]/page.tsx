@@ -5,10 +5,9 @@ import { notFound } from "next/navigation";
 import { DanhSachHr } from "@/components/hr/DanhSachHr";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
-import { timMucHr } from "@/lib/hr-module";
+import { coTepDinhKem, timMucHr } from "@/lib/hr-module";
 import { dbHr, docTatCa, laGiamDocTaiKhoan } from "@/lib/hr-db";
 import { quyenTep } from "@/lib/tep-dinh-kem-data";
-import { quyenTrenSo } from "@/lib/quyen-nghiep-vu";
 
 /** Link "← …" đầu trang theo nhóm của mục (mục có quayVe riêng thì dùng cái đó). */
 const GOC_NHOM: Record<string, { href: string; nhan: string }> = {
@@ -58,8 +57,7 @@ export default async function TrangMucHr({
         .data ?? []) as { id: string; ten: string }[];
     }),
   );
-  const coTep = !!muc.dinhKem && !!(await quyenTep(nd));
-  const xoaTep = coTep && (await quyenTrenSo(nd, "Pháp lý & Hồ sơ")).xoa;
+  const coTep = coTepDinhKem(muc) && !!(await quyenTep(nd, muc.ma)).muc;
   const soTep: Record<string, number> = {};
   if (coTep) for (const t of await docTatCa<{ dong_id: string }>("tep_dinh_kem", "id, dong_id", (q) => q.eq("man", muc.ma))) soTep[t.dong_id] = (soTep[t.dong_id] ?? 0) + 1;
   return (
@@ -88,7 +86,6 @@ export default async function TrangMucHr({
         chiXem={chiXem}
         khongXoa={!xoa}
         coTep={coTep}
-        xoaTep={xoaTep}
         soTep={soTep}
       />
     </>

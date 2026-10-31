@@ -43,14 +43,14 @@ function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string
 }
 
 /** Thẻ danh sách + hộp thoại thêm/sửa cho mọi mục HR khai trong hr-module.ts. Thẻ gọn trên điện thoại, 2–3 cột trên máy tính. */
-export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khongXoa = false, coTep = false, xoaTep = false, soTep = {} }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]>; chiXem?: boolean; khongXoa?: boolean; coTep?: boolean; xoaTep?: boolean; soTep?: Record<string, number> }) {
+export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khongXoa = false, coTep = false, soTep = {} }: { muc: MucHr; dong: Dong[]; nv: Tra[]; khoi: Tra[]; tc?: Record<string, Tra[]>; chiXem?: boolean; khongXoa?: boolean; coTep?: boolean; soTep?: Record<string, number> }) {
   const [tim, setTim] = useState("");
   const [loc, setLoc] = useState("");
   const [locCot, setLocCot] = useState<Record<string, string>>({});
   const [chiSap, setChiSap] = useState(false);
   const [sua, setSua] = useState<Dong | "moi" | null>(null);
   const [xemTep, setXemTep] = useState<Dong | null>(null);
-  const hienTep = muc.dinhKem && coTep;
+  const hienTep = coTep;
   const nvMap = useMemo(() => new Map(nv.map((x) => [x.id, x.ten])), [nv]);
   const khoiMap = useMemo(() => new Map(khoi.map((x) => [x.id, x.ten])), [khoi]);
   const tcMap = useMemo(() => new Map(Object.values(tc).flat().map((x) => [x.id, x.ten])), [tc]);
@@ -174,12 +174,12 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khong
         {sua !== null && <FormHr key={sua === "moi" ? "moi" : sua.id} muc={muc} coSan={sua === "moi" ? undefined : sua} nv={nv} khoi={khoi} tc={tc} khongXoa={khongXoa} xong={() => setSua(null)} />}
         {hienTep && sua !== null && (
           <div className="mt-5 border-t border-vien pt-4">
-            {sua === "moi" ? <p className="text-[13px] text-muc-3">Lưu dòng này xong sẽ đính kèm được tệp.</p> : <TepDinhKem man={muc.ma} dongId={sua.id} duocXoa={xoaTep} />}
+            {sua === "moi" ? <p className="text-[13px] text-muc-3">Lưu dòng này xong sẽ đính kèm được tệp.</p> : <TepDinhKem man={muc.ma} dongId={sua.id} />}
           </div>
         )}
       </Hop>
       <Hop mo={xemTep !== null} dong={() => setXemTep(null)} tieuDe={xemTep ? `Tệp đính kèm: ${hienGiaTri(cotTieuDe, xemTep, nvMap, khoiMap, tcMap) || muc.ten}` : "Tệp đính kèm"} rong="rong">
-        {xemTep !== null && <TepDinhKem man={muc.ma} dongId={xemTep.id} duocXoa={xoaTep} />}
+        {xemTep !== null && <TepDinhKem man={muc.ma} dongId={xemTep.id} />}
       </Hop>
     </div>
   );

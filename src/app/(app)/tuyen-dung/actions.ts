@@ -5,7 +5,7 @@ import { coVaiTro } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { BUOC_UNG_VIEN, TRANG_THAI_TIN } from "@/lib/tuyen-dung";
 
-export type KetQua = { loi?: string; ok?: boolean };
+export type KetQua = { loi?: string; ok?: boolean; id?: string };
 
 const KHONG_QUYEN: KetQua = { loi: "Bạn không có quyền thực hiện thao tác này." };
 const cho = async () => coVaiTro(["admin", "ky_thuat"]);
@@ -104,9 +104,9 @@ export async function luuUngVien(fd: FormData): Promise<KetQua> {
     trang_thai: buoc,
   };
   const db = createAdminClient();
-  const { error } = id
-    ? await db.from("ung_vien").update(du).eq("id", id)
-    : await db.from("ung_vien").insert({ ...du, tin_tuyen_dung_id: tinId, ...(ngayNhan ? { ngay_nhan_ho_so: ngayNhan } : {}) });
+  const { data: moi, error } = id
+    ? await db.from("ung_vien").update(du).eq("id", id).select("id").maybeSingle()
+    : await db.from("ung_vien").insert({ ...du, tin_tuyen_dung_id: tinId, ...(ngayNhan ? { ngay_nhan_ho_so: ngayNhan } : {}) }).select("id").maybeSingle();
   if (error) return { loi: "Chưa lưu được ứng viên. Thử lại sau." };
   if (id) {
     // Ngày nhận việc: đặt khi chuyển sang "Nhận việc" (không ghi đè nếu đã có), xoá khi rời khỏi bước đó.
@@ -115,7 +115,7 @@ export async function luuUngVien(fd: FormData): Promise<KetQua> {
     else await db.from("ung_vien").update({ ngay_nhan_viec: null }).eq("id", id);
   }
   xong();
-  return { ok: true };
+  return { ok: true, id: moi?.id ?? id };
 }
 
 export async function doiBuocUngVien(fd: FormData): Promise<KetQua> {

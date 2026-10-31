@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { duongDanHopLe, duongDanTrongKho, duoiTep, dungLuong, GIOI_HAN_TEP, kiemTep, laManTep } from "@/lib/tep-dinh-kem";
+import { duongDanHopLe, duongDanTrongKho, duoiTep, dungLuong, GIOI_HAN_TEP, kiemTep, laLoaiGiay, laManTep, loaiTheoMan } from "@/lib/tep-dinh-kem";
 
 describe("đính kèm tệp: kiểm tra", () => {
   it("nhận PDF, ảnh, Word, Excel, zip; từ chối đuôi lạ, tệp rỗng, quá 25MB", () => {
@@ -23,9 +23,23 @@ describe("đính kèm tệp: kiểm tra", () => {
   });
   it("tên màn hợp lệ, đuôi tệp, dung lượng đọc được", () => {
     expect(laManTep("so-hop-dong")).toBe(true);
-    expect(laManTep("nhan-vien")).toBe(false);
+    expect(laManTep("nhan-vien")).toBe(true); // chỉ kiểm hình dạng; màn có nhận tệp do máy chủ kiểm
+    expect(laManTep("../etc")).toBe(false);
+    expect(laManTep("A B")).toBe(false);
     expect(duoiTep("a.b.PDF")).toBe("pdf");
     expect(dungLuong(500)).toBe("1 KB");
     expect(dungLuong(2_621_440)).toBe("2,5 MB");
+  });
+  it("nhận slide, văn bản, ảnh iPhone; vẫn chặn svg/html/exe", () => {
+    for (const t of ["bai.pptx", "bai.PPT", "a.txt", "a.csv", "a.rtf", "a.odp", "a.heic", "a.bmp", "a.rar", "a.7z"]) expect(kiemTep(t, 100), t).toBeNull();
+    for (const t of ["a.svg", "a.html", "a.exe", "a.js"]) expect(kiemTep(t, 100), t).toMatch(/Chỉ nhận/);
+  });
+  it("loại giấy theo màn: ứng viên có CV, pháp lý có LOA/CFS, màn khác có tài liệu/slide/ảnh", () => {
+    expect(loaiTheoMan("ung-vien")).toContain("CV");
+    expect(loaiTheoMan("so-hop-dong")).toContain("CFS");
+    expect(loaiTheoMan("tai-san-noi-dung")).toEqual(expect.arrayContaining(["Tài liệu", "Bài thuyết trình (slide)", "Hình ảnh"]));
+    expect(laLoaiGiay("CV", "ung-vien")).toBe(true);
+    expect(laLoaiGiay("CV", "so-hop-dong")).toBe(false);
+    expect(laLoaiGiay("Bậy")).toBe(false);
   });
 });
