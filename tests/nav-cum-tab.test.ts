@@ -54,3 +54,25 @@ describe("cụm Tuyển dụng", () => {
     expect(cumCuaDuongDan("/tuyen-dung/abc-123")?.ma).toBe("tuyen-dung");
   });
 });
+
+describe("cụm Lương", () => {
+  const c = CUM_TAB.find((x) => x.ma === "luong")!;
+  it("quản trị thấy đủ 8 tab; nhân viên chỉ thấy Bảng lương (phiếu lương của mình) nên không có thanh tab; giữ riêng Chấm công, Bảng công, Quỹ phép", () => {
+    expect(tabCuaCum(c, "admin")).toHaveLength(8);
+    expect(tabCuaCum(c, "nhan_vien").map((t) => t.duong_dan)).toEqual(["/luong"]);
+    for (const p of ["/cham-cong", "/bang-cong", "/quy-phep"]) expect(cumCuaDuongDan(p), p).toBeNull();
+  });
+});
+
+describe("cụm Cài đặt phiếu", () => {
+  const c = CUM_TAB.find((x) => x.ma === "cai-dat-phieu")!;
+  it("Kỹ thuật thấy 3 tab; Quản trị thấy 2 (Setup luồng phiếu vốn chỉ của Kỹ thuật); nhân viên không thấy gì; Phê duyệt và Kỹ thuật không bị kéo vào cụm", () => {
+    expect(tabCuaCum(c, "ky_thuat")).toHaveLength(3);
+    expect(tabCuaCum(c, "admin").map((t) => t.duong_dan)).toEqual(["/phe-duyet/lua-chon", "/phan-quyen-nghiep-vu"]);
+    expect(tabCuaCum(c, "nhan_vien")).toHaveLength(0);
+    expect(locMenuTheoVaiTro("nhan_vien").some((m) => m.cum === "cai-dat-phieu")).toBe(false);
+    expect(cumCuaDuongDan("/phe-duyet")).toBeNull();
+    expect(cumCuaDuongDan("/ky-thuat")).toBeNull();
+    expect(cumCuaDuongDan("/ky-thuat/luong-phieu")?.ma).toBe("cai-dat-phieu");
+  });
+});
