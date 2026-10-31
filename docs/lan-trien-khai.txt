@@ -1,0 +1,1 @@
+31/10/2026 15:37 đẩy commit trống lên main để Vercel tự triển khai (không gắn [skip vercel]): gộp GPS 30 m, cờ giữ quyền, avatar Tula, đính kèm tệp
