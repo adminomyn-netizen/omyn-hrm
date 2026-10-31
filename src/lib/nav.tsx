@@ -32,6 +32,7 @@ import {
   FileSpreadsheet,
   PiggyBank,
   HeartPulse,
+  Handshake,
   type LucideIcon,
 } from "lucide-react";
 import type { VaiTro } from "@/lib/auth";
@@ -307,6 +308,22 @@ export const menuChinh: MucMenu[] = [
     icon: ClipboardList,
     chiVaiTro: CHI_QUAN_LY,
     moTa: "Đơn cho đại lý, khách sỉ từ báo giá tới thu đủ tiền.",
+  },
+  {
+    ten: "Cơ hội khách sỉ",
+    duong_dan: "/hr/co-hoi-khach-si",
+    nhom: "Kinh doanh",
+    icon: Handshake,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Khách sỉ, đại lý tiềm năng từ liên hệ đầu tới chốt hoặc mất.",
+  },
+  {
+    ten: "Đổi trả và hoàn hàng",
+    duong_dan: "/hr/doi-tra-hoan-hang",
+    nhom: "Kinh doanh",
+    icon: UserMinus,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Đơn khách trả hoặc đổi: lý do, tiền hoàn, người xử lý.",
   },
   {
     ten: "Danh mục sản phẩm",
