@@ -28,24 +28,24 @@ export async function docLuong(maPhieu: string): Promise<HangLuong[]> {
   }));
 }
 
-type NvTho = { id: string; user_id: string | null; ho_ten: string; chuc_danh: string | null; quan_ly_id: string | null; trang_thai: string };
-const sangNhanSu = (n: NvTho): NhanSuDuyet => ({ id: n.id, userId: n.user_id, hoTen: n.ho_ten, chucDanh: n.chuc_danh, quanLyId: n.quan_ly_id, daNghi: n.trang_thai === "Đã nghỉ" });
+type NvTho = { id: string; user_id: string | null; ho_ten: string; chuc_danh: string | null; quan_ly_id: string | null; trang_thai: string; quyen_giam_doc?: boolean | null };
+const sangNhanSu = (n: NvTho): NhanSuDuyet => ({ id: n.id, userId: n.user_id, hoTen: n.ho_ten, chucDanh: n.chuc_danh, quanLyId: n.quan_ly_id, daNghi: n.trang_thai === "Đã nghỉ", quyenGiamDoc: n.quyen_giam_doc });
 
 export async function nhanVienCuaTaiKhoan(userId: string): Promise<NhanSuDuyet | null> {
-  const { data } = await dbHr().from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, quan_ly_id, trang_thai").eq("user_id", userId).maybeSingle();
+  const { data } = await dbHr().from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, quan_ly_id, trang_thai, quyen_giam_doc").eq("user_id", userId).maybeSingle();
   return data ? sangNhanSu(data as NvTho) : null;
 }
 
 export async function nguCanhNguoiDuyet(nguoiNop: NhanSuDuyet | null): Promise<NguCanhNguoiDuyet> {
   const [{ data }, us] = await Promise.all([
-    dbHr().from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, quan_ly_id, trang_thai"),
+    dbHr().from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, quan_ly_id, trang_thai, quyen_giam_doc"),
     createAdminClient().auth.admin.listUsers({ page: 1, perPage: 1000 }),
   ]);
   const tatCa = ((data ?? []) as NvTho[]).map(sangNhanSu);
   const kyThuat = (us.data?.users ?? [])
     .filter((x) => x.app_metadata?.vai_tro === "ky_thuat")
     .map((x) => ({ userId: x.id, ten: (x.app_metadata?.ho_ten as string) || x.email || "Kỹ thuật" }));
-  return { nguoiNop, tatCa, giamDoc: tatCa.filter((n) => laGiamDoc(n.chucDanh) && n.userId), kyThuat };
+  return { nguoiNop, tatCa, giamDoc: tatCa.filter((n) => laGiamDoc(n.chucDanh, n.quyenGiamDoc) && n.userId), kyThuat };
 }
 
 /** Chuông trong ứng dụng + đẩy tới điện thoại. Không bao giờ ném lỗi: thông báo hỏng không được làm hỏng nghiệp vụ. */
@@ -148,7 +148,7 @@ export async function baoTheoCauHinh(maPhieu: string, suKien: SuKienThongBao, ng
     const { data } = await dbHr().from("pd_thong_bao_cau_hinh").select("loai_nguoi, chuc_danh, nhan_vien_id").eq("ma_phieu", maPhieu).eq("su_kien", suKien).eq("dang_bat", true);
     const ds = (data ?? []) as { loai_nguoi: LoaiNguoiDuyet; chuc_danh: string | null; nhan_vien_id: string | null }[];
     if (ds.length === 0) return;
-    const nguoiNop = nguoiNopId ? (await dbHr().from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, quan_ly_id, trang_thai").eq("id", nguoiNopId).maybeSingle()).data as NvTho | null : null;
+    const nguoiNop = nguoiNopId ? (await dbHr().from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, quan_ly_id, trang_thai, quyen_giam_doc").eq("id", nguoiNopId).maybeSingle()).data as NvTho | null : null;
     const ctx = await nguCanhNguoiDuyet(nguoiNop ? sangNhanSu(nguoiNop) : null);
     const user = new Set<string>();
     for (const r of ds) {

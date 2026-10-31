@@ -34,7 +34,7 @@ export async function layToanCanhKyThuat(): Promise<ToanCanh> {
   const nhatKy24h = new Date(Date.now() - 864e5).toISOString();
 
   const [nv, ccThang, don, uv, tin, ky, bl, tham, thoa, dg, khoi, nk, nkTong, ds] = await Promise.all([
-    db.from("nhan_vien").select("id, chuc_danh, trang_thai, ngay_vao_lam, user_id, khoi(ten)"),
+    db.from("nhan_vien").select("id, chuc_danh, trang_thai, ngay_vao_lam, user_id, quyen_giam_doc, khoi(ten)"),
     db.from("cham_cong").select("nhan_vien_id, ngay, gio_vao, gio_ra, trang_thai").gte("ngay", dauThang),
     db.from("don_tu").select("nhan_vien_id, loai, trang_thai, tu_ngay, den_ngay, created_at"),
     db.from("ung_vien").select("trang_thai, ngay_nhan_ho_so, ngay_phong_van"),
@@ -75,7 +75,7 @@ export async function layToanCanhKyThuat(): Promise<ToanCanh> {
   const dangNhap7 = taiKhoan.filter((u) => u.last_sign_in_at && Date.parse(u.last_sign_in_at) >= dem7).length;
   const chuaTungDangNhap = taiKhoan.filter((u) => !u.last_sign_in_at).length;
   const kyThuatIds = new Set(taiKhoan.filter((u) => u.app_metadata?.vai_tro === "ky_thuat").map((u) => u.id));
-  const phaiChamCong = dangLam.filter((n) => !khongCanChamCong(n.user_id && kyThuatIds.has(n.user_id) ? "ky_thuat" : null, n.chuc_danh));
+  const phaiChamCong = dangLam.filter((n) => !khongCanChamCong(n.user_id && kyThuatIds.has(n.user_id) ? "ky_thuat" : null, n.chuc_danh, n.quyen_giam_doc));
   const phaiChamCongIds = new Set(phaiChamCong.map((n) => n.id));
 
   // ── chấm công

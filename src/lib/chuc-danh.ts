@@ -1,5 +1,5 @@
 /** Chức danh nhạy cảm: chỉ Quản trị được gắn tài khoản vào hồ sơ có chức danh này. */
-const CHUC_DANH_NHAY_CAM = ["tổng giám đốc", "phó tổng giám đốc", "hcns", "kế toán"];
+const CHUC_DANH_NHAY_CAM = ["tổng giám đốc", "phó tổng giám đốc", "phó giám đốc", "hcns", "kế toán"];
 export function laChucDanhNhayCam(chucDanh: string | null | undefined) {
   const c = (chucDanh ?? "").toLowerCase();
   return CHUC_DANH_NHAY_CAM.some((x) => c.includes(x));
@@ -16,12 +16,13 @@ export function nenLaQuanTri(chucVu: string | null | undefined, tenKhoi: string 
   return tenKhoi === KHOI_QUYEN_QUAN_TRI || CHUC_VU_QUYEN_QUAN_TRI.includes((chucVu ?? "").trim().toLowerCase());
 }
 
-/** Chức vụ không phải chấm công (chủ app chốt 22/10/2026): Tổng giám đốc, Giám đốc và tài khoản Kỹ thuật.
+/** Cờ `nhan_vien.quyen_giam_doc` (migration 0051): người giữ quyền giám đốc dù chức danh ghi khác (chị Lâm = Phó giám đốc nhưng giữ mọi quyền hiện tại).
+ * Chức vụ không phải chấm công (chủ app chốt 22/10/2026): Tổng giám đốc, Giám đốc và tài khoản Kỹ thuật.
  * Mọi người còn lại — kể cả Quản trị/Hành chính nhân sự — đều phải chấm công. Phó giám đốc vẫn chấm công. */
 export const CHUC_VU_KHONG_CHAM_CONG = ["tổng giám đốc", "giám đốc"];
-export function khongCanChamCong(vaiTro: string | null | undefined, chucDanh: string | null | undefined) {
-  return vaiTro === "ky_thuat" || CHUC_VU_KHONG_CHAM_CONG.includes((chucDanh ?? "").trim().toLowerCase());
+export function khongCanChamCong(vaiTro: string | null | undefined, chucDanh: string | null | undefined, quyenGiamDoc?: boolean | null) {
+  return vaiTro === "ky_thuat" || !!quyenGiamDoc || CHUC_VU_KHONG_CHAM_CONG.includes((chucDanh ?? "").trim().toLowerCase());
 }
 
 /** Chức vụ giám đốc (Tổng giám đốc, Giám đốc): người duy nhất được nhập/sửa mức thưởng thi đua KPI (anh Nam 30/10). Phó giám đốc KHÔNG tính. */
-export const laGiamDoc = (chucDanh: string | null | undefined) => CHUC_VU_KHONG_CHAM_CONG.includes((chucDanh ?? "").trim().toLowerCase());
+export const laGiamDoc = (chucDanh: string | null | undefined, quyenGiamDoc?: boolean | null) => !!quyenGiamDoc || CHUC_VU_KHONG_CHAM_CONG.includes((chucDanh ?? "").trim().toLowerCase());

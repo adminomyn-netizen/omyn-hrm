@@ -280,7 +280,7 @@ export function hangApDung(luong: readonly HangLuong[], du: DuLieu): HangLuong[]
     .sort((a, b) => a.buoc - b.buoc);
 }
 
-export type NhanSuDuyet = { id: string; userId: string | null; hoTen: string; chucDanh: string | null; quanLyId: string | null; daNghi?: boolean };
+export type NhanSuDuyet = { id: string; userId: string | null; hoTen: string; chucDanh: string | null; quanLyId: string | null; daNghi?: boolean; quyenGiamDoc?: boolean | null };
 
 export type NguCanhNguoiDuyet = {
   nguoiNop: NhanSuDuyet | null;

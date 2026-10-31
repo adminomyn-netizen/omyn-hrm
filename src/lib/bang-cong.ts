@@ -47,7 +47,7 @@ export async function layBangCongThang(nam: number, thang: number): Promise<{ do
   const homNay = ngayHomNayHCM();
 
   const [nv, cc, don, le, kyThuat] = await Promise.all([
-    db.from("nhan_vien").select("id, ho_ten, ma_nhan_vien, chuc_danh, user_id, ngay_vao_lam, khoi(ten)").neq("trang_thai", "Đã nghỉ").order("ho_ten"),
+    db.from("nhan_vien").select("id, ho_ten, ma_nhan_vien, chuc_danh, user_id, ngay_vao_lam, quyen_giam_doc, khoi(ten)").neq("trang_thai", "Đã nghỉ").order("ho_ten"),
     docHet((a, b) => db.from("cham_cong").select("nhan_vien_id, ngay, gio_vao").gte("ngay", tu).lte("ngay", den).order("ngay").range(a, b)),
     docHet((a, b) =>
       db.from("don_tu").select("nhan_vien_id, loai, tu_ngay, den_ngay, gio_tu, gio_den").eq("trang_thai", "Đã duyệt").lte("tu_ngay", den).gte("den_ngay", tu).order("created_at").range(a, b),
@@ -64,7 +64,7 @@ export async function layBangCongThang(nam: number, thang: number): Promise<{ do
   for (const d of don) (donTheoNguoi.get(d.nhan_vien_id) ?? donTheoNguoi.set(d.nhan_vien_id, []).get(d.nhan_vien_id)!).push(d);
 
   const dong: DongBangCong[] = (nv.data ?? []).map((n) => {
-    const mien = khongCanChamCong(n.user_id && kyThuat.has(n.user_id) ? "ky_thuat" : null, n.chuc_danh);
+    const mien = khongCanChamCong(n.user_id && kyThuat.has(n.user_id) ? "ky_thuat" : null, n.chuc_danh, n.quyen_giam_doc);
     const co = chamTheoNguoi.get(n.id) ?? new Set<string>();
     const dn = donTheoNguoi.get(n.id) ?? [];
     const o = Array.from({ length: soNgay }, (_, i) => {

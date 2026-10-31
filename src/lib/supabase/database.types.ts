@@ -826,6 +826,7 @@ export type Database = {
           quan_ly_id: string | null
           quan_ly_phu_id: string | null
           tai_khoan_hoat_dong: boolean
+          quyen_giam_doc: boolean
           trang_thai: string
           user_id: string | null
         }
@@ -841,6 +842,7 @@ export type Database = {
           quan_ly_id?: string | null
           quan_ly_phu_id?: string | null
           tai_khoan_hoat_dong?: boolean
+          quyen_giam_doc?: boolean
           trang_thai?: string
           user_id?: string | null
         }
@@ -856,6 +858,7 @@ export type Database = {
           quan_ly_id?: string | null
           quan_ly_phu_id?: string | null
           tai_khoan_hoat_dong?: boolean
+          quyen_giam_doc?: boolean
           trang_thai?: string
           user_id?: string | null
         }

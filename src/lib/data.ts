@@ -52,9 +52,9 @@ export async function layNhanVienIdTheoUser(userId: string): Promise<string | nu
 
 /** Hồ sơ của tài khoản + có phải chấm công không (Tổng giám đốc, Giám đốc, Kỹ thuật thì không). */
 export async function layHoSoChamCong(userId: string, vaiTro: string) {
-  const { data, error } = await createAdminClient().from("nhan_vien").select("id, ho_ten, chuc_danh").eq("user_id", userId).maybeSingle();
+  const { data, error } = await createAdminClient().from("nhan_vien").select("id, ho_ten, chuc_danh, quyen_giam_doc").eq("user_id", userId).maybeSingle();
   if (error) throw error;
-  return { nhanVienId: data?.id ?? null, hoTen: data?.ho_ten ?? null, chucDanh: data?.chuc_danh ?? null, canChamCong: !khongCanChamCong(vaiTro, data?.chuc_danh) };
+  return { nhanVienId: data?.id ?? null, hoTen: data?.ho_ten ?? null, chucDanh: data?.chuc_danh ?? null, canChamCong: !khongCanChamCong(vaiTro, data?.chuc_danh, data?.quyen_giam_doc) };
 }
 
 /** Số ngày phép năm đã dùng + đang chờ duyệt của một người trong năm dương lịch `nam` (đơn bị từ chối không tính). */
@@ -115,7 +115,7 @@ export async function layChamCongHomNay() {
 
   const [{ data: nhanVienDangLam, error: loi1 }, { data: chamCong, error: loi2 }] =
     await Promise.all([
-      supabase.from("nhan_vien").select("id, chuc_danh, user_id").neq("trang_thai", "Đã nghỉ"),
+      supabase.from("nhan_vien").select("id, chuc_danh, user_id, quyen_giam_doc").neq("trang_thai", "Đã nghỉ"),
       supabase
         .from("cham_cong")
         .select("gio_vao, gio_ra, trang_thai, nhan_vien(ho_ten, khoi(ten))")
@@ -124,7 +124,7 @@ export async function layChamCongHomNay() {
   if (loi1) throw loi1;
   if (loi2) throw loi2;
   const kyThuat = await layUserIdKyThuat();
-  const canChamCong = nhanVienDangLam.filter((n) => !khongCanChamCong(n.user_id && kyThuat.has(n.user_id) ? "ky_thuat" : null, n.chuc_danh));
+  const canChamCong = nhanVienDangLam.filter((n) => !khongCanChamCong(n.user_id && kyThuat.has(n.user_id) ? "ky_thuat" : null, n.chuc_danh, n.quyen_giam_doc));
 
   return {
     tongNhanVien: canChamCong.length,

@@ -17,7 +17,7 @@ const KHONG_CHAM = new Set(["Nghỉ chế độ", "Công tác", "Làm remote", "
 export async function nguoiPhaiChamCong(ngay: string, userId?: string): Promise<NguoiCanCham[]> {
   if (new Date(`${ngay}T00:00:00Z`).getUTCDay() === 0) return [];
   const db = createAdminClient();
-  let qNv = db.from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, ngay_vao_lam").neq("trang_thai", "Đã nghỉ").not("user_id", "is", null);
+  let qNv = db.from("nhan_vien").select("id, user_id, ho_ten, chuc_danh, ngay_vao_lam, quyen_giam_doc").neq("trang_thai", "Đã nghỉ").not("user_id", "is", null);
   if (userId) qNv = qNv.eq("user_id", userId);
   const [{ data: le }, { data: nvs }, { data: dons }, { data: ccs }] = await Promise.all([
     db.from("ngay_le").select("ngay").eq("ngay", ngay).maybeSingle(),
@@ -39,7 +39,7 @@ export async function nguoiPhaiChamCong(ngay: string, userId?: string): Promise<
   for (const d of dons ?? []) donTheo.set(d.nhan_vien_id, [...(donTheo.get(d.nhan_vien_id) ?? []), d]);
   const ccTheo = new Map((ccs ?? []).map((c) => [c.nhan_vien_id, c]));
   return nvs.flatMap((n) => {
-    if (!n.user_id || khongCanChamCong(kyThuat.has(n.user_id) ? "ky_thuat" : "nhan_vien", n.chuc_danh)) return [];
+    if (!n.user_id || khongCanChamCong(kyThuat.has(n.user_id) ? "ky_thuat" : "nhan_vien", n.chuc_danh, n.quyen_giam_doc)) return [];
     if (n.ngay_vao_lam && ngay < n.ngay_vao_lam) return [];
     const phu = donTheo.get(n.id) ?? [];
     const caNgay = phu.some((d) => KHONG_CHAM.has(d.loai) || (NGHI_CA_NGAY.has(d.loai) && ((!d.gio_tu && !d.gio_den) || soNgayNghi(d.tu_ngay, d.den_ngay, d.gio_tu, d.gio_den) >= 1)));

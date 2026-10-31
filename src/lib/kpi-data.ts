@@ -29,7 +29,7 @@ async function docHet<T>(lay: (tu: number, den: number) => PromiseLike<{ data: T
 export async function docNen() {
   const db = dbHr();
   const [nv, ct, kh] = await Promise.all([
-    db.from("nhan_vien").select("id, ho_ten, ma_nhan_vien, khoi_id, quan_ly_id, user_id, chuc_danh").neq("trang_thai", "Đã nghỉ").order("ho_ten").limit(2000),
+    db.from("nhan_vien").select("id, ho_ten, ma_nhan_vien, khoi_id, quan_ly_id, user_id, chuc_danh, quyen_giam_doc").neq("trang_thai", "Đã nghỉ").order("ho_ten").limit(2000),
     db.from("kpi_chi_tieu").select("id, khoi_id, ten, don_vi, muc_tieu_ngay, trong_so, chieu").eq("hoat_dong", true).order("tao_luc").limit(500),
     db.from("khoi").select("id, ten").order("ten").limit(200),
   ]);
@@ -37,7 +37,7 @@ export async function docNen() {
   const kyThuat = new Set<string>();
   const { data: us } = await createAdminClient().auth.admin.listUsers({ page: 1, perPage: 1000 });
   for (const u of us?.users ?? []) if (u.app_metadata?.vai_tro === "ky_thuat") kyThuat.add(u.id);
-  const nguoi: NguoiKpiDay[] = (nv.data ?? []).filter((x) => !khongCanChamCong(x.user_id && kyThuat.has(x.user_id) ? "ky_thuat" : "nhan_vien", x.chuc_danh)).map((x) => ({ id: x.id, hoTen: x.ho_ten, khoiId: x.khoi_id, quanLyId: x.quan_ly_id, ma: x.ma_nhan_vien, userId: x.user_id }));
+  const nguoi: NguoiKpiDay[] = (nv.data ?? []).filter((x) => !khongCanChamCong(x.user_id && kyThuat.has(x.user_id) ? "ky_thuat" : "nhan_vien", x.chuc_danh, x.quyen_giam_doc)).map((x) => ({ id: x.id, hoTen: x.ho_ten, khoiId: x.khoi_id, quanLyId: x.quan_ly_id, ma: x.ma_nhan_vien, userId: x.user_id }));
   const chiTieu: (ChiTieu & { donVi: string })[] = (ct.data ?? []).map((x) => ({ id: x.id, khoiId: x.khoi_id, ten: x.ten, donVi: x.don_vi ?? "", mucTieuNgay: Number(x.muc_tieu_ngay), trongSo: x.trong_so, chieu: x.chieu as Chieu }));
   const khoi = new Map<string, string>((kh.data ?? []).map((x) => [x.id, x.ten]));
   return { nguoi, chiTieu, khoi };
