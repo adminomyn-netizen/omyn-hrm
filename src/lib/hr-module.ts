@@ -787,7 +787,7 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "duyet-bao-bi", ten: "Duyệt bao bì và nhãn", nhom: "Sản phẩm & Giá", bang: "sp_duyet_bao_bi", tieuDe: "tieu_de", trangThai: "trang_thai",
-    moTa: "Bao bì và nhãn gửi duyệt trước khi in: đủ thông tin bắt buộc, không ghi công dụng như thuốc, khớp hồ sơ công bố. Danh sách thông tin bắt buộc chính thức chờ chị Lâm hoặc luật sư xác nhận.",
+    moTa: "Bao bì và nhãn gửi duyệt trước khi in (Đã chốt thiết kế = thiết kế xong nhưng chưa kiểm pháp lý; Đạt = đã duyệt đủ): đủ thông tin bắt buộc, không ghi công dụng như thuốc, khớp hồ sơ công bố. Danh sách thông tin bắt buộc chính thức chờ chị Lâm hoặc luật sư xác nhận.",
     sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có bao bì nào gửi duyệt.",
     cot: [
       { k: "tieu_de", nhan: "Tiêu đề", kieu: "chu", batBuoc: true },
@@ -796,7 +796,7 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "du_thong_tin", nhan: "Đủ thông tin bắt buộc trên nhãn", kieu: "co", mac: false },
       { k: "khong_ghi_cong_dung_nhu_thuoc", nhan: "Không ghi công dụng như thuốc", kieu: "co", mac: false },
       { k: "khop_ho_so_cong_bo", nhan: "Khớp hồ sơ công bố", kieu: "co", mac: false },
-      { k: "trang_thai", nhan: "Kết quả duyệt", kieu: "chon", luaChon: ["Chờ duyệt", "Đạt", "Cần sửa"], mac: "Chờ duyệt" },
+      { k: "trang_thai", nhan: "Kết quả duyệt", kieu: "chon", luaChon: ["Chờ duyệt", "Đã chốt thiết kế", "Đạt", "Cần sửa"], mac: "Chờ duyệt" },
       { k: "nguoi_duyet", nhan: "Người duyệt", kieu: "chu" },
       { k: "nhan_xet", nhan: "Nhận xét", kieu: "nhieu", rong: true },
     ],
