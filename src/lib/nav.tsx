@@ -293,6 +293,22 @@ export const menuChinh: MucMenu[] = [
     moTa: "Chỉ tiêu giao theo tháng và kênh so với thực đạt.",
   },
   {
+    ten: "Doanh thu sàn theo ngày",
+    duong_dan: "/hr/doanh-thu-ngay",
+    nhom: "Kinh doanh",
+    icon: TrendingUp,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Mỗi ngày và gian hàng: số đơn, doanh thu, đơn huỷ, tiền hoàn.",
+  },
+  {
+    ten: "Đơn bán sỉ",
+    duong_dan: "/hr/don-si",
+    nhom: "Kinh doanh",
+    icon: ClipboardList,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Đơn cho đại lý, khách sỉ từ báo giá tới thu đủ tiền.",
+  },
+  {
     ten: "Danh mục sản phẩm",
     duong_dan: "/hr/san-pham",
     nhom: "Sản phẩm & Giá",
