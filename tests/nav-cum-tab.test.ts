@@ -28,7 +28,7 @@ describe("cụm tab trong menu", () => {
     for (const c of CUM_TAB) {
       for (const t of tabCuaCum(c, "nhan_vien")) {
         const goc = menuChinh.find((m) => m.duong_dan === t.duong_dan)!;
-        expect(goc.chiVaiTro, `${c.ma} ${t.duong_dan}`).toBeUndefined();
+        expect(!goc.chiVaiTro || goc.chiVaiTro.includes("nhan_vien"), `${c.ma} ${t.duong_dan}`).toBe(true);
       }
     }
   });
@@ -36,5 +36,21 @@ describe("cụm tab trong menu", () => {
     const c = CUM_TAB.find((x) => x.ma === "cong-no-dai-ly")!;
     expect(tabCuaCum(c, "nhan_vien")).toHaveLength(0);
     expect(tabCuaCum(c, "nhan_vien", ["/kinh-doanh/cong-no"]).map((t) => t.duong_dan)).toEqual(["/kinh-doanh/cong-no"]);
+  });
+});
+
+describe("cụm Tuyển dụng", () => {
+  const c = CUM_TAB.find((x) => x.ma === "tuyen-dung")!;
+  it("Yêu cầu tuyển dụng là màn riêng của nhân viên (giữ nguyên quyền cũ): quản trị thấy 3 tab, nhân viên chỉ 1 tab nên không có thanh tab, mục menu dẫn đúng chỗ", () => {
+    expect(tabCuaCum(c, "admin").map((t) => t.duong_dan)).toEqual(["/tuyen-dung", "/hr", "/hr/de-xuat-phe-duyet"]);
+    expect(tabCuaCum(c, "nhan_vien").map((t) => t.duong_dan)).toEqual(["/yeu-cau-tuyen-dung"]);
+    expect(locMenuTheoVaiTro("admin").find((m) => m.cum === "tuyen-dung")!.duong_dan).toBe("/tuyen-dung");
+    expect(locMenuTheoVaiTro("nhan_vien").find((m) => m.cum === "tuyen-dung")!.duong_dan).toBe("/yeu-cau-tuyen-dung");
+  });
+  it("/hr chỉ là Sổ tuyển dụng; các trang /hr/ khác không bị tính vào cụm", () => {
+    expect(cumCuaDuongDan("/hr")?.ma).toBe("tuyen-dung");
+    expect(cumCuaDuongDan("/hr/muc-tieu-tuyen-dung")).toBeNull();
+    expect(cumCuaDuongDan("/hr/de-xuat-phe-duyet")?.ma).toBe("tuyen-dung");
+    expect(cumCuaDuongDan("/tuyen-dung/abc-123")?.ma).toBe("tuyen-dung");
   });
 });
