@@ -2,10 +2,10 @@
 
 export type DaiLyNo = { id: string; ten: string; hanMuc: number | null };
 export type DongNo = { daiLyId: string; ngay: string; loai: string; soTien: number; hanThanhToan: string | null };
-export type CongNo = { id: string; ten: string; phatSinh: number; daThu: number; soDu: number; hanMuc: number | null; vuotHanMuc: boolean; quaHan: number };
+export type CongNo = { id: string; ten: string; phatSinh: number; daThu: number; soDu: number; hanMuc: number | null; vuotHanMuc: boolean; quaHan: number; denHan7Ngay: number };
 
 /** `loaiThu` là tên dòng trả nợ: "Đã thu" với đại lý (họ trả mình), "Đã trả" với nhà cung cấp (mình trả họ).
- * Số dư = tổng phát sinh − tổng đã thu (có thể âm khi thu dư). Quá hạn: trừ tiền đã thu vào khoản phát sinh CŨ NHẤT trước (FIFO), phần còn nợ của khoản đã quá hạn thanh toán (hạn < hôm nay) cộng lại. */
+ * Số dư = tổng phát sinh − tổng đã thu (có thể âm khi thu dư). Quá hạn: trừ tiền đã thu vào khoản phát sinh CŨ NHẤT trước (FIFO), phần còn nợ của khoản đã quá hạn thanh toán (hạn < hôm nay) cộng lại. Đến hạn 7 ngày: phần còn nợ của khoản có hạn từ hôm nay đến hôm nay + 7 ngày. */
 export function tinhCongNo(daiLy: readonly DaiLyNo[], dong: readonly DongNo[], homNay: string, loaiThu = "Đã thu"): CongNo[] {
   return daiLy
     .map((d) => {
@@ -14,13 +14,15 @@ export function tinhCongNo(daiLy: readonly DaiLyNo[], dong: readonly DongNo[], h
       const daThu = ds.filter((x) => x.loai === loaiThu).reduce((a, x) => a + x.soTien, 0);
       const soDu = phatSinh - daThu;
       let thu = daThu;
-      let quaHan = 0;
+      let quaHan = 0, denHan7Ngay = 0;
+      const han7 = new Date(Date.parse(`${homNay}T00:00:00Z`) + 7 * 864e5).toISOString().slice(0, 10);
       for (const x of ds.filter((y) => y.loai === "Phát sinh").sort((a, b) => a.ngay.localeCompare(b.ngay))) {
         const tru = Math.min(thu, x.soTien);
         thu -= tru;
         if (x.hanThanhToan && x.hanThanhToan < homNay) quaHan += x.soTien - tru;
+        else if (x.hanThanhToan && x.hanThanhToan <= han7) denHan7Ngay += x.soTien - tru;
       }
-      return { id: d.id, ten: d.ten, phatSinh, daThu, soDu, hanMuc: d.hanMuc, vuotHanMuc: d.hanMuc !== null && soDu > d.hanMuc, quaHan };
+      return { id: d.id, ten: d.ten, phatSinh, daThu, soDu, hanMuc: d.hanMuc, vuotHanMuc: d.hanMuc !== null && soDu > d.hanMuc, quaHan, denHan7Ngay };
     })
     .filter((c) => c.phatSinh || c.daThu)
     .sort((a, b) => b.soDu - a.soDu);

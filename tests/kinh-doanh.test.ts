@@ -15,7 +15,7 @@ describe("công nợ đại lý", () => {
       "2026-10-31",
     );
     expect(r.map((x) => x.id)).toEqual(["a", "b"]);
-    expect(r[0]).toMatchObject({ phatSinh: 18_000_000, daThu: 4_000_000, soDu: 14_000_000, vuotHanMuc: false, quaHan: 6_000_000 });
+    expect(r[0]).toMatchObject({ phatSinh: 18_000_000, daThu: 4_000_000, soDu: 14_000_000, vuotHanMuc: false, quaHan: 6_000_000, denHan7Ngay: expect.any(Number) });
     expect(r[1]).toMatchObject({ soDu: 0, quaHan: 0, vuotHanMuc: false });
   });
   it("vượt hạn mức khi số dư lớn hơn hạn mức", () => {
@@ -97,5 +97,21 @@ describe("doanh thu sàn 3 nguồn", () => {
     expect(theoNguon[0]).toMatchObject({ doanhThu: 170, hoan: 0, rong: 170, tuKeo: true });
     expect(theoNguon[1].rong).toBe(25);
     expect(theoNguon[2].rong).toBe(20);
+  });
+});
+
+describe("công nợ đến hạn 7 ngày", () => {
+  it("chỉ tính khoản có hạn từ hôm nay đến +7 ngày, trừ tiền đã thu vào khoản cũ nhất trước", () => {
+    const r = tinhCongNo(
+      [{ id: "a", ten: "A", hanMuc: null }],
+      [
+        { daiLyId: "a", ngay: "2026-10-01", loai: "Phát sinh", soTien: 100, hanThanhToan: "2026-11-05" },
+        { daiLyId: "a", ngay: "2026-10-02", loai: "Phát sinh", soTien: 50, hanThanhToan: "2026-11-09" },
+        { daiLyId: "a", ngay: "2026-10-03", loai: "Phát sinh", soTien: 30, hanThanhToan: "2026-11-20" },
+        { daiLyId: "a", ngay: "2026-10-04", loai: "Đã thu", soTien: 40, hanThanhToan: null },
+      ],
+      "2026-11-02",
+    );
+    expect(r[0]).toMatchObject({ quaHan: 0, denHan7Ngay: 110 });
   });
 });
