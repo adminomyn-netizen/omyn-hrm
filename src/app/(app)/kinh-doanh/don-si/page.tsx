@@ -6,18 +6,22 @@ import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { docTatCa } from "@/lib/hr-db";
 import { tienVN } from "@/lib/dinh-dang";
 import { doiChieuDonSi } from "@/lib/kinh-doanh";
+import { NutXuatKho } from "@/components/kinh-doanh/NutXuatKho";
+
+const DUOC_XUAT = ["Đã chốt", "Đang giao", "Đã giao", "Đã thu đủ"];
 
 /** Đối chiếu đơn bán sỉ: tổng các dòng hàng (đã trừ chiết khấu) so với giá trị đơn đã ghi. Số tự tính, không nhập tay. */
 export default async function TrangDoiChieuDonSi() {
   await yeuCauQuyenSo("Kinh doanh");
   const [don, dong] = await Promise.all([
-    docTatCa<{ id: string; ma_don: string; gia_tri: number }>("kd_don_si", "id, ma_don, gia_tri"),
+    docTatCa<{ id: string; ma_don: string; gia_tri: number; trang_thai: string; da_xuat_kho_luc: string | null }>("kd_don_si", "id, ma_don, gia_tri, trang_thai, da_xuat_kho_luc"),
     docTatCa<{ don_si_id: string; so_luong: number; don_gia: number; chiet_khau: number }>("kd_don_si_dong", "id, don_si_id, so_luong, don_gia, chiet_khau"),
   ]);
   const ds = doiChieuDonSi(
     don.map((d) => ({ id: d.id, ma: d.ma_don, giaTri: d.gia_tri })),
     dong.map((d) => ({ donSiId: d.don_si_id, soLuong: d.so_luong, donGia: d.don_gia, chietKhau: d.chiet_khau })),
   );
+  const thongTin = new Map(don.map((d) => [d.id, d]));
   const chuaCoDong = ds.filter((d) => d.soDong === 0).length;
   const lech = ds.filter((d) => d.lech !== null && d.lech !== 0).length;
   return (
@@ -34,8 +38,8 @@ export default async function TrangDoiChieuDonSi() {
         {ds.length === 0 ? (
           <p className="px-4 py-6 text-[14px] text-muc-3">Chưa có đơn sỉ nào. Tạo đơn ở màn Đơn bán sỉ, rồi thêm dòng hàng cho từng đơn.</p>
         ) : (
-          <table className="w-full min-w-[640px] text-[14px]">
-            <thead><tr className="text-left text-[12px] font-medium text-muc-3"><th className="px-4 py-3">Mã đơn</th><th className="px-4 py-3 text-right">Số dòng</th><th className="px-4 py-3 text-right">Tổng dòng hàng</th><th className="px-4 py-3 text-right">Giá trị đơn</th><th className="px-4 py-3">Đối chiếu</th></tr></thead>
+          <table className="w-full min-w-[760px] text-[14px]">
+            <thead><tr className="text-left text-[12px] font-medium text-muc-3"><th className="px-4 py-3">Mã đơn</th><th className="px-4 py-3 text-right">Số dòng</th><th className="px-4 py-3 text-right">Tổng dòng hàng</th><th className="px-4 py-3 text-right">Giá trị đơn</th><th className="px-4 py-3">Đối chiếu</th><th className="px-4 py-3">Kho và công nợ</th></tr></thead>
             <tbody>
               {ds.map((d) => (
                 <tr key={d.id} className="border-t border-vien">
@@ -44,6 +48,15 @@ export default async function TrangDoiChieuDonSi() {
                   <td className="px-4 py-3 text-right tabular-nums">{d.soDong ? tienVN(d.tongDong) : "—"}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{tienVN(d.giaTri)}</td>
                   <td className={`px-4 py-3 text-[13px] ${d.lech === null || d.lech === 0 ? "text-muc-3" : "text-loi"}`}>{d.lech === null ? "Chưa có dòng hàng" : d.lech === 0 ? "Khớp" : `Đơn ${d.lech > 0 ? "cao hơn" : "thấp hơn"} dòng hàng ${tienVN(Math.abs(d.lech))}`}</td>
+                  <td className="px-4 py-3 text-[13px] text-muc-3">
+                    {(() => {
+                      const t = thongTin.get(d.id);
+                      if (t?.da_xuat_kho_luc) return "Đã xuất kho, đã ghi nợ";
+                      if (!t || !DUOC_XUAT.includes(t.trang_thai)) return "Chờ chốt đơn";
+                      if (d.soDong === 0 || d.lech !== 0) return "Cần dòng hàng khớp tiền";
+                      return <NutXuatKho donId={d.id} />;
+                    })()}
+                  </td>
                 </tr>
               ))}
             </tbody>
