@@ -368,6 +368,22 @@ const menuGoc: MucMenu[] = [
     moTa: "Đơn cho đại lý, khách sỉ từ báo giá tới thu đủ tiền.",
   },
   {
+    ten: "Dòng hàng của đơn sỉ",
+    duong_dan: "/hr/don-si-dong-hang",
+    nhom: "Kinh doanh",
+    icon: ClipboardList,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Sản phẩm, số lượng, đơn giá, chiết khấu của từng đơn sỉ.",
+  },
+  {
+    ten: "Đối chiếu đơn sỉ",
+    duong_dan: "/kinh-doanh/don-si",
+    nhom: "Kinh doanh",
+    icon: ClipboardList,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Tổng dòng hàng so với giá trị đơn, đơn lệch tiền.",
+  },
+  {
     ten: "Cơ hội khách sỉ",
     duong_dan: "/hr/co-hoi-khach-si",
     nhom: "Kinh doanh",
@@ -897,6 +913,7 @@ export const CUM_TAB: readonly CumTab[] = [
   { ma: "lo-hang", ten: "Lô hàng", moTa: "Số lô và hạn dùng từng lô nhập; kiểm nghiệm, lưu mẫu và kết quả kiểm lô.", icon: CalendarDays, chinh: "/hr/lo-hang-han-dung", tabs: [{ ten: "Lô và hạn dùng", duong_dan: "/hr/lo-hang-han-dung" }, { ten: "Kiểm lô nhập", duong_dan: "/hr/kiem-lo-nhap" }] },
   { ma: "dong-goi", ten: "Đóng gói và giao hàng", moTa: "Từng đơn đóng gói, vận chuyển, mã vận đơn và thống kê theo trạng thái, kênh, người đóng.", icon: Activity, chinh: "/hr/dong-goi-giao-hang", tabs: [{ ten: "Đơn đóng gói", duong_dan: "/hr/dong-goi-giao-hang" }, { ten: "Thống kê", duong_dan: "/kho/dong-goi" }] },
   { ma: "cong-no-dai-ly", ten: "Công nợ đại lý", moTa: "Ghi phát sinh và đã thu của đại lý, khách sỉ; số dư, quá hạn, vượt hạn mức tự tính.", icon: Wallet, chinh: "/hr/cong-no-dai-ly", tabs: [{ ten: "Ghi công nợ", duong_dan: "/hr/cong-no-dai-ly" }, { ten: "Số dư", duong_dan: "/kinh-doanh/cong-no" }] },
+  { ma: "don-si", ten: "Đơn bán sỉ", moTa: "Đơn bán cho đại lý, khách sỉ, từng dòng hàng và đối chiếu tổng tiền.", icon: Wallet, chinh: "/hr/don-si", tabs: [{ ten: "Đơn bán sỉ", duong_dan: "/hr/don-si" }, { ten: "Dòng hàng", duong_dan: "/hr/don-si-dong-hang" }, { ten: "Đối chiếu", duong_dan: "/kinh-doanh/don-si" }] },
   { ma: "cong-no-ncc", ten: "Công nợ nhà cung cấp", moTa: "Ghi phải trả nhà cung cấp; số còn phải trả và quá hạn tự tính.", icon: PiggyBank, chinh: "/hr/cong-no-nha-cung-cap", tabs: [{ ten: "Ghi công nợ", duong_dan: "/hr/cong-no-nha-cung-cap" }, { ten: "Số dư phải trả", duong_dan: "/tai-chinh/cong-no-ncc" }] },
   // Cụm 2: Tuyển dụng. Nhân viên thường chỉ thấy tab Yêu cầu tuyển dụng nên thanh tab tự ẩn.
   { ma: "tuyen-dung", ten: "Tuyển dụng", moTa: "Yêu cầu tuyển dụng, tin đăng và ứng viên, sổ tuyển dụng (mục tiêu, ngân sách, kênh, phỏng vấn, offer) và đề xuất nhân sự cần duyệt.", icon: UserPlus, chinh: "/tuyen-dung", tabs: [{ ten: "Tin và ứng viên", duong_dan: "/tuyen-dung" }, { ten: "Yêu cầu tuyển dụng", duong_dan: "/yeu-cau-tuyen-dung" }, { ten: "Sổ tuyển dụng", duong_dan: "/hr" }, { ten: "Đề xuất cần duyệt", duong_dan: "/hr/de-xuat-phe-duyet" }] },

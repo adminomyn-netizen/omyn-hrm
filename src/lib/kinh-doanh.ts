@@ -101,3 +101,20 @@ export function gopDoanhThuSan(tay: readonly DongSanTay[], shopeeKeo: readonly D
   const theoNguon = [...ra.values()].map((r) => ({ ...r, rong: Math.max(0, r.doanhThu - r.hoan) }));
   return { theoNguon, ngayShopeeKeo };
 }
+
+export type DonSiDoiChieu = { id: string; ma: string; giaTri: number; tongDong: number; soDong: number; lech: number | null };
+
+/** Thành tiền một dòng hàng = số lượng × đơn giá × (100 − chiết khấu %) / 100, làm tròn đồng. */
+export const thanhTienDong = (soLuong: number, donGia: number, chietKhau: number) => Math.round((soLuong * donGia * (100 - chietKhau)) / 100);
+
+/** Đối chiếu từng đơn sỉ: tổng các dòng hàng so với "giá trị đơn" đã ghi. Đơn chưa có dòng nào thì không so (lech = null). */
+export function doiChieuDonSi(
+  don: readonly { id: string; ma: string; giaTri: number }[],
+  dong: readonly { donSiId: string; soLuong: number; donGia: number; chietKhau: number }[],
+): DonSiDoiChieu[] {
+  return don.map((d) => {
+    const ds = dong.filter((x) => x.donSiId === d.id);
+    const tongDong = ds.reduce((a, x) => a + thanhTienDong(x.soLuong, x.donGia, x.chietKhau), 0);
+    return { id: d.id, ma: d.ma, giaTri: d.giaTri, tongDong, soDong: ds.length, lech: ds.length ? d.giaTri - tongDong : null };
+  });
+}

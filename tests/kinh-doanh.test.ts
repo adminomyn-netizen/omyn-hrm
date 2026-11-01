@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gopDoanhThuSan, ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi } from "@/lib/kinh-doanh";
+import { gopDoanhThuSan, ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi, doiChieuDonSi, thanhTienDong } from "@/lib/kinh-doanh";
 
 describe("công nợ đại lý", () => {
   it("số dư, vượt hạn mức, quá hạn theo thứ tự trừ khoản cũ nhất trước", () => {
@@ -113,5 +113,17 @@ describe("công nợ đến hạn 7 ngày", () => {
       "2026-11-02",
     );
     expect(r[0]).toMatchObject({ quaHan: 0, denHan7Ngay: 110 });
+  });
+});
+
+describe("đối chiếu đơn sỉ với dòng hàng", () => {
+  it("thành tiền có chiết khấu, tổng dòng so với giá trị đơn, đơn chưa có dòng thì không so", () => {
+    expect(thanhTienDong(10, 100_000, 10)).toBe(900_000);
+    const r = doiChieuDonSi(
+      [{ id: "d1", ma: "S1", giaTri: 1_500_000 }, { id: "d2", ma: "S2", giaTri: 500 }],
+      [{ donSiId: "d1", soLuong: 10, donGia: 100_000, chietKhau: 10 }, { donSiId: "d1", soLuong: 5, donGia: 120_000, chietKhau: 0 }],
+    );
+    expect(r[0]).toMatchObject({ tongDong: 1_500_000, soDong: 2, lech: 0 });
+    expect(r[1]).toMatchObject({ tongDong: 0, soDong: 0, lech: null });
   });
 });

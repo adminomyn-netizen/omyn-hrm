@@ -697,6 +697,19 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
+    ma: "don-si-dong-hang", ten: "Dòng hàng của đơn sỉ", nhom: "Kinh doanh", bang: "kd_don_si_dong", tieuDe: "don_si_id",
+    moTa: "Từng dòng hàng trong đơn bán sỉ: sản phẩm, số lượng, đơn giá, chiết khấu. Thành tiền và tổng đơn tự tính ở màn Đối chiếu đơn sỉ, không nhập tay.",
+    sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có dòng hàng nào. Tạo đơn ở màn Đơn bán sỉ trước, rồi thêm từng sản phẩm của đơn vào đây.",
+    cot: [
+      { k: "don_si_id", nhan: "Đơn sỉ", kieu: "tc", bangTc: "kd_don_si", batBuoc: true, the: true },
+      { k: "san_pham_id", nhan: "Sản phẩm", kieu: "tc", bangTc: "sp_san_pham", batBuoc: true, the: true },
+      { k: "so_luong", nhan: "Số lượng", kieu: "so", batBuoc: true, mac: 1, khoang: [1, 1000000], the: true },
+      { k: "don_gia", nhan: "Đơn giá (đ)", kieu: "tien", batBuoc: true, goiY: "Giá sỉ theo màn Bảng giá theo kênh", the: true },
+      { k: "chiet_khau", nhan: "Chiết khấu (%)", kieu: "so", mac: 0, khoang: [0, 100], the: true },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
     ma: "co-hoi-khach-si", ten: "Cơ hội khách sỉ", nhom: "Kinh doanh", bang: "kd_co_hoi", tieuDe: "ten_khach", trangThai: "giai_doan",
     moTa: "Khách sỉ, đại lý tiềm năng từ lần liên hệ đầu tới khi chốt hoặc mất: nguồn, nhu cầu, giá trị dự kiến, ngày liên hệ tiếp. Báo trước 2 ngày khi tới hẹn liên hệ. Chốt xong thì điền ngày chốt (doanh số theo người tính theo ngày này) và thêm vào màn Đại lý và khách sỉ.",
     sapXep: { cot: "tao_luc", giam: true }, canhBao: { cot: "lien_he_tiep", ngay: 2, nhan: "Sắp tới hẹn liên hệ" }, trong: "Chưa có cơ hội nào.",
