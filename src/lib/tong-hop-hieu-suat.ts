@@ -41,8 +41,8 @@ export async function tinhTongHop(k: KyTongHop): Promise<{ tieuDe: string; noiDu
   const chiTiet = { luot, dungGio, diMuon, thieuRa, donDuyet: duyet, donTuChoi: tuChoi, donCho: cho, nhanSuMoi: nvMoi?.length ?? 0, dangLam: dangLam ?? 0, ungVienMoi: uv?.length ?? 0, tyLeDungGio: ty };
   const noiDung = [
     luot ? `Chuyên cần: ${luot} lượt chấm công, đúng giờ ${ty}% (${dungGio}), đi muộn ${diMuon}, thiếu giờ ra ${thieuRa}.` : "Chuyên cần: chưa có lượt chấm công nào.",
-    `Đơn từ: ${duyet} đã duyệt, ${tuChoi} từ chối, ${cho} đang chờ.`,
-    `Nhân sự: ${chiTiet.nhanSuMoi} người mới vào, đang làm ${chiTiet.dangLam} người. Tuyển dụng: ${chiTiet.ungVienMoi} ứng viên mới.`,
+    `Đơn từ: ${duyet} duyệt, ${tuChoi} từ chối, ${cho} chờ.`,
+    `Nhân sự: mới vào ${chiTiet.nhanSuMoi}, đang làm ${chiTiet.dangLam}. Ứng viên mới: ${chiTiet.ungVienMoi}.`,
   ].join(" ");
   return { tieuDe: `Tổng hợp hiệu suất ${k.nhan}`, noiDung, chiTiet };
 }

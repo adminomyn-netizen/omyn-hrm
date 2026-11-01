@@ -56,7 +56,7 @@ export async function GET(req: Request) {
       const tt = await tinhTongHop(k);
       const { data: moi } = await db.from("tong_hop_hieu_suat").upsert({ loai: k.loai, ky: k.ky, tieu_de: tt.tieuDe, noi_dung: tt.noiDung, chi_tiet: tt.chiTiet }, { onConflict: "loai,ky", ignoreDuplicates: true }).select("id");
       // Chỉ báo khi kỳ này vừa được ghi lần đầu (đã có từ lần chạy trước thì bỏ qua).
-      if (moi?.length) for (const u of quanLy) await gui(u, `tong_hop_${k.loai}`, { tieuDe: tt.tieuDe, noiDung: "Đã có tổng hợp mới. Mở chuông thông báo để xem số liệu.", url: "/tong-hop" });
+      if (moi?.length) for (const u of quanLy) await gui(u, `tong_hop_${k.loai}`, { tieuDe: tt.tieuDe, noiDung: tt.noiDung, url: "/tong-hop" });
     }
   }
   let hr = 0;
