@@ -118,3 +118,22 @@ export function doiChieuDonSi(
     return { id: d.id, ma: d.ma, giaTri: d.giaTri, tongDong, soDong: ds.length, lech: ds.length ? d.giaTri - tongDong : null };
   });
 }
+
+export type DiemKhach = { id: string; ten: string; kenh: string; dongYNhanTin: boolean; tich: number; dung: number; soDu: number; hang: string | null };
+
+/** Điểm từng khách lẻ: tích − dùng. Hạng = hạng có mức điểm tối thiểu cao nhất mà TỔNG ĐIỂM ĐÃ TÍCH đạt (dùng điểm không làm tụt hạng). Chưa đặt hạng nào thì hạng để trống. */
+export function tinhDiemKhach(
+  khach: readonly { id: string; ten: string; kenh: string; dongYNhanTin: boolean }[],
+  dong: readonly { khachId: string; loai: string; soDiem: number }[],
+  hang: readonly { ten: string; diemToiThieu: number }[],
+): DiemKhach[] {
+  const hangXep = [...hang].sort((a, b) => b.diemToiThieu - a.diemToiThieu);
+  return khach
+    .map((k) => {
+      const ds = dong.filter((x) => x.khachId === k.id);
+      const tich = ds.filter((x) => x.loai === "Tích").reduce((a, x) => a + x.soDiem, 0);
+      const dung = ds.filter((x) => x.loai === "Dùng").reduce((a, x) => a + x.soDiem, 0);
+      return { id: k.id, ten: k.ten, kenh: k.kenh, dongYNhanTin: k.dongYNhanTin, tich, dung, soDu: tich - dung, hang: hangXep.find((h) => tich >= h.diemToiThieu)?.ten ?? null };
+    })
+    .sort((a, b) => b.tich - a.tich);
+}

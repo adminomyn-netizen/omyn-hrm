@@ -710,6 +710,43 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
+    ma: "khach-le", ten: "Khách lẻ", nhom: "Kinh doanh", bang: "kd_khach_le", tieuDe: "ten",
+    moTa: "Khách mua lẻ từ sàn, Facebook, Zalo, điện thoại: liên hệ, kênh, ngày sinh và việc khách có đồng ý nhận tin hay không. Chỉ nhắn tin cho khách đã đánh dấu đồng ý. Điểm và hạng tự tính ở màn Điểm và hạng khách.",
+    sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có khách lẻ nào.",
+    cot: [
+      { k: "ten", nhan: "Tên khách", kieu: "chu", batBuoc: true },
+      { k: "dien_thoai", nhan: "Điện thoại", kieu: "chu", the: true },
+      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: ["Shopee", "TikTok Shop", "Facebook", "Zalo", "Điện thoại", "Khác"], mac: "Facebook", the: true },
+      { k: "ngay_sinh", nhan: "Ngày sinh", kieu: "ngay" },
+      { k: "dia_chi", nhan: "Địa chỉ", kieu: "chu" },
+      { k: "dong_y_nhan_tin", nhan: "Đã đồng ý nhận tin (SMS, Zalo, email)", kieu: "co", the: true },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "diem-khach", ten: "Sổ điểm khách lẻ", nhom: "Kinh doanh", bang: "kd_diem_khach", tieuDe: "khach_le_id",
+    moTa: "Mỗi lần khách được cộng điểm (Tích) hoặc dùng điểm (Dùng). Số dư và hạng tự tính, không nhập tay. Quy tắc cộng bao nhiêu điểm cho mỗi đơn do chị Lâm chốt, chưa đặt thì nhập số điểm theo từng đơn.",
+    sapXep: { cot: "ngay", giam: true }, trong: "Chưa có lần cộng hay dùng điểm nào. Thêm khách ở màn Khách lẻ trước.",
+    cot: [
+      { k: "khach_le_id", nhan: "Khách lẻ", kieu: "tc", bangTc: "kd_khach_le", batBuoc: true, the: true },
+      { k: "ngay", nhan: "Ngày", kieu: "ngay", batBuoc: true, the: true },
+      { k: "loai", nhan: "Loại", kieu: "chon", luaChon: ["Tích", "Dùng"], mac: "Tích", the: true },
+      { k: "so_diem", nhan: "Số điểm", kieu: "so", batBuoc: true, mac: 1, khoang: [1, 10000000], the: true },
+      { k: "ma_don", nhan: "Mã đơn", kieu: "chu", the: true },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "hang-khach", ten: "Hạng khách", nhom: "Kinh doanh", bang: "kd_hang_khach", tieuDe: "ten",
+    moTa: "Các hạng khách và số điểm tích luỹ tối thiểu để lên hạng (do chị Lâm đặt, em không tự đặt số). Khách ở hạng cao nhất có mức điểm tối thiểu không vượt tổng điểm đã tích.",
+    sapXep: { cot: "diem_toi_thieu" }, trong: "Chưa đặt hạng nào. Chị Lâm cho tên hạng và số điểm để lên hạng, rồi nhập vào đây.",
+    cot: [
+      { k: "ten", nhan: "Tên hạng", kieu: "chu", batBuoc: true },
+      { k: "diem_toi_thieu", nhan: "Điểm tích luỹ tối thiểu", kieu: "so", batBuoc: true, mac: 0, khoang: [0, 100000000], the: true },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
     ma: "co-hoi-khach-si", ten: "Cơ hội khách sỉ", nhom: "Kinh doanh", bang: "kd_co_hoi", tieuDe: "ten_khach", trangThai: "giai_doan",
     moTa: "Khách sỉ, đại lý tiềm năng từ lần liên hệ đầu tới khi chốt hoặc mất: nguồn, nhu cầu, giá trị dự kiến, ngày liên hệ tiếp. Báo trước 2 ngày khi tới hẹn liên hệ. Chốt xong thì điền ngày chốt (doanh số theo người tính theo ngày này) và thêm vào màn Đại lý và khách sỉ.",
     sapXep: { cot: "tao_luc", giam: true }, canhBao: { cot: "lien_he_tiep", ngay: 2, nhan: "Sắp tới hẹn liên hệ" }, trong: "Chưa có cơ hội nào.",

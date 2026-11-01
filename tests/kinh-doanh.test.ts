@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gopDoanhThuSan, ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi, doiChieuDonSi, thanhTienDong } from "@/lib/kinh-doanh";
+import { gopDoanhThuSan, ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi, doiChieuDonSi, thanhTienDong, tinhDiemKhach } from "@/lib/kinh-doanh";
 
 describe("công nợ đại lý", () => {
   it("số dư, vượt hạn mức, quá hạn theo thứ tự trừ khoản cũ nhất trước", () => {
@@ -125,5 +125,19 @@ describe("đối chiếu đơn sỉ với dòng hàng", () => {
     );
     expect(r[0]).toMatchObject({ tongDong: 1_500_000, soDong: 2, lech: 0 });
     expect(r[1]).toMatchObject({ tongDong: 0, soDong: 0, lech: null });
+  });
+});
+
+describe("điểm và hạng khách lẻ", () => {
+  it("số dư = tích − dùng; hạng theo tổng đã tích, dùng điểm không tụt hạng; chưa đặt hạng thì trống", () => {
+    const khach = [{ id: "a", ten: "A", kenh: "Facebook", dongYNhanTin: true }, { id: "b", ten: "B", kenh: "Shopee", dongYNhanTin: false }];
+    const dong = [
+      { khachId: "a", loai: "Tích", soDiem: 120 }, { khachId: "a", loai: "Dùng", soDiem: 100 }, { khachId: "b", loai: "Tích", soDiem: 10 },
+    ];
+    const hang = [{ ten: "Thân thiết", diemToiThieu: 50 }, { ten: "Mới", diemToiThieu: 0 }, { ten: "VIP", diemToiThieu: 500 }];
+    const r = tinhDiemKhach(khach, dong, hang);
+    expect(r[0]).toMatchObject({ id: "a", tich: 120, dung: 100, soDu: 20, hang: "Thân thiết" });
+    expect(r[1]).toMatchObject({ id: "b", soDu: 10, hang: "Mới" });
+    expect(tinhDiemKhach(khach, dong, [])[0].hang).toBeNull();
   });
 });
