@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { gopDoanhThuSan, ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi, doiChieuDonSi, thanhTienDong, tinhDiemKhach } from "@/lib/kinh-doanh";
+import { gopDoanhThuSan, ngayChotCuaCoHoi, tinhCongNo, tinhDoanhSo, tinhDoanhSoTheoNguoi, doiChieuDonSi, thanhTienDong, tinhDiemKhach, congThang } from "@/lib/kinh-doanh";
 
 describe("công nợ đại lý", () => {
   it("số dư, vượt hạn mức, quá hạn theo thứ tự trừ khoản cũ nhất trước", () => {
@@ -128,16 +128,49 @@ describe("đối chiếu đơn sỉ với dòng hàng", () => {
   });
 });
 
-describe("điểm và hạng khách lẻ", () => {
-  it("số dư = tích − dùng; hạng theo tổng đã tích, dùng điểm không tụt hạng; chưa đặt hạng thì trống", () => {
-    const khach = [{ id: "a", ten: "A", kenh: "Facebook", dongYNhanTin: true }, { id: "b", ten: "B", kenh: "Shopee", dongYNhanTin: false }];
-    const dong = [
-      { khachId: "a", loai: "Tích", soDiem: 120 }, { khachId: "a", loai: "Dùng", soDiem: 100 }, { khachId: "b", loai: "Tích", soDiem: 10 },
-    ];
-    const hang = [{ ten: "Thân thiết", diemToiThieu: 50 }, { ten: "Mới", diemToiThieu: 0 }, { ten: "VIP", diemToiThieu: 500 }];
-    const r = tinhDiemKhach(khach, dong, hang);
-    expect(r[0]).toMatchObject({ id: "a", tich: 120, dung: 100, soDu: 20, hang: "Thân thiết" });
-    expect(r[1]).toMatchObject({ id: "b", soDu: 10, hang: "Mới" });
-    expect(tinhDiemKhach(khach, dong, [])[0].hang).toBeNull();
+describe("điểm và hạng khách lẻ (tham số tạm)", () => {
+  const ch = { dongMoiDiem: 10_000, dongGiamMoiDiem: 100, hetHanThang: 12, cuaSoHangThang: 12 };
+  const hang = [
+    { ten: "Thành viên", muaToiThieu: 0, heSoPt: 100 }, { ten: "Bạc", muaToiThieu: 3_000_000, heSoPt: 120 },
+    { ten: "Vàng", muaToiThieu: 10_000_000, heSoPt: 150 }, { ten: "Kim cương", muaToiThieu: 30_000_000, heSoPt: 200 },
+  ];
+  const k = (id: string) => ({ id, ten: id, kenh: "Facebook", dongYNhanTin: true });
+  const mua = (khachId: string, ngay: string, soTien: number) => ({ khachId, loai: "Mua", ngay, soTien, soDiem: 0 });
+
+  it("10.000đ = 1 điểm, hạng Thành viên nhân 1, làm tròn xuống, 1 điểm đổi 100đ", () => {
+    const r = tinhDiemKhach([k("a")], [mua("a", "2026-11-01", 125_000)], hang, ch, "2026-11-02")[0];
+    expect(r).toMatchObject({ daTich: 12, soDu: 12, soDuTien: 1200, hang: "Thành viên", muaCuaSo: 125_000 });
+  });
+  it("hệ số theo hạng lúc mua: mua 3 triệu lên Bạc, lần mua sau nhân 1,2", () => {
+    const r = tinhDiemKhach([k("a")], [mua("a", "2026-10-01", 3_000_000), mua("a", "2026-10-20", 1_000_000)], hang, ch, "2026-11-02")[0];
+    expect(r.daTich).toBe(300 + 120); // lần 1 hạng Thành viên (×1), lần 2 đã là Bạc (×1,2)
+    expect(r).toMatchObject({ hang: "Bạc", heSoPt: 120, muaCuaSo: 4_000_000 });
+  });
+  it("các mốc hạng 3, 10, 30 triệu và Kim cương nhân 2", () => {
+    const h = (t: number) => tinhDiemKhach([k("a")], [mua("a", "2026-09-01", t)], hang, ch, "2026-11-02")[0].hang;
+    expect([h(2_999_999), h(3_000_000), h(10_000_000), h(30_000_000)]).toEqual(["Thành viên", "Bạc", "Vàng", "Kim cương"]);
+    const r = tinhDiemKhach([k("a")], [mua("a", "2026-01-01", 30_000_000), mua("a", "2026-02-01", 1_000_000)], hang, ch, "2026-03-01")[0];
+    expect(r.daTich).toBe(3000 + 200);
+  });
+  it("điểm hết hạn sau 12 tháng và mua cũ hơn 12 tháng không tính vào hạng", () => {
+    const r = tinhDiemKhach([k("a")], [mua("a", "2025-10-01", 5_000_000), mua("a", "2026-06-01", 100_000)], hang, ch, "2026-11-02")[0];
+    expect(r).toMatchObject({ hetHan: 500, soDu: 12, muaCuaSo: 100_000, hang: "Thành viên" }); // lần 2 còn hạng Bạc (×1,2) vì lần 1 còn trong 12 tháng lúc đó
+  });
+  it("dùng điểm trừ lô cũ nhất còn hạn; dùng quá số có thì báo thiếu; tặng điểm cũng có hạn", () => {
+    const dong = [mua("a", "2026-01-01", 100_000), mua("a", "2026-05-01", 100_000), { khachId: "a", loai: "Dùng", ngay: "2026-06-01", soTien: null, soDiem: 15 }, { khachId: "a", loai: "Tặng", ngay: "2026-06-02", soTien: null, soDiem: 5 }];
+    const r = tinhDiemKhach([k("a")], dong, hang, ch, "2026-11-02")[0];
+    expect(r).toMatchObject({ daTich: 25, dung: 15, soDu: 10, thieu: 0 });
+    const q = tinhDiemKhach([k("a")], [mua("a", "2026-01-01", 100_000), { khachId: "a", loai: "Dùng", ngay: "2026-02-01", soTien: null, soDiem: 30 }], hang, ch, "2026-11-02")[0];
+    expect(q).toMatchObject({ soDu: 0, thieu: 20 });
+  });
+  it("điểm sắp hết hạn trong 30 ngày; chưa đặt hạng thì hạng trống, hệ số 100%", () => {
+    const r = tinhDiemKhach([k("a")], [mua("a", "2025-11-20", 100_000)], hang, ch, "2026-11-02")[0];
+    expect(r).toMatchObject({ soDu: 10, sapHet: 10 });
+    expect(tinhDiemKhach([k("a")], [mua("a", "2026-11-01", 100_000)], [], ch, "2026-11-02")[0]).toMatchObject({ hang: null, heSoPt: 100, daTich: 10 });
+  });
+  it("cộng tháng không tràn ngày", () => {
+    expect(congThang("2026-02-28", 12)).toBe("2027-02-28");
+    expect(congThang("2024-02-29", 12)).toBe("2025-02-28");
+    expect(congThang("2026-11-02", -12)).toBe("2025-11-02");
   });
 });

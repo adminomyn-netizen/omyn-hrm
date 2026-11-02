@@ -119,21 +119,86 @@ export function doiChieuDonSi(
   });
 }
 
-export type DiemKhach = { id: string; ten: string; kenh: string; dongYNhanTin: boolean; tich: number; dung: number; soDu: number; hang: string | null };
+export type DiemCauHinh = { dongMoiDiem: number; dongGiamMoiDiem: number; hetHanThang: number; cuaSoHangThang: number };
+export type HangKhach = { ten: string; muaToiThieu: number; heSoPt: number };
+export type DongDiem = { khachId: string; loai: string; ngay: string; soTien: number | null; soDiem: number };
+export type DiemKhach = {
+  id: string; ten: string; kenh: string; dongYNhanTin: boolean;
+  /** Tổng mua trong cửa sổ hạng (mặc định 12 tháng gần nhất). */
+  muaCuaSo: number; hang: string | null; heSoPt: number;
+  daTich: number; dung: number; hetHan: number; soDu: number; soDuTien: number;
+  /** Điểm còn lại sẽ hết hạn trong 30 ngày tới. */
+  sapHet: number;
+  /** Điểm dùng vượt số có (sổ ghi sai), 0 là đúng. */
+  thieu: number;
+};
 
-/** Điểm từng khách lẻ: tích − dùng. Hạng = hạng có mức điểm tối thiểu cao nhất mà TỔNG ĐIỂM ĐÃ TÍCH đạt (dùng điểm không làm tụt hạng). Chưa đặt hạng nào thì hạng để trống. */
+/** Cộng/trừ tháng trên ngày ISO (YYYY-MM-DD); ngày không có trong tháng đích thì lùi về cuối tháng. */
+export function congThang(ngay: string, thang: number): string {
+  const [y, m, d] = ngay.split("-").map(Number);
+  const t = new Date(Date.UTC(y, m - 1 + thang, 1));
+  const cuoi = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
+  t.setUTCDate(Math.min(d, cuoi));
+  return t.toISOString().slice(0, 10);
+}
+const congNgay = (ngay: string, n: number) => new Date(Date.parse(ngay) + n * 864e5).toISOString().slice(0, 10);
+
+const hangTheoMua = (hang: readonly HangKhach[], mua: number) => [...hang].sort((a, b) => b.muaToiThieu - a.muaToiThieu).find((h) => mua >= h.muaToiThieu) ?? null;
+
+/** Điểm của một lần mua = số tiền / đồng-mỗi-điểm × hệ số hạng (% , 100 = giữ nguyên), làm tròn xuống; toàn số nguyên nên không lệch số lẻ. */
+export const diemMotLanMua = (soTien: number, dongMoiDiem: number, heSoPt: number) => Math.floor((soTien * heSoPt) / (dongMoiDiem * 100));
+
+/**
+ * Điểm và hạng khách lẻ theo tham số cấu hình (không cứng trong mã):
+ * - Mua: điểm = số tiền / dongMoiDiem × hệ số của hạng khách đang có LÚC MUA (hạng tính từ các lần mua trước đó trong cửa sổ cuaSoHangThang).
+ * - Tặng: cộng tay. Mỗi lần cộng thành một lô điểm hết hạn sau hetHanThang tháng.
+ * - Dùng: trừ lần lượt từ lô cũ nhất còn hạn tại ngày dùng.
+ * - Hạng hiện tại = hạng cao nhất có muaToiThieu ≤ tổng mua trong cửa sổ tính đến hôm nay; chưa có hạng nào thì để trống.
+ */
 export function tinhDiemKhach(
   khach: readonly { id: string; ten: string; kenh: string; dongYNhanTin: boolean }[],
-  dong: readonly { khachId: string; loai: string; soDiem: number }[],
-  hang: readonly { ten: string; diemToiThieu: number }[],
+  dong: readonly DongDiem[],
+  hang: readonly HangKhach[],
+  ch: DiemCauHinh,
+  homNay: string,
 ): DiemKhach[] {
-  const hangXep = [...hang].sort((a, b) => b.diemToiThieu - a.diemToiThieu);
+  const sapHetDen = congNgay(homNay, 30);
   return khach
     .map((k) => {
-      const ds = dong.filter((x) => x.khachId === k.id);
-      const tich = ds.filter((x) => x.loai === "Tích").reduce((a, x) => a + x.soDiem, 0);
-      const dung = ds.filter((x) => x.loai === "Dùng").reduce((a, x) => a + x.soDiem, 0);
-      return { id: k.id, ten: k.ten, kenh: k.kenh, dongYNhanTin: k.dongYNhanTin, tich, dung, soDu: tich - dung, hang: hangXep.find((h) => tich >= h.diemToiThieu)?.ten ?? null };
+      const ds = dong.map((d, i) => ({ d, i })).filter((x) => x.d.khachId === k.id).sort((a, b) => (a.d.ngay < b.d.ngay ? -1 : a.d.ngay > b.d.ngay ? 1 : a.i - b.i)).map((x) => x.d);
+      const lo: { het: string; con: number }[] = [];
+      const mua: { ngay: string; tien: number }[] = [];
+      let daTich = 0, dung = 0, thieu = 0;
+      for (const d of ds) {
+        if (d.loai === "Mua" && d.soTien) {
+          const bat = congThang(d.ngay, -ch.cuaSoHangThang);
+          const truoc = mua.filter((m) => m.ngay > bat).reduce((a, m) => a + m.tien, 0);
+          const diem = diemMotLanMua(d.soTien, ch.dongMoiDiem, hangTheoMua(hang, truoc)?.heSoPt ?? 100);
+          mua.push({ ngay: d.ngay, tien: d.soTien });
+          if (diem > 0) { lo.push({ het: congThang(d.ngay, ch.hetHanThang), con: diem }); daTich += diem; }
+        } else if (d.loai === "Tặng") {
+          lo.push({ het: congThang(d.ngay, ch.hetHanThang), con: d.soDiem }); daTich += d.soDiem;
+        } else if (d.loai === "Dùng") {
+          dung += d.soDiem;
+          let can = d.soDiem;
+          for (const l of lo) {
+            if (can <= 0) break;
+            if (l.het <= d.ngay || l.con <= 0) continue;
+            const t = Math.min(l.con, can); l.con -= t; can -= t;
+          }
+          thieu += can;
+        }
+      }
+      const conHan = lo.filter((l) => l.het > homNay);
+      const soDu = conHan.reduce((a, l) => a + l.con, 0);
+      const hetHan = lo.filter((l) => l.het <= homNay).reduce((a, l) => a + l.con, 0);
+      const bat = congThang(homNay, -ch.cuaSoHangThang);
+      const muaCuaSo = mua.filter((m) => m.ngay > bat).reduce((a, m) => a + m.tien, 0);
+      const h = hangTheoMua(hang, muaCuaSo);
+      return {
+        id: k.id, ten: k.ten, kenh: k.kenh, dongYNhanTin: k.dongYNhanTin, muaCuaSo, hang: h?.ten ?? null, heSoPt: h?.heSoPt ?? 100,
+        daTich, dung, hetHan, soDu, soDuTien: soDu * ch.dongGiamMoiDiem, sapHet: conHan.filter((l) => l.het <= sapHetDen).reduce((a, l) => a + l.con, 0), thieu,
+      };
     })
-    .sort((a, b) => b.tich - a.tich);
+    .sort((a, b) => b.muaCuaSo - a.muaCuaSo);
 }
