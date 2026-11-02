@@ -65,12 +65,17 @@ describe("hồ sơ nhân viên", () => {
     expect(kiemTraTep("image/png", 10 * 1024 * 1024 + 1)).toMatch(/10 MB/);
     expect(kiemTraTep("image/png", 0)).toBeTruthy();
   });
-  it("kiểm trường: CCCD 9/12 số, MST 10/13 số, BHXH 10 số; trống thì bỏ qua", () => {
+  it("kiểm trường: CCCD 9/12 số, MST 10/12/13 số, BHXH 10/12 số (12 số = số CCCD); trống thì bỏ qua", () => {
     expect(kiemTraHoSo({})).toBeNull();
     expect(kiemTraHoSo({ cccd: "001234567890" })).toBeNull();
     expect(kiemTraHoSo({ cccd: "12345" })).toMatch(/CCCD/);
     expect(kiemTraHoSo({ ma_so_thue: "0123456789" })).toBeNull();
     expect(kiemTraHoSo({ ma_so_thue: "12" })).toMatch(/thuế/);
+    expect(kiemTraHoSo({ ma_so_thue: "001234567890" })).toBeNull();
+    expect(kiemTraHoSo({ ma_so_thue: "00123456789" })).toMatch(/thuế/);
+    expect(kiemTraHoSo({ so_bhxh: "001234567890" })).toBeNull();
+    expect(kiemTraHoSo({ so_bhxh: "0123456789" })).toBeNull();
+    expect(kiemTraHoSo({ so_bhxh: "01234567890" })).toMatch(/BHXH/);
     expect(kiemTraHoSo({ so_bhxh: "123" })).toMatch(/BHXH/);
     expect(kiemTraHoSo({ ngay_sinh: "31/12/1990" })).toMatch(/Ngày sinh/);
   });

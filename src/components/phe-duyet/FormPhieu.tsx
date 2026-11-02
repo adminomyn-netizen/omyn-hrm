@@ -25,7 +25,16 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
   tepCu?: Record<string, string[]>; ban?: Du; nopLai?: string;
 }) {
   const router = useRouter();
-  const [du, setDu] = useState<Du>(ban ?? {});
+  // Ô chọn chỉ còn đúng 1 lựa chọn (vd Đơn vị làm việc = Omyn) thì chọn sẵn, người nộp không phải bấm.
+  const [du, setDu] = useState<Du>(() => {
+    const d: Du = { ...(ban ?? {}) };
+    for (const t of mau.truong) {
+      if (typeof d[t.ma] === "string" && d[t.ma]) continue;
+      const ds = t.kieu === "dm" ? danhMuc[t.danhMuc ?? ""] ?? [] : t.kieu === "chon" ? [...(t.luaChon ?? [])] : [];
+      if (ds.length === 1) d[t.ma] = ds[0];
+    }
+    return d;
+  });
   const [tep, setTep] = useState<Record<string, TepMoi[]>>({});
   const [loi, setLoi] = useState<string>();
   const [loiO, setLoiO] = useState<Record<string, string>>({});

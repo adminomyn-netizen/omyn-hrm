@@ -42,8 +42,8 @@ export function kiemTraHoSo(h: { cccd?: string; dien_thoai?: string; ma_so_thue?
   if (h.cccd && !/^(\d{9}|\d{12})$/.test(so(h.cccd))) return "Số CCCD gồm 12 chữ số (CMND cũ 9 số).";
   if (h.dien_thoai && !/^[0-9+().-]{8,16}$/.test(so(h.dien_thoai))) return "Số điện thoại chưa đúng.";
   if (h.nguoi_than_dien_thoai && !/^[0-9+().-]{8,16}$/.test(so(h.nguoi_than_dien_thoai))) return "Số điện thoại người thân chưa đúng.";
-  if (h.ma_so_thue && !/^(\d{10}|\d{13}|\d{10}-\d{3})$/.test(so(h.ma_so_thue))) return "Mã số thuế gồm 10 hoặc 13 chữ số.";
-  if (h.so_bhxh && !/^\d{10}$/.test(so(h.so_bhxh))) return "Số sổ BHXH gồm 10 chữ số.";
+  if (h.ma_so_thue && !/^(\d{10}|\d{12}|\d{13}|\d{10}-\d{3})$/.test(so(h.ma_so_thue))) return "Mã số thuế gồm 10, 12 (số CCCD) hoặc 13 chữ số.";
+  if (h.so_bhxh && !/^(\d{10}|\d{12})$/.test(so(h.so_bhxh))) return "Số sổ BHXH gồm 10 chữ số, hoặc 12 chữ số (số CCCD).";
   if (h.ngay_sinh && !ngayHopLe(h.ngay_sinh)) return "Ngày sinh chưa đúng.";
   if (h.ngay_cap_cccd && !ngayHopLe(h.ngay_cap_cccd)) return "Ngày cấp CCCD chưa đúng.";
   return null;

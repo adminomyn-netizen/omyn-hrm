@@ -80,7 +80,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
     moTa: "Xác nhận làm thêm giờ/tăng ca, kèm thông tin khách nếu phục vụ khách.",
     lark: { ma: "AFD92B28-7B81-4120-9386-7C26ABE597B6", buoc: "10 bước: AND×4, CC×3, AND, (1 bước điều kiện), AND" },
     truong: [
-      chon("noi_lam_viec", "Nơi làm việc", ["Chi nhánh AVI", "Chi nhánh ADL"]), chon("nhan_vien", "Nhân viên", ["Văn phòng", "Khác"]),
+      chon("noi_lam_viec", "Nơi làm việc", ["Omyn"]), chon("nhan_vien", "Nhân viên", ["Văn phòng", "Khác"]),
       chu("ma_khach_hang", "Mã khách hàng", { hien: { truong: "nhan_vien", la: ["Khác"] }, suyRa: "Lark: có điều kiện hiện. Em đặt hiện khi Nhân viên = Khác (làm việc với khách)." }),
       chu("ten_khach_hang", "Tên khách hàng", { hien: { truong: "nhan_vien", la: ["Khác"] } }),
       chu("ten_dich_vu", "Tên dịch vụ", { hien: { truong: "nhan_vien", la: ["Khác"] } }),
@@ -94,7 +94,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
     moTa: "Đăng ký các ngày trực page theo chi nhánh.",
     lark: { ma: "2F4ED200-A815-458B-AE5F-4B9FFCBC41EB", buoc: "4 bước: AND×4" },
     truong: [
-      ngay("ngay", "Ngày"), chon("chi_nhanh", "Chi nhánh", ["ADL", "AVI", "MSC"]),
+      ngay("ngay", "Ngày"), chon("chi_nhanh", "Chi nhánh", ["Omyn"]),
       o("bang", "chi_tiet", "Chi tiết", { con: [ngay("ngay_dang_ky", "Ngày đăng ký")] }),
     ],
   },

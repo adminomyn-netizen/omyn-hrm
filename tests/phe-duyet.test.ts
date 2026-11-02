@@ -21,7 +21,7 @@ describe("mẫu phiếu Lark", () => {
           expect(goc?.kieu, `${m.ma}.${t.ma}`).toBe("chon");
           for (const v of t.hien.la) expect(goc!.luaChon, `${m.ma}.${t.ma}=${v}`).toContain(v);
         }
-        if (t.kieu === "chon") expect(t.luaChon?.length, `${m.ma}.${t.ma}`).toBeGreaterThan(1);
+        if (t.kieu === "chon") expect(t.luaChon?.length, `${m.ma}.${t.ma}`).toBeGreaterThan(0);
         if (t.kieu === "cong") expect(m.truong.find((x) => x.ma === t.tong!.bang)?.con?.some((c) => c.ma === t.tong!.cot), `${m.ma}.${t.ma}`).toBe(true);
         if (t.bangChuTu) expect(m.truong.find((x) => x.ma === t.bangChuTu)?.kieu).toBe("tien");
         if (t.khongTruoc) expect(m.truong.some((x) => x.ma === t.khongTruoc)).toBe(true);
