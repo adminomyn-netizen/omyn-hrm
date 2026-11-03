@@ -24,6 +24,8 @@ export type CotHr = {
   coTheTrong?: boolean;
   /** Khoảng giá trị hợp lệ [nhỏ nhất, lớn nhất] cho cột số. */
   khoang?: readonly [number, number];
+  /** Bắt buộc điền khi cột `k` của cùng dòng có một trong các giá trị `la` (vd lý do khi điều chỉnh kho). */
+  batBuocKhi?: { k: string; la: readonly string[] };
 };
 
 export type MucHr = {
@@ -1003,7 +1005,7 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "nhap-xuat-kho", ten: "Phiếu nhập xuất kho", nhom: "Tài chính & Kho", bang: "kho_nhap_xuat", tieuDe: "san_pham_id", trangThai: "loai",
-    moTa: "Mỗi lần nhập, xuất hoặc điều chỉnh kho là một dòng: sản phẩm, số lượng, số lô, đối tượng, chứng từ. Tồn kho tự tính từ các dòng này ở màn Tồn kho.",
+    moTa: "Mỗi lần nhập, xuất hoặc điều chỉnh kho là một dòng: sản phẩm, số lượng, số lô, đối tượng, chứng từ. Xuất huỷ hoặc điều chỉnh thì phải ghi lý do. Tồn kho tự tính từ các dòng này ở màn Tồn kho.",
     sapXep: { cot: "ngay", giam: true }, trong: "Chưa có phiếu nhập xuất nào. Thêm sản phẩm ở màn Danh mục sản phẩm trước.",
     cot: [
       { k: "ngay", nhan: "Ngày", kieu: "ngay", batBuoc: true, the: true },
@@ -1014,6 +1016,7 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "nha_cung_cap_id", nhan: "Nhà cung cấp (khi nhập hàng)", kieu: "tc", bangTc: "tc_nha_cung_cap" },
       { k: "doi_tuong", nhan: "Nơi nhận (khi xuất hàng)", kieu: "chu" },
       { k: "chung_tu", nhan: "Số chứng từ", kieu: "chu" },
+      { k: "ly_do", nhan: "Lý do (bắt buộc khi điều chỉnh tăng/giảm, kể cả xuất huỷ)", kieu: "chon", luaChon: ["Hết hạn, huỷ", "Hư hỏng, vỡ", "Hao hụt", "Mất", "Kiểm kê lệch", "Mẫu dùng thử, quà tặng", "Nhập nhầm, sửa lại", "Khác"], batBuocKhi: { k: "loai", la: ["Điều chỉnh tăng", "Điều chỉnh giảm"] }, the: true },
       { k: "nguoi_lap_id", nhan: "Người lập", kieu: "nv" },
       { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
     ],

@@ -576,6 +576,14 @@ const menuGoc: MucMenu[] = [
     moTa: "Tồn từng sản phẩm tự tính từ phiếu nhập xuất.",
   },
   {
+    ten: "Xuất nhập tồn",
+    duong_dan: "/kho/xuat-nhap-ton",
+    nhom: "Tài chính & Kho",
+    icon: LayoutGrid,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Tồn đầu, nhập, xuất, điều chỉnh, tồn cuối theo kỳ; điều chỉnh theo lý do.",
+  },
+  {
     ten: "Kiểm kê kho",
     duong_dan: "/hr/kiem-ke-kho",
     nhom: "Tài chính & Kho",
@@ -606,6 +614,14 @@ const menuGoc: MucMenu[] = [
     icon: Activity,
     chiVaiTro: CHI_QUAN_LY,
     moTa: "Số đơn đóng gói theo trạng thái, kênh, người đóng và tỷ lệ hoàn.",
+  },
+  {
+    ten: "Lô sắp hết hạn",
+    duong_dan: "/kho/lo-han-dung",
+    nhom: "Tài chính & Kho",
+    icon: CalendarDays,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Cảnh báo lô quá hạn, sắp hết hạn; gợi ý xuất lô gần hết hạn trước.",
   },
   {
     ten: "Lô hàng và hạn sử dụng",
@@ -990,7 +1006,7 @@ const menuGoc: MucMenu[] = [
 export type CumTab = { ma: string; ten: string; moTa: string; icon: LucideIcon; chinh: string; tabs: readonly { ten: string; duong_dan: string }[] };
 export const CUM_TAB: readonly CumTab[] = [
   // Cụm 1: các cặp màn trùng nhau.
-  { ma: "lo-hang", ten: "Lô hàng", moTa: "Số lô và hạn dùng từng lô nhập; kiểm nghiệm, lưu mẫu và kết quả kiểm lô.", icon: CalendarDays, chinh: "/hr/lo-hang-han-dung", tabs: [{ ten: "Lô và hạn dùng", duong_dan: "/hr/lo-hang-han-dung" }, { ten: "Kiểm lô nhập", duong_dan: "/hr/kiem-lo-nhap" }] },
+  { ma: "lo-hang", ten: "Lô hàng", moTa: "Số lô và hạn dùng từng lô nhập; kiểm nghiệm, lưu mẫu và kết quả kiểm lô.", icon: CalendarDays, chinh: "/hr/lo-hang-han-dung", tabs: [{ ten: "Lô và hạn dùng", duong_dan: "/hr/lo-hang-han-dung" }, { ten: "Kiểm lô nhập", duong_dan: "/hr/kiem-lo-nhap" }, { ten: "Cảnh báo hết hạn", duong_dan: "/kho/lo-han-dung" }] },
   { ma: "dong-goi", ten: "Đóng gói và giao hàng", moTa: "Từng đơn đóng gói, vận chuyển, mã vận đơn và thống kê theo trạng thái, kênh, người đóng.", icon: Activity, chinh: "/hr/dong-goi-giao-hang", tabs: [{ ten: "Đơn đóng gói", duong_dan: "/hr/dong-goi-giao-hang" }, { ten: "Thống kê", duong_dan: "/kho/dong-goi" }] },
   { ma: "cong-no-dai-ly", ten: "Công nợ đại lý", moTa: "Ghi phát sinh và đã thu của đại lý, khách sỉ; số dư, quá hạn, vượt hạn mức tự tính.", icon: Wallet, chinh: "/hr/cong-no-dai-ly", tabs: [{ ten: "Ghi công nợ", duong_dan: "/hr/cong-no-dai-ly" }, { ten: "Số dư", duong_dan: "/kinh-doanh/cong-no" }] },
   { ma: "don-si", ten: "Đơn bán sỉ", moTa: "Đơn bán cho đại lý, khách sỉ, từng dòng hàng và đối chiếu tổng tiền.", icon: Wallet, chinh: "/hr/don-si", tabs: [{ ten: "Đơn bán sỉ", duong_dan: "/hr/don-si" }, { ten: "Dòng hàng", duong_dan: "/hr/don-si-dong-hang" }, { ten: "Đối chiếu", duong_dan: "/kinh-doanh/don-si" }] },

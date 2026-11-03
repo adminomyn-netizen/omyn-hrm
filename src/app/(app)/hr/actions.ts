@@ -40,6 +40,10 @@ export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
     if ("loi" in r) return { loi: r.loi };
     dong[c.k] = r.v;
   }
+  for (const c of muc.cot) {
+    if (c.batBuocKhi && c.batBuocKhi.la.includes(String(dong[c.batBuocKhi.k] ?? "")) && (dong[c.k] === null || dong[c.k] === "" || dong[c.k] === undefined))
+      return { loi: `Cần ghi “${c.nhan.replace(/\s*\(.*$/, "")}” khi chọn ${String(dong[c.batBuocKhi.k]).toLowerCase()}.` };
+  }
   const db = dbHr();
   const cu = id
     ? ((await db.from(muc.bang).select("*").eq("id", id).maybeSingle())
