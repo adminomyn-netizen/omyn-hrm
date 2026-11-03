@@ -126,3 +126,29 @@ describe("dự báo nhập hàng", () => {
     expect(r3[0]).toMatchObject({ trangThai: "Sắp cần nhập" });
   });
 });
+
+import { doiSoatCod } from "@/lib/kho";
+
+describe("đối soát COD vận chuyển", () => {
+  const d = (o: Partial<{ id: string; ma: string; donVi: string; trangThai: string; ngay: string; ngayGiao: string | null; thuHo: number; daNhan: number; phi: number | null }>) => ({ id: "1", ma: "D1", donVi: "GHN", trangThai: "Đã giao", ngay: "2026-10-20", ngayGiao: "2026-10-22", thuHo: 500000, daNhan: 0, phi: 30000, ...o });
+  it("gom theo đơn vị (không phân biệt hoa thường), tính còn treo và quá hạn từ ngày giao", () => {
+    const r = doiSoatCod([
+      d({ id: "1" }),
+      d({ id: "2", ma: "D2", donVi: " ghn ", thuHo: 300000, daNhan: 300000, phi: null }),
+      d({ id: "3", ma: "D3", ngayGiao: "2026-11-01", thuHo: 200000, daNhan: 50000 }),
+      d({ id: "4", ma: "D4", donVi: "VTP", trangThai: "Hoàn hoặc trả", thuHo: 400000 }),
+      d({ id: "5", ma: "D5", trangThai: "Chờ đóng" }),
+    ], "2026-11-03", 7);
+    const ghn = r.theoDonVi.find((x) => x.donVi === "GHN")!;
+    expect(ghn).toMatchObject({ soDon: 3, thuHo: 1000000, daNhan: 350000, conTreo: 650000, soDonQuaHan: 1, phi: 60000, soDonThieuPhi: 1 });
+    expect(r.theoDonVi.find((x) => x.donVi === "VTP")).toMatchObject({ soDon: 1, thuHo: 0, conTreo: 0 });
+    expect(r.quaHan).toEqual([{ id: "1", ma: "D1", donVi: "GHN", ngayGiao: "2026-10-22", soNgay: 12, conTreo: 500000 }]);
+  });
+  it("thiếu ngày giao thì tính từ ngày đơn; nhận dư được liệt kê và không làm âm số treo", () => {
+    const r = doiSoatCod([d({ id: "1", ngayGiao: null, ngay: "2026-10-30", daNhan: 0 }), d({ id: "2", ma: "D2", thuHo: 100000, daNhan: 150000 })], "2026-11-03", 7);
+    expect(r.quaHan).toEqual([]);
+    expect(r.nhanDu.map((x) => x.id)).toEqual(["2"]);
+    expect(r.theoDonVi[0].conTreo).toBe(500000);
+    expect(r.theoDonVi[0].daNhan).toBe(100000);
+  });
+});

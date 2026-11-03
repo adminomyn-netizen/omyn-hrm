@@ -1086,7 +1086,7 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "dong-goi-giao-hang", ten: "Đóng gói và giao hàng", nhom: "Tài chính & Kho", bang: "kho_dong_goi_giao", tieuDe: "ma_don", trangThai: "trang_thai",
-    moTa: "Từng đơn đóng gói: mã đơn, kênh, người đóng, đơn vị vận chuyển, mã vận đơn, đã giao hay hoàn trả.",
+    moTa: "Từng đơn đóng gói: mã đơn, kênh, người đóng, đơn vị vận chuyển, mã vận đơn, đã giao hay hoàn trả, tiền thu hộ COD và COD đã nhận về. Đối soát theo đơn vị vận chuyển ở màn Đối soát COD.",
     sapXep: { cot: "ngay", giam: true }, trong: "Chưa có đơn nào.",
     cot: [
       { k: "ngay", nhan: "Ngày", kieu: "ngay", batBuoc: true, the: true },
@@ -1096,6 +1096,11 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "don_vi_van_chuyen", nhan: "Đơn vị vận chuyển", kieu: "chu" },
       { k: "ma_van_don", nhan: "Mã vận đơn", kieu: "chu", the: true },
       { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Chờ đóng", "Đã đóng", "Đã giao", "Hoàn hoặc trả"], mac: "Chờ đóng" },
+      { k: "ngay_giao", nhan: "Ngày giao thành công", kieu: "ngay" },
+      { k: "thu_ho", nhan: "Tiền thu hộ COD (đ), 0 nếu đã thanh toán trước", kieu: "tien", mac: 0, the: true },
+      { k: "phi_van_chuyen", nhan: "Phí vận chuyển (đ)", kieu: "tien", coTheTrong: true },
+      { k: "cod_da_nhan", nhan: "COD đơn vị vận chuyển đã chuyển về (đ)", kieu: "tien", mac: 0, the: true },
+      { k: "ngay_nhan_cod", nhan: "Ngày nhận COD", kieu: "ngay" },
       { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
     ],
   },
