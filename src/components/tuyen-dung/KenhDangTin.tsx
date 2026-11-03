@@ -1,5 +1,6 @@
 "use client";
 
+import { BieuTuongNenTang } from "@/components/ui/BieuTuongNenTang";
 import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Hop } from "@/components/ui/Hop";
@@ -55,8 +56,8 @@ export function KenhDangTin({ tin, kenh }: { tin: TinTom; kenh: KenhDang[] }) {
           {kenh.map((k) => (
             <li key={k.id} className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-2.5 text-[13px]">
               <span className="flex min-w-0 flex-wrap items-center gap-2">
-                <span className="font-medium text-muc">{k.kenh}</span>
-                <NhanTrangThai kieu={k.trang_thai === "Đang đăng" ? "tot" : "tram"}>{k.trang_thai}</NhanTrangThai>
+                <span className="inline-flex items-center gap-2 font-medium text-muc"><BieuTuongNenTang ten={k.kenh} kich={20} />{k.kenh}</span>
+                <NhanTrangThai sac={k.trang_thai === "Đang đăng" ? "la" : "xam"}>{k.trang_thai}</NhanTrangThai>
                 <span className="text-muc-3">{ngayVN(k.ngay_dang)}</span>
                 {k.link_bai && <a href={k.link_bai} target="_blank" rel="noopener noreferrer" className={NUT_CHU}>Xem bài</a>}
               </span>

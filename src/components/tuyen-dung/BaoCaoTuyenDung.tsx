@@ -1,3 +1,4 @@
+import { BieuTuongNenTang } from "@/components/ui/BieuTuongNenTang";
 import { tienVN } from "@/lib/dinh-dang";
 import type { tinhBaoCaoTuyenDung } from "@/lib/tuyen-dung";
 
@@ -41,14 +42,14 @@ export function BaoCaoTuyenDung({ bc }: { bc: BaoCao }) {
           <h3 className="mb-3 text-[15px] font-semibold text-muc">Nguồn ứng viên</h3>
           {bc.theoNguon.length === 0 ? <p className="text-[13px] text-muc-3">Chưa có ứng viên.</p> : (
             <table className="w-full text-left text-[13px]"><thead><tr className="nhan-muc border-b border-vien"><th className="py-2 font-medium">Nguồn</th><th className="py-2 text-right font-medium">Ứng viên</th><th className="py-2 text-right font-medium">Nhận việc</th></tr></thead>
-              <tbody>{bc.theoNguon.map((n) => <tr key={n.nguon} className="border-b border-vien"><td className="py-2 text-muc-2">{n.nguon}</td><td className="py-2 text-right tabular-nums">{n.so}</td><td className="py-2 text-right tabular-nums">{n.nhanViec}</td></tr>)}</tbody></table>
+              <tbody>{bc.theoNguon.map((n) => <tr key={n.nguon} className="border-b border-vien"><td className="py-2 text-muc-2"><span className="inline-flex items-center gap-2"><BieuTuongNenTang ten={n.nguon} kich={18} />{n.nguon}</span></td><td className="py-2 text-right tabular-nums">{n.so}</td><td className="py-2 text-right tabular-nums">{n.nhanViec}</td></tr>)}</tbody></table>
           )}
         </section>
         <section>
           <h3 className="mb-3 text-[15px] font-semibold text-muc">Chi phí theo kênh</h3>
           {bc.theoKenh.length === 0 ? <p className="text-[13px] text-muc-3">Chưa ghi lần đăng nào.</p> : (
             <table className="w-full text-left text-[13px]"><thead><tr className="nhan-muc border-b border-vien"><th className="py-2 font-medium">Kênh</th><th className="py-2 text-right font-medium">Số bài</th><th className="py-2 text-right font-medium">Chi phí</th></tr></thead>
-              <tbody>{bc.theoKenh.map((k) => <tr key={k.kenh} className="border-b border-vien"><td className="py-2 text-muc-2">{k.kenh}</td><td className="py-2 text-right tabular-nums">{k.soBai}</td><td className="py-2 text-right tabular-nums">{tienVN(k.chiPhi)}</td></tr>)}</tbody></table>
+              <tbody>{bc.theoKenh.map((k) => <tr key={k.kenh} className="border-b border-vien"><td className="py-2 text-muc-2"><span className="inline-flex items-center gap-2"><BieuTuongNenTang ten={k.kenh} kich={18} />{k.kenh}</span></td><td className="py-2 text-right tabular-nums">{k.soBai}</td><td className="py-2 text-right tabular-nums">{tienVN(k.chiPhi)}</td></tr>)}</tbody></table>
           )}
         </section>
       </div>

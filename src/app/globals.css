@@ -38,6 +38,8 @@
   --sac-tim: #6d28d9; --sac-tim-nen: #efe7ff; --sac-tim-mau: #8b5cf6; --sac-tim-1: #7c3aed; --sac-tim-2: #5b21b6;
   --sac-cam: #a24a05; --sac-cam-nen: #fff0d4; --sac-cam-mau: #f59e0b; --sac-cam-1: #b45309; --sac-cam-2: #92400e;
   --sac-hong: #be123c; --sac-hong-nen: #ffe3ea; --sac-hong-mau: #f43f5e; --sac-hong-1: #e11d48; --sac-hong-2: #be123c;
+  --sac-la: #166534; --sac-la-nen: #dcfce7; --sac-la-mau: #22c55e;
+  --sac-xam: #4b5563; --sac-xam-nen: #e9ecef; --sac-xam-mau: #9ca3af;
 
   /* Menu trái luôn nền lục đậm (cả khi giao diện sáng) — điểm tựa của bố cục. */
   --menu: #4e1621;
@@ -103,6 +105,8 @@
   --sac-tim: #cdbcff; --sac-tim-nen: #26184d;
   --sac-cam: #fdc982; --sac-cam-nen: #3d2a0e;
   --sac-hong: #ffadc0; --sac-hong-nen: #44131f;
+  --sac-la: #86efac; --sac-la-nen: #12301c; --sac-la-mau: #4ade80;
+  --sac-xam: #cbd5e1; --sac-xam-nen: #2a2f38; --sac-xam-mau: #94a3b8;
 
   --the-1: #331f23; --the-2: #261619; --the-vien-nang: #5a3a42;
   --bong-1: 0 1px 2px rgb(0 0 0 / 0.35), 0 4px 10px -2px rgb(0 0 0 / 0.35);

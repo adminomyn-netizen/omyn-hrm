@@ -4,6 +4,8 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Hop } from "@/components/ui/Hop";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
+import { NhanNenTang } from "@/components/ui/BieuTuongNenTang";
+import { SAC_BUOC_UNG_VIEN, mauSac, type Sac } from "@/lib/mau-trang-thai";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU } from "@/components/ui/dinh-dang";
 import { FormTin, type KhoiLuaChon, type TinCoSan } from "./FormTin";
@@ -17,7 +19,7 @@ import { ngayVN } from "@/lib/dinh-dang";
 export type Tin = TinCoSan & { khoi_ten: string };
 
 const DANG_PV = ["Hẹn phỏng vấn", "Vòng 1", "Vòng 2", "Đề nghị"];
-const MAU_PHAU = ["#E6D8DA", "#D9A7B0", "#B8475A", "#8B2635", "#C9826F", "#6B1A27", "#96797E"];
+const sacBuoc = (b: string): Sac => SAC_BUOC_UNG_VIEN[b] ?? "xam";
 const kieuTin = (t: string) => (t === "Đang tuyển" ? "tot" : t === "Đang phỏng vấn" ? "cho" : "tram");
 
 type Hop =
@@ -177,8 +179,8 @@ export function DanhSachTuyenDung({
 
           {/* phễu */}
           <div className="flex h-2.5 overflow-hidden" style={{ borderRadius: 10 }} role="img" aria-label={phau.map((p) => `${p.b} ${p.so}`).join(", ")}>
-            {phau.map((p, i) => (
-              <span key={p.b} style={{ flex: Math.max(p.so, 0.35), background: MAU_PHAU[i] }} />
+            {phau.map((p) => (
+              <span key={p.b} style={{ flex: Math.max(p.so, 0.35), background: `var(--sac-${sacBuoc(p.b)}-mau)` }} />
             ))}
           </div>
 
@@ -206,11 +208,15 @@ export function DanhSachTuyenDung({
                       setDangKeo(null);
                       if (id) chuyenBuoc(id, b);
                     }}
-                    className={`flex min-h-[420px] flex-col gap-2.5 rounded-[12px] p-3 transition-colors ${b === "Không đạt" ? "bg-giay-tram/60" : "bg-giay-tram"} ${dich ? "outline outline-2 -outline-offset-2 outline-[var(--nhan)]" : ""}`}
+                    style={{ background: `color-mix(in srgb, ${mauSac(sacBuoc(b)).nen} 70%, var(--giay))`, borderTop: `3px solid var(--sac-${sacBuoc(b)}-mau)` }}
+                    className={`flex min-h-[420px] flex-col gap-2.5 rounded-[12px] p-3 transition-colors ${dich ? "outline outline-2 -outline-offset-2 outline-[var(--nhan)]" : ""}`}
                   >
                     <div className="flex items-center justify-between px-1 pb-1">
-                      <h3 className="text-[13px] font-semibold text-muc">{b}</h3>
-                      <span className="flex h-[22px] min-w-[22px] items-center justify-center rounded-[11px] bg-giay-sang px-1.5 text-[12px] font-semibold tabular-nums text-muc-2">{the.length}</span>
+                      <h3 className="flex items-center gap-2 text-[13px] font-semibold" style={{ color: mauSac(sacBuoc(b)).chu }}>
+                        <span aria-hidden className="h-2.5 w-2.5 shrink-0" style={{ borderRadius: 9999, background: `var(--sac-${sacBuoc(b)}-mau)` }} />
+                        {b}
+                      </h3>
+                      <span className="flex h-[22px] min-w-[22px] items-center justify-center px-1.5 text-[12px] font-semibold tabular-nums" style={{ borderRadius: 11, background: "var(--giay-sang)", color: mauSac(sacBuoc(b)).chu }}>{the.length}</span>
                     </div>
                     {the.map((u) => (
                       <article
@@ -225,10 +231,11 @@ export function DanhSachTuyenDung({
                           setDangKeo(null);
                           setCotDich(null);
                         }}
+                        style={{ borderLeft: `3px solid var(--sac-${sacBuoc(b)}-mau)` }}
                         className={`cursor-grab the-noi the-noi-thap p-3.5 active:cursor-grabbing ${dangKeo === u.id ? "opacity-40" : ""}`}
                       >
                         <button type="button" onClick={() => setHop({ k: "uv", man: { sua: u } })} className="flex w-full items-center gap-2.5 text-left">
-                          <span className="flex h-8 w-8 shrink-0 items-center justify-center bg-nhan-nhat text-[12px] font-semibold text-nhan-dam" style={{ borderRadius: 9999 }}>
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center text-[12px] font-semibold" style={{ borderRadius: 9999, background: mauSac(sacBuoc(b)).nen, color: mauSac(sacBuoc(b)).chu }}>
                             {u.ho_ten.trim().split(/\s+/).pop()?.charAt(0).toUpperCase()}
                           </span>
                           <span className="min-w-0">
@@ -237,7 +244,7 @@ export function DanhSachTuyenDung({
                           </span>
                         </button>
                         <div className="mt-2.5 flex flex-wrap gap-1.5">
-                          {u.nguon && <span className="rounded-tag bg-nhan-nhat px-2 py-px text-[11px] font-medium text-nhan-dam">{u.nguon}</span>}
+                          {u.nguon && <NhanNenTang ten={u.nguon} nho />}
                           {u.link_cv && (
                             <a href={u.link_cv} target="_blank" rel="noopener noreferrer" draggable={false} className="rounded-tag bg-giay-tram px-2 py-px text-[11px] font-medium text-muc-2 hover:text-muc">Xem CV</a>
                           )}
