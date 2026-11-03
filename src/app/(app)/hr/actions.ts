@@ -6,6 +6,7 @@ import { quyenTrenSo } from "@/lib/quyen-nghiep-vu";
 import { dbHr, laGiamDocTaiKhoan } from "@/lib/hr-db";
 import { chuanHoaGiaTri, timMucHr, type MucHr } from "@/lib/hr-module";
 import { cotDoi, ghiLichSuNhanSu } from "@/lib/nhan-su-lich-su";
+import { tinhHoaHong, tyLeApDung } from "@/lib/hoa-hong";
 import { kiemTraDung, tinhGiam, type LanDung, type Voucher } from "@/lib/khuyen-mai";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -54,6 +55,25 @@ async function kiemTraRiengCuaMuc(ma: string, dong: Dong, db: SupabaseClient, id
     const toiDa = tinhGiam(v, don);
     if (dong.so_tien_giam == null) dong.so_tien_giam = toiDa;
     else if (Number(dong.so_tien_giam) > toiDa) return `Số tiền giảm không được quá ${toiDa.toLocaleString("vi-VN")}đ theo quy định của voucher.`;
+  }
+  if (ma === "hoa-hong") {
+    const { data: c } = await db.from("kd_ctv").select("ty_le_hoa_hong").eq("id", String(dong.ctv_id)).maybeSingle();
+    if (!c) return "Không tìm thấy người giới thiệu.";
+    const tyLe = tyLeApDung(dong.ty_le == null ? null : Number(dong.ty_le), { tyLe: (c as { ty_le_hoa_hong: number | null }).ty_le_hoa_hong });
+    if (tyLe === null) return "Người này chưa có tỷ lệ hoa hồng mặc định, hãy nhập tỷ lệ cho đơn.";
+    dong.ty_le = tyLe;
+    const don = Number(dong.so_tien_don);
+    const toiDa = tinhHoaHong(don, tyLe);
+    if (dong.so_tien_hoa_hong == null) dong.so_tien_hoa_hong = toiDa;
+    else if (Number(dong.so_tien_hoa_hong) > toiDa) return `Hoa hồng không được quá ${toiDa.toLocaleString("vi-VN")}đ (${tyLe}% giá trị đơn).`;
+    if (dong.trang_thai === "Đã chi" && !dong.ngay_chi) return "Cần ghi ngày chi khi chọn Đã chi.";
+    if (dong.trang_thai !== "Đã chi" && dong.ngay_chi) return "Chỉ ghi ngày chi khi trạng thái là Đã chi.";
+    if (dong.ma_don && dong.trang_thai !== "Huỷ") {
+      let q = db.from("kd_hoa_hong").select("id").eq("ctv_id", String(dong.ctv_id)).eq("ma_don", String(dong.ma_don)).neq("trang_thai", "Huỷ");
+      if (id) q = q.neq("id", id);
+      const { data: trung } = await q.limit(1);
+      if (trung && trung.length) return "Mã đơn này đã tính hoa hồng cho người này rồi.";
+    }
   }
   return null;
 }

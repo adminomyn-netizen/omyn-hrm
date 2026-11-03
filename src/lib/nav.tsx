@@ -488,6 +488,30 @@ const menuGoc: MucMenu[] = [
     moTa: "Lượt dùng, tiền giảm theo kênh và theo voucher.",
   },
   {
+    ten: "Cộng tác viên giới thiệu",
+    duong_dan: "/hr/ctv",
+    nhom: "Kinh doanh",
+    icon: Users,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Người giới thiệu khách, tỷ lệ hoa hồng.",
+  },
+  {
+    ten: "Sổ hoa hồng",
+    duong_dan: "/hr/hoa-hong",
+    nhom: "Kinh doanh",
+    icon: Users,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Hoa hồng từng đơn: chờ duyệt, đã duyệt, đã chi.",
+  },
+  {
+    ten: "Hoa hồng giới thiệu",
+    duong_dan: "/kinh-doanh/hoa-hong",
+    nhom: "Kinh doanh",
+    icon: Users,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Doanh số, hoa hồng còn phải chi theo người, theo kỳ.",
+  },
+  {
     ten: "Điểm và hạng khách lẻ",
     duong_dan: "/kinh-doanh/khach-le",
     nhom: "Kinh doanh",
@@ -1061,6 +1085,7 @@ export const CUM_TAB: readonly CumTab[] = [
   { ma: "khach-le", ten: "Khách lẻ và điểm", moTa: "Khách lẻ, sổ điểm, hạng khách; số dư điểm và hạng tự tính.", icon: Users, chinh: "/hr/khach-le", tabs: [{ ten: "Khách lẻ", duong_dan: "/hr/khach-le" }, { ten: "Sổ điểm", duong_dan: "/hr/diem-khach" }, { ten: "Hạng khách", duong_dan: "/hr/hang-khach" }, { ten: "Tham số điểm", duong_dan: "/hr/diem-cau-hinh" }, { ten: "Điểm và hạng", duong_dan: "/kinh-doanh/khach-le" }] },
   { ma: "tin-nhan", ten: "Tin nhắn khách lẻ", moTa: "Mẫu tin, kịch bản, hàng đợi gửi SMS và Zalo cho khách đồng ý nhận tin. Cổng gửi đang tắt.", icon: Users, chinh: "/kinh-doanh/tin-nhan", tabs: [{ ten: "Tổng quan", duong_dan: "/kinh-doanh/tin-nhan" }, { ten: "Mẫu tin", duong_dan: "/hr/mau-tin" }, { ten: "Kịch bản", duong_dan: "/hr/kich-ban-tin" }, { ten: "Hàng đợi", duong_dan: "/hr/hang-doi-tin" }, { ten: "Cổng gửi", duong_dan: "/hr/cong-gui-tin" }] },
   { ma: "khuyen-mai", ten: "Voucher và khuyến mãi", moTa: "Mã giảm giá, sổ dùng voucher và hiệu quả khuyến mãi theo kênh.", icon: Wallet, chinh: "/hr/voucher", tabs: [{ ten: "Voucher", duong_dan: "/hr/voucher" }, { ten: "Sổ dùng", duong_dan: "/hr/voucher-dung" }, { ten: "Hiệu quả", duong_dan: "/kinh-doanh/khuyen-mai" }] },
+  { ma: "hoa-hong", ten: "Cộng tác viên và hoa hồng", moTa: "Người giới thiệu, sổ hoa hồng từng đơn và tổng hợp phải chi theo kỳ.", icon: Users, chinh: "/hr/ctv", tabs: [{ ten: "Cộng tác viên", duong_dan: "/hr/ctv" }, { ten: "Sổ hoa hồng", duong_dan: "/hr/hoa-hong" }, { ten: "Tổng hợp", duong_dan: "/kinh-doanh/hoa-hong" }] },
   { ma: "cong-no-ncc", ten: "Công nợ nhà cung cấp", moTa: "Ghi phải trả nhà cung cấp; số còn phải trả và quá hạn tự tính.", icon: PiggyBank, chinh: "/hr/cong-no-nha-cung-cap", tabs: [{ ten: "Ghi công nợ", duong_dan: "/hr/cong-no-nha-cung-cap" }, { ten: "Số dư phải trả", duong_dan: "/tai-chinh/cong-no-ncc" }] },
   // Cụm 2: Tuyển dụng. Nhân viên thường chỉ thấy tab Yêu cầu tuyển dụng nên thanh tab tự ẩn.
   { ma: "tuyen-dung", ten: "Tuyển dụng", moTa: "Yêu cầu tuyển dụng, tin đăng và ứng viên, sổ tuyển dụng (mục tiêu, ngân sách, kênh, phỏng vấn, offer) và đề xuất nhân sự cần duyệt.", icon: UserPlus, chinh: "/tuyen-dung", tabs: [{ ten: "Tin và ứng viên", duong_dan: "/tuyen-dung" }, { ten: "Yêu cầu tuyển dụng", duong_dan: "/yeu-cau-tuyen-dung" }, { ten: "Sổ tuyển dụng", duong_dan: "/hr" }, { ten: "Đề xuất cần duyệt", duong_dan: "/hr/de-xuat-phe-duyet" }] },
