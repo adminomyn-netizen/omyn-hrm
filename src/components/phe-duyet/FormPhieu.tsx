@@ -33,6 +33,8 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
       const ds = t.kieu === "dm" ? danhMuc[t.danhMuc ?? ""] ?? [] : t.kieu === "chon" ? [...(t.luaChon ?? [])] : [];
       if (ds.length === 1) d[t.ma] = ds[0];
     }
+    // Bảng bắt buộc (vd Hạng mục chi phí) hiện sẵn một dòng trống để người nộp thấy ngay chỗ nhập.
+    for (const t of mau.truong) if (t.kieu === "bang" && t.batBuoc && !Array.isArray(d[t.ma])) d[t.ma] = [{}];
     return d;
   });
   const [tep, setTep] = useState<Record<string, TepMoi[]>>({});
@@ -85,7 +87,7 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
     if (!truongDangHien(t, goc)) return null;
     switch (t.kieu) {
       case "chu": {
-        if (t.bangChuTu) return <Cap t={t} khoa={khoa}><input readOnly tabIndex={-1} value={tienBangChu(Number(du[t.bangChuTu]))} placeholder={t.goiY} className={`${O_NHAP} bg-giay-tram`} /></Cap>;
+        if (t.bangChuTu) return <Cap t={t} khoa={khoa} nhan={`${t.ten} (tự điền, không nhập)`}><input readOnly tabIndex={-1} value={tienBangChu(Number(du[t.bangChuTu]))} placeholder={t.goiY} className={`${O_NHAP} cursor-not-allowed bg-giay-tram`} /></Cap>;
         return <Cap t={t} khoa={khoa}><input value={chuoi(v)} onChange={(e) => dat1(e.target.value)} placeholder={t.goiY} maxLength={300} className={O_NHAP} /></Cap>;
       }
       case "nhieu":
@@ -115,7 +117,7 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
           <Cap t={t} khoa={khoa}>
             {ds.length > 0
               ? <Chon ariaLabel={t.ten} giaTri={chuoi(v)} onDoi={dat1} luaChon={ds.map((x) => ({ gia_tri: x, nhan: x }))} />
-              : <input value={chuoi(v)} onChange={(e) => dat1(e.target.value)} maxLength={200} placeholder="Nhập (danh mục chưa được cài đặt)" className={O_NHAP} />}
+              : <input value={chuoi(v)} onChange={(e) => dat1(e.target.value)} maxLength={200} placeholder={`Nhập ${t.ten.toLowerCase()}`} className={O_NHAP} />}
           </Cap>
         );
       }
@@ -153,7 +155,7 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
         );
       }
       case "cong":
-        return <Cap t={t} khoa={khoa}><div className={`${O_NHAP} flex items-center bg-giay-tram tabular-nums`}>{Number(tongBang(t)).toLocaleString("vi-VN")} đ</div></Cap>;
+        return <Cap t={t} khoa={khoa} nhan={`${t.ten} (tự cộng từ các dòng hạng mục, không nhập)`}><div className={`${O_NHAP} flex cursor-not-allowed items-center bg-giay-tram tabular-nums`}>{Number(tongBang(t)).toLocaleString("vi-VN")} đ</div></Cap>;
       case "tep": {
         const moi = tep[t.ma] ?? [];
         const cu = tepCu[t.ma] ?? [];
