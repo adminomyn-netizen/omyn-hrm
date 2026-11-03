@@ -6,6 +6,8 @@ import { quyenTrenSo } from "@/lib/quyen-nghiep-vu";
 import { dbHr, laGiamDocTaiKhoan } from "@/lib/hr-db";
 import { chuanHoaGiaTri, timMucHr, type MucHr } from "@/lib/hr-module";
 import { cotDoi, ghiLichSuNhanSu } from "@/lib/nhan-su-lich-su";
+import { kiemTraDung, tinhGiam, type LanDung, type Voucher } from "@/lib/khuyen-mai";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type KetQuaHr = { loi?: string; ok?: boolean };
 const KHONG_QUYEN: KetQuaHr = {
@@ -21,6 +23,39 @@ async function nguoiQuanTri(muc: MucHr, xoa = false) {
   if (muc.chiGiamDocSua || nd.vaiTro !== "nhan_vien") return null;
   const q = await quyenTrenSo(nd, muc.nhom);
   return q.muc === "nhap" && (!xoa || q.xoa) ? nd : null;
+}
+
+type Dong = Record<string, string | number | boolean | null>;
+const laVoucher = (r: Record<string, unknown>): Voucher => ({
+  id: String(r.id), ma: String(r.ma), loai: String(r.loai), giaTri: Number(r.gia_tri), giamToiDa: r.giam_toi_da == null ? null : Number(r.giam_toi_da), donToiThieu: Number(r.don_toi_thieu),
+  kenh: String(r.kenh), tuNgay: String(r.tu_ngay), denNgay: String(r.den_ngay), gioiHanLuot: r.gioi_han_luot == null ? null : Number(r.gioi_han_luot),
+  gioiHanMoiKhach: r.gioi_han_moi_khach == null ? null : Number(r.gioi_han_moi_khach), bat: Boolean(r.bat),
+});
+
+/** Kiểm riêng theo mục trước khi lưu (có thể bổ sung giá trị tự tính vào dòng). Trả câu lỗi hoặc null. */
+async function kiemTraRiengCuaMuc(ma: string, dong: Dong, db: SupabaseClient, id: string): Promise<string | null> {
+  if (ma === "voucher") {
+    dong.ma = String(dong.ma ?? "").trim().toUpperCase();
+    if (!dong.ma) return "Cần ghi mã voucher.";
+    if (dong.loai === "Giảm %" && Number(dong.gia_tri) > 100) return "Giảm theo % thì mức giảm tối đa 100.";
+    if (dong.loai === "Giảm tiền" && dong.giam_toi_da != null) return "Mức giảm tối đa chỉ dùng cho loại giảm %.";
+    if (String(dong.den_ngay) < String(dong.tu_ngay)) return "Ngày kết thúc phải sau hoặc bằng ngày bắt đầu.";
+    return null;
+  }
+  if (ma === "voucher-dung") {
+    const { data: vr } = await db.from("kd_voucher").select("*").eq("id", String(dong.voucher_id)).maybeSingle();
+    if (!vr) return "Không tìm thấy voucher.";
+    const v = laVoucher(vr as Record<string, unknown>);
+    const { data: ds } = await db.from("kd_voucher_dung").select("id, voucher_id, khach_le_id, ngay, kenh, so_tien_don, so_tien_giam").eq("voucher_id", v.id);
+    const daDung: LanDung[] = ((ds ?? []) as Record<string, unknown>[]).filter((r) => String(r.id) !== id).map((r) => ({ voucherId: v.id, khachId: (r.khach_le_id as string | null) ?? null, ngay: String(r.ngay), kenh: String(r.kenh), soTienDon: Number(r.so_tien_don), soTienGiam: Number(r.so_tien_giam) }));
+    const don = Number(dong.so_tien_don);
+    const loi = kiemTraDung(v, { ngay: String(dong.ngay), kenh: String(dong.kenh), khachId: (dong.khach_le_id as string | null) ?? null, soTienDon: don }, daDung);
+    if (loi) return loi;
+    const toiDa = tinhGiam(v, don);
+    if (dong.so_tien_giam == null) dong.so_tien_giam = toiDa;
+    else if (Number(dong.so_tien_giam) > toiDa) return `Số tiền giảm không được quá ${toiDa.toLocaleString("vi-VN")}đ theo quy định của voucher.`;
+  }
+  return null;
 }
 
 export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
@@ -45,6 +80,8 @@ export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
       return { loi: `Cần ghi “${c.nhan.replace(/\s*\(.*$/, "")}” khi chọn ${String(dong[c.batBuocKhi.k]).toLowerCase()}.` };
   }
   const db = dbHr();
+  const loiRieng = await kiemTraRiengCuaMuc(muc.ma, dong, db, id);
+  if (loiRieng) return { loi: loiRieng };
   const cu = id
     ? ((await db.from(muc.bang).select("*").eq("id", id).maybeSingle())
         .data as Record<string, unknown> | null)
