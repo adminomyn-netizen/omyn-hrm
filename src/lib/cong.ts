@@ -1,4 +1,4 @@
-import { soNgayNghi } from "@/lib/don-tu";
+import { phatHienSaiPham, soNgayNghi } from "@/lib/don-tu";
 
 /** Mã công của một ngày trong bảng chấm công tháng (theo phần mềm chấm công mẫu, thêm CĐ và V).
  * X đủ ngày · N nửa ngày · CT công tác · P nghỉ phép năm · L nghỉ lễ · O nghỉ ốm · KP nghỉ không lương · CĐ nghỉ chế độ (thai sản…) · V vắng không đơn · "" không tính (Chủ nhật, chưa đến ngày, chưa vào làm). */
@@ -102,3 +102,40 @@ export const CHU_THICH_CONG: { ma: Exclude<MaCong, "">; ten: string; coLuong: st
   { ma: "CĐ", ten: "Nghỉ chế độ (thai sản…)", coLuong: "Không lương công ty (BHXH chi trả)" },
   { ma: "V", ten: "Vắng, không có đơn", coLuong: "Không lương" },
 ];
+
+export type LechGio = {
+  /** Vào trễ hơn mốc đi muộn. */
+  muon: boolean;
+  /** Check out sớm hơn cuối ca. */
+  som: boolean;
+  /** Có đơn "Đi trễ" / "Về sớm" đã duyệt cho ngày này: vẫn ghi nhận nhưng không tính là vi phạm. */
+  muonCoDon: boolean;
+  somCoDon: boolean;
+  /** Tiếng Việt, dùng làm chú thích khi rê chuột. */
+  ghiChu: string;
+};
+
+/**
+ * Lệch giờ của MỘT ngày đi làm bình thường (mã X, không ghi chú: remote, ngoài công ty, miễn chấm công, công tác không xét).
+ * Chỉ trả kết quả khi có vào trễ hoặc check out sớm; ngày đúng giờ trả null. Hôm nay chưa check out thì chưa xét về sớm.
+ */
+export function lechGioMotNgay(o: OCong, cc: { gio_vao: string | null; gio_ra: string | null } | undefined, ngay: string, homNay: string, don: readonly DonDaDuyet[]): LechGio | null {
+  if (!cc || o.ma !== "X" || o.ghiChu) return null;
+  const sai = phatHienSaiPham(cc, ngay, homNay);
+  const muon = sai.some((x) => x.ma === "vao_tre");
+  const som = sai.some((x) => x.ma === "ra_som");
+  if (!muon && !som) return null;
+  const coDon = (loai: string) => don.some((d) => d.loai === loai && d.tu_ngay <= ngay && ngay <= d.den_ngay);
+  const g = (x: string | null) => (x ? x.slice(0, 5) : "");
+  const phan: string[] = [];
+  if (muon) phan.push(`vào ${g(cc.gio_vao)} (trễ${coDon("Đi trễ") ? ", đã có đơn Đi trễ" : ""})`);
+  if (som) phan.push(`ra ${g(cc.gio_ra)} (sớm${coDon("Về sớm") ? ", đã có đơn Về sớm" : ""})`);
+  return { muon, som, muonCoDon: muon && coDon("Đi trễ"), somCoDon: som && coDon("Về sớm"), ghiChu: phan.join(", ") };
+}
+
+/** Công còn thiếu so với số ngày tính công: mỗi ngày có mã (không kể Chủ nhật, chưa tới ngày) đáng 1 công; nghỉ không lương, ốm, chế độ, vắng và nửa ngày làm hụt công. */
+export function congConThieu(o: readonly OCong[]): { ngayTinhCong: number; thieu: number } {
+  const ngayTinhCong = o.filter((c) => c.ma !== "").length;
+  const huong = o.reduce((a, c) => a + c.cong, 0);
+  return { ngayTinhCong, thieu: Math.max(0, Math.round((ngayTinhCong - huong) * 10) / 10) };
+}

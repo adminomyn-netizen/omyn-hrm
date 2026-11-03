@@ -30,6 +30,9 @@ const MAU: Record<Exclude<MaCong, "">, string> = {
 const so = (n: number) => (n === 0 ? "" : String(Math.round(n * 10) / 10).replace(".", ","));
 const ngayVN = (iso: string) => iso.split("-").reverse().join("/");
 const TONG_COT = ["X", "N", "CT", "P", "L", "O", "KP", "CĐ", "V"] as const;
+/** Ô lệch giờ: đỏ nếu chưa có đơn đã duyệt; vàng nếu đã có đơn Đi trễ / Về sớm. */
+const MAU_LECH_DO = "bg-loi-nen text-loi font-semibold ring-2 ring-loi";
+const MAU_LECH_DA_DON = "bg-canh-bao-nen text-canh-bao ring-1 ring-canh-bao";
 
 /** Bảng chấm công tháng: mỗi nhân viên một dòng, mỗi ngày một ô mã công (X, N, CT, P, L, O, KP, CĐ, V), cột tổng và công hưởng lương. */
 export function BangCongThang({ nam, thang, hienTai, dong, ngayLe, soNgay, homNay }: { nam: number; thang: number; hienTai: { nam: number; thang: number }; dong: DongBangCong[]; ngayLe: NgayLe[]; soNgay: number; homNay: string }) {
@@ -107,6 +110,11 @@ export function BangCongThang({ nam, thang, hienTai, dong, ngayLe, soNgay, homNa
             </li>
           ))}
         </ul>
+        <ul className="mt-3 space-y-1.5 text-[13px] text-muc-2">
+          <li><span className={`mr-2 inline-flex h-6 min-w-8 items-center justify-center rounded-tag px-1.5 text-[12px] ${MAU_LECH_DO}`}>X</span>Vào trễ sau 08:15 hoặc check out trước 17:00 và chưa có đơn Đi trễ / Về sớm đã duyệt.</li>
+          <li><span className={`mr-2 inline-flex h-6 min-w-8 items-center justify-center rounded-tag px-1.5 text-[12px] ${MAU_LECH_DA_DON}`}>X</span>Lệch giờ nhưng đã có đơn đã duyệt (vẫn ghi nhận, không tính vi phạm).</li>
+          <li><span className="mr-2 inline-flex h-6 min-w-8 items-center justify-center rounded-tag bg-loi-nen px-1.5 text-[12px] font-semibold text-loi">21</span>Ô Công hưởng đỏ: công hưởng lương ít hơn số ngày tính công (thiếu bao nhiêu ghi bên dưới).</li>
+        </ul>
         <p className="mt-3 text-[13px] text-muc-3">Chủ nhật không tính (công ty làm thứ Hai đến thứ Bảy). Người miễn chấm công (Giám đốc và người được giữ quyền giám đốc) mặc định đủ công các ngày làm việc đã qua. Cùng bộ quy tắc này được dùng khi lập bảng lương.</p>
       </details>
 
@@ -122,7 +130,9 @@ export function BangCongThang({ nam, thang, hienTai, dong, ngayLe, soNgay, homNa
                 </th>
               ))}
               {TONG_COT.map((c, i) => <th key={c} className={`min-w-[30px] border-l px-1 text-center font-medium ${i === 0 ? "border-l-2 border-vien-dam" : "border-vien"}`} title={CHU_THICH_CONG.find((x) => x.ma === c)?.ten}>{c}</th>)}
-              <th className="sticky right-0 z-10 min-w-[72px] border-l border-vien-dam bg-nhan-nhat px-2 text-center font-semibold text-nhan-dam">Công hưởng</th>
+              <th className="min-w-[34px] border-l-2 border-vien-dam px-1 text-center font-medium text-loi" title="Số ngày vào trễ chưa có đơn đã duyệt">Muộn</th>
+              <th className="min-w-[34px] border-l border-vien px-1 text-center font-medium text-loi" title="Số ngày check out sớm chưa có đơn đã duyệt">Sớm</th>
+              <th className="sticky right-0 z-10 min-w-[84px] border-l border-vien-dam bg-nhan-nhat px-2 text-center font-semibold text-nhan-dam">Công hưởng</th>
             </tr>
           </thead>
           <tbody>
@@ -133,12 +143,17 @@ export function BangCongThang({ nam, thang, hienTai, dong, ngayLe, soNgay, homNa
                   <div className="text-[11px] text-muc-3">{[d.maNhanVien, d.khoi].filter(Boolean).join(" · ") || d.chucDanh}{d.mienChamCong ? " · miễn chấm công" : ""}</div>
                 </td>
                 {d.o.map((o, i) => (
-                  <td key={i} className={`p-0.5 text-center ${ngay[i].thu === 0 ? "bg-giay-tram/70" : ""}`} title={o.ghiChu}>
-                    {o.ma && <span className={`flex h-7 items-center justify-center rounded-[4px] text-[11px] ${MAU[o.ma]}`}>{o.ma}</span>}
+                  <td key={i} className={`p-0.5 text-center ${ngay[i].thu === 0 ? "bg-giay-tram/70" : ""}`} title={d.lech[i] ? `Lệch giờ: ${d.lech[i]!.ghiChu}` : o.ghiChu}>
+                    {o.ma && <span className={`flex h-7 items-center justify-center rounded-[4px] text-[11px] ${d.lech[i] ? (d.lech[i]!.muon && !d.lech[i]!.muonCoDon) || (d.lech[i]!.som && !d.lech[i]!.somCoDon) ? MAU_LECH_DO : MAU_LECH_DA_DON : MAU[o.ma]}`}>{o.ma}</span>}
                   </td>
                 ))}
                 {TONG_COT.map((c, i) => <td key={c} className={`border-l px-1 text-center tabular-nums text-muc-2 ${i === 0 ? "border-l-2 border-vien-dam" : "border-vien"}`}>{so(d.tong[c])}</td>)}
-                <td className="sticky right-0 z-10 border-l border-vien-dam bg-nhan-nhat px-2 text-center text-[13px] font-semibold tabular-nums text-nhan-dam">{so(d.tong.congHuong) || "0"}</td>
+                <td className={`border-l-2 border-vien-dam px-1 text-center tabular-nums ${d.soMuon > 0 ? "font-semibold text-loi" : "text-muc-3"}`}>{d.soMuon || ""}</td>
+                <td className={`border-l border-vien px-1 text-center tabular-nums ${d.soSom > 0 ? "font-semibold text-loi" : "text-muc-3"}`}>{d.soSom || ""}</td>
+                <td className={`sticky right-0 z-10 border-l border-vien-dam px-2 text-center text-[13px] font-semibold tabular-nums ${d.thieuCong > 0 ? "bg-loi-nen text-loi" : "bg-nhan-nhat text-nhan-dam"}`} title={d.thieuCong > 0 ? `Thiếu ${so(d.thieuCong)} công so với ${d.ngayTinhCong} ngày tính công` : `Đủ ${d.ngayTinhCong} ngày công`}>
+                  {so(d.tong.congHuong) || "0"}
+                  {d.thieuCong > 0 && <div className="text-[10px] font-normal">thiếu {so(d.thieuCong)}</div>}
+                </td>
               </tr>
             ))}
           </tbody>

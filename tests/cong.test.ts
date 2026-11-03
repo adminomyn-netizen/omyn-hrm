@@ -82,3 +82,32 @@ describe("tongHopCong", () => {
     expect(t).toMatchObject({ X: 1, L: 1, N: 1, V: 1, congHuong: 3, congLam: 1.5 });
   });
 });
+
+import { congConThieu, lechGioMotNgay } from "@/lib/cong";
+
+describe("lệch giờ và thiếu công trong bảng công", () => {
+  const X = { ma: "X" as const, cong: 1, congLam: 1 };
+  const homNay = "2026-11-10";
+  it("vào trễ hoặc ra sớm thì đánh dấu; đúng giờ thì không", () => {
+    expect(lechGioMotNgay(X, { gio_vao: "08:10:00", gio_ra: "17:30:00" }, "2026-11-05", homNay, [])).toBeNull();
+    expect(lechGioMotNgay(X, { gio_vao: "08:40:00", gio_ra: "17:30:00" }, "2026-11-05", homNay, [])).toMatchObject({ muon: true, som: false, muonCoDon: false });
+    expect(lechGioMotNgay(X, { gio_vao: "08:00:00", gio_ra: "16:30:00" }, "2026-11-05", homNay, [])).toMatchObject({ muon: false, som: true });
+  });
+  it("có đơn Đi trễ / Về sớm đã duyệt thì ghi nhận nhưng không tính vi phạm", () => {
+    const don = [{ loai: "Đi trễ", tu_ngay: "2026-11-05", den_ngay: "2026-11-05" }];
+    const r = lechGioMotNgay(X, { gio_vao: "09:00:00", gio_ra: "17:30:00" }, "2026-11-05", homNay, don);
+    expect(r).toMatchObject({ muon: true, muonCoDon: true });
+    expect(r?.ghiChu).toContain("đã có đơn Đi trễ");
+  });
+  it("không xét ngày nghỉ nửa ngày, remote/miễn chấm công, thiếu dữ liệu; hôm nay chưa ra thì chưa xét về sớm", () => {
+    expect(lechGioMotNgay({ ma: "N", cong: 1, congLam: 0.5 }, { gio_vao: "10:00:00", gio_ra: null }, "2026-11-05", homNay, [])).toBeNull();
+    expect(lechGioMotNgay({ ...X, ghiChu: "Làm remote" }, { gio_vao: "10:00:00", gio_ra: null }, "2026-11-05", homNay, [])).toBeNull();
+    expect(lechGioMotNgay(X, undefined, "2026-11-05", homNay, [])).toBeNull();
+    expect(lechGioMotNgay(X, { gio_vao: "08:00:00", gio_ra: null }, homNay, homNay, [])).toBeNull();
+  });
+  it("thiếu công: ngày tính công trừ công hưởng", () => {
+    const o = [X, X, { ma: "N" as const, cong: 0.5, congLam: 0.5 }, { ma: "V" as const, cong: 0, congLam: 0 }, { ma: "P" as const, cong: 1, congLam: 0 }, { ma: "" as const, cong: 0, congLam: 0 }];
+    expect(congConThieu(o)).toEqual({ ngayTinhCong: 5, thieu: 1.5 });
+    expect(congConThieu([X, X])).toEqual({ ngayTinhCong: 2, thieu: 0 });
+  });
+});
