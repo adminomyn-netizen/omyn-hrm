@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { Fragment, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Paperclip, Plus, X } from "lucide-react";
 import { Chon } from "@/components/ui/Chon";
@@ -18,6 +18,17 @@ type Du = Record<string, unknown>;
 
 const KHO = "phe-duyet-tep";
 const chuoi = (v: unknown) => (typeof v === "string" ? v : "");
+
+/** Khung một ô: nhãn, nội dung, lỗi. Phải nằm NGOÀI FormPhieu: khai báo trong hàm thì mỗi lần gõ một chữ nó thành thành phần mới, ô nhập bị dựng lại và mất con trỏ (lỗi "gõ được 1 chữ rồi không gõ được nữa"). */
+function Cap({ t, khoa, nhan, loiO, children }: { t: Truong; khoa: string; nhan?: string; loiO: Record<string, string>; children: React.ReactNode }) {
+  return (
+    <div className={t.kieu === "nhieu" || t.kieu === "bang" || t.kieu === "tep" ? "sm:col-span-2" : ""}>
+      <label className={NHAN_O}>{nhan ?? t.ten}{t.batBuoc && <span className="text-loi"> *</span>}</label>
+      {children}
+      {loiO[khoa] && <p role="alert" className="mt-1 text-[13px] text-loi">{loiO[khoa]}</p>}
+    </div>
+  );
+}
 
 /** Biểu mẫu nộp phiếu dựng từ cấu hình mẫu (bê nguyên ô nhập Lark): ô hiện theo điều kiện, bảng nhiều dòng, đính kèm tệp. Cũng dùng để sửa và nộp lại khi được yêu cầu bổ sung. */
 export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nopLai }: {
@@ -73,31 +84,21 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
     router.refresh();
   });
 
-  function Cap({ t, khoa, nhan, children }: { t: Truong; khoa: string; nhan?: string; children: React.ReactNode }) {
-    return (
-      <div className={t.kieu === "nhieu" || t.kieu === "bang" || t.kieu === "tep" ? "sm:col-span-2" : ""}>
-        <label className={NHAN_O}>{nhan ?? t.ten}{t.batBuoc && <span className="text-loi"> *</span>}</label>
-        {children}
-        {loiO[khoa] && <p role="alert" className="mt-1 text-[13px] text-loi">{loiO[khoa]}</p>}
-      </div>
-    );
-  }
-
-  function Truong1({ t, v, dat1, khoa, goc }: { t: Truong; v: unknown; dat1: (x: unknown) => void; khoa: string; goc: Du }) {
+  function renderTruong({ t, v, dat1, khoa, goc }: { t: Truong; v: unknown; dat1: (x: unknown) => void; khoa: string; goc: Du }) {
     if (!truongDangHien(t, goc)) return null;
     switch (t.kieu) {
       case "chu": {
-        if (t.bangChuTu) return <Cap t={t} khoa={khoa} nhan={`${t.ten} (tự điền, không nhập)`}><input readOnly tabIndex={-1} value={tienBangChu(Number(du[t.bangChuTu]))} placeholder={t.goiY} className={`${O_NHAP} cursor-not-allowed bg-giay-tram`} /></Cap>;
-        return <Cap t={t} khoa={khoa}><input value={chuoi(v)} onChange={(e) => dat1(e.target.value)} placeholder={t.goiY} maxLength={300} className={O_NHAP} /></Cap>;
+        if (t.bangChuTu) return <Cap loiO={loiO} t={t} khoa={khoa} nhan={`${t.ten} (tự điền, không nhập)`}><input readOnly tabIndex={-1} value={tienBangChu(Number(du[t.bangChuTu]))} placeholder={t.goiY} className={`${O_NHAP} cursor-not-allowed bg-giay-tram`} /></Cap>;
+        return <Cap loiO={loiO} t={t} khoa={khoa}><input value={chuoi(v)} onChange={(e) => dat1(e.target.value)} placeholder={t.goiY} maxLength={300} className={O_NHAP} /></Cap>;
       }
       case "nhieu":
-        return <Cap t={t} khoa={khoa}><textarea value={chuoi(v)} onChange={(e) => dat1(e.target.value)} maxLength={4000} className={O_NHIEU_DONG} /></Cap>;
+        return <Cap loiO={loiO} t={t} khoa={khoa}><textarea value={chuoi(v)} onChange={(e) => dat1(e.target.value)} maxLength={4000} className={O_NHIEU_DONG} /></Cap>;
       case "ngay":
-        return <Cap t={t} khoa={khoa}><NgayChon ariaLabel={t.ten} giaTri={chuoi(v)} onDoi={dat1} denNam={2100} tuNam={2020} /></Cap>;
+        return <Cap loiO={loiO} t={t} khoa={khoa}><NgayChon ariaLabel={t.ten} giaTri={chuoi(v)} onDoi={dat1} denNam={2100} tuNam={2020} /></Cap>;
       case "ngay_gio": {
         const [d = "", g = ""] = chuoi(v).split("T");
         return (
-          <Cap t={t} khoa={khoa}>
+          <Cap loiO={loiO} t={t} khoa={khoa}>
             <div className="grid grid-cols-[1fr_1fr] gap-2">
               <NgayChon ariaLabel={`${t.ten} (ngày)`} giaTri={d} onDoi={(x) => dat1(x && g ? `${x}T${g}` : x ? `${x}T` : "")} denNam={2100} tuNam={2020} />
               <GioChon ariaLabel={`${t.ten} (giờ)`} giaTriMacDinh={g} onDoi={(x) => dat1(d && x ? `${d}T${x}` : d ? `${d}T` : "")} />
@@ -106,15 +107,15 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
         );
       }
       case "so":
-        return <Cap t={t} khoa={khoa}><input inputMode="numeric" value={v === undefined || v === null ? "" : String(v)} onChange={(e) => dat1(e.target.value.replace(/\D/g, ""))} className={O_NHAP} /></Cap>;
+        return <Cap loiO={loiO} t={t} khoa={khoa}><input inputMode="numeric" value={v === undefined || v === null ? "" : String(v)} onChange={(e) => dat1(e.target.value.replace(/\D/g, ""))} className={O_NHAP} /></Cap>;
       case "tien":
-        return <Cap t={t} khoa={khoa}><OTien ariaLabel={t.ten} giaTriMacDinh={typeof v === "number" ? v : 0} onDoi={dat1} /></Cap>;
+        return <Cap loiO={loiO} t={t} khoa={khoa}><OTien ariaLabel={t.ten} giaTriMacDinh={typeof v === "number" ? v : 0} onDoi={dat1} /></Cap>;
       case "chon":
-        return <Cap t={t} khoa={khoa}><Chon ariaLabel={t.ten} giaTri={chuoi(v)} onDoi={dat1} luaChon={(t.luaChon ?? []).map((x) => ({ gia_tri: x, nhan: x }))} /></Cap>;
+        return <Cap loiO={loiO} t={t} khoa={khoa}><Chon ariaLabel={t.ten} giaTri={chuoi(v)} onDoi={dat1} luaChon={(t.luaChon ?? []).map((x) => ({ gia_tri: x, nhan: x }))} /></Cap>;
       case "dm": {
         const ds = danhMuc[t.danhMuc ?? ""] ?? [];
         return (
-          <Cap t={t} khoa={khoa}>
+          <Cap loiO={loiO} t={t} khoa={khoa}>
             {ds.length > 0
               ? <Chon ariaLabel={t.ten} giaTri={chuoi(v)} onDoi={dat1} luaChon={ds.map((x) => ({ gia_tri: x, nhan: x }))} />
               : <input value={chuoi(v)} onChange={(e) => dat1(e.target.value)} maxLength={200} placeholder={`Nhập ${t.ten.toLowerCase()}`} className={O_NHAP} />}
@@ -125,7 +126,7 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
         const ds = t.nhieu ? (Array.isArray(v) ? (v as string[]) : []) : [];
         const ten = (id: string) => nhanSu.find((n) => n.id === id)?.ten ?? "(đã nghỉ)";
         return (
-          <Cap t={t} khoa={khoa}>
+          <Cap loiO={loiO} t={t} khoa={khoa}>
             {t.nhieu ? (
               <div className="space-y-2">
                 {ds.length > 0 && (
@@ -149,18 +150,18 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
       case "phieu": {
         const ds = phieuNoi.filter((p) => !t.loaiPhieuNoi || t.loaiPhieuNoi.includes(p.maPhieu));
         return (
-          <Cap t={t} khoa={khoa}>
+          <Cap loiO={loiO} t={t} khoa={khoa}>
             <Chon ariaLabel={t.ten} trong={ds.length ? "Chọn phiếu" : "Chưa có phiếu nào để nối"} giaTri={chuoi(v)} onDoi={dat1} luaChon={ds.map((p) => ({ gia_tri: p.id, nhan: p.ten }))} />
           </Cap>
         );
       }
       case "cong":
-        return <Cap t={t} khoa={khoa} nhan={`${t.ten} (tự cộng từ các dòng hạng mục, không nhập)`}><div className={`${O_NHAP} flex cursor-not-allowed items-center bg-giay-tram tabular-nums`}>{Number(tongBang(t)).toLocaleString("vi-VN")} đ</div></Cap>;
+        return <Cap loiO={loiO} t={t} khoa={khoa} nhan={`${t.ten} (tự cộng từ các dòng hạng mục, không nhập)`}><div className={`${O_NHAP} flex cursor-not-allowed items-center bg-giay-tram tabular-nums`}>{Number(tongBang(t)).toLocaleString("vi-VN")} đ</div></Cap>;
       case "tep": {
         const moi = tep[t.ma] ?? [];
         const cu = tepCu[t.ma] ?? [];
         return (
-          <Cap t={t} khoa={khoa}>
+          <Cap loiO={loiO} t={t} khoa={khoa}>
             <div className="space-y-2">
               {(cu.length > 0 || moi.length > 0) && (
                 <ul className="space-y-1">
@@ -186,12 +187,12 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
         const dong = Array.isArray(v) ? (v as Du[]) : [];
         const sua = (i: number, ma: string, x: unknown) => dat1(dong.map((d, j) => (j === i ? { ...d, [ma]: x } : d)));
         return (
-          <Cap t={t} khoa={khoa}>
+          <Cap loiO={loiO} t={t} khoa={khoa}>
             <div className="space-y-2.5">
               {dong.map((d, i) => (
                 <div key={i} className="rounded-nho border border-vien p-3">
                   <div className="grid gap-3 sm:grid-cols-2">
-                    {(t.con ?? []).map((c) => <Truong1 key={c.ma} t={c} v={d[c.ma]} dat1={(x) => sua(i, c.ma, x)} khoa={`${t.ma}.${i}.${c.ma}`} goc={d} />)}
+                    {(t.con ?? []).map((c) => <Fragment key={c.ma}>{renderTruong({ t: c, v: d[c.ma], dat1: (x) => sua(i, c.ma, x), khoa: `${t.ma}.${i}.${c.ma}`, goc: d })}</Fragment>)}
                   </div>
                   <button type="button" className={`${NUT_CHU_NGUY} mt-2`} onClick={() => dat1(dong.filter((_, j) => j !== i))}>Xoá dòng {i + 1}</button>
                 </div>
@@ -209,7 +210,7 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
   return (
     <div className="the-noi the-noi-thap p-5 sm:p-6">
       <div className="grid gap-x-4 gap-y-5 sm:grid-cols-2">
-        {mau.truong.map((t) => <Truong1 key={t.ma} t={t} v={du[t.ma]} dat1={(x) => dat(t.ma, x)} khoa={t.ma} goc={du} />)}
+        {mau.truong.map((t) => <Fragment key={t.ma}>{renderTruong({ t, v: du[t.ma], dat1: (x) => dat(t.ma, x), khoa: t.ma, goc: du })}</Fragment>)}
       </div>
       {loi && <p role="alert" className="mt-5 text-[14px] text-loi">{loi}</p>}
       <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-vien pt-5">
