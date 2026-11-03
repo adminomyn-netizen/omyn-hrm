@@ -1,18 +1,24 @@
 /** Đọc bảng đơn lẻ dán từ Excel (tách bằng Tab) hoặc file CSV xuất từ sàn. Hàm thuần, không chạm DB. */
 export type TrangThaiDonLe = "Đang xử lý" | "Đã giao" | "Hoàn trả" | "Huỷ";
-export type DonLeDoc = { dong: number; ngay: string; maDon: string; tenKhach: string | null; dienThoai: string | null; giaTri: number; trangThai: TrangThaiDonLe };
+/** Một dòng hàng của đơn trong file (sàn xuất mỗi sản phẩm một dòng, lặp lại mã đơn). */
+export type HangDoc = { dong: number; sku: string | null; tenSp: string | null; soLuong: number; donGia: number | null };
+export type DonLeDoc = { dong: number; ngay: string; maDon: string; tenKhach: string | null; dienThoai: string | null; giaTri: number; trangThai: TrangThaiDonLe; hang: HangDoc[] };
 export type LoiDong = { dong: number; loi: string };
 
 const bo = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
 /** Tên cột chấp nhận (đã bỏ dấu, chữ thường) cho từng trường. */
-const COT: Record<"ngay" | "maDon" | "ten" | "sdt" | "tien" | "trangThai", string[]> = {
+const COT: Record<"ngay" | "maDon" | "ten" | "sdt" | "tien" | "trangThai" | "sku" | "tenSp" | "soLuong" | "donGia", string[]> = {
   ngay: ["ngay", "ngay dat hang", "ngay tao don", "ngay dat", "order date", "order creation time", "created time", "thoi gian tao don"],
   maDon: ["ma don", "ma don hang", "order id", "order no", "so don", "ma van don" ],
   ten: ["ten khach", "khach hang", "ten khach hang", "nguoi mua", "ten nguoi nhan", "buyer", "buyer username", "recipient"],
   sdt: ["sdt", "so dien thoai", "dien thoai", "phone", "phone number", "so dt"],
   tien: ["tien khach tra", "tong tien", "tong thanh toan", "tong gia tri don hang", "gia tri don", "gia tri", "so tien", "total", "order amount", "total amount", "tong tien thanh toan"],
   trangThai: ["trang thai", "trang thai don hang", "status", "order status"],
+  sku: ["ma san pham", "ma sp", "sku", "seller sku", "sku reference no", "sku id", "sku san pham", "ma hang"],
+  tenSp: ["ten san pham", "san pham", "product name", "ten hang", "ten hang hoa", "ten san pham ten phan loai"],
+  soLuong: ["so luong", "sl", "quantity", "qty"],
+  donGia: ["don gia", "gia ban", "gia", "unit price", "price", "original price", "gia goc", "deal price", "gia san pham"],
 };
 
 export function tachBang(text: string): string[][] {
@@ -72,31 +78,68 @@ export const chuanSdt = (s: string | null | undefined) => {
 
 /**
  * Đọc bảng đơn. Dòng đầu là tiêu đề; bắt buộc có cột Mã đơn, Ngày, Tiền (tên cột nhận cả tiếng Việt và tiếng Anh của Shopee/TikTok);
- * Tên khách, SĐT, Trạng thái là tuỳ chọn (không có trạng thái thì Đang xử lý). Mã đơn trùng trong file chỉ lấy dòng đầu.
+ * Tên khách, SĐT, Trạng thái là tuỳ chọn (không có trạng thái thì Đang xử lý).
+ * Có thêm cột sản phẩm (Mã sản phẩm/SKU hoặc Tên sản phẩm) và Số lượng thì mỗi dòng là một dòng hàng và các dòng cùng mã đơn gộp thành một đơn
+ * (thông tin đơn lấy ở dòng đầu); khi đó dòng hàng lỗi chỉ bị bỏ và báo ở `canhBao`, đơn vẫn được nhập. Không có cột sản phẩm thì mã đơn trùng trong file chỉ lấy dòng đầu và báo lỗi.
  */
-export function docBangDonLe(text: string): { don: DonLeDoc[]; loi: LoiDong[]; thieuCot: string[] } {
+export function docBangDonLe(text: string): { don: DonLeDoc[]; loi: LoiDong[]; canhBao: LoiDong[]; thieuCot: string[] } {
   const bang = tachBang(text);
-  if (bang.length === 0) return { don: [], loi: [], thieuCot: ["file trống"] };
+  if (bang.length === 0) return { don: [], loi: [], canhBao: [], thieuCot: ["file trống"] };
   const tieuDe = bang[0].map(bo);
   const tim = (k: keyof typeof COT) => tieuDe.findIndex((h) => COT[k].includes(h));
-  const cot = { ngay: tim("ngay"), maDon: tim("maDon"), ten: tim("ten"), sdt: tim("sdt"), tien: tim("tien"), tt: tim("trangThai") };
+  const cot = { ngay: tim("ngay"), maDon: tim("maDon"), ten: tim("ten"), sdt: tim("sdt"), tien: tim("tien"), tt: tim("trangThai"), sku: tim("sku"), tenSp: tim("tenSp"), sl: tim("soLuong"), gia: tim("donGia") };
   const thieuCot = [cot.maDon < 0 && "Mã đơn", cot.ngay < 0 && "Ngày", cot.tien < 0 && "Tiền khách trả"].filter(Boolean) as string[];
-  if (thieuCot.length) return { don: [], loi: [], thieuCot };
-  const don: DonLeDoc[] = [], loi: LoiDong[] = [], thay = new Set<string>();
+  if (thieuCot.length) return { don: [], loi: [], canhBao: [], thieuCot };
+  const coHang = cot.sl >= 0 && (cot.sku >= 0 || cot.tenSp >= 0);
+  const don: DonLeDoc[] = [], loi: LoiDong[] = [], canhBao: LoiDong[] = [], theoMa = new Map<string, DonLeDoc>();
+  const docHang = (r: string[], dong: number): HangDoc | null => {
+    const sku = cot.sku >= 0 ? (r[cot.sku] ?? "").trim() : "";
+    const tenSp = cot.tenSp >= 0 ? (r[cot.tenSp] ?? "").trim() : "";
+    if (!sku && !tenSp) return null;
+    const slTho = (r[cot.sl] ?? "").trim();
+    const sl = slTho === "" ? 1 : docTien(slTho);
+    if (sl === null || sl < 1 || sl > 100000) { canhBao.push({ dong, loi: `Số lượng “${slTho}” không hợp lệ, bỏ dòng hàng này.` }); return null; }
+    const gia = cot.gia >= 0 && (r[cot.gia] ?? "").trim() !== "" ? docTien(r[cot.gia]) : null;
+    return { dong, sku: sku || null, tenSp: tenSp || null, soLuong: sl, donGia: gia };
+  };
   bang.slice(1).forEach((r, i) => {
     const dong = i + 2;
     const maDon = (r[cot.maDon] ?? "").trim();
     if (!maDon) return void loi.push({ dong, loi: "Thiếu mã đơn." });
-    if (thay.has(maDon)) return void loi.push({ dong, loi: `Mã đơn ${maDon} trùng với dòng trên trong file.` });
+    const co = theoMa.get(maDon);
+    if (co) {
+      if (!coHang) return void loi.push({ dong, loi: `Mã đơn ${maDon} trùng với dòng trên trong file.` });
+      const h = docHang(r, dong);
+      if (h) co.hang.push(h);
+      return;
+    }
     const ngay = docNgay(r[cot.ngay] ?? "");
     if (!ngay) return void loi.push({ dong, loi: `Ngày “${r[cot.ngay] ?? ""}” không đọc được (dùng dd/mm/yyyy hoặc yyyy-mm-dd).` });
     const giaTri = docTien(r[cot.tien] ?? "");
     if (giaTri === null || giaTri <= 0) return void loi.push({ dong, loi: `Tiền “${r[cot.tien] ?? ""}” không hợp lệ (cần lớn hơn 0).` });
-    thay.add(maDon);
     const sdt = cot.sdt >= 0 ? chuanSdt(r[cot.sdt]) : "";
-    don.push({ dong, ngay, maDon, giaTri, tenKhach: cot.ten >= 0 && r[cot.ten]?.trim() ? r[cot.ten].trim() : null, dienThoai: sdt.length >= 9 ? sdt : null, trangThai: cot.tt >= 0 ? docTrangThai(r[cot.tt] ?? "") : "Đang xử lý" });
+    const d: DonLeDoc = { dong, ngay, maDon, giaTri, tenKhach: cot.ten >= 0 && r[cot.ten]?.trim() ? r[cot.ten].trim() : null, dienThoai: sdt.length >= 9 ? sdt : null, trangThai: cot.tt >= 0 ? docTrangThai(r[cot.tt] ?? "") : "Đang xử lý", hang: [] };
+    if (coHang) { const h = docHang(r, dong); if (h) d.hang.push(h); }
+    theoMa.set(maDon, d); don.push(d);
   });
-  return { don, loi, thieuCot: [] };
+  return { don, loi, canhBao, thieuCot: [] };
+}
+
+export type SanPhamKhop = { id: string; maSp: string; ten: string };
+
+/** Tìm sản phẩm trong danh mục cho một dòng hàng: khớp mã (SKU) trước, rồi khớp tên (bỏ dấu, không phân biệt hoa thường). Không khớp thì null. */
+export function khopSanPham(h: Pick<HangDoc, "sku" | "tenSp">, ds: readonly SanPhamKhop[]): string | null {
+  const ung = [h.sku, h.tenSp].filter((x): x is string => !!x).map(bo).filter(Boolean);
+  for (const u of ung) { const t = ds.find((s) => bo(s.maSp) === u); if (t) return t.id; }
+  for (const u of ung) { const t = ds.find((s) => bo(s.ten) === u); if (t) return t.id; }
+  return null;
+}
+
+/** Đơn giá từng dòng: file có đủ đơn giá thì dùng đúng; thiếu thì chia đều tổng tiền đơn theo số lượng (lãi gộp chỉ gần đúng). */
+export function donGiaCacDong(giaTri: number, hang: readonly Pick<HangDoc, "soLuong" | "donGia">[]): number[] {
+  if (hang.length && hang.every((h) => h.donGia !== null)) return hang.map((h) => h.donGia as number);
+  const tongSl = hang.reduce((a, h) => a + h.soLuong, 0);
+  return hang.map(() => (tongSl > 0 ? Math.round(giaTri / tongSl) : 0));
 }
 
 /** Giá trị một ô Excel (exceljs) → chữ để dán vào bảng nhập: ngày thành dd/mm/yyyy, công thức lấy kết quả, chữ có định dạng nối lại, tab/xuống dòng trong ô đổi thành khoảng trắng. */

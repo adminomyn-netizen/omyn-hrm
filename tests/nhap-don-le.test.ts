@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { chuanSdt, docBangDonLe, docNgay, docTien, docTrangThai, tachBang } from "@/lib/nhap-don-le";
+import { chuanSdt, docBangDonLe, docNgay, docTien, docTrangThai, donGiaCacDong, khopSanPham, tachBang } from "@/lib/nhap-don-le";
 
 describe("nhập đơn lẻ từ bảng", () => {
   it("đọc ngày nhiều kiểu, từ chối ngày không có thật", () => {
@@ -47,8 +47,8 @@ describe("nhập đơn lẻ từ bảng", () => {
     const r = docBangDonLe(t);
     expect(r.thieuCot).toEqual([]);
     expect(r.don).toEqual([
-      { dong: 2, ngay: "2026-11-03", maDon: "A1", tenKhach: "An", dienThoai: "0912345678", giaTri: 1250000, trangThai: "Đã giao" },
-      { dong: 7, ngay: "2026-11-01", maDon: "A4", tenKhach: "Chi", dienThoai: "0988000111", giaTri: 300000, trangThai: "Huỷ" },
+      { dong: 2, ngay: "2026-11-03", maDon: "A1", tenKhach: "An", dienThoai: "0912345678", giaTri: 1250000, trangThai: "Đã giao", hang: [] },
+      { dong: 7, ngay: "2026-11-01", maDon: "A4", tenKhach: "Chi", dienThoai: "0988000111", giaTri: 300000, trangThai: "Huỷ", hang: [] },
     ]);
     expect(r.loi.map((l) => l.dong)).toEqual([3, 4, 5, 6]);
   });
@@ -79,5 +79,35 @@ describe("đọc file Excel thành bảng nhập", () => {
     expect(r.don[0].maDon).toBe("A001");
     expect(r.don[0].ngay).toBe("2026-11-03");
     expect(r.don[0].giaTri).toBe(350000);
+  });
+
+  it("file sàn nhiều dòng mỗi đơn: gộp theo mã đơn, giữ dòng hàng", () => {
+    const t = ["Mã đơn\tNgày\tTổng tiền\tSKU\tSố lượng\tĐơn giá",
+      "S1\t03/11/2026\t500000\tHK-01\t2\t150000",
+      "S1\t03/11/2026\t500000\tHK-02\t1\t200000",
+      "S2\t03/11/2026\t90000\tHK-01\t1\t",
+      "S3\t03/11/2026\t90000\tHK-01\tabc\t"].join("\n");
+    const r = docBangDonLe(t);
+    expect(r.loi).toEqual([]);
+    expect(r.don.map((d) => [d.maDon, d.hang.length])).toEqual([["S1", 2], ["S2", 1], ["S3", 0]]);
+    expect(r.don[0].hang[1]).toMatchObject({ sku: "HK-02", soLuong: 1, donGia: 200000 });
+    expect(r.don[1].hang[0].donGia).toBeNull();
+    expect(r.canhBao.map((c) => c.dong)).toEqual([5]);
+  });
+  it("không có cột sản phẩm thì mã đơn trùng vẫn báo lỗi", () => {
+    const r = docBangDonLe("Mã đơn\tNgày\tTổng tiền\nA\t03/11/2026\t100\nA\t03/11/2026\t100");
+    expect(r.don.length).toBe(1);
+    expect(r.loi.map((l) => l.dong)).toEqual([3]);
+  });
+  it("khớp sản phẩm theo mã trước rồi tên, bỏ dấu", () => {
+    const ds = [{ id: "1", maSp: "HK-01", ten: "Kem chống nắng" }, { id: "2", maSp: "HK-02", ten: "Sữa rửa mặt" }];
+    expect(khopSanPham({ sku: "hk-02", tenSp: null }, ds)).toBe("2");
+    expect(khopSanPham({ sku: null, tenSp: "KEM CHONG NANG" }, ds)).toBe("1");
+    expect(khopSanPham({ sku: "x", tenSp: "Sữa rửa mặt" }, ds)).toBe("2");
+    expect(khopSanPham({ sku: "x", tenSp: "lạ" }, ds)).toBeNull();
+  });
+  it("đơn giá: có đủ thì dùng, thiếu thì chia theo số lượng", () => {
+    expect(donGiaCacDong(1000, [{ soLuong: 1, donGia: 300 }, { soLuong: 2, donGia: 350 }])).toEqual([300, 350]);
+    expect(donGiaCacDong(900, [{ soLuong: 1, donGia: null }, { soLuong: 2, donGia: 100 }])).toEqual([300, 300]);
   });
 });
