@@ -14,6 +14,9 @@ const dm = (ma: string, ten: string, danhMuc: string, mo?: Mo) => o("dm", ma, te
 const nv = (ma: string, ten: string, mo?: Mo) => o("nv", ma, ten, mo);
 const tep = (ma: string, ten: string, mo?: Mo) => o("tep", ma, ten, mo);
 
+/** Khung bút toán kế toán (Nợ/Có, đối tượng, tài khoản, số tiền) theo form Lark; để sẵn khung không bắt buộc, chi tiết bổ sung sau. */
+const BUT_TOAN = (ma: string, ten: string) =>
+  o("bang", ma, ten, { batBuoc: false, con: [chon("no_co", "Nợ/Có", ["Nợ", "Có"], { batBuoc: false }), dm("doi_tuong", "Đối tượng", "Đối tượng", { batBuoc: false }), chu("tai_khoan_ke_toan", "Tài khoản", { batBuoc: false }), tien("so_tien", "Số tiền", { batBuoc: false })] });
 const BANG_CHU = (tien: string) => chu("so_tien_bang_chu", "Số tiền bằng chữ", { bangChuTu: tien, goiY: "Tự điền từ số tiền" });
 const NGUOI_NHAN_BAN_GIAO = nv("nguoi_nhan", "Người nhận bàn giao", { nhieu: true });
 
@@ -175,7 +178,9 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
       chu("ngan_hang", "Ngân hàng", { hien: { truong: "can_thanh_toan_them", la: ["Có"] } }),
       chu("so_tien_bang_chu", "Số tiền bằng chữ", { bangChuTu: "so_tien_thieu", goiY: "Tự điền từ số tiền thiếu", hien: { truong: "can_thanh_toan_them", la: ["Có"] } }),
       tep("ho_so", "Hồ sơ đính kèm"),
-      chon("hinh_thuc_thanh_toan", "Hình thức thanh toán", ["Tiền mặt", "Chuyển khoản", "Tiền mặt quỹ"], { batBuoc: false }), chu("link_dinh_kem", "Link đính kèm"),
+      chon("hinh_thuc_thanh_toan", "Hình thức thanh toán", ["Tiền mặt", "Chuyển khoản", "Tiền mặt quỹ"], { batBuoc: false }),
+      BUT_TOAN("but_toan_chi_phi", "Bút toán ghi nhận chi phí"), BUT_TOAN("but_toan_thanh_toan", "Bút toán ghi nhận thanh toán"),
+      chu("link_dinh_kem", "Link đính kèm"),
     ],
   },
   {
@@ -188,6 +193,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
       tep("ho_so_lien_quan", "Hồ sơ liên quan đính kèm", { batBuoc: false }),
       chon("hinh_thuc_thanh_toan", "Hình thức thanh toán", ["Tiền mặt", "Chuyển khoản", "Tiền mặt quỹ"], { batBuoc: false }),
       chu("so_tai_khoan", "Số tài khoản người nhận"), chu("ten_chu_tk", "Họ tên chủ tài khoản"), chu("ngan_hang", "Ngân hàng nhận tiền"),
+      BUT_TOAN("but_toan_chi_phi", "Bút toán ghi nhận mua hàng/chi phí"), BUT_TOAN("but_toan_thanh_toan", "Bút toán ghi nhận thanh toán"),
       chu("link_dinh_kem", "Đính kèm link", { batBuoc: false }), nhieu("ghi_chu", "Ghi chú", { batBuoc: false }),
     ],
   },
@@ -203,6 +209,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
       ngay("ngay_can_tam_ung", "Ngày cần tạm ứng"), tep("ho_so_lien_quan", "Hồ sơ liên quan đính kèm", { batBuoc: false }),
       chon("hinh_thuc_thanh_toan", "Hình thức thanh toán", ["Tiền mặt", "Chuyển khoản", "Tiền mặt quỹ"], { batBuoc: false }),
       chu("so_tai_khoan", "Số tài khoản người nhận"), chu("ten_chu_tk", "Họ tên chủ tài khoản"), chu("ngan_hang", "Ngân hàng nhận tiền"),
+      BUT_TOAN("but_toan_thanh_toan", "Bút toán ghi nhận thanh toán"),
       nhieu("ghi_chu", "Ghi chú", { batBuoc: false }),
     ],
   },

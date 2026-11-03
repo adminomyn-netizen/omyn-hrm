@@ -218,3 +218,14 @@ describe("ghi đè ô của Kỹ thuật", () => {
     expect(ds).not.toContain("noi_dung");
   });
 });
+
+describe("khung bút toán kế toán (để sẵn, bổ sung chi tiết sau)", () => {
+  it("không bắt buộc, nhập được nhiều dòng; dòng trống hoàn toàn không làm lỗi", () => {
+    const tu = mauTheoMa("de-nghi-tam-ung")!;
+    const ok = kiemTraPhieu(tu, { but_toan_thanh_toan: [{ no_co: "Nợ", tai_khoan_ke_toan: "1111", so_tien: 1_000_000 }, { no_co: "Có", tai_khoan_ke_toan: "3311", so_tien: 1_000_000 }] }, CTX);
+    expect(ok.loi.but_toan_thanh_toan).toBeUndefined();
+    expect((ok.sach.but_toan_thanh_toan as unknown[]).length).toBe(2);
+    expect(kiemTraPhieu(tu, {}, CTX).loi.but_toan_thanh_toan).toBeUndefined();
+    for (const ma of ["de-nghi-thanh-toan", "de-nghi-hoan-ung"]) expect(kiemTraPhieu(mauTheoMa(ma)!, {}, CTX).loi.but_toan_chi_phi).toBeUndefined();
+  });
+});
