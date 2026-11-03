@@ -57,3 +57,27 @@ describe("nhập đơn lẻ từ bảng", () => {
     expect(docBangDonLe("").thieuCot).toEqual(["file trống"]);
   });
 });
+
+import { hangExcelThanhBang, oExcelThanhChu } from "@/lib/nhap-don-le";
+
+describe("đọc file Excel thành bảng nhập", () => {
+  it("ô ngày, công thức, chữ định dạng, số và ô trống", () => {
+    expect(oExcelThanhChu(new Date(Date.UTC(2026, 10, 3)))).toBe("03/11/2026");
+    expect(oExcelThanhChu({ formula: "A1+1", result: 350000 })).toBe("350000");
+    expect(oExcelThanhChu({ richText: [{ text: "Nguyễn " }, { text: "Lan" }] })).toBe("Nguyễn Lan");
+    expect(oExcelThanhChu({ text: "a\tb", hyperlink: "x" })).toBe("a b");
+    expect(oExcelThanhChu(null)).toBe("");
+    expect(oExcelThanhChu(0)).toBe("0");
+  });
+  it("bảng sau khi đọc đi qua đúng bộ đọc đơn lẻ, bỏ hàng trống", () => {
+    const text = hangExcelThanhBang([["Mã đơn", "Ngày", "Tên khách", "Số điện thoại", "Tiền khách trả", "Trạng thái"], [], ["A001", new Date(Date.UTC(2026, 10, 3)), "Lan", "0912345678", 350000, "Hoàn thành"], [null, null, null, null, null, null]]);
+    expect(text.split("\n")).toHaveLength(2);
+    const r = docBangDonLe(text);
+    expect(r.thieuCot).toEqual([]);
+    expect(r.loi).toEqual([]);
+    expect(r.don).toHaveLength(1);
+    expect(r.don[0].maDon).toBe("A001");
+    expect(r.don[0].ngay).toBe("2026-11-03");
+    expect(r.don[0].giaTri).toBe(350000);
+  });
+});

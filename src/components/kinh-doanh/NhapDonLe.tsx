@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { Chon } from "@/components/ui/Chon";
 import { Gat } from "@/components/ui/Gat";
 import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
-import { nhapDonLeTuBang, type KetQuaNhap } from "@/app/(app)/kinh-doanh/nhap-don-le/actions";
+import { docFileExcelDonLe, nhapDonLeTuBang, type KetQuaNhap } from "@/app/(app)/kinh-doanh/nhap-don-le/actions";
 
 const KENH = ["Shopee", "TikTok Shop", "Facebook", "Zalo", "Điện thoại", "Khác"].map((k) => ({ gia_tri: k, nhan: k }));
 const so = (n: number) => n.toLocaleString("vi-VN");
@@ -26,8 +26,8 @@ export function NhapDonLe() {
       <div>
         <label className={NHAN_O} htmlFor="bang-don">Bảng đơn (dòng đầu là tên cột)</label>
         <textarea id="bang-don" value={text} onChange={(e) => { setText(e.target.value); setKq(null); }} rows={10} placeholder={"Mã đơn\tNgày\tTên khách\tSố điện thoại\tTiền khách trả\tTrạng thái\nA001\t03/11/2026\tLan\t0912345678\t350.000\tHoàn thành"} className={`${O_NHIEU_DONG} font-mono text-[13px]`} />
-        <p className="mt-1.5 text-[13px] text-muc-3">Dán trực tiếp từ Excel (chọn ô, sao chép), hoặc chọn file CSV:{" "}
-          <input type="file" accept=".csv,.tsv,.txt" aria-label="Chọn file CSV" onChange={async (e) => { const f = e.target.files?.[0]; if (f) { setText(await f.text()); setKq(null); } }} className="text-[13px]" />
+        <p className="mt-1.5 text-[13px] text-muc-3">Dán trực tiếp từ Excel (chọn ô, sao chép), hoặc chọn file Excel (.xlsx) / CSV:{" "}
+          <input type="file" accept=".csv,.tsv,.txt,.xlsx" aria-label="Chọn file Excel hoặc CSV" onChange={async (e) => { const f = e.target.files?.[0]; if (!f) return; setKq(null); if (f.name.toLowerCase().endsWith(".xlsx")) { const fd = new FormData(); fd.set("file", f); const r = await docFileExcelDonLe(fd); if (r.loi) setKq({ loi: r.loi }); else setText(r.text ?? ""); } else setText(await f.text()); }} className="text-[13px]" />
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-3">

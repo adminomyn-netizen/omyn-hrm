@@ -98,3 +98,27 @@ export function docBangDonLe(text: string): { don: DonLeDoc[]; loi: LoiDong[]; t
   });
   return { don, loi, thieuCot: [] };
 }
+
+/** Giá trị một ô Excel (exceljs) → chữ để dán vào bảng nhập: ngày thành dd/mm/yyyy, công thức lấy kết quả, chữ có định dạng nối lại, tab/xuống dòng trong ô đổi thành khoảng trắng. */
+export function oExcelThanhChu(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  if (v instanceof Date) {
+    if (Number.isNaN(v.getTime())) return "";
+    const d = String(v.getUTCDate()).padStart(2, "0"), m = String(v.getUTCMonth() + 1).padStart(2, "0");
+    return `${d}/${m}/${v.getUTCFullYear()}`;
+  }
+  if (typeof v === "object") {
+    const o = v as Record<string, unknown>;
+    if (Array.isArray(o.richText)) return (o.richText as { text?: string }[]).map((x) => x.text ?? "").join("").replace(/[\t\r\n]+/g, " ").trim();
+    if ("result" in o) return oExcelThanhChu(o.result);
+    if (typeof o.text === "string") return o.text.replace(/[\t\r\n]+/g, " ").trim();
+    if (typeof o.error === "string") return "";
+    return "";
+  }
+  return String(v).replace(/[\t\r\n]+/g, " ").trim();
+}
+
+/** Các hàng của một trang tính → bảng chữ tab-phân-cách (bỏ hàng trống), cùng định dạng với ô dán từ Excel. */
+export function hangExcelThanhBang(hang: readonly (readonly unknown[])[]): string {
+  return hang.map((h) => h.map(oExcelThanhChu).join("\t")).filter((d) => d.replace(/\t/g, "").trim() !== "").join("\n");
+}

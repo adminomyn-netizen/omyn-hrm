@@ -5,7 +5,8 @@ import { layNguoiDungHienTai } from "@/lib/auth";
 import { quyenTrenSo } from "@/lib/quyen-nghiep-vu";
 import { dbHr, docTatCa } from "@/lib/hr-db";
 import { ghiLichSuNhanSu } from "@/lib/nhan-su-lich-su";
-import { chuanSdt, docBangDonLe, type LoiDong } from "@/lib/nhap-don-le";
+import ExcelJS from "exceljs";
+import { chuanSdt, docBangDonLe, hangExcelThanhBang, type LoiDong } from "@/lib/nhap-don-le";
 
 export type KetQuaNhap = {
   loi?: string; thieuCot?: string[];
@@ -65,4 +66,31 @@ export async function nhapDonLeTuBang(text: string, kenh: string, taoKhach: bool
   await ghiLichSuNhanSu({ nhanVienId: null, doiTuong: "Sổ đơn lẻ", doiTuongId: null, hanhDong: "Thêm", moTa: `Nhập đơn lẻ từ file (${kenh}): thêm ${canNhap.length} đơn, ${sdtMoi.size} khách mới, bỏ qua ${tong.daCo} đơn đã có và ${r.loi.length} dòng lỗi`, truoc: null, sau: { kenh, don: canNhap.length, khach_moi: sdtMoi.size }, nguoi: { id: nd.id, hoTen: nd.hoTen } });
   for (const p of ["/hr/don-le", "/kinh-doanh/khach-le", "/kinh-doanh/lai-gop", "/hr/khach-le", "/kinh-doanh/tin-nhan"]) revalidatePath(p);
   return { ...tong };
+}
+
+/** Đọc file Excel (.xlsx) thành bảng chữ để đưa vào ô nhập (trang tính đầu tiên, dòng đầu là tên cột). Chỉ đọc, không ghi gì. */
+export async function docFileExcelDonLe(fd: FormData): Promise<{ loi?: string; text?: string; soDong?: number }> {
+  const nd = await layNguoiDungHienTai();
+  if (!nd || nd.phaiDoiMatKhau) return { loi: "Bạn không có quyền thực hiện thao tác này." };
+  if (nd.vaiTro !== "admin" && nd.vaiTro !== "ky_thuat") {
+    if (nd.vaiTro !== "nhan_vien") return { loi: "Bạn không có quyền thực hiện thao tác này." };
+    if ((await quyenTrenSo(nd, "Kinh doanh")).muc !== "nhap") return { loi: "Bạn không có quyền nhập ở mục Kinh doanh." };
+  }
+  const f = fd.get("file");
+  if (!(f instanceof File) || !f.name.toLowerCase().endsWith(".xlsx")) return { loi: "Chọn file Excel đuôi .xlsx." };
+  if (f.size > 8 * 1024 * 1024) return { loi: "File quá lớn (tối đa 8 MB), chia nhỏ rồi nhập từng phần." };
+  try {
+    const wb = new ExcelJS.Workbook();
+    await wb.xlsx.load((await f.arrayBuffer()) as ArrayBuffer);
+    const ws = wb.worksheets.find((w) => w.rowCount > 0);
+    if (!ws) return { loi: "File không có dữ liệu." };
+    const hang: unknown[][] = [];
+    const cot = Math.min(ws.columnCount, 40);
+    ws.eachRow({ includeEmpty: false }, (row) => { hang.push(Array.from({ length: cot }, (_, i) => row.getCell(i + 1).value)); });
+    const text = hangExcelThanhBang(hang);
+    if (!text) return { loi: "File không có dữ liệu." };
+    return { text, soDong: text.split("\n").length - 1 };
+  } catch {
+    return { loi: "Không đọc được file này. Kiểm tra đây là file .xlsx (không phải .xls cũ) và không đặt mật khẩu." };
+  }
 }
