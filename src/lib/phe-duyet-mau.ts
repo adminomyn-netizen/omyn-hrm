@@ -49,7 +49,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
   },
   {
     ma: "dang-ky-vang-mat", ten: "Đăng ký vắng mặt", nhomMacDinh: "HR",
-    moTa: "Đăng ký nghỉ/vắng mặt kèm ủy nhiệm công việc (MSC_BNLPT).",
+    moTa: "Đăng ký nghỉ/vắng mặt kèm ủy nhiệm công việc.",
     lark: { ma: "85393DB4-891C-4633-9B8C-890AFE3A1FB4", buoc: "68 bước: AND×42, CC×9, AND, 16 bước điều kiện, AND" },
     truong: [
       dm("don_vi", "Đơn vị làm việc", "Đơn vị làm việc"), dm("nhom_lam_viec", "Nhóm làm việc", "Nhóm làm việc"),

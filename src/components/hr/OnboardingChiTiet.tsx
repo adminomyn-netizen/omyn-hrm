@@ -144,7 +144,7 @@ function FormTrangThai({ onb, nv, lamViec, dang }: { onb: Onb; nv: Tra[]; lamVie
         <div><label className={NHAN_O}>Quản lý trực tiếp</label><Chon ten="quan_ly_id" trong="Chọn" giaTriMacDinh={onb.quanLyId ?? ""} luaChon={lc} /></div>
         <div><label className={NHAN_O}>Mentor</label><Chon ten="mentor_id" trong="Chọn" giaTriMacDinh={onb.mentorId ?? ""} luaChon={lc} /></div>
         <div className="sm:col-span-2"><label className={NHAN_O}>Thông tin còn thiếu</label><input name="thong_tin_con_thieu" defaultValue={onb.conThieu ?? ""} className={O_NHAP} placeholder="VD: thiếu CCCD mặt sau, sổ BHXH" /></div>
-        <div className="flex flex-wrap gap-x-8 gap-y-3 sm:col-span-2"><Gat nhan="Đã tạo tài khoản Lark" giaTriMacDinh={onb.tkLark} onDoi={setTk} /><Gat nhan="Đã giới thiệu công ty" giaTriMacDinh={onb.gioiThieu} onDoi={setGt} /></div>
+        <div className="flex flex-wrap gap-x-8 gap-y-3 sm:col-span-2"><Gat nhan="Đã tạo tài khoản hệ thống" giaTriMacDinh={onb.tkLark} onDoi={setTk} /><Gat nhan="Đã giới thiệu công ty" giaTriMacDinh={onb.gioiThieu} onDoi={setGt} /></div>
         <div className="sm:col-span-2"><label className={NHAN_O}>Ghi chú</label><textarea name="ghi_chu" defaultValue={onb.ghiChu ?? ""} className={O_NHIEU_DONG} style={{ minHeight: 64 }} /></div>
       </div>
       <div className="flex justify-end gap-2.5"><button type="button" disabled={dang} className={NUT_CHINH} onClick={() => { const fd = new FormData(ref.current!); lamViec(() => capNhatOnb(fd)); }}>Lưu trạng thái</button></div>

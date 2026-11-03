@@ -28,7 +28,7 @@ export function CauHinhLuong({ d }: { d: DuLieuCauHinh }) {
     <section className="min-w-0 space-y-4">
       <div className="the-noi the-noi-thap p-4 sm:p-5">
         <h2 className="text-[17px] font-semibold text-muc">{d.ten}</h2>
-        <p className="mt-1 text-[13px] text-muc-3">Luồng gốc trên Lark: {d.larkBuoc}. Cấu hình dưới đây là luồng đang chạy trong Omyn.</p>
+        <p className="mt-1 text-[13px] text-muc-3">Luồng mẫu: {d.larkBuoc}. Cấu hình dưới đây là luồng đang chạy trong Omyn.</p>
         <div className="mt-3 flex flex-wrap gap-1" role="tablist">
           {TABS.map(([k, t]) => (
             <button key={k} type="button" role="tab" aria-selected={tab === k} onClick={() => setTab(k)} className={`rounded-nho px-3 py-1.5 text-[14px] ${tab === k ? "bg-giay-tram font-semibold text-muc" : "text-muc-2 hover:bg-giay-tram"}`}>{t}</button>

@@ -4,7 +4,7 @@ export type GiaiDoan = (typeof GIAI_DOAN)[number];
 
 export const NHIEM_VU_MAU: { giaiDoan: GiaiDoan; noiDung: string }[] = [
   { giaiDoan: "Trước ngày 1", noiDung: "Gửi form thông tin cá nhân và danh sách giấy tờ cần nộp" },
-  { giaiDoan: "Trước ngày 1", noiDung: "Tạo tài khoản Lark, email công ty và quyền hệ thống" },
+  { giaiDoan: "Trước ngày 1", noiDung: "Tạo tài khoản Omyn, email công ty và quyền hệ thống" },
   { giaiDoan: "Trước ngày 1", noiDung: "Chuẩn bị chỗ ngồi, thiết bị và gửi lịch ngày đầu tiên" },
   { giaiDoan: "Tuần 1", noiDung: "Chào mừng, giới thiệu công ty, văn hoá và nội quy" },
   { giaiDoan: "Tuần 1", noiDung: "Giới thiệu đội ngũ và mentor kèm cặp" },
