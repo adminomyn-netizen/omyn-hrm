@@ -76,14 +76,19 @@ describe("kiểm tra phiếu", () => {
     expect(khong.loi.ten_chu_tk).toBeUndefined();
     expect(khong.sach.ten_chu_tk).toBeUndefined();
   });
-  it("tạm ứng: bảng hạng mục cộng thành tổng dự trù; thiếu dòng thì báo", () => {
+  it("tạm ứng: bảng hạng mục cộng thành tổng dự trù; hạng mục, số tiền dự kiến và ghi chú không bắt buộc", () => {
     const tu = mauTheoMa("de-nghi-tam-ung")!;
     const ok = kiemTraPhieu(tu, { don_vi: "AVI", bo_phan: "Phòng Kế Toán", khoan_chi: "x", noi_dung: "n", so_tien: 300, hang_muc_chi_phi: [{ hang_muc_chi: "a", so_tien: 100 }, { hang_muc_chi: "b", so_tien: 200 }], ngay_can_tam_ung: "2026-11-01", so_tai_khoan: "1", ten_chu_tk: "A", ngan_hang: "B", ghi_chu: "g" }, CTX);
     expect(ok.loi).toEqual({});
     expect(ok.sach.tong_du_tru).toBe(300);
-    const thieu = kiemTraPhieu(tu, { hang_muc_chi_phi: [{ hang_muc_chi: "a" }] }, CTX);
-    expect(thieu.loi["hang_muc_chi_phi.0.so_tien"]).toBeTruthy();
-    expect(kiemTraPhieu(tu, {}, CTX).loi.hang_muc_chi_phi).toBeTruthy();
+    // Tạm ứng để mua đồ/đi công tác thì chưa phát sinh chi phí: không có bảng, không có số dự kiến, không có ghi chú vẫn nộp được.
+    const chuaPhatSinh = kiemTraPhieu(tu, { don_vi: "AVI", bo_phan: "Phòng Kế Toán", khoan_chi: "x", noi_dung: "n", so_tien: 300, ngay_can_tam_ung: "2026-11-01", so_tai_khoan: "1", ten_chu_tk: "A", ngan_hang: "B" }, CTX);
+    expect(chuaPhatSinh.loi).toEqual({});
+    expect(chuaPhatSinh.sach.tong_du_tru).toBe(0);
+    const khongSoTien = kiemTraPhieu(tu, { don_vi: "AVI", bo_phan: "Phòng Kế Toán", khoan_chi: "x", noi_dung: "n", so_tien: 300, hang_muc_chi_phi: [{ hang_muc_chi: "Mua văn phòng phẩm" }], ngay_can_tam_ung: "2026-11-01", so_tai_khoan: "1", ten_chu_tk: "A", ngan_hang: "B" }, CTX);
+    expect(khongSoTien.loi).toEqual({});
+    // Đã thêm dòng thì vẫn phải ghi tên hạng mục.
+    expect(kiemTraPhieu(tu, { hang_muc_chi_phi: [{}] }, CTX).loi["hang_muc_chi_phi.0.hang_muc_chi"]).toBeTruthy();
   });
   it("tệp bắt buộc tính theo số tệp đã đính; kết thúc không được trước bắt đầu; nhiều người nhận", () => {
     const bg = mauTheoMa("ban-giao-tai-san")!;

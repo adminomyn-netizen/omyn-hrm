@@ -194,11 +194,11 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
     truong: [
       dm("don_vi", "Đơn vị làm việc", "Đơn vị làm việc"), dm("bo_phan", "Bộ phận", "Bộ phận"), dm("khoan_chi", "Khoản chi", "Khoản chi"),
       chu("noi_dung", "Nội dung đề xuất"), tien("so_tien", "Số tiền"), BANG_CHU("so_tien"),
-      o("bang", "hang_muc_chi_phi", "Hạng mục chi phí", { con: [chu("hang_muc_chi", "Hạng mục chi"), tien("so_tien", "Số tiền")] }),
-      o("cong", "tong_du_tru", "Tổng tiền dự trù", { tong: { bang: "hang_muc_chi_phi", cot: "so_tien" } }),
+      o("bang", "hang_muc_chi_phi", "Hạng mục chi phí (nếu đã biết, chưa phát sinh thì để trống)", { batBuoc: false, con: [chu("hang_muc_chi", "Hạng mục chi"), tien("so_tien", "Số tiền dự kiến", { batBuoc: false })] }),
+      o("cong", "tong_du_tru", "Tổng tiền dự trù", { batBuoc: false, tong: { bang: "hang_muc_chi_phi", cot: "so_tien" } }),
       ngay("ngay_can_tam_ung", "Ngày cần tạm ứng"), tep("ho_so_lien_quan", "Hồ sơ liên quan đính kèm", { batBuoc: false }),
       chu("so_tai_khoan", "Số tài khoản người nhận"), chu("ten_chu_tk", "Họ tên chủ tài khoản"), chu("ngan_hang", "Ngân hàng nhận tiền"),
-      nhieu("ghi_chu", "Ghi chú"),
+      nhieu("ghi_chu", "Ghi chú", { batBuoc: false }),
     ],
   },
   {
