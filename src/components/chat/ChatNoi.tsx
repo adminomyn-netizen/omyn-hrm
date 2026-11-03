@@ -5,13 +5,13 @@ import Image from "next/image";
 import { Paperclip, SendHorizontal, X } from "lucide-react";
 import { duyetSuaChat, guiTinChat, layChat, type TrangChat } from "@/app/chat-actions";
 
-/** Ảnh đại diện Tula. Hiện là ảnh tạm (chữ T trên nền xanh AMIA); khi có ảnh thật chỉ cần thay tệp này (vuông, ≤ 100KB) và đổi đường dẫn ở đây. */
+/** Ảnh đại diện Tula. Hiện là ảnh tạm (chữ O trên nền đỏ rượu vang Omyn); khi có ảnh thật chỉ cần thay tệp này (vuông, ≤ 100KB) và đổi đường dẫn ở đây. */
 const ANH_TULA = "/tula-avatar.svg";
 
 /** Lời nhắc ở bong bóng cạnh avatar khi khung chat đang đóng: thay phiên, thân thiện, xưng "em", gọi người dùng là "mình". */
 const LOI_NHAC = [
-  "Xin chào! Mình cần hỗ trợ gì thì cứ chat với Tula ở đây nhé.",
-  "Xin chào, Tula đây! Cần em giúp gì không ạ?",
+  "Xin chào! Mình cần hỗ trợ gì thì cứ chat với Omyn Bot ở đây nhé.",
+  "Xin chào, Omyn Bot đây! Cần em giúp gì không ạ?",
   "Mình cần tra chấm công hay tìm nhân viên? Em làm nhanh cho ạ.",
   "Cần xuất danh sách ra Excel không ạ? Cứ nhờ em nhé.",
   "Chưa biết thao tác ở đâu? Em hướng dẫn từng bước cho mình ạ.",
@@ -147,11 +147,11 @@ export function ChatNoi({ choPhepSua, hoTen }: { choPhepSua: boolean; hoTen: str
                 onMouseEnter={() => setTamDung(true)} onMouseLeave={() => setTamDung(false)} onFocus={() => setTamDung(true)} onBlur={() => setTamDung(false)}
                 onKeyDown={(e) => { if (e.key === "Escape") setBong(null); }}>
                 <button type="button" onClick={moChat} className="min-w-0 flex-1 rounded-nho py-2.5 pl-3 pr-1 text-left text-[14px] leading-snug text-muc">{bong}</button>
-                <button type="button" onClick={tatBong} aria-label="Tắt lời nhắc của Tula" className="m-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-nho text-muc-3 hover:bg-giay-tram"><X strokeWidth={1.8} className="h-4 w-4" aria-hidden /></button>
+                <button type="button" onClick={tatBong} aria-label="Tắt lời nhắc của Omyn Bot" className="m-1 flex h-8 w-8 shrink-0 items-center justify-center rounded-nho text-muc-3 hover:bg-giay-tram"><X strokeWidth={1.8} className="h-4 w-4" aria-hidden /></button>
               </div>
             )}
           </div>
-          <button type="button" onClick={moChat} aria-label="Mở khung chat với Tula" title="Chat với Tula"
+          <button type="button" onClick={moChat} aria-label="Mở khung chat với Omyn Bot" title="Chat với Omyn Bot"
             className="tula-nut relative block h-14 w-14 shrink-0 p-0 transition-[filter] duration-150" style={{ borderRadius: 9999 }}>
             <span className="tula-nay relative h-14 w-14">
               <Image src={ANH_TULA} alt="" width={56} height={56} unoptimized className="h-14 w-14 object-cover" style={{ borderRadius: 9999, border: "2px solid var(--giay-sang)", boxShadow: "var(--bong-2)" }} />
@@ -162,11 +162,11 @@ export function ChatNoi({ choPhepSua, hoTen }: { choPhepSua: boolean; hoTen: str
         </div>
       )}
       {mo && (
-        <section role="dialog" aria-label="Chat với Tula" style={{ position: "fixed" }} className="the-noi the-noi-thap vao fixed bottom-[84px] right-3 z-40 flex h-[min(560px,calc(100dvh-170px))] w-[380px] max-w-[calc(100vw-1.5rem)] flex-col overflow-hidden p-0 lg:bottom-6 lg:right-6 lg:h-[min(600px,calc(100dvh-110px))]">
+        <section role="dialog" aria-label="Chat với Omyn Bot" style={{ position: "fixed" }} className="the-noi the-noi-thap vao fixed bottom-[84px] right-3 z-40 flex h-[min(560px,calc(100dvh-170px))] w-[380px] max-w-[calc(100vw-1.5rem)] flex-col overflow-hidden p-0 lg:bottom-6 lg:right-6 lg:h-[min(600px,calc(100dvh-110px))]">
           <header className="flex items-center gap-3 border-b border-vien px-4 py-3">
             <Image src={ANH_TULA} alt="" width={36} height={36} unoptimized className="h-9 w-9 shrink-0 object-cover" style={{ borderRadius: 9999 }} />
             <div className="min-w-0 flex-1">
-              <div className="text-[15px] font-semibold text-muc">Tula · Trợ lý AI</div>
+              <div className="text-[15px] font-semibold text-muc">Omyn Bot · Trợ lý AI</div>
               <div className="flex items-center gap-1.5 text-[12px] text-muc-3"><span aria-hidden className={`h-2 w-2 ${chat?.online ? "bg-nhan" : "bg-vien-dam"}`} style={{ borderRadius: 9999 }} />{chat == null ? "Đang kết nối" : chat.online ? "Đang online" : "Đang offline, em trả lời khi máy bật lại"}</div>
             </div>
             <button type="button" onClick={() => setMo(false)} aria-label="Đóng chat" className="rounded-nho p-1.5 text-muc-3 hover:bg-giay-tram"><X strokeWidth={1.8} className="h-5 w-5" aria-hidden /></button>
@@ -174,7 +174,7 @@ export function ChatNoi({ choPhepSua, hoTen }: { choPhepSua: boolean; hoTen: str
           <div ref={cuonRef} className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 py-4" aria-live="polite">
             {tin.length === 0 && (
               <div>
-                <p className="rounded-nho bg-giay-tram px-3 py-2.5 text-[14px] text-muc">Em là Tula, trợ lý AI. {hoTen.split(" ").slice(-1)[0]} cần em hỗ trợ gì ạ? Em tra cứu, hướng dẫn thao tác và xuất file Excel cho mình ngay đây.</p>
+                <p className="rounded-nho bg-giay-tram px-3 py-2.5 text-[14px] text-muc">Em là Omyn Bot, trợ lý AI. {hoTen.split(" ").slice(-1)[0]} cần em hỗ trợ gì ạ? Em tra cứu, hướng dẫn thao tác và xuất file Excel cho mình ngay đây.</p>
                 <div className="mt-3 flex flex-wrap gap-2">{GOI_Y.map((g) => <button key={g} type="button" onClick={() => gui(g)} className="rounded-nho border border-vien-dam px-2.5 py-1.5 text-[13px] text-muc-2 hover:bg-giay-tram">{g}</button>)}</div>
               </div>
             )}
@@ -189,7 +189,7 @@ export function ChatNoi({ choPhepSua, hoTen }: { choPhepSua: boolean; hoTen: str
                 </div>
               </div>
             ))}
-            {chat?.dangCho && <p className="text-[13px] text-muc-3">{choLau ? "Tula đang offline, tin của mình được giữ, em trả lời ngay khi máy bật lại." : "Tula đang soạn trả lời…"}</p>}
+            {chat?.dangCho && <p className="text-[13px] text-muc-3">{choLau ? "Omyn Bot đang offline, tin của mình được giữ, em trả lời ngay khi máy bật lại." : "Omyn Bot đang soạn trả lời…"}</p>}
           </div>
           <div className="border-t border-vien px-3 pb-3 pt-2.5">
             {choPhepSua && (
@@ -200,7 +200,7 @@ export function ChatNoi({ choPhepSua, hoTen }: { choPhepSua: boolean; hoTen: str
             {loi && <p role="alert" className="mb-2 text-[13px] text-loi">{loi}</p>}
             <form onSubmit={(e) => { e.preventDefault(); gui(nhap); }} className="flex items-end gap-2">
               <textarea value={nhap} onChange={(e) => setNhap(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); gui(nhap); } }} rows={1} maxLength={2000}
-                placeholder={cheDo === "sua" ? "Mô tả phần cần sửa trong app…" : "Hỏi Tula bất cứ điều gì…"} aria-label="Nội dung gửi Tula"
+                placeholder={cheDo === "sua" ? "Mô tả phần cần sửa trong app…" : "Hỏi Omyn Bot bất cứ điều gì…"} aria-label="Nội dung gửi Omyn Bot"
                 className="max-h-28 min-h-10 flex-1 resize-none rounded-nho border border-vien-dam bg-giay-sang px-3 py-2 text-[14px] text-muc outline-none focus:border-nhan" />
               <button type="submit" disabled={dang || !nhap.trim()} aria-label="Gửi" className="nut-vang flex h-10 w-10 shrink-0 items-center justify-center disabled:opacity-50"><SendHorizontal strokeWidth={1.8} className="h-[18px] w-[18px]" aria-hidden /></button>
             </form>

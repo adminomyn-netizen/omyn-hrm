@@ -22,7 +22,7 @@ export async function guiTinChat(fd: FormData): Promise<KQ> {
   if (!noiDung) return { loi: "Gõ nội dung cần hỏi." };
   if (noiDung.length > 2000) return { loi: "Tin dài quá (tối đa 2000 ký tự). Chia nhỏ giúp em." };
   const loai = chuoi(fd, "loai") === "sua" ? "sua" : "hoi";
-  if (loai === "sua" && !laKyThuat(nd.vaiTro)) return { loi: "Chỉ vai trò Kỹ thuật mới nhờ Tula sửa ứng dụng. Anh/chị vẫn hỏi đáp và xuất file bình thường." };
+  if (loai === "sua" && !laKyThuat(nd.vaiTro)) return { loi: "Chỉ vai trò Kỹ thuật mới nhờ Omyn Bot sửa ứng dụng. Anh/chị vẫn hỏi đáp và xuất file bình thường." };
   const db = createAdminClient();
   const { data: cuoc, error: eC } = await db.from("chat_cuoc").upsert({ user_id: nd.id }, { onConflict: "user_id" }).select("id").single();
   if (eC || !cuoc) return { loi: "Chưa mở được cuộc chat, thử lại." };
@@ -30,8 +30,8 @@ export async function guiTinChat(fd: FormData): Promise<KQ> {
     db.from("chat_tin").select("id", { count: "exact", head: true }).eq("cuoc_id", cuoc.id).eq("vai", "nguoi").in("trang_thai", ["cho", "dang_xu_ly"]),
     db.from("chat_tin").select("id", { count: "exact", head: true }).eq("cuoc_id", cuoc.id).eq("vai", "nguoi").gte("tao_luc", new Date(Date.now() - 86_400_000).toISOString()),
   ]);
-  if ((dangCho ?? 0) > 0) return { loi: "Tula đang trả lời tin trước, đợi một chút nhé." };
-  if ((homNay ?? 0) >= GIOI_HAN_NGAY) return { loi: `Hôm nay anh/chị đã gửi ${GIOI_HAN_NGAY} tin cho Tula, mai hỏi tiếp nhé.` };
+  if ((dangCho ?? 0) > 0) return { loi: "Omyn Bot đang trả lời tin trước, đợi một chút nhé." };
+  if ((homNay ?? 0) >= GIOI_HAN_NGAY) return { loi: `Hôm nay anh/chị đã gửi ${GIOI_HAN_NGAY} tin cho Omyn Bot, mai hỏi tiếp nhé.` };
   const { error } = await db.from("chat_tin").insert({
     cuoc_id: cuoc.id, user_id: nd.id, vai: "nguoi", loai, vai_tro_chup: nd.vaiTro, noi_dung: noiDung, trang_thai: "cho",
     thong_hanh: randomBytes(24).toString("hex"), han_thong_hanh: new Date(Date.now() + 15 * 60_000).toISOString(),
