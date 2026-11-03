@@ -152,3 +152,15 @@ describe("đối soát COD vận chuyển", () => {
     expect(r.theoDonVi[0].daNhan).toBe(100000);
   });
 });
+
+import { phanBoLoFefo } from "@/lib/ton-kho";
+
+describe("chia lô khi xuất (hạn gần trước)", () => {
+  const l = (soLo: string, hanDung: string, conLai: number, ngayCon: number) => ({ id: soLo, sanPhamId: "s", soLo, hanDung, conLai, ngayCon, muc: "Còn lâu" as const, trangThai: "Còn trong kho" });
+  it("lấy lô hạn gần trước, bỏ lô quá hạn, phần thiếu xuất không số lô", () => {
+    const lo = [l("C", "2027-01-01", 100, 60), l("A", "2026-12-01", 5, 28), l("Q", "2026-10-01", 50, -33), l("B", "2026-12-20", 10, 47)];
+    expect(phanBoLoFefo(12, lo)).toEqual([{ soLo: "A", soLuong: 5 }, { soLo: "B", soLuong: 7 }]);
+    expect(phanBoLoFefo(200, lo)).toEqual([{ soLo: "A", soLuong: 5 }, { soLo: "B", soLuong: 10 }, { soLo: "C", soLuong: 100 }, { soLo: null, soLuong: 85 }]);
+    expect(phanBoLoFefo(3, [])).toEqual([{ soLo: null, soLuong: 3 }]);
+  });
+});

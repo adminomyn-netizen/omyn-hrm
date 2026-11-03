@@ -139,3 +139,22 @@ export function duBaoNhap(sp: readonly SanPhamKho[], dong: readonly DongKho[], h
   const thuTu = { "Hết hàng": 0, "Cần nhập ngay": 1, "Sắp cần nhập": 2, "Đủ hàng": 3, "Chưa có số bán": 4 };
   return ra.sort((a, b) => thuTu[a.trangThai] - thuTu[b.trangThai] || (a.ngayConBan ?? 1e9) - (b.ngayConBan ?? 1e9));
 }
+
+export type PhanBoLo = { soLo: string | null; soLuong: number };
+
+/**
+ * Chia số lượng xuất vào các lô theo hạn gần nhất trước (FEFO), chỉ lô CÒN HẠN và còn hàng; không được dùng lô quá hạn.
+ * Phần không đủ lô để chia thì xuất không ghi số lô (soLo = null) để tồn tổng vẫn đúng.
+ */
+export function phanBoLoFefo(soLuong: number, lo: readonly LoTon[]): PhanBoLo[] {
+  const ra: PhanBoLo[] = [];
+  let can = soLuong;
+  for (const l of [...lo].filter((x) => x.ngayCon >= 0 && x.conLai > 0).sort((a, b) => (a.hanDung < b.hanDung ? -1 : a.hanDung > b.hanDung ? 1 : 0))) {
+    if (can <= 0) break;
+    const t = Math.min(can, l.conLai);
+    ra.push({ soLo: l.soLo, soLuong: t });
+    can -= t;
+  }
+  if (can > 0) ra.push({ soLo: null, soLuong: can });
+  return ra;
+}

@@ -727,7 +727,7 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "don-le", ten: "Sổ đơn lẻ", nhom: "Kinh doanh", bang: "kd_don_le", tieuDe: "ma_don", trangThai: "trang_thai",
-    moTa: "Đơn bán lẻ từ sàn, Facebook, Zalo, điện thoại. Đơn ĐÃ GIAO có gắn khách thì điểm khách tự cộng (không cần ghi tay ở Sổ điểm); hoàn trả hoặc huỷ thì điểm tự mất theo. Mỗi kênh một mã đơn chỉ ghi một lần. Thêm dòng hàng ở màn Dòng hàng đơn lẻ để tính lãi gộp.",
+    moTa: "Đơn bán lẻ từ sàn, Facebook, Zalo, điện thoại. Đơn ĐÃ GIAO có gắn khách thì điểm khách tự cộng (không cần ghi tay ở Sổ điểm); hoàn trả hoặc huỷ thì điểm tự mất theo. Mỗi kênh một mã đơn chỉ ghi một lần. Thêm dòng hàng ở màn Dòng hàng đơn lẻ: đơn đã giao tự TRỪ KHO (chia lô hạn gần trước) và tính được lãi gộp; hoàn trả hoặc huỷ thì hàng tự về kho.",
     sapXep: { cot: "ngay", giam: true }, trong: "Chưa có đơn lẻ nào.",
     cot: [
       { k: "ngay", nhan: "Ngày đơn", kieu: "ngay", batBuoc: true, the: true },
@@ -741,7 +741,7 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "don-le-dong-hang", ten: "Dòng hàng đơn lẻ", nhom: "Kinh doanh", bang: "kd_don_le_dong", tieuDe: "don_le_id",
-    moTa: "Sản phẩm trong đơn lẻ: số lượng, đơn giá, chiết khấu. Không bắt buộc; có dòng hàng thì màn Lãi gộp theo kênh tính được lãi gộp thực tế cho kênh lẻ (cần giá vốn đã duyệt).",
+    moTa: "Sản phẩm trong đơn lẻ: số lượng, đơn giá, chiết khấu. Đơn đã giao có dòng hàng thì kho tự xuất đúng số lượng (chia lô hạn gần trước), sửa hay xoá dòng hàng thì kho tự theo. Cũng để màn Lãi gộp theo kênh tính lãi thực tế cho kênh lẻ (cần giá vốn đã duyệt).",
     sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có dòng hàng nào. Tạo đơn ở màn Sổ đơn lẻ trước.",
     cot: [
       { k: "don_le_id", nhan: "Đơn lẻ", kieu: "tc", bangTc: "kd_don_le", batBuoc: true, the: true },

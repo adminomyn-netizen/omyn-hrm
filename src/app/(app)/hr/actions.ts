@@ -7,6 +7,7 @@ import { dbHr, laGiamDocTaiKhoan } from "@/lib/hr-db";
 import { chuanHoaGiaTri, timMucHr, type MucHr } from "@/lib/hr-module";
 import { cotDoi, ghiLichSuNhanSu } from "@/lib/nhan-su-lich-su";
 import { tinhHoaHong, tyLeApDung } from "@/lib/hoa-hong";
+import { dongBoKhoDonLe } from "@/lib/kho-don-le";
 import { kiemTraDung, tinhGiam, type LanDung, type Voucher } from "@/lib/khuyen-mai";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -106,6 +107,7 @@ export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
     ? ((await db.from(muc.bang).select("*").eq("id", id).maybeSingle())
         .data as Record<string, unknown> | null)
     : null;
+  if (muc.ma === "nhap-xuat-kho" && cu?.don_le_dong_id) return { loi: "Phiếu này tự sinh từ đơn lẻ. Sửa ở Sổ đơn lẻ hoặc Dòng hàng đơn lẻ." };
   const { data: moi, error } = id
     ? await db
         .from(muc.bang)
@@ -115,6 +117,20 @@ export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
         .maybeSingle()
     : await db.from(muc.bang).insert(dong).select("id").maybeSingle();
   if (error) return { loi: "Chưa lưu được. Kiểm tra lại các ô rồi thử lại." };
+  let ghiChuKho = "";
+  if (muc.ma === "don-le" || muc.ma === "don-le-dong-hang") {
+    const donIds = new Set<string>();
+    if (muc.ma === "don-le") donIds.add((moi as { id: string } | null)?.id ?? id);
+    else { donIds.add(String(dong.don_le_id)); if (cu?.don_le_id) donIds.add(String(cu.don_le_id)); }
+    for (const d of donIds) {
+      const kq = await dongBoKhoDonLe(db, d);
+      if (kq.loi) return { loi: kq.loi };
+      if (kq.xuat || kq.go) ghiChuKho = `; kho: ${kq.xuat ? `tự xuất ${kq.xuat} phiếu` : `gỡ ${kq.go} phiếu xuất`}`;
+    }
+    revalidatePath("/ton-kho");
+    revalidatePath("/hr/nhap-xuat-kho");
+    revalidatePath("/kho/lo-han-dung");
+  }
   const doi = cotDoi(cu, dong);
   await ghiLichSuNhanSu({
     nhanVienId:
@@ -123,8 +139,8 @@ export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
     doiTuongId: (moi as { id: string } | null)?.id ?? (id || null),
     hanhDong: id ? "Sửa" : "Thêm",
     moTa: id
-      ? `${muc.ten}: sửa ${doi.length ? doi.map((k) => muc.cot.find((c) => c.k === k)?.nhan ?? k).join(", ") : "không đổi gì"}`
-      : `${muc.ten}: thêm mới`,
+      ? `${muc.ten}: sửa ${doi.length ? doi.map((k) => muc.cot.find((c) => c.k === k)?.nhan ?? k).join(", ") : "không đổi gì"}${ghiChuKho}`
+      : `${muc.ten}: thêm mới${ghiChuKho}`,
     truoc: cu,
     sau: dong,
     nguoi: { id: nd.id, hoTen: nd.hoTen },
@@ -146,8 +162,13 @@ export async function xoaBanGhiHr(ma: string, id: string): Promise<KetQuaHr> {
   const cu = (
     await dbHr().from(muc.bang).select("*").eq("id", id).maybeSingle()
   ).data as Record<string, unknown> | null;
+  if (muc.ma === "nhap-xuat-kho" && cu?.don_le_dong_id) return { loi: "Phiếu này tự sinh từ đơn lẻ. Muốn gỡ, đổi trạng thái đơn hoặc xoá dòng hàng đơn lẻ." };
   const { error } = await dbHr().from(muc.bang).delete().eq("id", id);
   if (error) return { loi: "Chưa xoá được." };
+  if (muc.ma === "don-le" || muc.ma === "don-le-dong-hang") {
+    revalidatePath("/ton-kho");
+    revalidatePath("/hr/nhap-xuat-kho");
+  }
   await ghiLichSuNhanSu({
     nhanVienId: typeof cu?.nhan_vien_id === "string" ? cu.nhan_vien_id : null,
     doiTuong: muc.ten,
