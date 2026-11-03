@@ -216,3 +216,27 @@ describe("khung tin nhắn khách lẻ", () => {
     expect(lapHangDoi(khach, diem, [], kb("Điểm sắp hết hạn"), mau, [{ khachId: "a", kichBanId: "k1", ngay: "2026-10-01" }], "2026-11-05").length).toBe(1);
   });
 });
+
+import { bienTheoGia, giaVonMoiNhat, laiGopSi } from "@/lib/kinh-doanh";
+
+describe("lãi gộp theo kênh", () => {
+  const g = (o: Partial<{ sanPhamId: string; kenh: string; giaVon: number | null; giaBan: number | null; trangThai: string; hieuLucTu: string | null; taoLuc: string }>) => ({ sanPhamId: "a", kenh: "Sàn", giaVon: 60, giaBan: 100, trangThai: "Đã duyệt", hieuLucTu: null, taoLuc: "2026-10-01", ...o });
+  it("biên theo giá: chỉ giá đã duyệt có đủ vốn và giá bán; không đoán số thiếu", () => {
+    const r = bienTheoGia([g({}), g({ kenh: "Sỉ", giaBan: 80 }), g({ sanPhamId: "b", giaVon: null }), g({ sanPhamId: "c", giaBan: null }), g({ sanPhamId: "d", trangThai: "Chờ duyệt" })]);
+    expect(r.dong.map((d) => [d.kenh, d.lai, d.phanTram])).toEqual([["Sàn", 40, 40], ["Sỉ", 20, 25]]);
+    expect(r.theoKenh).toEqual([{ kenh: "Sàn", soDong: 3, soDuSo: 1, thapNhat: 40, caoNhat: 40 }, { kenh: "Sỉ", soDong: 1, soDuSo: 1, thapNhat: 25, caoNhat: 25 }]);
+  });
+  it("giá vốn mới nhất theo ngày hiệu lực, bỏ giá chưa duyệt", () => {
+    const m = giaVonMoiNhat([g({ giaVon: 50, hieuLucTu: "2026-01-01" }), g({ giaVon: 70, hieuLucTu: "2026-06-01" }), g({ giaVon: 99, hieuLucTu: "2026-09-01", trangThai: "Chờ duyệt" })]);
+    expect(m.get("a")).toBe(70);
+  });
+  it("lãi gộp sỉ: thiếu giá vốn thì liệt kê và không tính vào lãi", () => {
+    const r = laiGopSi([{ sanPhamId: "a", soLuong: 10, donGia: 100, chietKhau: 10 }, { sanPhamId: "x", soLuong: 5, donGia: 200, chietKhau: 0 }], new Map([["a", 60]]));
+    expect(r).toMatchObject({ doanhThu: 1900, doanhThuCoVon: 900, von: 600, laiGop: 300, phanTram: 33.3, soDong: 2, soDongCoVon: 1, thieuVon: ["x"] });
+  });
+  it("không dòng nào có giá vốn thì không đưa ra lãi", () => {
+    const r = laiGopSi([{ sanPhamId: "x", soLuong: 1, donGia: 100, chietKhau: 0 }], new Map());
+    expect(r.laiGop).toBeNull();
+    expect(r.phanTram).toBeNull();
+  });
+});

@@ -202,3 +202,56 @@ export function tinhDiemKhach(
     })
     .sort((a, b) => b.muaCuaSo - a.muaCuaSo);
 }
+
+export type GiaBan = { sanPhamId: string; kenh: string; giaVon: number | null; giaBan: number | null; trangThai: string; hieuLucTu: string | null; taoLuc: string };
+export type BienTheoKenh = { kenh: string; soDong: number; soDuSo: number; thapNhat: number | null; caoNhat: number | null };
+export type DongBien = { sanPhamId: string; kenh: string; giaVon: number; giaBan: number; lai: number; phanTram: number };
+export type LaiSi = { doanhThu: number; doanhThuCoVon: number; von: number; laiGop: number | null; phanTram: number | null; soDong: number; soDongCoVon: number; thieuVon: string[] };
+
+/**
+ * Lãi gộp theo giá: chỉ các dòng giá ĐÃ DUYỆT có đủ cả giá vốn lẫn giá bán (giá bán > 0); thiếu một trong hai thì không tính, không đoán.
+ * Phần trăm = (giá bán − giá vốn) / giá bán, làm tròn 1 chữ số thập phân.
+ */
+export function bienTheoGia(gia: readonly GiaBan[]): { dong: DongBien[]; theoKenh: BienTheoKenh[] } {
+  const da = gia.filter((g) => g.trangThai === "Đã duyệt");
+  const dong: DongBien[] = da
+    .filter((g) => g.giaVon !== null && g.giaBan !== null && g.giaBan > 0)
+    .map((g) => ({ sanPhamId: g.sanPhamId, kenh: g.kenh, giaVon: g.giaVon as number, giaBan: g.giaBan as number, lai: (g.giaBan as number) - (g.giaVon as number), phanTram: Math.round((((g.giaBan as number) - (g.giaVon as number)) / (g.giaBan as number)) * 1000) / 10 }));
+  const kenh = [...new Set(da.map((g) => g.kenh))].sort();
+  const theoKenh = kenh.map((k) => {
+    const ds = dong.filter((d) => d.kenh === k);
+    const pt = ds.map((d) => d.phanTram);
+    return { kenh: k, soDong: da.filter((g) => g.kenh === k).length, soDuSo: ds.length, thapNhat: pt.length ? Math.min(...pt) : null, caoNhat: pt.length ? Math.max(...pt) : null };
+  });
+  return { dong, theoKenh };
+}
+
+/** Giá vốn một sản phẩm = giá vốn của dòng giá ĐÃ DUYỆT mới nhất (theo ngày hiệu lực, rồi ngày tạo) có ghi giá vốn; chưa có thì thiếu. */
+export function giaVonMoiNhat(gia: readonly GiaBan[]): Map<string, number> {
+  const m = new Map<string, { von: number; khoa: string }>();
+  for (const g of gia) {
+    if (g.trangThai !== "Đã duyệt" || g.giaVon === null) continue;
+    const khoa = `${g.hieuLucTu ?? ""}|${g.taoLuc}`;
+    const cu = m.get(g.sanPhamId);
+    if (!cu || khoa > cu.khoa) m.set(g.sanPhamId, { von: g.giaVon, khoa });
+  }
+  return new Map([...m].map(([k, v]) => [k, v.von]));
+}
+
+/**
+ * Lãi gộp thực tế kênh sỉ từ các dòng hàng của đơn đã chốt trở đi. Chỉ tính phần có giá vốn; dòng thiếu giá vốn liệt kê ở `thieuVon`
+ * và KHÔNG tính vào lãi (không đưa ra lãi nếu không dòng nào có giá vốn).
+ */
+export function laiGopSi(dong: readonly { sanPhamId: string; soLuong: number; donGia: number; chietKhau: number }[], von: ReadonlyMap<string, number>): LaiSi {
+  let doanhThu = 0, doanhThuCoVon = 0, tongVon = 0, soDongCoVon = 0;
+  const thieu = new Set<string>();
+  for (const d of dong) {
+    const tt = thanhTienDong(d.soLuong, d.donGia, d.chietKhau);
+    doanhThu += tt;
+    const v = von.get(d.sanPhamId);
+    if (v === undefined) { thieu.add(d.sanPhamId); continue; }
+    doanhThuCoVon += tt; tongVon += v * d.soLuong; soDongCoVon++;
+  }
+  const lai = soDongCoVon ? doanhThuCoVon - tongVon : null;
+  return { doanhThu, doanhThuCoVon, von: tongVon, laiGop: lai, phanTram: lai !== null && doanhThuCoVon > 0 ? Math.round((lai / doanhThuCoVon) * 1000) / 10 : null, soDong: dong.length, soDongCoVon, thieuVon: [...thieu] };
+}

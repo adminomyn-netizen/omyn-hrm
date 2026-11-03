@@ -456,6 +456,14 @@ const menuGoc: MucMenu[] = [
     moTa: "Nhà cung cấp gửi tin, đang tắt.",
   },
   {
+    ten: "Lãi gộp theo kênh",
+    duong_dan: "/kinh-doanh/lai-gop",
+    nhom: "Kinh doanh",
+    icon: Wallet,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Biên lãi gộp theo bảng giá đã duyệt và lãi thực tế kênh sỉ.",
+  },
+  {
     ten: "Điểm và hạng khách lẻ",
     duong_dan: "/kinh-doanh/khach-le",
     nhom: "Kinh doanh",
