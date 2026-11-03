@@ -229,3 +229,19 @@ describe("khung bút toán kế toán (để sẵn, bổ sung chi tiết sau)", 
     for (const ma of ["de-nghi-thanh-toan", "de-nghi-hoan-ung"]) expect(kiemTraPhieu(mauTheoMa(ma)!, {}, CTX).loi.but_toan_chi_phi).toBeUndefined();
   });
 });
+
+describe("ô bổ sung sau khi so với form Lark", () => {
+  it("công tác: chi tiết chi phí cộng thành tổng đề nghị; không bắt buộc", () => {
+    const m = mauTheoMa("de-xuat-di-cong-tac")!;
+    const r = kiemTraPhieu(m, { chi_tiet_chi_phi: [{ so_tien: 500_000 }, { so_tien: 250_000 }] }, CTX);
+    expect(r.sach.tong_de_nghi).toBe(750_000);
+    expect(kiemTraPhieu(m, {}, CTX).loi.chi_tiet_chi_phi).toBeUndefined();
+  });
+  it("khen thưởng/kỷ luật: 3 tệp kỷ luật chỉ bắt buộc khi loại là Kỷ luật; điều chỉnh nhân sự cần tệp quyết định", () => {
+    const m = mauTheoMa("de-xuat-khen-thuong-ky-luat")!;
+    const kl = kiemTraPhieu(m, { loai: "Kỷ luật" }, CTX).loi;
+    expect(kl.ban_tuong_trinh && kl.thong_bao_hop_ky_luat && kl.bien_ban_xu_ly_ky_luat).toBeTruthy();
+    const kt = kiemTraPhieu(m, { loai: "Khen thưởng" }, CTX).loi;
+    expect(kt.ban_tuong_trinh).toBeUndefined();
+  });
+});

@@ -66,7 +66,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
     ma: "tiep-nhan-yeu-cau-hanh-chinh", ten: "Tiếp nhận yêu cầu xử lý hành chính", nhomMacDinh: "ADM",
     moTa: "Ghi nhận một yêu cầu hành chính và người xử lý.",
     lark: { ma: "5A61DA44-A896-40C1-8888-E31D7FC4593D", buoc: "4 bước: AND, AND, OR, AND" },
-    truong: [ngay("ngay_phat_sinh", "Ngày phát sinh"), chu("noi_dung", "Nội dung yêu cầu"), nv("nguoi_xu_ly", "Người xử lý")],
+    truong: [ngay("ngay_phat_sinh", "Ngày phát sinh"), chu("noi_dung", "Nội dung yêu cầu"), nv("nguoi_xu_ly", "Người xử lý"), chu("trang_thai_xu_ly", "Trạng thái xử lý", { batBuoc: false }), nhieu("ghi_chu", "Ghi chú", { batBuoc: false })],
   },
   {
     ma: "phieu-thu-tien", ten: "Phiếu thu tiền", nhomMacDinh: "FIN",
@@ -111,6 +111,9 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
       tep("de_xuat_khen_thuong", "Đề xuất khen thưởng", { hien: { truong: "loai", la: ["Khen thưởng"] } }),
       nv("nhan_vien_vi_pham", "Nhân viên vi phạm", { hien: { truong: "loai", la: ["Kỷ luật"] } }),
       tep("ban_ghi_nhan_su_viec", "Bản ghi nhận sự việc", { hien: { truong: "loai", la: ["Kỷ luật"] } }),
+      tep("ban_tuong_trinh", "Bản tường trình", { hien: { truong: "loai", la: ["Kỷ luật"] } }),
+      tep("thong_bao_hop_ky_luat", "Thông báo họp kỷ luật", { hien: { truong: "loai", la: ["Kỷ luật"] } }),
+      tep("bien_ban_xu_ly_ky_luat", "Biên bản xử lý kỷ luật", { hien: { truong: "loai", la: ["Kỷ luật"] } }),
     ],
   },
   {
@@ -125,6 +128,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
       dm("phong_ban_moi", "Phòng ban mới", "Phòng ban", { hien: { truong: "loai", la: ["Luân chuyển"] } }),
       dm("chuc_vu_moi", "Chức vụ mới", "Chức vụ", { hien: { truong: "loai", la: ["Luân chuyển", "Thăng chức"] } }),
       nhieu("noi_dung", "Nội dung đề xuất"), ngay("thoi_gian_ap_dung", "Thời gian áp dụng"),
+      tep("tep_quyet_dinh", "Tệp quyết định"),
     ],
   },
   {
@@ -147,6 +151,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
     truong: [
       chon("loai", "Thời lượng", ["Nửa ngày", "Cả ngày"], { suyRa: "Ô “Out-of-office” của Lark có đơn vị nửa ngày/cả ngày; em tách thành thời lượng + từ/đến + lý do." }),
       ngayGio("tu", "Từ"), ngayGio("den", "Đến", { khongTruoc: "tu" }), nhieu("ly_do", "Lý do làm online", { batBuoc: false }),
+      tep("anh", "Ảnh (nếu có)", { batBuoc: false }),
     ],
   },
   {
@@ -232,7 +237,12 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
       chu("noi_di", "Nơi đi", { suyRa: "Ô “Business trip widgets” của Lark: em tách thành nơi đi/đến, từ/đến, phương tiện." }), chu("noi_den", "Nơi đến"),
       ngayGio("tu", "Từ"), ngayGio("den", "Đến", { khongTruoc: "tu" }),
       chon("phuong_tien", "Phương tiện", ["Máy bay", "Ô tô", "Tàu hỏa", "Xe máy", "Khác"], { batBuoc: false }),
+      chon("chieu_di", "Một chiều/Khứ hồi", ["Một chiều", "Khứ hồi"], { batBuoc: false }),
+      nhieu("ghi_chu_chuyen_di", "Ghi chú chuyến đi", { batBuoc: false }), chu("di_cung", "Đi cùng", { batBuoc: false }),
       nhieu("muc_dich", "Mục đích công tác"), tep("quyet_dinh", "Quyết định/Đề nghị công tác (đính kèm file – nếu có)", { batBuoc: false }),
+      o("bang", "chi_tiet_chi_phi", "Chi tiết chi phí", { batBuoc: false, con: [ngay("ngay_chi", "Ngày chi", { batBuoc: false }), dm("loai_chi_phi", "Loại chi phí", "Loại chi phí", { batBuoc: false }), chu("noi_dung_chi", "Nội dung chi", { batBuoc: false }), tien("so_tien", "Số tiền", { batBuoc: false }), chu("ghi_chu", "Ghi chú", { batBuoc: false })] }),
+      tep("chung_tu", "Hóa đơn / Vé / Chứng từ thanh toán", { batBuoc: false }),
+      o("cong", "tong_de_nghi", "Tổng số tiền đề nghị thanh toán", { batBuoc: false, tong: { bang: "chi_tiet_chi_phi", cot: "so_tien" } }),
     ],
   },
 ];
