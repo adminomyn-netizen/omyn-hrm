@@ -170,6 +170,34 @@ describe("luồng duyệt", () => {
   });
 });
 
+describe("đề nghị hoàn ứng: thừa hoặc thiếu, chỉ một trong hai", () => {
+  const mau = mauTheoMa("de-nghi-hoan-ung")!;
+  const goc = { da_tam_ung: 5_000_000, noi_dung: "x", ho_so: [] };
+  it("ứng thừa + chọn Không: tự tính tiền thừa, không có ô thiếu / tài khoản / bằng chữ", () => {
+    const r = kiemTraPhieu(mau, { ...goc, thuc_te_chi: 3_000_000, can_thanh_toan_them: "Không", so_tien_thieu: 999, tai_khoan: "1" }, CTX);
+    expect(r.loi.can_thanh_toan_them).toBeUndefined();
+    expect(r.sach.thua_can_hoan).toBe(2_000_000);
+    expect(r.sach.so_tien_thieu).toBeUndefined();
+    expect(r.sach.tai_khoan).toBeUndefined();
+    expect(r.sach.so_tien_bang_chu).toBeUndefined();
+  });
+  it("ứng thiếu + chọn Có: tự tính tiền thiếu và bằng chữ, hỏi tài khoản, không có ô thừa", () => {
+    const r = kiemTraPhieu(mau, { ...goc, thuc_te_chi: 7_500_000, can_thanh_toan_them: "Có", thua_can_hoan: 5 }, CTX);
+    expect(r.loi.can_thanh_toan_them).toBeUndefined();
+    expect(r.loi.tai_khoan).toBeTruthy();
+    expect(r.loi.so_tien_thieu).toBeUndefined();
+    expect(r.sach.so_tien_thieu).toBe(2_500_000);
+    expect(String(r.sach.so_tien_bang_chu)).toMatch(/hai triệu năm trăm nghìn/i);
+    expect(r.sach.thua_can_hoan).toBeUndefined();
+  });
+  it("chọn sai chiều thì báo lỗi ở ô Cần thanh toán thêm", () => {
+    expect(kiemTraPhieu(mau, { ...goc, thuc_te_chi: 3_000_000, can_thanh_toan_them: "Có" }, CTX).loi.can_thanh_toan_them).toMatch(/chọn “Không”/);
+    expect(kiemTraPhieu(mau, { ...goc, thuc_te_chi: 6_000_000, can_thanh_toan_them: "Không" }, CTX).loi.can_thanh_toan_them).toMatch(/chọn “Có”/);
+    expect(kiemTraPhieu(mau, { ...goc, thuc_te_chi: 5_000_000, can_thanh_toan_them: "Có" }, CTX).loi.can_thanh_toan_them).toBeTruthy();
+    expect(kiemTraPhieu(mau, { ...goc, thuc_te_chi: 5_000_000, can_thanh_toan_them: "Không" }, CTX).loi.can_thanh_toan_them).toBeUndefined();
+  });
+});
+
 describe("ghi đè ô của Kỹ thuật", () => {
   const mau = mauTheoMa("de-nghi-hoan-ung")!;
   const g = (truong: string, mo: Partial<GhiDeO>): GhiDeO => ({ truong, batBuoc: "Mặc định", cheDoHien: "Mặc định", hienTruong: null, hienGiaTri: null, ...mo });

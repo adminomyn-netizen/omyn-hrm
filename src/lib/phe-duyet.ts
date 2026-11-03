@@ -19,6 +19,8 @@ export type Truong = {
   con?: readonly Truong[];
   /** kieu "cong": tổng cột `cot` của bảng `bang` (tự tính, không cho nhập). */
   tong?: { bang: string; cot: string };
+  /** kieu "tien": tự tính = max(0, ô `tu` − ô `tru`), không cho nhập (vd tiền thừa/thiếu khi hoàn ứng). */
+  hieu?: { tu: string; tru: string };
   /** kieu "chu": tự điền số tiền bằng chữ từ ô tiền `tien` (tự tính ở máy chủ). */
   bangChuTu?: string;
   /** Ô ngày/giờ này không được trước ô `khongTruoc`. */
@@ -41,6 +43,25 @@ export type MauPhieu = {
 };
 
 export type DuLieu = Record<string, unknown>;
+
+/** Kiểm tra chéo giữa các ô theo mã phiếu (hàm không đi qua được ranh giới máy chủ → giao diện nên không để trong mẫu). Trả lỗi theo mã ô. */
+const KIEM_CHEO: Record<string, (sach: DuLieu) => Record<string, string>> = {
+  "de-nghi-hoan-ung": (d): Record<string, string> => {
+    const a = d.da_tam_ung, b = d.thuc_te_chi;
+    if (typeof a !== "number" || typeof b !== "number") return {};
+    if (d.can_thanh_toan_them === "Có" && b <= a) return { can_thanh_toan_them: "Chi thực tế không lớn hơn số đã tạm ứng nên không có khoản thiếu. Hãy chọn “Không”." };
+    if (d.can_thanh_toan_them === "Không" && b > a) return { can_thanh_toan_them: "Chi thực tế lớn hơn số đã tạm ứng, còn thiếu. Hãy chọn “Có” để xin thanh toán bổ sung." };
+    return {};
+  },
+};
+
+/** Giá trị ô tự tính theo hiệu hai ô tiền; thiếu một trong hai ô thì chưa tính được. */
+export function giaTriHieu(t: Truong, du: DuLieu): number | undefined {
+  if (!t.hieu) return undefined;
+  const a = du[t.hieu.tu], b = du[t.hieu.tru];
+  if (typeof a !== "number" || typeof b !== "number") return undefined;
+  return Math.max(0, a - b);
+}
 
 // ---------------------------------------------------------------- số phiếu
 
@@ -206,7 +227,7 @@ export function kiemTraPhieu(mau: MauPhieu, du: DuLieu, ctx: NguCanhKiemTra): Ke
   const sach: DuLieu = {};
   const hien = (t: Truong) => truongDangHien(t, du);
   for (const t of mau.truong) {
-    if (!hien(t) || t.kieu === "cong" || t.bangChuTu) continue;
+    if (!hien(t) || t.kieu === "cong" || t.bangChuTu || t.hieu) continue;
     const v = kiemMotO(t, du[t.ma], t.ma, du, ctx, loi);
     if (v !== undefined) sach[t.ma] = v;
   }
@@ -215,6 +236,10 @@ export function kiemTraPhieu(mau: MauPhieu, du: DuLieu, ctx: NguCanhKiemTra): Ke
     if (t.kieu === "cong" && t.tong) {
       const dong = (sach[t.tong.bang] as DuLieu[] | undefined) ?? [];
       sach[t.ma] = dong.reduce((s, d) => s + (typeof d[t.tong!.cot] === "number" ? (d[t.tong!.cot] as number) : 0), 0);
+    }
+    if (t.hieu) {
+      const h = giaTriHieu(t, sach);
+      if (h !== undefined) sach[t.ma] = h;
     }
     if (t.bangChuTu) {
       const tien = sach[t.bangChuTu];
@@ -225,6 +250,8 @@ export function kiemTraPhieu(mau: MauPhieu, du: DuLieu, ctx: NguCanhKiemTra): Ke
       loi[t.ma] = `“${t.ten}” không được trước “${mau.truong.find((x) => x.ma === t.khongTruoc)?.ten ?? "ô trên"}”.`;
     }
   }
+  const cheo = KIEM_CHEO[mau.ma];
+  if (cheo) for (const [ma, m] of Object.entries(cheo(sach))) if (!loi[ma]) loi[ma] = m;
   return { loi, sach };
 }
 

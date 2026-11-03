@@ -10,7 +10,7 @@ import { OTien } from "@/components/ui/OTien";
 import { NHAN_O, NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import { createClient } from "@/lib/supabase/client";
 import { nopLaiPhieu, nopPhieu, xinUploadTep, type TepMoi } from "@/app/(app)/phe-duyet/actions";
-import { tienBangChu, truongDangHien, type MauPhieu, type Truong } from "@/lib/phe-duyet";
+import { giaTriHieu, tienBangChu, truongDangHien, type MauPhieu, type Truong } from "@/lib/phe-duyet";
 
 export type NhanSuChon = { id: string; ten: string };
 export type PhieuNoi = { id: string; ten: string; maPhieu: string };
@@ -84,11 +84,17 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
     router.refresh();
   });
 
+  /** Số tiền của một ô, kể cả ô tự tính theo hiệu hai ô khác. */
+  const nguonTien = (ma: string): unknown => {
+    const o = mau.truong.find((x) => x.ma === ma);
+    return o?.hieu ? giaTriHieu(o, du) : du[ma];
+  };
+
   function renderTruong({ t, v, dat1, khoa, goc }: { t: Truong; v: unknown; dat1: (x: unknown) => void; khoa: string; goc: Du }) {
     if (!truongDangHien(t, goc)) return null;
     switch (t.kieu) {
       case "chu": {
-        if (t.bangChuTu) return <Cap loiO={loiO} t={t} khoa={khoa} nhan={`${t.ten} (tự điền, không nhập)`}><input readOnly tabIndex={-1} value={tienBangChu(Number(du[t.bangChuTu]))} placeholder={t.goiY} className={`${O_NHAP} cursor-not-allowed bg-giay-tram`} /></Cap>;
+        if (t.bangChuTu) return <Cap loiO={loiO} t={t} khoa={khoa} nhan={`${t.ten} (tự điền, không nhập)`}><input readOnly tabIndex={-1} value={tienBangChu(Number(nguonTien(t.bangChuTu)))} placeholder={t.goiY} className={`${O_NHAP} cursor-not-allowed bg-giay-tram`} /></Cap>;
         return <Cap loiO={loiO} t={t} khoa={khoa}><input value={chuoi(v)} onChange={(e) => dat1(e.target.value)} placeholder={t.goiY} maxLength={300} className={O_NHAP} /></Cap>;
       }
       case "nhieu":
@@ -109,6 +115,7 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
       case "so":
         return <Cap loiO={loiO} t={t} khoa={khoa}><input inputMode="numeric" value={v === undefined || v === null ? "" : String(v)} onChange={(e) => dat1(e.target.value.replace(/\D/g, ""))} className={O_NHAP} /></Cap>;
       case "tien":
+        if (t.hieu) return <Cap loiO={loiO} t={t} khoa={khoa} nhan={`${t.ten} (tự tính, không nhập)`}><div className={`${O_NHAP} flex cursor-not-allowed items-center bg-giay-tram tabular-nums`}>{Number(giaTriHieu(t, du) ?? 0).toLocaleString("vi-VN")} đ</div></Cap>;
         return <Cap loiO={loiO} t={t} khoa={khoa}><OTien ariaLabel={t.ten} giaTriMacDinh={typeof v === "number" ? v : 0} onDoi={dat1} /></Cap>;
       case "chon":
         return <Cap loiO={loiO} t={t} khoa={khoa}><Chon ariaLabel={t.ten} giaTri={chuoi(v)} onDoi={dat1} luaChon={(t.luaChon ?? []).map((x) => ({ gia_tri: x, nhan: x }))} /></Cap>;
