@@ -115,3 +115,27 @@ export function dieuChinhTheoLyDo(dong: readonly DongKhoLyDo[], tu: string, den:
   }
   return [...m.values()].sort((a, b) => b.tang + b.giam - (a.tang + a.giam));
 }
+
+export type DuBaoNhap = { id: string; ma: string; ten: string; ton: number; daBan: number; tocDoNgay: number; ngayConBan: number | null; canNhap: number; trangThai: "Hết hàng" | "Cần nhập ngay" | "Sắp cần nhập" | "Đủ hàng" | "Chưa có số bán" };
+
+/**
+ * Dự báo nhập hàng từ tốc độ xuất kho gần đây (không phải dự đoán thị trường):
+ * - tốc độ/ngày = tổng phiếu Xuất trong `soNgayBan` ngày gần nhất (tính đến hết `homNay`) ÷ soNgayBan; điều chỉnh không tính là bán.
+ * - số ngày còn bán được = tồn ÷ tốc độ.
+ * - cần nhập = tốc độ × (ngày hàng về + ngày dự trữ) − tồn, làm tròn lên, tối thiểu 0.
+ * - Cần nhập ngay: còn bán được ≤ ngày hàng về; Sắp cần nhập: ≤ ngày hàng về + ngày dự trữ; chưa bán gì trong kỳ thì "Chưa có số bán", không dự báo.
+ */
+export function duBaoNhap(sp: readonly SanPhamKho[], dong: readonly DongKho[], homNay: string, soNgayBan: number, ngayHangVe: number, ngayDuTru: number): DuBaoNhap[] {
+  const bat = new Date(Date.parse(homNay) - (soNgayBan - 1) * 864e5).toISOString().slice(0, 10);
+  const ra: DuBaoNhap[] = [];
+  for (const t of tinhTonKho(sp, dong.filter((d) => d.ngay === undefined || d.ngay <= homNay))) {
+    const daBan = dong.filter((d) => d.sanPhamId === t.id && d.loai === "Xuất" && d.ngay !== undefined && d.ngay >= bat && d.ngay <= homNay).reduce((a, d) => a + d.soLuong, 0);
+    const tocDoNgay = daBan / soNgayBan;
+    const ngayConBan = tocDoNgay > 0 ? Math.floor(Math.max(t.ton, 0) / tocDoNgay) : null;
+    const canNhap = Math.max(0, Math.ceil(tocDoNgay * (ngayHangVe + ngayDuTru) - t.ton));
+    const trangThai: DuBaoNhap["trangThai"] = tocDoNgay === 0 ? "Chưa có số bán" : t.ton <= 0 ? "Hết hàng" : (ngayConBan as number) <= ngayHangVe ? "Cần nhập ngay" : (ngayConBan as number) <= ngayHangVe + ngayDuTru ? "Sắp cần nhập" : "Đủ hàng";
+    ra.push({ id: t.id, ma: t.ma, ten: t.ten, ton: t.ton, daBan, tocDoNgay, ngayConBan, canNhap, trangThai });
+  }
+  const thuTu = { "Hết hàng": 0, "Cần nhập ngay": 1, "Sắp cần nhập": 2, "Đủ hàng": 3, "Chưa có số bán": 4 };
+  return ra.sort((a, b) => thuTu[a.trangThai] - thuTu[b.trangThai] || (a.ngayConBan ?? 1e9) - (b.ngayConBan ?? 1e9));
+}

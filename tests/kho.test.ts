@@ -93,3 +93,36 @@ describe("xuất nhập tồn theo kỳ", () => {
     ]);
   });
 });
+
+import { duBaoNhap } from "@/lib/ton-kho";
+
+describe("dự báo nhập hàng", () => {
+  const sp = [{ id: "a", ma: "A", ten: "Kem" }, { id: "b", ma: "B", ten: "Sữa" }, { id: "c", ma: "C", ten: "Mặt nạ" }, { id: "d", ma: "D", ten: "Dầu" }];
+  const dong = [
+    { sanPhamId: "a", loai: "Nhập", soLuong: 100, ngay: "2026-09-01" }, { sanPhamId: "a", loai: "Xuất", soLuong: 90, ngay: "2026-10-20" },
+    { sanPhamId: "b", loai: "Nhập", soLuong: 500, ngay: "2026-09-01" }, { sanPhamId: "b", loai: "Xuất", soLuong: 30, ngay: "2026-10-20" },
+    { sanPhamId: "c", loai: "Nhập", soLuong: 10, ngay: "2026-09-01" }, { sanPhamId: "c", loai: "Xuất", soLuong: 10, ngay: "2026-10-01" }, { sanPhamId: "c", loai: "Xuất", soLuong: 60, ngay: "2026-08-01" },
+    { sanPhamId: "d", loai: "Nhập", soLuong: 50, ngay: "2026-09-01" }, { sanPhamId: "d", loai: "Điều chỉnh giảm", soLuong: 5, ngay: "2026-10-20" },
+  ];
+  it("tốc độ bán 30 ngày, số ngày còn bán, số cần nhập và trạng thái", () => {
+    const r = duBaoNhap(sp, dong, "2026-11-03", 30, 20, 30);
+    const a = r.find((x) => x.id === "a")!, b = r.find((x) => x.id === "b")!, c = r.find((x) => x.id === "c")!, d = r.find((x) => x.id === "d")!;
+    expect(a).toMatchObject({ ton: 10, daBan: 90, tocDoNgay: 3, ngayConBan: 3, canNhap: 140, trangThai: "Cần nhập ngay" });
+    expect(b).toMatchObject({ ton: 470, daBan: 30, canNhap: 0, trangThai: "Đủ hàng" });
+    expect(c).toMatchObject({ ton: -60, daBan: 0, trangThai: "Chưa có số bán" });
+    expect(d).toMatchObject({ ton: 45, daBan: 0, trangThai: "Chưa có số bán" });
+  });
+  it("bán gần đây mà hết tồn thì xếp đầu, ngoài kỳ không tính", () => {
+    const r = duBaoNhap([sp[2]], [{ sanPhamId: "c", loai: "Nhập", soLuong: 10, ngay: "2026-09-01" }, { sanPhamId: "c", loai: "Xuất", soLuong: 10, ngay: "2026-10-30" }], "2026-11-03", 30, 20, 30);
+    expect(r[0].trangThai).toBe("Hết hàng");
+    expect(r[0].canNhap).toBe(17);
+  });
+  it("sắp cần nhập: còn bán được hơn ngày hàng về nhưng chưa đủ dự trữ", () => {
+    const r = duBaoNhap([sp[0]], [{ sanPhamId: "a", loai: "Nhập", soLuong: 100, ngay: "2026-09-01" }, { sanPhamId: "a", loai: "Xuất", soLuong: 30, ngay: "2026-10-20" }], "2026-11-03", 30, 20, 30);
+    expect(r[0]).toMatchObject({ ton: 70, ngayConBan: 70, trangThai: "Đủ hàng" });
+    const r2 = duBaoNhap([sp[0]], [{ sanPhamId: "a", loai: "Nhập", soLuong: 100, ngay: "2026-09-01" }, { sanPhamId: "a", loai: "Xuất", soLuong: 60, ngay: "2026-10-20" }], "2026-11-03", 30, 20, 30);
+    expect(r2[0]).toMatchObject({ ton: 40, ngayConBan: 20, trangThai: "Cần nhập ngay" });
+    const r3 = duBaoNhap([sp[0]], [{ sanPhamId: "a", loai: "Nhập", soLuong: 100, ngay: "2026-09-01" }, { sanPhamId: "a", loai: "Xuất", soLuong: 60, ngay: "2026-10-20" }], "2026-11-03", 30, 10, 30);
+    expect(r3[0]).toMatchObject({ trangThai: "Sắp cần nhập" });
+  });
+});

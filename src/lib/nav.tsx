@@ -592,6 +592,14 @@ const menuGoc: MucMenu[] = [
     moTa: "Tồn đầu, nhập, xuất, điều chỉnh, tồn cuối theo kỳ; điều chỉnh theo lý do.",
   },
   {
+    ten: "Dự báo nhập hàng",
+    duong_dan: "/kho/du-bao-nhap",
+    nhom: "Tài chính & Kho",
+    icon: LayoutGrid,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Gợi ý nhập theo tốc độ xuất kho và tồn hiện có.",
+  },
+  {
     ten: "Kiểm kê kho",
     duong_dan: "/hr/kiem-ke-kho",
     nhom: "Tài chính & Kho",
