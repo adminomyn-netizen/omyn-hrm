@@ -1,3 +1,4 @@
+import { docDieuKien } from "@/lib/dieu-kien";
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { dbHr } from "@/lib/hr-db";
@@ -21,10 +22,10 @@ export async function docNhomMa(): Promise<Record<string, { nhom: string; dung: 
 }
 
 export async function docLuong(maPhieu: string): Promise<HangLuong[]> {
-  const { data } = await dbHr().from("pd_luong_duyet").select("buoc, ten_buoc, kieu, loai_nguoi, chuc_danh, nhan_vien_id, dieu_kien_truong, dieu_kien_gia_tri").eq("ma_phieu", maPhieu).order("buoc");
-  return ((data ?? []) as Record<string, string | number | null>[]).map((r) => ({
+  const { data } = await dbHr().from("pd_luong_duyet").select("buoc, ten_buoc, kieu, loai_nguoi, chuc_danh, nhan_vien_id, dieu_kien_truong, dieu_kien_gia_tri, dieu_kien").eq("ma_phieu", maPhieu).order("buoc");
+  return ((data ?? []) as Record<string, string | number | null | object>[]).map((r) => ({
     buoc: r.buoc as number, tenBuoc: r.ten_buoc as string | null, kieu: r.kieu as KieuBuoc, loaiNguoi: r.loai_nguoi as LoaiNguoiDuyet,
-    chucDanh: r.chuc_danh as string | null, nhanVienId: r.nhan_vien_id as string | null, dieuKienTruong: r.dieu_kien_truong as string | null, dieuKienGiaTri: r.dieu_kien_gia_tri as string | null,
+    chucDanh: r.chuc_danh as string | null, nhanVienId: r.nhan_vien_id as string | null, dieuKienTruong: r.dieu_kien_truong as string | null, dieuKienGiaTri: r.dieu_kien_gia_tri as string | null, dieuKien: docDieuKien(r.dieu_kien),
   }));
 }
 

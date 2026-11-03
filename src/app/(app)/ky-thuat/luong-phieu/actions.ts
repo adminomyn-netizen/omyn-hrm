@@ -11,6 +11,8 @@ export type KetQuaCauHinh = { ok?: boolean; loi?: string };
 
 const KIEU = ["AND", "OR", "CC"];
 const LOAI_NGUOI = ["Quản lý trực tiếp", "Quản lý cấp trên", "Chức danh", "Nhân viên", "Giám đốc", "Kỹ thuật"];
+/** Riêng bước duyệt: thêm người nộp (nhận bản sao) và người chọn trong ô nhân sự của phiếu. */
+const LOAI_BUOC = [...LOAI_NGUOI, "Người nộp", "Người trong phiếu"];
 const UUID = /^[0-9a-f-]{36}$/i;
 const TRANG = "/ky-thuat/luong-phieu";
 
@@ -25,7 +27,7 @@ const ghiLichSu = (ma: string, doiTuong: string, hanhDong: "Thêm" | "Sửa" | "
   dbHr().from("pd_cau_hinh_lich_su").insert({ ma_phieu: ma, doi_tuong: doiTuong, hanh_dong: hanhDong, mo_ta: moTa, truoc: truoc ?? null, sau: sau ?? null, user_id: nd.id, ten_nguoi: nd.hoTen });
 
 const chuoi = (v: unknown, toiDa = 200) => (typeof v === "string" ? v.trim().slice(0, toiDa) : "");
-const moTaNguoi = (loai: string, chucDanh: string | null, tenNv: string | null) => (loai === "Chức danh" ? `Chức danh ${chucDanh}` : loai === "Nhân viên" ? `Nhân viên ${tenNv ?? ""}` : loai);
+const moTaNguoi = (loai: string, chucDanh: string | null, tenNv: string | null) => (loai === "Chức danh" ? `Chức danh ${chucDanh}` : loai === "Nhân viên" ? `Nhân viên ${tenNv ?? ""}` : loai === "Người trong phiếu" ? `Người chọn ở ô ${chucDanh}` : loai);
 
 async function tenNhanVien(id: string | null): Promise<string | null> {
   if (!id) return null;
@@ -45,15 +47,16 @@ export async function luuBuoc(v: BuocVao): Promise<KetQuaCauHinh> {
   const buoc = Number(v.buoc);
   if (!Number.isInteger(buoc) || buoc < 1 || buoc > 30) return { loi: "Bước số từ 1 đến 30." };
   if (!KIEU.includes(v.kieu)) return { loi: "Kiểu duyệt không hợp lệ." };
-  if (!LOAI_NGUOI.includes(v.loai_nguoi)) return { loi: "Loại người duyệt không hợp lệ." };
+  if (!LOAI_BUOC.includes(v.loai_nguoi)) return { loi: "Loại người duyệt không hợp lệ." };
   const chucDanh = chuoi(v.chuc_danh);
   const nvId = v.loai_nguoi === "Nhân viên" ? chuoi(v.nhan_vien_id, 40) : "";
   if (v.loai_nguoi === "Chức danh" && !chucDanh) return { loi: "Nhập chức danh cần duyệt." };
   if (v.loai_nguoi === "Nhân viên" && !UUID.test(nvId)) return { loi: "Chọn nhân sự." };
+  if (v.loai_nguoi === "Người trong phiếu" && !mau.truong.some((t) => t.ma === chucDanh && t.kieu === "nv")) return { loi: "Chọn ô nhân sự của phiếu." };
   const dkT = chuoi(v.dk_truong), dkG = chuoi(v.dk_gia_tri);
   if ((dkT === "") !== (dkG === "")) return { loi: "Điều kiện cần đủ cả ô và giá trị, hoặc bỏ trống cả hai." };
   if (dkT && !oDieuKhienDuoc(mau, "").some((t) => t.ma === dkT)) return { loi: "Ô điều kiện phải là ô chọn của phiếu này." };
-  const dong = { ma_phieu: v.ma_phieu, buoc, ten_buoc: chuoi(v.ten_buoc) || null, kieu: v.kieu, loai_nguoi: v.loai_nguoi, chuc_danh: v.loai_nguoi === "Chức danh" ? chucDanh : null, nhan_vien_id: nvId || null, dieu_kien_truong: dkT || null, dieu_kien_gia_tri: dkG || null };
+  const dong = { ma_phieu: v.ma_phieu, buoc, ten_buoc: chuoi(v.ten_buoc) || null, kieu: v.kieu, loai_nguoi: v.loai_nguoi, chuc_danh: v.loai_nguoi === "Chức danh" || v.loai_nguoi === "Người trong phiếu" ? chucDanh : null, nhan_vien_id: nvId || null, dieu_kien_truong: dkT || null, dieu_kien_gia_tri: dkG || null };
   const db = dbHr();
   const ten = await tenNhanVien(dong.nhan_vien_id);
   const mo = `Bước ${buoc} (${v.kieu}): ${moTaNguoi(v.loai_nguoi, dong.chuc_danh, ten)}${dkT ? `, khi ${dkT} = ${dkG}` : ""}`;

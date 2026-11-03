@@ -1,5 +1,7 @@
 /** Bộ phê duyệt chuyển từ Lark: kiểu ô, kiểm tra phiếu, số phiếu, luồng duyệt nhiều bước. Hàm thuần, không đụng DB (xem phe-duyet-data.ts, app/(app)/phe-duyet/actions.ts). */
 
+import { danhGiaDieuKien, type DieuKien } from "./dieu-kien";
+
 export type KieuTruong = "chu" | "nhieu" | "ngay" | "ngay_gio" | "so" | "tien" | "chon" | "dm" | "nv" | "tep" | "bang" | "cong" | "phieu";
 
 export type Truong = {
@@ -286,7 +288,7 @@ export const oDieuKhienDuoc = (mau: MauPhieu, truong: string) => mau.truong.filt
 // ---------------------------------------------------------------- luồng duyệt
 
 export type KieuBuoc = "AND" | "OR" | "CC";
-export type LoaiNguoiDuyet = "Quản lý trực tiếp" | "Quản lý cấp trên" | "Chức danh" | "Nhân viên" | "Giám đốc" | "Kỹ thuật";
+export type LoaiNguoiDuyet = "Quản lý trực tiếp" | "Quản lý cấp trên" | "Chức danh" | "Nhân viên" | "Giám đốc" | "Kỹ thuật" | "Người nộp" | "Người trong phiếu" | "Tự từ chối";
 
 export type HangLuong = {
   buoc: number;
@@ -297,12 +299,15 @@ export type HangLuong = {
   nhanVienId: string | null;
   dieuKienTruong: string | null;
   dieuKienGiaTri: string | null;
+  /** Cây điều kiện của nhánh Lark (lồng nhau, so sánh số tiền, hoặc, nhánh còn lại). */
+  dieuKien?: DieuKien | null;
 };
 
 /** Các hàng của luồng áp dụng cho phiếu này: hàng có điều kiện chỉ giữ khi ô điều kiện đúng giá trị. */
 export function hangApDung(luong: readonly HangLuong[], du: DuLieu): HangLuong[] {
   return luong
     .filter((h) => !h.dieuKienTruong || String(du[h.dieuKienTruong] ?? "") === h.dieuKienGiaTri)
+    .filter((h) => danhGiaDieuKien(h.dieuKien, du))
     .slice()
     .sort((a, b) => a.buoc - b.buoc);
 }
@@ -315,6 +320,8 @@ export type NguCanhNguoiDuyet = {
   giamDoc: readonly NhanSuDuyet[];
   /** Tài khoản Kỹ thuật (không có hồ sơ nhân sự). */
   kyThuat: readonly { userId: string; ten: string }[];
+  /** Dữ liệu phiếu đang nộp (cho kiểu "Người trong phiếu": đọc ô nhân sự của phiếu). */
+  duLieu?: DuLieu;
 };
 
 export type NguoiDuyet = { nhanVienId: string | null; userId: string | null; ten: string };
@@ -349,6 +356,17 @@ export function giaiNguoiDuyet(h: HangLuong, c: NguCanhNguoiDuyet): NguoiDuyet[]
     case "Giám đốc":
       ra.push(...c.giamDoc.filter((n) => !n.daNghi));
       break;
+    case "Người nộp": {
+      // Người nộp tự nhận bản sao của chính phiếu mình: không bị loại như người duyệt.
+      const n = c.nguoiNop && c.tatCa.find((x) => x.id === c.nguoiNop!.id && x.userId);
+      return n ? [{ nhanVienId: n.id, userId: n.userId, ten: n.hoTen }] : [];
+    }
+    case "Người trong phiếu": {
+      const v = c.duLieu?.[h.chucDanh ?? ""];
+      const ids = Array.isArray(v) ? v : typeof v === "string" ? [v] : [];
+      for (const id of ids) { const n = theoId(String(id)); if (n) ra.push(n); }
+      break;
+    }
     case "Kỹ thuật":
       return c.kyThuat.filter((k) => k.userId !== c.nguoiNop?.userId).map((k) => ({ nhanVienId: null, userId: k.userId, ten: k.ten }));
   }

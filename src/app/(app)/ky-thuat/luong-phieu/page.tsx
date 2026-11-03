@@ -19,7 +19,7 @@ export default async function TrangSetupLuongPhieu({ searchParams }: { searchPar
   const db = dbHr();
   const [nhom, danhMuc, nhanSu, buoc, soBuocTatCa, ghide, tb, ls] = await Promise.all([
     docNhomMa(), docDanhMuc(), taiDanhSachNhanSu(),
-    db.from("pd_luong_duyet").select("id, buoc, ten_buoc, kieu, loai_nguoi, chuc_danh, nhan_vien_id, dieu_kien_truong, dieu_kien_gia_tri").eq("ma_phieu", ma).order("buoc").order("tao_luc"),
+    db.from("pd_luong_duyet").select("id, buoc, ten_buoc, kieu, loai_nguoi, chuc_danh, nhan_vien_id, dieu_kien_truong, dieu_kien_gia_tri, dieu_kien").eq("ma_phieu", ma).order("buoc").order("tao_luc"),
     db.from("pd_luong_duyet").select("ma_phieu, buoc"),
     db.from("pd_o_cau_hinh").select("truong, bat_buoc, che_do_hien, hien_truong, hien_gia_tri").eq("ma_phieu", ma),
     db.from("pd_thong_bao_cau_hinh").select("id, su_kien, loai_nguoi, chuc_danh, nhan_vien_id, dang_bat").eq("ma_phieu", ma).order("tao_luc"),

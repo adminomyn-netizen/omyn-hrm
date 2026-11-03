@@ -1,5 +1,6 @@
 "use client";
 
+import { docDieuKien, moTaDieuKien } from "@/lib/dieu-kien";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Plus } from "lucide-react";
@@ -7,7 +8,7 @@ import { Chon } from "@/components/ui/Chon";
 import { NHAN_O, NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU, O_NHAP } from "@/components/ui/dinh-dang";
 import { luuBuoc, luuGhiDeO, luuNhomMa, luuThongBao, xoaBuoc, xoaThongBao, type KetQuaCauHinh } from "@/app/(app)/ky-thuat/luong-phieu/actions";
 
-type Hang = { id: string; buoc: number; ten_buoc: string | null; kieu: string; loai_nguoi: string; chuc_danh: string | null; nhan_vien_id: string | null; dieu_kien_truong: string | null; dieu_kien_gia_tri: string | null };
+type Hang = { id: string; buoc: number; ten_buoc: string | null; kieu: string; loai_nguoi: string; chuc_danh: string | null; nhan_vien_id: string | null; dieu_kien?: unknown; dieu_kien_truong: string | null; dieu_kien_gia_tri: string | null };
 type Tb = { id: string; su_kien: string; loai_nguoi: string; chuc_danh: string | null; nhan_vien_id: string | null; dang_bat: boolean };
 type GhiDe = { truong: string; bat_buoc: string; che_do_hien: string; hien_truong: string | null; hien_gia_tri: string[] | null };
 type Ls = { id: string; doi_tuong: string; hanh_dong: string; mo_ta: string; ten_nguoi: string | null; luc: string };
@@ -16,6 +17,7 @@ export type DuLieuCauHinh = { ma: string; ten: string; larkBuoc: string; nhomMac
 
 const KIEU = [{ gia_tri: "AND", nhan: "AND · mọi người đều phải duyệt" }, { gia_tri: "OR", nhan: "OR · một người duyệt là đủ" }, { gia_tri: "CC", nhan: "CC · chỉ nhận bản sao" }];
 const LOAI = ["Quản lý trực tiếp", "Quản lý cấp trên", "Chức danh", "Nhân viên", "Giám đốc", "Kỹ thuật"].map((x) => ({ gia_tri: x, nhan: x }));
+const LOAI_BUOC = [...LOAI, { gia_tri: "Người nộp", nhan: "Người nộp phiếu (nhận bản sao)" }, { gia_tri: "Người trong phiếu", nhan: "Người chọn trong phiếu" }];
 const SU_KIEN = ["Nộp phiếu", "Duyệt xong", "Từ chối", "Cần bổ sung", "Huỷ"].map((x) => ({ gia_tri: x, nhan: x }));
 const KIEU_O: Record<string, string> = { chu: "Chữ", nhieu: "Đoạn văn", ngay: "Ngày", ngay_gio: "Ngày giờ", so: "Số", tien: "Tiền", chon: "Chọn", dm: "Danh mục", nv: "Nhân sự", tep: "Tệp", bang: "Bảng", cong: "Tổng", phieu: "Nối phiếu" };
 const gio = (iso: string) => new Date(iso).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh", day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
@@ -58,13 +60,14 @@ function useChay() {
   return { loi, dang, chay };
 }
 
-function ChonNguoi({ loai, chucDanh, nvId, setChucDanh, setNvId, nhanSu }: { loai: string; chucDanh: string; nvId: string; setChucDanh: (v: string) => void; setNvId: (v: string) => void; nhanSu: DuLieuCauHinh["nhanSu"] }) {
+function ChonNguoi({ loai, chucDanh, nvId, setChucDanh, setNvId, nhanSu, oNv }: { oNv?: { ma: string; ten: string }[]; loai: string; chucDanh: string; nvId: string; setChucDanh: (v: string) => void; setNvId: (v: string) => void; nhanSu: DuLieuCauHinh["nhanSu"] }) {
   if (loai === "Chức danh") return <div><label className={NHAN_O}>Chức danh</label><input value={chucDanh} onChange={(e) => setChucDanh(e.target.value)} placeholder="Kế toán tổng hợp" className={O_NHAP} /></div>;
   if (loai === "Nhân viên") return <div><label className={NHAN_O}>Nhân sự</label><Chon ariaLabel="Nhân sự" trong="Chọn người" giaTri={nvId} onDoi={setNvId} luaChon={nhanSu.map((n) => ({ gia_tri: n.id, nhan: n.ten }))} /></div>;
+  if (loai === "Người trong phiếu") return <div><label className={NHAN_O}>Ô nhân sự của phiếu</label><Chon ariaLabel="Ô nhân sự" trong="Chọn ô" giaTri={chucDanh} onDoi={setChucDanh} luaChon={(oNv ?? []).map((t) => ({ gia_tri: t.ma, nhan: t.ten }))} /></div>;
   return null;
 }
 
-const tenNguoi = (loai: string, chucDanh: string | null, nvId: string | null, nhanSu: DuLieuCauHinh["nhanSu"]) => (loai === "Chức danh" ? `Chức danh “${chucDanh}”` : loai === "Nhân viên" ? nhanSu.find((n) => n.id === nvId)?.ten ?? "Nhân sự đã nghỉ" : loai);
+const tenNguoi = (loai: string, chucDanh: string | null, nvId: string | null, nhanSu: DuLieuCauHinh["nhanSu"]) => (loai === "Chức danh" ? `Chức danh “${chucDanh}”` : loai === "Người nộp" ? "Người nộp phiếu" : loai === "Người trong phiếu" ? `Người chọn ở ô “${chucDanh}”` : loai === "Nhân viên" ? nhanSu.find((n) => n.id === nvId)?.ten ?? "Nhân sự đã nghỉ" : loai);
 
 // ------------------------------------------------------------------ Luồng duyệt
 
@@ -84,7 +87,7 @@ function TabBuoc({ d }: { d: DuLieuCauHinh }) {
               {d.buoc.filter((h) => h.buoc === b).map((h) => (
                 <li key={h.id} className="flex flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2.5 text-[14px]">
                   <span className="rounded-tag bg-giay-tram px-2 py-0.5 text-[12px] font-medium text-muc-2">{h.kieu}</span>
-                  <span className="min-w-0 flex-1 text-muc">{tenNguoi(h.loai_nguoi, h.chuc_danh, h.nhan_vien_id, d.nhanSu)}{h.dieu_kien_truong && <span className="ml-2 text-[13px] text-muc-3">chỉ khi {d.truong.find((t) => t.ma === h.dieu_kien_truong)?.ten ?? h.dieu_kien_truong} = {h.dieu_kien_gia_tri}</span>}</span>
+                  <span className="min-w-0 flex-1 text-muc">{tenNguoi(h.loai_nguoi, h.chuc_danh, h.nhan_vien_id, d.nhanSu)}{h.dieu_kien != null && <span className="ml-2 block text-[13px] text-muc-3">Chỉ khi {moTaDieuKien(docDieuKien(h.dieu_kien), (m) => d.truong.find((t) => t.ma === m)?.ten ?? m) || "điều kiện không đọc được"}</span>}{h.dieu_kien_truong && <span className="ml-2 text-[13px] text-muc-3">chỉ khi {d.truong.find((t) => t.ma === h.dieu_kien_truong)?.ten ?? h.dieu_kien_truong} = {h.dieu_kien_gia_tri}</span>}</span>
                   <button type="button" className={NUT_CHU} onClick={() => setSua(h)}>Sửa</button>
                   <button type="button" disabled={dang} className={NUT_CHU_NGUY} onClick={() => { if (window.confirm("Xoá dòng này khỏi luồng duyệt?")) chay(() => xoaBuoc(d.ma, h.id)); }}>Xoá</button>
                 </li>
@@ -122,8 +125,8 @@ function FormBuoc({ d, oDk, dau, xong }: { d: DuLieuCauHinh; oDk: Truong[]; dau:
         <div><label className={NHAN_O}>Bước số</label><input inputMode="numeric" value={buoc} onChange={(e) => setBuoc(e.target.value.replace(/\D/g, ""))} className={O_NHAP} /></div>
         <div><label className={NHAN_O}>Tên bước (tuỳ chọn)</label><input value={ten} onChange={(e) => setTen(e.target.value)} placeholder="Kế toán kiểm tra" className={O_NHAP} /></div>
         <div><label className={NHAN_O}>Kiểu</label><Chon ariaLabel="Kiểu" giaTri={kieu} onDoi={setKieu} luaChon={KIEU} /></div>
-        <div><label className={NHAN_O}>Người duyệt / nhận là</label><Chon ariaLabel="Người duyệt" giaTri={loai} onDoi={setLoai} luaChon={LOAI} /></div>
-        <ChonNguoi loai={loai} chucDanh={cd} nvId={nv} setChucDanh={setCd} setNvId={setNv} nhanSu={d.nhanSu} />
+        <div><label className={NHAN_O}>Người duyệt / nhận là</label><Chon ariaLabel="Người duyệt" giaTri={loai} onDoi={setLoai} luaChon={LOAI_BUOC} /></div>
+        <ChonNguoi loai={loai} chucDanh={cd} nvId={nv} setChucDanh={setCd} setNvId={setNv} nhanSu={d.nhanSu} oNv={d.truong.filter((t) => t.kieu === "nv")} />
         <div className="sm:col-span-2">
           <label className={NHAN_O}>Chỉ áp dụng khi (tuỳ chọn — dùng cho nhánh theo đơn vị/phòng)</label>
           <div className="grid gap-2 sm:grid-cols-2">

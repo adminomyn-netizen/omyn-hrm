@@ -1,5 +1,6 @@
 "use server";
 
+import { khoaDacBiet } from "@/lib/dieu-kien";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
@@ -127,8 +128,13 @@ export async function nopPhieu(ma: string, du: Record<string, unknown>, tep: Tep
   const loiLuu = await luuTep(id, tep);
   if (loiLuu) return huyPhieuLoi(loiLuu);
 
-  const ctx = await nguCanhNguoiDuyet(nguoiNop);
-  let hang: HangLuong[] = hangApDung(await docLuong(ma), sach);
+  const ctx = { ...(await nguCanhNguoiDuyet(nguoiNop)), duLieu: sach };
+  // Điều kiện "người nộp thuộc đơn vị …" (chép từ Lark): đối chiếu với tên khối của người nộp.
+  const { data: khoiNop } = await db.from("nhan_vien").select("khoi:khoi_id(ten)").eq("id", nguoiNop.id).maybeSingle();
+  const tenKhoiNop = ((khoiNop as { khoi?: { ten?: string } | null } | null)?.khoi?.ten) ?? "";
+  let hang: HangLuong[] = hangApDung(await docLuong(ma), { ...sach, ...khoaDacBiet(sach, nguoiNop, ctx.tatCa, tenKhoiNop) });
+  const tuChoiSan = hang.find((h) => h.loaiNguoi === "Tự từ chối");
+  if (tuChoiSan) return huyPhieuLoi(tuChoiSan.tenBuoc || "Phiếu này bị hệ thống tự từ chối theo quy định, không nộp được.");
   let cacO = dungCacO(hang, ctx).map((x) => ({ ...x, id: crypto.randomUUID() }));
   let kq = batDauLuong(cacO);
   if (kq.trangThai === "Đã duyệt") {
