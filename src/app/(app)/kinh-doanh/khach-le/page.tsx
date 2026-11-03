@@ -4,6 +4,7 @@ import Link from "next/link";
 import { yeuCauQuyenSo } from "@/lib/quyen-nghiep-vu";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { docTatCa } from "@/lib/hr-db";
+import { layDongDiemGop } from "@/lib/kinh-doanh-db";
 import { tinhDiemKhach } from "@/lib/kinh-doanh";
 import { ngayHomNayHCM } from "@/lib/data";
 
@@ -12,9 +13,9 @@ const so = (n: number) => n.toLocaleString("vi-VN");
 /** Điểm và hạng từng khách lẻ, tính từ sổ điểm theo tham số ở màn Tham số điểm. Không nhập tay. */
 export default async function TrangDiemKhachLe() {
   await yeuCauQuyenSo("Kinh doanh");
-  const [kh, dd, hg, chd] = await Promise.all([
+  const [kh, dong, hg, chd] = await Promise.all([
     docTatCa<{ id: string; ten: string; kenh: string; dong_y_nhan_tin: boolean }>("kd_khach_le", "id, ten, kenh, dong_y_nhan_tin"),
-    docTatCa<{ khach_le_id: string; loai: string; ngay: string; so_tien: number | null; so_diem: number }>("kd_diem_khach", "id, khach_le_id, loai, ngay, so_tien, so_diem"),
+    layDongDiemGop(),
     docTatCa<{ ten: string; mua_toi_thieu: number; he_so_tich_pt: number }>("kd_hang_khach", "id, ten, mua_toi_thieu, he_so_tich_pt"),
     docTatCa<{ dong_moi_diem: number; dong_giam_moi_diem: number; het_han_thang: number; cua_so_hang_thang: number }>("kd_diem_cau_hinh", "id, dong_moi_diem, dong_giam_moi_diem, het_han_thang, cua_so_hang_thang"),
   ]);
@@ -23,7 +24,7 @@ export default async function TrangDiemKhachLe() {
   const ds = ch
     ? tinhDiemKhach(
         kh.map((k) => ({ id: k.id, ten: k.ten, kenh: k.kenh, dongYNhanTin: k.dong_y_nhan_tin })),
-        dd.map((d) => ({ khachId: d.khach_le_id, loai: d.loai, ngay: d.ngay, soTien: d.so_tien, soDiem: d.so_diem })),
+        dong,
         hg.map((h) => ({ ten: h.ten, muaToiThieu: h.mua_toi_thieu, heSoPt: h.he_so_tich_pt })),
         ch,
         ngayHomNayHCM(),
@@ -34,8 +35,9 @@ export default async function TrangDiemKhachLe() {
   const chuaDongY = ds.filter((d) => !d.dongYNhanTin).length;
   return (
     <>
-      <TieuDeTrang tieuDe="Điểm và hạng khách lẻ" phu="Điểm tích theo số tiền mua, nhân hệ số của hạng; hạng theo tổng mua gần đây. Số lấy từ sổ điểm, không nhập tay.">
-        <Link href="/hr/diem-khach" className="nut-vang rounded-nho px-3.5 py-2 text-[14px] font-medium">Ghi mua, tặng, dùng điểm</Link>
+      <TieuDeTrang tieuDe="Điểm và hạng khách lẻ" phu="Điểm tự cộng từ Sổ đơn lẻ (đơn đã giao có gắn khách), nhân hệ số của hạng; hạng theo tổng mua gần đây. Không nhập tay.">
+        <Link href="/hr/don-le" className="nut-vang rounded-nho px-3.5 py-2 text-[14px] font-medium">Ghi đơn lẻ</Link>
+        <Link href="/hr/diem-khach" className="rounded-nho border border-vien px-3.5 py-2 text-[14px] font-medium">Tặng, dùng điểm</Link>
       </TieuDeTrang>
       <p className="mb-4 rounded-nho border border-vien px-4 py-3 text-[13px] text-muc-2">
         <strong className="font-semibold text-muc">Tham số TẠM, chờ chị Linh/chị Lâm duyệt.</strong>{" "}

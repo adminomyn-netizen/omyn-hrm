@@ -12,11 +12,13 @@ const DA_CHOT = ["Đã chốt", "Đang giao", "Đã giao", "Đã thu đủ"];
 /** Lãi gộp theo kênh: biên theo bảng giá đã duyệt, và lãi thực tế kênh sỉ. Chỉ tính khi có giá vốn, thiếu thì nói rõ, không đoán. */
 export default async function TrangLaiGop() {
   await yeuCauQuyenSo("Kinh doanh");
-  const [sp, gia, don, dong] = await Promise.all([
+  const [sp, gia, don, dong, dl, dld] = await Promise.all([
     docTatCa<{ id: string; ma_sp: string; ten: string }>("sp_san_pham", "id, ma_sp, ten"),
     docTatCa<{ san_pham_id: string; kenh: string; gia_von: number | null; gia_ban: number | null; trang_thai: string; hieu_luc_tu: string | null; tao_luc: string }>("sp_gia", "id, san_pham_id, kenh, gia_von, gia_ban, trang_thai, hieu_luc_tu, tao_luc"),
     docTatCa<{ id: string; trang_thai: string }>("kd_don_si", "id, trang_thai"),
     docTatCa<{ don_si_id: string; san_pham_id: string; so_luong: number; don_gia: number; chiet_khau: number }>("kd_don_si_dong", "id, don_si_id, san_pham_id, so_luong, don_gia, chiet_khau"),
+    docTatCa<{ id: string; kenh: string; trang_thai: string }>("kd_don_le", "id, kenh, trang_thai"),
+    docTatCa<{ don_le_id: string; san_pham_id: string; so_luong: number; don_gia: number; chiet_khau: number }>("kd_don_le_dong", "id, don_le_id, san_pham_id, so_luong, don_gia, chiet_khau"),
   ]);
   const ten = new Map(sp.map((s) => [s.id, `${s.ten} (${s.ma_sp})`]));
   const g = gia.map((x) => ({ sanPhamId: x.san_pham_id, kenh: x.kenh, giaVon: x.gia_von, giaBan: x.gia_ban, trangThai: x.trang_thai, hieuLucTu: x.hieu_luc_tu, taoLuc: x.tao_luc }));
@@ -26,6 +28,13 @@ export default async function TrangLaiGop() {
     dong.filter((d) => donChot.has(d.don_si_id)).map((d) => ({ sanPhamId: d.san_pham_id, soLuong: d.so_luong, donGia: d.don_gia, chietKhau: d.chiet_khau })),
     giaVonMoiNhat(g),
   );
+  const von = giaVonMoiNhat(g);
+  const kenhDonLe = new Map(dl.filter((d) => d.trang_thai === "Đã giao").map((d) => [d.id, d.kenh]));
+  const leTheoKenh = [...new Set(kenhDonLe.values())].sort().map((k) => ({
+    kenh: k,
+    soDon: [...kenhDonLe.values()].filter((x) => x === k).length,
+    ...laiGopSi(dld.filter((d) => kenhDonLe.get(d.don_le_id) === k).map((d) => ({ sanPhamId: d.san_pham_id, soLuong: d.so_luong, donGia: d.don_gia, chietKhau: d.chiet_khau })), von),
+  }));
   const pt = (n: number | null) => (n === null ? "—" : `${n.toLocaleString("vi-VN")}%`);
   return (
     <>
@@ -88,8 +97,26 @@ export default async function TrangLaiGop() {
           </>
         )}
       </section>
+      <h2 className="chu-tieu-de mb-2 text-[20px] text-muc">Lãi gộp thực tế kênh lẻ (từ Sổ đơn lẻ)</h2>
+      <section data-m="7" className="mau-nhom the-noi the-noi-thap mau-vach mb-6 overflow-x-auto">
+        {leTheoKenh.length === 0 ? <p className="px-4 py-6 text-[14px] text-muc-3">Chưa có đơn lẻ đã giao nào. Ghi đơn ở <Link href="/hr/don-le" className="underline">Sổ đơn lẻ</Link>, thêm dòng hàng ở <Link href="/hr/don-le-dong-hang" className="underline">Dòng hàng đơn lẻ</Link>.</p> : (
+          <table className="w-full min-w-[760px] text-[14px]">
+            <thead><tr className="text-left text-[12px] font-medium text-muc-3"><th className="px-4 py-3">Kênh</th><th className="px-4 py-3 text-right">Đơn đã giao</th><th className="px-4 py-3 text-right">Doanh thu theo dòng hàng</th><th className="px-4 py-3 text-right">Dòng có giá vốn</th><th className="px-4 py-3 text-right">Lãi gộp</th><th className="px-4 py-3 text-right">Biên</th></tr></thead>
+            <tbody>{leTheoKenh.map((k) => (
+              <tr key={k.kenh} className="border-t border-vien">
+                <td className="px-4 py-3 font-medium text-muc">{k.kenh}</td>
+                <td className="px-4 py-3 text-right tabular-nums">{k.soDon}</td>
+                <td className="px-4 py-3 text-right tabular-nums">{k.soDong === 0 ? "chưa có dòng hàng" : tienVN(k.doanhThu)}</td>
+                <td className={`px-4 py-3 text-right tabular-nums ${k.soDongCoVon < k.soDong ? "text-canh-bao" : ""}`}>{k.soDongCoVon}/{k.soDong}</td>
+                <td className="px-4 py-3 text-right tabular-nums">{k.laiGop === null ? "—" : tienVN(k.laiGop)}</td>
+                <td className="px-4 py-3 text-right font-semibold tabular-nums">{pt(k.phanTram)}</td>
+              </tr>))}
+            </tbody>
+          </table>
+        )}
+      </section>
       <p className="rounded-nho border border-vien px-4 py-3 text-[13px] text-muc-2">
-        Kênh sàn, Facebook, lẻ: app chưa có số lượng bán theo sản phẩm nên chưa tính lãi gộp thực tế, chỉ có biên theo bảng giá ở trên. Giá vốn lấy từ dòng giá đã duyệt mới nhất của sản phẩm. Chưa trừ phí sàn, vận chuyển, khuyến mãi.
+        Kênh lẻ chỉ tính trên các dòng hàng đã ghi và có giá vốn đã duyệt; đơn chưa có dòng hàng thì không tính lãi, không đoán. Giá vốn lấy từ dòng giá đã duyệt mới nhất của sản phẩm. Chưa trừ phí sàn, vận chuyển, khuyến mãi.
       </p>
     </>
   );

@@ -726,8 +726,35 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
+    ma: "don-le", ten: "Sổ đơn lẻ", nhom: "Kinh doanh", bang: "kd_don_le", tieuDe: "ma_don", trangThai: "trang_thai",
+    moTa: "Đơn bán lẻ từ sàn, Facebook, Zalo, điện thoại. Đơn ĐÃ GIAO có gắn khách thì điểm khách tự cộng (không cần ghi tay ở Sổ điểm); hoàn trả hoặc huỷ thì điểm tự mất theo. Mỗi kênh một mã đơn chỉ ghi một lần. Thêm dòng hàng ở màn Dòng hàng đơn lẻ để tính lãi gộp.",
+    sapXep: { cot: "ngay", giam: true }, trong: "Chưa có đơn lẻ nào.",
+    cot: [
+      { k: "ngay", nhan: "Ngày đơn", kieu: "ngay", batBuoc: true, the: true },
+      { k: "ma_don", nhan: "Mã đơn", kieu: "chu", batBuoc: true },
+      { k: "kenh", nhan: "Kênh", kieu: "chon", luaChon: ["Shopee", "TikTok Shop", "Facebook", "Zalo", "Điện thoại", "Khác"], mac: "Facebook", the: true },
+      { k: "khach_le_id", nhan: "Khách lẻ (để trống nếu khách vãng lai, không tích điểm)", kieu: "tc", bangTc: "kd_khach_le", the: true },
+      { k: "gia_tri", nhan: "Tiền khách trả (đ)", kieu: "tien", batBuoc: true, the: true },
+      { k: "trang_thai", nhan: "Trạng thái", kieu: "chon", luaChon: ["Đang xử lý", "Đã giao", "Hoàn trả", "Huỷ"], mac: "Đang xử lý" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
+    ma: "don-le-dong-hang", ten: "Dòng hàng đơn lẻ", nhom: "Kinh doanh", bang: "kd_don_le_dong", tieuDe: "don_le_id",
+    moTa: "Sản phẩm trong đơn lẻ: số lượng, đơn giá, chiết khấu. Không bắt buộc; có dòng hàng thì màn Lãi gộp theo kênh tính được lãi gộp thực tế cho kênh lẻ (cần giá vốn đã duyệt).",
+    sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có dòng hàng nào. Tạo đơn ở màn Sổ đơn lẻ trước.",
+    cot: [
+      { k: "don_le_id", nhan: "Đơn lẻ", kieu: "tc", bangTc: "kd_don_le", batBuoc: true, the: true },
+      { k: "san_pham_id", nhan: "Sản phẩm", kieu: "tc", bangTc: "sp_san_pham", batBuoc: true, the: true },
+      { k: "so_luong", nhan: "Số lượng", kieu: "so", batBuoc: true, mac: 1, khoang: [1, 1000000], the: true },
+      { k: "don_gia", nhan: "Đơn giá (đ)", kieu: "tien", batBuoc: true, the: true },
+      { k: "chiet_khau", nhan: "Chiết khấu (%)", kieu: "so", mac: 0, khoang: [0, 100], the: true },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
     ma: "diem-khach", ten: "Sổ điểm khách lẻ", nhom: "Kinh doanh", bang: "kd_diem_khach", tieuDe: "khach_le_id",
-    moTa: "Mỗi lần khách MUA (ghi số tiền, điểm tự tính theo tham số và hạng lúc mua), TẶNG điểm (cộng tay) hoặc DÙNG điểm (trừ điểm, lấy điểm cũ nhất trước). Số dư, hạng, điểm sắp hết hạn tự tính ở màn Điểm và hạng, không nhập tay. Tham số đang TẠM, chờ chị Linh/chị Lâm duyệt.",
+    moTa: "Điểm MUA tự cộng từ Sổ đơn lẻ (đơn đã giao có gắn khách); chỉ ghi Mua tay ở đây khi đơn không có trong Sổ đơn lẻ (ghi mã đơn để không bị cộng đôi). TẶNG điểm (cộng tay) hoặc DÙNG điểm (trừ điểm, lấy điểm cũ nhất trước). Số dư, hạng, điểm sắp hết hạn tự tính ở màn Điểm và hạng, không nhập tay. Tham số đang TẠM, chờ chị Linh/chị Lâm duyệt.",
     sapXep: { cot: "ngay", giam: true }, trong: "Chưa có lần mua, tặng hay dùng điểm nào. Thêm khách ở màn Khách lẻ trước.",
     cot: [
       { k: "khach_le_id", nhan: "Khách lẻ", kieu: "tc", bangTc: "kd_khach_le", batBuoc: true, the: true },

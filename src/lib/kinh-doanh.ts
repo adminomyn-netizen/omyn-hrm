@@ -121,7 +121,7 @@ export function doiChieuDonSi(
 
 export type DiemCauHinh = { dongMoiDiem: number; dongGiamMoiDiem: number; hetHanThang: number; cuaSoHangThang: number };
 export type HangKhach = { ten: string; muaToiThieu: number; heSoPt: number };
-export type DongDiem = { khachId: string; loai: string; ngay: string; soTien: number | null; soDiem: number };
+export type DongDiem = { khachId: string; loai: string; ngay: string; soTien: number | null; soDiem: number; maDon?: string | null };
 export type DiemKhach = {
   id: string; ten: string; kenh: string; dongYNhanTin: boolean;
   /** Tổng mua trong cửa sổ hạng (mặc định 12 tháng gần nhất). */
@@ -254,4 +254,17 @@ export function laiGopSi(dong: readonly { sanPhamId: string; soLuong: number; do
   }
   const lai = soDongCoVon ? doanhThuCoVon - tongVon : null;
   return { doanhThu, doanhThuCoVon, von: tongVon, laiGop: lai, phanTram: lai !== null && doanhThuCoVon > 0 ? Math.round((lai / doanhThuCoVon) * 1000) / 10 : null, soDong: dong.length, soDongCoVon, thieuVon: [...thieu] };
+}
+
+export type DonLeTinhDiem = { khachId: string | null; ngay: string; maDon: string; giaTri: number; trangThai: string };
+
+/**
+ * Các dòng "Mua" tự sinh từ Sổ đơn lẻ: chỉ đơn ĐÃ GIAO và có gắn khách. Đơn hoàn trả, huỷ hay đang xử lý không cộng điểm (đổi trạng thái là điểm tự đổi theo vì điểm luôn tính lại).
+ * Nếu sổ điểm đã có dòng Mua ghi tay cùng mã đơn của cùng khách thì bỏ dòng tự sinh, để không cộng đôi.
+ */
+export function dongMuaTuDonLe(don: readonly DonLeTinhDiem[], dongTay: readonly DongDiem[]): DongDiem[] {
+  const daGhi = new Set(dongTay.filter((d) => d.loai === "Mua" && d.maDon?.trim()).map((d) => `${d.khachId}|${d.maDon!.trim()}`));
+  return don
+    .filter((d) => d.trangThai === "Đã giao" && d.khachId && !daGhi.has(`${d.khachId}|${d.maDon.trim()}`))
+    .map((d) => ({ khachId: d.khachId as string, loai: "Mua", ngay: d.ngay, soTien: d.giaTri, soDiem: 0, maDon: d.maDon }));
 }

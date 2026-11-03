@@ -240,3 +240,27 @@ describe("lãi gộp theo kênh", () => {
     expect(r.phanTram).toBeNull();
   });
 });
+
+import { dongMuaTuDonLe } from "@/lib/kinh-doanh";
+
+describe("điểm tự cộng từ sổ đơn lẻ", () => {
+  const don = (o: object) => ({ khachId: "a", ngay: "2026-11-01", maDon: "D1", giaTri: 500000, trangThai: "Đã giao", ...o });
+  it("chỉ đơn đã giao có gắn khách mới sinh dòng Mua", () => {
+    const r = dongMuaTuDonLe([don({}), don({ maDon: "D2", trangThai: "Hoàn trả" }), don({ maDon: "D3", trangThai: "Huỷ" }), don({ maDon: "D4", trangThai: "Đang xử lý" }), don({ maDon: "D5", khachId: null })], []);
+    expect(r).toEqual([{ khachId: "a", loai: "Mua", ngay: "2026-11-01", soTien: 500000, soDiem: 0, maDon: "D1" }]);
+  });
+  it("bỏ dòng tự sinh nếu sổ điểm đã ghi tay cùng mã đơn của cùng khách (không cộng đôi)", () => {
+    const tay = [{ khachId: "a", loai: "Mua", ngay: "2026-11-01", soTien: 500000, soDiem: 0, maDon: " D1 " }];
+    expect(dongMuaTuDonLe([don({}), don({ maDon: "D6", khachId: "b" })], tay).map((x) => x.maDon)).toEqual(["D6"]);
+    expect(dongMuaTuDonLe([don({ khachId: "b" })], tay).length).toBe(1);
+  });
+  it("điểm khớp công thức hiện có: đơn 1.000.000đ → 100 điểm ở hạng Thành viên", () => {
+    const kh = [{ id: "a", ten: "An", kenh: "Facebook", dongYNhanTin: true }];
+    const hang = [{ ten: "Thành viên", muaToiThieu: 0, heSoPt: 100 }];
+    const ch = { dongMoiDiem: 10000, dongGiamMoiDiem: 100, hetHanThang: 12, cuaSoHangThang: 12 };
+    const r = tinhDiemKhach(kh, dongMuaTuDonLe([don({ giaTri: 1000000 })], []), hang, ch, "2026-11-03");
+    expect(r[0]).toMatchObject({ daTich: 100, soDu: 100, hang: "Thành viên" });
+    const hoan = tinhDiemKhach(kh, dongMuaTuDonLe([don({ giaTri: 1000000, trangThai: "Hoàn trả" })], []), hang, ch, "2026-11-03");
+    expect(hoan[0]).toMatchObject({ daTich: 0, soDu: 0, muaCuaSo: 0 });
+  });
+});

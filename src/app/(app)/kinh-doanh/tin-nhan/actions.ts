@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
 import { quyenTrenSo } from "@/lib/quyen-nghiep-vu";
 import { dbHr, docTatCa } from "@/lib/hr-db";
+import { layDongDiemGop } from "@/lib/kinh-doanh-db";
 import { ngayHomNayHCM } from "@/lib/data";
 import { tinhDiemKhach } from "@/lib/kinh-doanh";
 import { lapHangDoi } from "@/lib/tin-nhan";
@@ -21,9 +22,9 @@ export async function lapHangDoiHomNay(): Promise<KetQuaLap> {
     if (q.muc !== "nhap") return { loi: "Bạn không có quyền thực hiện thao tác này." };
   }
   const homNay = ngayHomNayHCM();
-  const [kh, dd, hg, chd, kb, mt, co] = await Promise.all([
+  const [kh, dong, hg, chd, kb, mt, co] = await Promise.all([
     docTatCa<{ id: string; ten: string; kenh: string; dien_thoai: string | null; ngay_sinh: string | null; dong_y_nhan_tin: boolean }>("kd_khach_le", "id, ten, kenh, dien_thoai, ngay_sinh, dong_y_nhan_tin"),
-    docTatCa<{ khach_le_id: string; loai: string; ngay: string; so_tien: number | null; so_diem: number }>("kd_diem_khach", "id, khach_le_id, loai, ngay, so_tien, so_diem"),
+    layDongDiemGop(),
     docTatCa<{ ten: string; mua_toi_thieu: number; he_so_tich_pt: number }>("kd_hang_khach", "id, ten, mua_toi_thieu, he_so_tich_pt"),
     docTatCa<{ dong_moi_diem: number; dong_giam_moi_diem: number; het_han_thang: number; cua_so_hang_thang: number }>("kd_diem_cau_hinh", "id, dong_moi_diem, dong_giam_moi_diem, het_han_thang, cua_so_hang_thang"),
     docTatCa<{ id: string; su_kien: string; so_ngay: number; mau_tin_id: string; bat: boolean }>("tn_kich_ban", "id, su_kien, so_ngay, mau_tin_id, bat"),
@@ -34,7 +35,7 @@ export async function lapHangDoiHomNay(): Promise<KetQuaLap> {
   const diem = c
     ? tinhDiemKhach(
         kh.map((k) => ({ id: k.id, ten: k.ten, kenh: k.kenh, dongYNhanTin: k.dong_y_nhan_tin })),
-        dd.map((d) => ({ khachId: d.khach_le_id, loai: d.loai, ngay: d.ngay, soTien: d.so_tien, soDiem: d.so_diem })),
+        dong,
         hg.map((h) => ({ ten: h.ten, muaToiThieu: h.mua_toi_thieu, heSoPt: h.he_so_tich_pt })),
         { dongMoiDiem: c.dong_moi_diem, dongGiamMoiDiem: c.dong_giam_moi_diem, hetHanThang: c.het_han_thang, cuaSoHangThang: c.cua_so_hang_thang },
         homNay,
@@ -43,7 +44,7 @@ export async function lapHangDoiHomNay(): Promise<KetQuaLap> {
   const muc = lapHangDoi(
     kh.map((k) => ({ id: k.id, ten: k.ten, dienThoai: k.dien_thoai, ngaySinh: k.ngay_sinh, dongYNhanTin: k.dong_y_nhan_tin })),
     diem,
-    dd.map((d) => ({ khachId: d.khach_le_id, loai: d.loai, ngay: d.ngay, soTien: d.so_tien, soDiem: d.so_diem })),
+    dong,
     kb.map((k) => ({ id: k.id, suKien: k.su_kien, soNgay: k.so_ngay, mauTinId: k.mau_tin_id, bat: k.bat })),
     mt.map((m) => ({ id: m.id, kenh: m.kenh, noiDung: m.noi_dung, dangDung: m.dang_dung })),
     co.map((x) => ({ khachId: x.khach_le_id, kichBanId: x.kich_ban_id, ngay: x.ngay_du_kien })),
