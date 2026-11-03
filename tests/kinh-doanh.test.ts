@@ -174,3 +174,45 @@ describe("điểm và hạng khách lẻ (tham số tạm)", () => {
     expect(congThang("2026-11-02", -12)).toBe("2025-11-02");
   });
 });
+
+import { bienLaTrongMau, dienMau, lapHangDoi } from "../src/lib/tin-nhan";
+
+describe("khung tin nhắn khách lẻ", () => {
+  const khach = [
+    { id: "a", ten: "An", dienThoai: "0900000001", ngaySinh: "1990-11-05", dongYNhanTin: true },
+    { id: "b", ten: "Bình", dienThoai: "0900000002", ngaySinh: "1990-11-05", dongYNhanTin: false },
+    { id: "c", ten: "Chi", dienThoai: "", ngaySinh: "1990-11-05", dongYNhanTin: true },
+  ];
+  const mau = [{ id: "m1", kenh: "Zalo" as const, noiDung: "Chào {ten}, hạng {hang}, {diem} điểm", dangDung: true }];
+  const diem = [{ id: "a", ten: "An", kenh: "Zalo", dongYNhanTin: true, muaCuaSo: 0, hang: "Bạc", heSoPt: 120, daTich: 5, dung: 0, hetHan: 0, soDu: 5, soDuTien: 500, sapHet: 5, thieu: 0 }];
+  const kb = (suKien: string, soNgay = 0, bat = true) => [{ id: "k1", suKien, soNgay, mauTinId: "m1", bat }];
+  it("điền biến, nhận ra biến lạ", () => {
+    expect(dienMau("{ten} {hang} {diem}", { ten: "An", hang: null, diem: 1500 })).toBe("An chưa có hạng 1.500");
+    expect(bienLaTrongMau("Chào {ten} {sdt}")).toEqual(["sdt"]);
+  });
+  it("sinh nhật: chỉ khách đồng ý + có số điện thoại", () => {
+    const r = lapHangDoi(khach, diem, [], kb("Sinh nhật"), mau, [], "2026-11-05");
+    expect(r.map((x) => x.khachId)).toEqual(["a"]);
+    expect(r[0].noiDung).toBe("Chào An, hạng Bạc, 5 điểm");
+  });
+  it("sinh nhật báo trước N ngày", () => {
+    expect(lapHangDoi(khach, diem, [], kb("Sinh nhật", 3), mau, [], "2026-11-02").length).toBe(1);
+    expect(lapHangDoi(khach, diem, [], kb("Sinh nhật", 3), mau, [], "2026-11-03").length).toBe(0);
+  });
+  it("sau khi mua: đúng N ngày kể từ lần mua gần nhất", () => {
+    const dong = [{ khachId: "a", loai: "Mua", ngay: "2026-10-01", soTien: 1, soDiem: 0 }, { khachId: "a", loai: "Mua", ngay: "2026-11-01", soTien: 1, soDiem: 0 }];
+    expect(lapHangDoi(khach, diem, dong, kb("Sau khi mua", 1), mau, [], "2026-11-02").length).toBe(1);
+    expect(lapHangDoi(khach, diem, dong, kb("Sau khi mua", 32), mau, [], "2026-11-02").length).toBe(0);
+  });
+  it("kịch bản tắt hoặc mẫu ngừng dùng thì không lập; không lập trùng", () => {
+    expect(lapHangDoi(khach, diem, [], kb("Sinh nhật", 0, false), mau, [], "2026-11-05")).toEqual([]);
+    expect(lapHangDoi(khach, diem, [], kb("Sinh nhật"), [{ ...mau[0], dangDung: false }], [], "2026-11-05")).toEqual([]);
+    expect(lapHangDoi(khach, diem, [], kb("Sinh nhật"), mau, [{ khachId: "a", kichBanId: "k1", ngay: "2026-11-05" }], "2026-11-05")).toEqual([]);
+  });
+  it("điểm sắp hết hạn: dùng số điểm sắp hết, chỉ 1 tin trong 30 ngày", () => {
+    const r = lapHangDoi(khach, diem, [], kb("Điểm sắp hết hạn"), [{ ...mau[0], noiDung: "{diem}" }], [], "2026-11-05");
+    expect(r[0].noiDung).toBe("5");
+    expect(lapHangDoi(khach, diem, [], kb("Điểm sắp hết hạn"), mau, [{ khachId: "a", kichBanId: "k1", ngay: "2026-10-20" }], "2026-11-05")).toEqual([]);
+    expect(lapHangDoi(khach, diem, [], kb("Điểm sắp hết hạn"), mau, [{ khachId: "a", kichBanId: "k1", ngay: "2026-10-01" }], "2026-11-05").length).toBe(1);
+  });
+});
