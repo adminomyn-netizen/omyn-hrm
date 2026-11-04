@@ -91,8 +91,8 @@ export function ThoaThuanLuong({ ds }: { ds: ThoaThuanView[] }) {
               </div>
               <div>
                 <label className={NHAN_O} htmlFor="tt-kpi">% KPI nền trong lương</label>
-                <input id="tt-kpi" name="ty_le_kpi" type="number" min={0} max={50} defaultValue={t?.ty_le_kpi ?? 10} className={`${O_NHAP} text-right`} />
-                <div className="mt-1 text-[12px] text-muc-3">10% cho nhân viên; Ban điều hành để 0.</div>
+                <input id="tt-kpi" name="ty_le_kpi" type="number" min={0} max={50} defaultValue={t?.ty_le_kpi ?? ""} placeholder="0" className={`${O_NHAP} text-right`} />
+                <div className="mt-1 text-[12px] text-muc-3">Để trống là 0%. Xuất bảng lương xem rồi điều chỉnh sau.</div>
               </div>
               <div>
                 <label className={NHAN_O} htmlFor="tt-pc">Phụ cấp cố định mỗi tháng</label>
@@ -109,6 +109,7 @@ export function ThoaThuanLuong({ ds }: { ds: ThoaThuanView[] }) {
               <div className="flex flex-col gap-3 sm:col-span-2">
                 <Gat ten="dong_bh" nhan="Đóng bảo hiểm (BHXH, BHYT, BHTN)" giaTriMacDinh={t?.dong_bh ?? true} />
                 <Gat ten="an_ca" nhan="Hưởng tiền ăn theo ngày đi làm" giaTriMacDinh={t?.an_ca ?? true} />
+                <div className="-mt-1.5 text-[12px] text-muc-3">Tiền ăn tự tính mỗi tháng = mức tiền ăn mỗi ngày (ở Tham số lương, hiện 25.000đ) × số ngày công thực tế. Không cần nhập vào phụ cấp cố định.</div>
                 <Gat ten="phu_cap_mien_thue" nhan="Phụ cấp được miễn thuế (vd điện thoại khoán)" giaTriMacDinh={t?.phu_cap_mien_thue ?? true} />
               </div>
               <div className="sm:col-span-2">
