@@ -8,7 +8,7 @@ import { NhanNenTang } from "@/components/ui/BieuTuongNenTang";
 import { SAC_BUOC_UNG_VIEN, mauSac, type Sac } from "@/lib/mau-trang-thai";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
 import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU } from "@/components/ui/dinh-dang";
-import { FormTin, type KhoiLuaChon, type TinCoSan } from "./FormTin";
+import { FormTin, type JdLuaChon, type KhoiLuaChon, type TinCoSan } from "./FormTin";
 import { FormUngVien, type UngVien } from "./FormUngVien";
 import { KenhDangTin } from "./KenhDangTin";
 import type { KenhDang } from "@/lib/data-tuyen-dung";
@@ -33,6 +33,7 @@ export function DanhSachTuyenDung({
   ungVien,
   kenh,
   khoi,
+  jd,
   tinBanDau,
   moDangTuyen,
 }: {
@@ -40,6 +41,7 @@ export function DanhSachTuyenDung({
   ungVien: UngVien[];
   kenh: KenhDang[];
   khoi: KhoiLuaChon[];
+  jd?: JdLuaChon[];
   tinBanDau?: string;
   moDangTuyen?: boolean;
 }) {
@@ -266,7 +268,7 @@ export function DanhSachTuyenDung({
 
       {/* đăng / sửa tin */}
       <Hop mo={hop?.k === "tin"} dong={dong} tieuDe={hop?.k === "tin" && hop.tin ? "Sửa tin tuyển dụng" : "Đăng tuyển"} moTa="Tin sẽ hiện ở bảng để HCNS nhận và theo dõi hồ sơ.">
-        {hop?.k === "tin" && <FormTin key={hop.tin?.id ?? "moi"} khoi={khoi} coSan={hop.tin} xong={() => { dong(); lamMoi(); }} huy={dong} />}
+        {hop?.k === "tin" && <FormTin key={hop.tin?.id ?? "moi"} khoi={khoi} jd={jd} coSan={hop.tin} xong={() => { dong(); lamMoi(); }} huy={dong} />}
       </Hop>
 
       {/* xoá tin */}

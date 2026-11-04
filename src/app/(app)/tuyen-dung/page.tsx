@@ -9,17 +9,20 @@ import { layDanhSachKhoi, layTuyenDungDayDu } from "@/lib/data";
 import { layKenhDang, layYeuCauTuyenDung } from "@/lib/data-tuyen-dung";
 import { tinhBaoCaoTuyenDung } from "@/lib/tuyen-dung";
 import { yeuCauVaiTro } from "@/lib/auth";
+import { layJd } from "@/lib/data-jd";
 
 const TAB = [
   { ma: "yeu-cau", ten: "Yêu cầu" },
   { ma: "tin", ten: "Tin và ứng viên" },
   { ma: "bao-cao", ten: "Báo cáo" },
 ] as const;
+/** Mô tả công việc (JD) từng vị trí nằm ở Sổ tuyển dụng; để một lối vào ngay trên thanh này cho dễ thấy. */
+const LINK_JD = "/hr/jd-vi-tri";
 
 export default async function TrangTuyenDung({ searchParams }: { searchParams: Promise<{ tab?: string; tin?: string; dang?: string }> }) {
   const { tab: tabThamSo, tin: tinThamSo, dang } = await searchParams;
   await yeuCauVaiTro(["admin", "ky_thuat"]);
-  const [{ tin, ungVien }, khoi, yeuCau, kenh] = await Promise.all([layTuyenDungDayDu(), layDanhSachKhoi(), layYeuCauTuyenDung(), layKenhDang()]);
+  const [{ tin, ungVien }, khoi, yeuCau, kenh, jdRows] = await Promise.all([layTuyenDungDayDu(), layDanhSachKhoi(), layYeuCauTuyenDung(), layKenhDang(), layJd()]);
   const choTiepNhan = yeuCau.filter((y) => y.trang_thai === "Chờ tiếp nhận").length;
   // Link cũ (?tin=…, ?dang=1) luôn mở tab Tin; không chỉ định thì ưu tiên Yêu cầu khi còn yêu cầu chờ tiếp nhận.
   const tab = tabThamSo === "yeu-cau" || tabThamSo === "tin" || tabThamSo === "bao-cao" ? tabThamSo : tinThamSo || dang ? "tin" : choTiepNhan > 0 ? "yeu-cau" : "tin";
@@ -33,6 +36,7 @@ export default async function TrangTuyenDung({ searchParams }: { searchParams: P
             {t.ten}{t.ma === "yeu-cau" && choTiepNhan > 0 && <span className="ml-2 rounded-tag bg-canh-bao-nen px-1.5 py-px text-[11px] font-semibold text-canh-bao">{choTiepNhan}</span>}
           </Link>
         ))}
+        <Link href={LINK_JD} className="-mb-px ml-auto border-b-2 border-transparent px-4 py-2.5 text-[14px] text-muc-2 hover:text-muc">Mô tả công việc (JD)</Link>
       </nav>
 
       {tab === "yeu-cau" && (
@@ -46,6 +50,7 @@ export default async function TrangTuyenDung({ searchParams }: { searchParams: P
           tin={tin.map((t) => ({ id: t.id, vi_tri: t.vi_tri, khoi_id: t.khoi_id, khoi_ten: t.khoi_ten, so_luong_can: t.so_luong_can, trang_thai: t.trang_thai, han_nop: t.han_nop, mo_ta: t.mo_ta }))}
           ungVien={ungVien}
           kenh={kenh}
+          jd={jdRows}
           khoi={khoiLC}
           tinBanDau={tinThamSo}
           moDangTuyen={dang === "1"}

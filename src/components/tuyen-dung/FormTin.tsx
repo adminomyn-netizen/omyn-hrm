@@ -8,6 +8,8 @@ import { NHAN_O, NUT_CHINH, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/u
 import { TRANG_THAI_TIN } from "@/lib/tuyen-dung";
 
 export type KhoiLuaChon = { id: string; ten: string };
+/** JD đã viết cho từng vị trí (nội dung ghép sẵn thành văn bản) để lấy lại khi đăng tin. */
+export type JdLuaChon = { vi_tri: string; noi_dung: string };
 export type TinCoSan = {
   id: string;
   vi_tri: string;
@@ -19,7 +21,10 @@ export type TinCoSan = {
 };
 
 /** Biểu mẫu đăng/sửa tin tuyển dụng trong hộp thoại (nút type="button", xem ghi chú ở src/lib/actions.ts). */
-export function FormTin({ khoi, coSan, xong, huy }: { khoi: KhoiLuaChon[]; coSan?: TinCoSan; xong: () => void; huy: () => void }) {
+export function FormTin({ khoi, jd = [], coSan, xong, huy }: { khoi: KhoiLuaChon[]; jd?: JdLuaChon[]; coSan?: TinCoSan; xong: () => void; huy: () => void }) {
+  const [viTri, setViTri] = useState(coSan?.vi_tri ?? "");
+  const [moTa, setMoTa] = useState(coSan?.mo_ta ?? "");
+  const jdKhop = jd.find((j) => j.vi_tri.trim().toLowerCase() === viTri.trim().toLowerCase());
   const [loi, setLoi] = useState<string | undefined>();
   const [dangXuLy, startXuLy] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
@@ -40,7 +45,8 @@ export function FormTin({ khoi, coSan, xong, huy }: { khoi: KhoiLuaChon[]; coSan
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <div className="sm:col-span-2">
           <label htmlFor="t-vi-tri" className={NHAN_O}>Vị trí cần tuyển *</label>
-          <input id="t-vi-tri" name="vi_tri" required defaultValue={coSan?.vi_tri ?? ""} placeholder="Ví dụ: Content Marketing" className={O_NHAP} />
+          <input id="t-vi-tri" name="vi_tri" required value={viTri} onChange={(e) => setViTri(e.target.value)} list="t-vi-tri-jd" placeholder="Ví dụ: Content Marketing" className={O_NHAP} />
+          {jd.length > 0 && <datalist id="t-vi-tri-jd">{jd.map((j) => <option key={j.vi_tri} value={j.vi_tri} />)}</datalist>}
         </div>
         <div>
           <label htmlFor="t-khoi" className={NHAN_O}>Khối *</label>
@@ -60,7 +66,8 @@ export function FormTin({ khoi, coSan, xong, huy }: { khoi: KhoiLuaChon[]; coSan
         </div>
         <div className="sm:col-span-2">
           <label htmlFor="t-mo-ta" className={NHAN_O}>Mô tả công việc, yêu cầu</label>
-          <textarea id="t-mo-ta" name="mo_ta" defaultValue={coSan?.mo_ta ?? ""} className={O_NHIEU_DONG} />
+          <textarea id="t-mo-ta" name="mo_ta" value={moTa} onChange={(e) => setMoTa(e.target.value)} className={O_NHIEU_DONG} />
+          {jdKhop && <button type="button" onClick={() => setMoTa(jdKhop.noi_dung)} className="mt-1.5 text-[13px] text-nhan-dam underline underline-offset-2">Điền mô tả từ JD của vị trí này</button>}
         </div>
       </div>
       {loi && <div role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</div>}

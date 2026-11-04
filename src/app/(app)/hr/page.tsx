@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   ClipboardList,
+  FileText,
   Handshake,
   Megaphone,
   CalendarClock,
@@ -16,6 +17,7 @@ import { dbHr } from "@/lib/hr-db";
 import { HR_MUC } from "@/lib/hr-module";
 
 const ICON: Record<string, typeof Target> = {
+  "jd-vi-tri": FileText,
   "muc-tieu-tuyen-dung": Target,
   "ngan-sach-tuyen-dung": Wallet,
   "kenh-tuyen-dung": Megaphone,
