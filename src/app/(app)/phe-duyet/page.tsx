@@ -26,11 +26,16 @@ export default async function TrangPheDuyet({ searchParams }: { searchParams: Pr
   const sp = await searchParams;
   const laQuanLy = nd.vaiTro === "admin" || nd.vaiTro === "ky_thuat";
   const tabs = TAB.filter((t) => !("quanLy" in t) || laQuanLy);
-  const tab = tabs.find((t) => t.ma === sp.tab)?.ma ?? tabs[0].ma;
   const q = (sp.q ?? "").trim().slice(0, 60);
   const nhomLoc = /^[A-Z]{2,6}$/.test(sp.nhom ?? "") ? sp.nhom! : "";
   const db = dbHr();
   const nv = await nhanVienCuaTaiKhoan(nd.id);
+  // Không chọn tab: mở "Chờ tôi duyệt" khi có phiếu chờ; không thì mở "Tôi đã nộp" để người nộp thấy ngay phiếu của mình (nhân viên thường hay tưởng phiếu mất).
+  let tab: string = tabs.find((t) => t.ma === sp.tab)?.ma ?? "";
+  if (!tab) {
+    const { count } = await db.from("pd_buoc").select("id", { count: "exact", head: true }).eq("user_id", nd.id).eq("trang_thai", "Chờ").neq("kieu", "CC");
+    tab = (count ?? 0) > 0 || !nv ? tabs[0].ma : "cua-toi";
+  }
 
   let ids: string[] | null = null;
   if (tab === "cho-toi" || tab === "ban-sao") {

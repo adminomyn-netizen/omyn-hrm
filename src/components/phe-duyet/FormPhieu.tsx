@@ -159,6 +159,7 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
         return (
           <Cap loiO={loiO} t={t} khoa={khoa}>
             <Chon ariaLabel={t.ten} trong={ds.length ? "Chọn phiếu" : "Chưa có phiếu nào để nối"} giaTri={chuoi(v)} onDoi={dat1} luaChon={ds.map((p) => ({ gia_tri: p.id, nhan: p.ten }))} />
+            {ds.length === 0 && <div className="mt-1 text-[12px] text-muc-3">Chỉ nối được phiếu đã duyệt xong. Phiếu của bạn đang chờ duyệt thì xem ở Phê duyệt → Tôi đã nộp.</div>}
           </Cap>
         );
       }
