@@ -24,7 +24,7 @@ export function QuanLyLuong({ ky, chon, dong, thamSo, thoaThuan, thamSoDs }: { k
       </div>
       {tab === "bang" && <BangLuongKy ky={ky} chon={chon} dong={dong} thamSo={thamSo} />}
       {tab === "thue-bh" && <ThueBaoHiem ky={ky} chon={chon} dong={dong} thamSo={thamSo} />}
-      {tab === "thoa-thuan" && <ThoaThuanLuong ds={thoaThuan} />}
+      {tab === "thoa-thuan" && <ThoaThuanLuong ds={thoaThuan} tienAnNgay={thamSo.tien_an_ngay} />}
       {tab === "tham-so" && <ThamSoLuong ds={thamSoDs} />}
     </div>
   );

@@ -17,7 +17,7 @@ export type ThoaThuanView = {
 };
 
 /** Thỏa thuận lương của từng người: lương gộp, % KPI, phụ cấp, tiền ăn, bảo hiểm, người phụ thuộc, kiểu công. Dòng lương mỗi kỳ sẽ CHỤP lại các số này. */
-export function ThoaThuanLuong({ ds }: { ds: ThoaThuanView[] }) {
+export function ThoaThuanLuong({ ds, tienAnNgay }: { ds: ThoaThuanView[]; tienAnNgay: number }) {
   const router = useRouter();
   const [sua, setSua] = useState<ThoaThuanView | null>(null);
   const [loi, setLoi] = useState<string | undefined>();
@@ -111,7 +111,11 @@ export function ThoaThuanLuong({ ds }: { ds: ThoaThuanView[] }) {
               <div className="flex flex-col gap-3 sm:col-span-2">
                 <Gat ten="dong_bh" nhan="Đóng bảo hiểm (BHXH, BHYT, BHTN)" giaTriMacDinh={t?.dong_bh ?? true} />
                 <Gat ten="an_ca" nhan="Hưởng tiền ăn theo ngày đi làm" giaTriMacDinh={t?.an_ca ?? true} />
-                <div className="-mt-1.5 text-[12px] text-muc-3">Tiền ăn tự tính mỗi tháng = mức tiền ăn mỗi ngày (ở Tham số lương, hiện 25.000đ) × số ngày công thực tế. Không cần nhập vào phụ cấp cố định.</div>
+                <div>
+                  <label className={NHAN_O} htmlFor="tt-an">Phụ cấp ăn trưa (tự động)</label>
+                  <input id="tt-an" readOnly tabIndex={-1} value={`${tienVN(tienAnNgay)} / ngày công`} className={`${O_NHAP} bg-giay-tram/60 text-right text-muc-2`} />
+                  <div className="mt-1 text-[12px] text-muc-3">Bảng lương tự tính = mức này × số ngày công thực tế. Đổi mức ở Tham số lương. Không nhập vào phụ cấp cố định.</div>
+                </div>
                 <Gat ten="phu_cap_mien_thue" nhan="Phụ cấp được miễn thuế (vd điện thoại khoán)" giaTriMacDinh={t?.phu_cap_mien_thue ?? true} />
               </div>
               <div className="sm:col-span-2">
