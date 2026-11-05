@@ -105,7 +105,11 @@ describe("tinhLuong", () => {
 });
 
 describe("congChuanTheoKy", () => {
-  it("văn phòng = tham số", () => expect(congChuanTheoKy("van_phong", 2026, 11, 24)).toBe(24));
+  it("văn phòng cũng theo tháng: T11/2026 = 25, T10/2026 = 31 − 4 Chủ nhật = 27, T2/2026 = 24", () => {
+    expect(congChuanTheoKy("van_phong", 2026, 11, 24)).toBe(25);
+    expect(congChuanTheoKy("van_phong", 2026, 10, 24)).toBe(27);
+    expect(congChuanTheoKy("van_phong", 2026, 2, 24)).toBe(24);
+  });
   it("vận hành T11/2026 = 30 ngày − 5 Chủ nhật = 25 (khớp plan)", () => expect(congChuanTheoKy("van_hanh", 2026, 11, 24)).toBe(25));
   it("vận hành T2/2026 = 28 ngày − 4 Chủ nhật = 24", () => expect(congChuanTheoKy("van_hanh", 2026, 2, 24)).toBe(24));
 });

@@ -127,7 +127,7 @@ export function BangLuongKy({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
               {suaDuoc && kyChon.trang_thai === "da_lap" && (
                 <>
                   <button type="button" className={NUT_CHU} disabled={dangXuLy} onClick={() => chayKy(lapBangLuong)}>Lập thêm cho người mới</button>
-                  <button type="button" className={NUT_CHU} disabled={dangXuLy} onClick={() => chayKy(tinhLaiKy)}>Tính lại cả kỳ</button>
+                  <button type="button" className={NUT_CHU} disabled={dangXuLy} onClick={() => chayKy(tinhLaiKy)}>Cập nhật và tính lại cả kỳ</button>
                 </>
               )}
               {kyChon.trang_thai === "mo" && dong.length === 0 && <button type="button" className={NUT_CHU_NGUY} onClick={() => setHop({ k: "xoa" })}>Xoá kỳ</button>}

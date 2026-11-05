@@ -102,7 +102,7 @@ export function ThoaThuanLuong({ ds, tienAnNgay }: { ds: ThoaThuanView[]; tienAn
               </div>
               <div>
                 <label className={NHAN_O} htmlFor="tt-kieu">Kiểu công</label>
-                <Chon id="tt-kieu" ten="kieu_cong" giaTriMacDinh={t?.kieu_cong ?? "van_phong"} luaChon={[{ gia_tri: "van_phong", nhan: "Văn phòng (24 công)" }, { gia_tri: "van_hanh", nhan: "Vận hành (ngày trong tháng trừ Chủ nhật)" }]} />
+                <Chon id="tt-kieu" ten="kieu_cong" giaTriMacDinh={t?.kieu_cong ?? "van_phong"} luaChon={[{ gia_tri: "van_phong", nhan: "Văn phòng (ngày trong tháng trừ Chủ nhật)" }, { gia_tri: "van_hanh", nhan: "Vận hành (ngày trong tháng trừ Chủ nhật)" }]} />
               </div>
               <div>
                 <label className={NHAN_O} htmlFor="tt-pt">Số người phụ thuộc đã đăng ký</label>
