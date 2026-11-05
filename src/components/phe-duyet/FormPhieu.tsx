@@ -10,7 +10,7 @@ import { OTien } from "@/components/ui/OTien";
 import { NHAN_O, NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import { createClient } from "@/lib/supabase/client";
 import { nopLaiPhieu, nopPhieu, xinUploadTep, type TepMoi } from "@/app/(app)/phe-duyet/actions";
-import { giaTriHieu, tienBangChu, truongDangHien, type MauPhieu, type Truong } from "@/lib/phe-duyet";
+import { giaTriHieu, giaTriSoGio, tienBangChu, truongDangHien, type MauPhieu, type Truong } from "@/lib/phe-duyet";
 
 export type NhanSuChon = { id: string; ten: string };
 export type PhieuNoi = { id: string; ten: string; maPhieu: string };
@@ -113,6 +113,7 @@ export function FormPhieu({ mau, danhMuc, nhanSu, phieuNoi, tepCu = {}, ban, nop
         );
       }
       case "so":
+        if (t.soGio) return <Cap loiO={loiO} t={t} khoa={khoa} nhan={`${t.ten} (tự tính, không nhập)`}><div className={`${O_NHAP} flex cursor-not-allowed items-center bg-giay-tram tabular-nums`}>{giaTriSoGio(t, du)?.toLocaleString("vi-VN") ?? "—"} giờ</div></Cap>;
         return <Cap loiO={loiO} t={t} khoa={khoa}><input inputMode="numeric" value={v === undefined || v === null ? "" : String(v)} onChange={(e) => dat1(e.target.value.replace(/\D/g, ""))} className={O_NHAP} /></Cap>;
       case "tien":
         if (t.hieu) return <Cap loiO={loiO} t={t} khoa={khoa} nhan={`${t.ten} (tự tính, không nhập)`}><div className={`${O_NHAP} flex cursor-not-allowed items-center bg-giay-tram tabular-nums`}>{Number(giaTriHieu(t, du) ?? 0).toLocaleString("vi-VN")} đ</div></Cap>;

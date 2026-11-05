@@ -244,4 +244,11 @@ describe("ô bổ sung sau khi so với form Lark", () => {
     const kt = kiemTraPhieu(m, { loai: "Khen thưởng" }, CTX).loi;
     expect(kt.ban_tuong_trinh).toBeUndefined();
   });
+
+  it("phiếu làm thêm giờ: số giờ tự tính từ thời gian bắt đầu/kết thúc, không cho nhập", () => {
+    const m = mauTheoMa("xac-nhan-lam-them-gio")!;
+    const day = { noi_lam_viec: "Omyn", nhan_vien: "Văn phòng", ly_do: "Chốt báo cáo", khung_gio: "Giờ hành chính", tu: "2026-11-05T18:00", den: "2026-11-05T20:30", so_gio: 99 };
+    expect(kiemTraPhieu(m, day, CTX).sach.so_gio).toBe(2.5);
+    expect(kiemTraPhieu(m, { ...day, den: "2026-11-05T17:00" }, CTX).sach.so_gio).toBeUndefined();
+  });
 });

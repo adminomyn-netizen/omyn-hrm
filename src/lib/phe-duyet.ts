@@ -23,6 +23,8 @@ export type Truong = {
   tong?: { bang: string; cot: string };
   /** kieu "tien": tự tính = max(0, ô `tu` − ô `tru`), không cho nhập (vd tiền thừa/thiếu khi hoàn ứng). */
   hieu?: { tu: string; tru: string };
+  /** kieu "so": tự tính số giờ giữa hai ô ngày giờ (`tu` → `den`), làm tròn 2 số lẻ, không cho nhập (vd khoảng thời gian làm thêm giờ). */
+  soGio?: { tu: string; den: string };
   /** kieu "chu": tự điền số tiền bằng chữ từ ô tiền `tien` (tự tính ở máy chủ). */
   bangChuTu?: string;
   /** Ô ngày/giờ này không được trước ô `khongTruoc`. */
@@ -63,6 +65,16 @@ export function giaTriHieu(t: Truong, du: DuLieu): number | undefined {
   const a = du[t.hieu.tu], b = du[t.hieu.tru];
   if (typeof a !== "number" || typeof b !== "number") return undefined;
   return Math.max(0, a - b);
+}
+
+/** Số giờ giữa hai ô ngày giờ dạng "2026-11-05T08:00"; thiếu một ô, sai dạng hoặc đến trước từ thì chưa tính được. */
+export function giaTriSoGio(t: Truong, du: DuLieu): number | undefined {
+  if (!t.soGio) return undefined;
+  const a = du[t.soGio.tu], b = du[t.soGio.den];
+  const doc = (x: unknown) => (typeof x === "string" && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(x) ? Date.parse(`${x.slice(0, 16)}:00Z`) : NaN);
+  const ms = doc(b) - doc(a);
+  if (!Number.isFinite(ms) || ms < 0) return undefined;
+  return Math.round((ms / 3600000) * 100) / 100;
 }
 
 // ---------------------------------------------------------------- số phiếu
@@ -229,7 +241,7 @@ export function kiemTraPhieu(mau: MauPhieu, du: DuLieu, ctx: NguCanhKiemTra): Ke
   const sach: DuLieu = {};
   const hien = (t: Truong) => truongDangHien(t, du);
   for (const t of mau.truong) {
-    if (!hien(t) || t.kieu === "cong" || t.bangChuTu || t.hieu) continue;
+    if (!hien(t) || t.kieu === "cong" || t.bangChuTu || t.hieu || t.soGio) continue;
     const v = kiemMotO(t, du[t.ma], t.ma, du, ctx, loi);
     if (v !== undefined) sach[t.ma] = v;
   }
@@ -238,6 +250,10 @@ export function kiemTraPhieu(mau: MauPhieu, du: DuLieu, ctx: NguCanhKiemTra): Ke
     if (t.kieu === "cong" && t.tong) {
       const dong = (sach[t.tong.bang] as DuLieu[] | undefined) ?? [];
       sach[t.ma] = dong.reduce((s, d) => s + (typeof d[t.tong!.cot] === "number" ? (d[t.tong!.cot] as number) : 0), 0);
+    }
+    if (t.soGio) {
+      const g = giaTriSoGio(t, sach);
+      if (g !== undefined) sach[t.ma] = g;
     }
     if (t.hieu) {
       const h = giaTriHieu(t, sach);

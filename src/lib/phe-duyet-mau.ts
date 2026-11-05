@@ -13,6 +13,7 @@ const chon = (ma: string, ten: string, luaChon: readonly string[], mo?: Mo) => o
 const dm = (ma: string, ten: string, danhMuc: string, mo?: Mo) => o("dm", ma, ten, { danhMuc, ...mo });
 const nv = (ma: string, ten: string, mo?: Mo) => o("nv", ma, ten, mo);
 const tep = (ma: string, ten: string, mo?: Mo) => o("tep", ma, ten, mo);
+const so = (ma: string, ten: string, mo?: Mo) => o("so", ma, ten, mo);
 
 /** Khung bút toán kế toán (Nợ/Có, đối tượng, tài khoản, số tiền) theo form Lark; để sẵn khung không bắt buộc, chi tiết bổ sung sau. */
 const BUT_TOAN = (ma: string, ten: string) =>
@@ -88,6 +89,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
       chu("ten_khach_hang", "Tên khách hàng", { hien: { truong: "nhan_vien", la: ["Khác"] } }),
       chu("ten_dich_vu", "Tên dịch vụ", { hien: { truong: "nhan_vien", la: ["Khác"] } }),
       nhieu("ly_do", "Lý do tăng ca"), ngayGio("tu", "Thời gian bắt đầu"), ngayGio("den", "Thời gian kết thúc", { khongTruoc: "tu" }),
+      so("so_gio", "Khoảng thời gian (giờ)", { batBuoc: false, soGio: { tu: "tu", den: "den" } }),
       nhieu("ghi_chu", "Ghi chú", { hien: { truong: "khung_gio", la: ["Ngoài giờ hành chính"] }, suyRa: "Lark: có điều kiện hiện. Em đặt hiện khi khung giờ là Ngoài giờ hành chính." }),
       chon("khung_gio", "Khung giờ làm việc", ["Giờ hành chính", "Ngoài giờ hành chính"]),
     ],
