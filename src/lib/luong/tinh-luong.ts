@@ -148,8 +148,8 @@ export function tinhLuong(v: DauVaoLuong, p: ThamSo): KetQuaLuong {
 }
 
 /** Công chuẩn của một tháng = số ngày trong tháng trừ số Chủ nhật (công ty làm thứ Hai–thứ Bảy), nên đổi theo từng tháng (24, 25, 26…).
- *  Cả văn phòng và vận hành dùng chung cách tính (chị Phượng 05/11: công chuẩn không cố định 24). Tham số `cong_chuan_van_phong` chỉ còn là mức dự phòng, không dùng để tính. */
-export function congChuanTheoKy(_kieu: "van_phong" | "van_hanh", nam: number, thang: number, _congChuanDuPhong?: number): number {
+ *  Cả văn phòng và vận hành dùng chung cách tính (chị Phượng 05/11: công chuẩn không cố định 24). Tham số `cong_chuan_van_phong` không còn dùng để tính. */
+export function congChuanTheoKy(_kieu: "van_phong" | "van_hanh", nam: number, thang: number): number {
   const soNgay = new Date(Date.UTC(nam, thang, 0)).getUTCDate();
   let chuNhat = 0;
   for (let d = 1; d <= soNgay; d++) if (new Date(Date.UTC(nam, thang - 1, d)).getUTCDay() === 0) chuNhat++;

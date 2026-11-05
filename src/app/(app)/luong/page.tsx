@@ -8,6 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { phepNamDuoc } from "@/lib/quy-phep";
 import { layPhepNamDaDung, layDongLuongCuaKy, layKyLuong, layNhanVienIdTheoUser, layPhieuLuongCuaToi, layThamSoLuong, layThoaThuanLuong } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
+import { dongBoKyTuHoSo } from "@/lib/luong/dong-bo-ky";
 import { THAM_SO_MAC_DINH, type ThamSo } from "@/lib/luong/tinh-luong";
 import type { DongLuongView } from "@/components/luong/ChiTietDongLuong";
 
@@ -47,9 +48,11 @@ export default async function TrangLuong({ searchParams }: { searchParams: Promi
   const { ky: kyThamSo } = await searchParams;
   const [ky, thoaThuan, thamSoDs] = await Promise.all([layKyLuong(), layThoaThuanLuong(), layThamSoLuong()]);
   const chon = ky.find((k) => k.id === kyThamSo)?.id ?? ky[0]?.id ?? "";
-  const dongRaw = chon ? await layDongLuongCuaKy(chon) : [];
   const thamSo: ThamSo = { ...THAM_SO_MAC_DINH };
   for (const t of thamSoDs) thamSo[t.khoa] = t.gia_tri;
+  // Hồ sơ đổi sau khi lập bảng lương (Thử việc, thỏa thuận, công chuẩn theo tháng) thì tự cập nhật dòng lương của kỳ còn sửa được, không cần bấm nút.
+  if (chon) await dongBoKyTuHoSo(chon, thamSo).catch(() => undefined);
+  const dongRaw = chon ? await layDongLuongCuaKy(chon) : [];
   const dong = dongRaw.map((d) => ({
     ...d,
     luong_thoa_thuan: Number(d.luong_thoa_thuan), phu_cap: Number(d.phu_cap), cong_chuan: Number(d.cong_chuan), cong_huong: Number(d.cong_huong), ngay_lam: Number(d.ngay_lam),

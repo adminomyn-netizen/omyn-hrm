@@ -4,10 +4,11 @@ import { revalidatePath } from "next/cache";
 import { layNguoiDungHienTai } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { guiChoNguoiDung } from "@/lib/push";
-import { congChuanTheoKy, tinhLuong, type DauVaoLuong, type ThamSo } from "@/lib/luong/tinh-luong";
+import { congChuanTheoKy, type ThamSo } from "@/lib/luong/tinh-luong";
 import { layBangCongThang } from "@/lib/bang-cong";
 import { tongGioTheoLoai } from "@/lib/tang-ca";
 import { dbHr } from "@/lib/hr-db";
+import { cotKetQua, dongBoKyTuHoSo, tuDong, type Dong } from "@/lib/luong/dong-bo-ky";
 
 export type KetQuaLuong = { loi?: string; ok?: boolean; thongBao?: string };
 const KHONG_QUYEN: KetQuaLuong = { loi: "Chỉ Quản trị và Kỹ thuật mới được xem và sửa lương." };
@@ -48,25 +49,6 @@ async function docThamSo(): Promise<{ p: ThamSo; chuaXacNhan: number }> {
   }
   return { p, chuaXacNhan: chua };
 }
-
-type Dong = {
-  luong_thoa_thuan: number; ty_le_kpi: number; thu_viec: boolean; cong_chuan: number; cong_huong: number; ngay_lam: number; ty_le_ht_kpi: number;
-  phu_cap: number; phu_cap_mien_thue: boolean; an_ca: boolean; dong_bh: boolean; so_nguoi_phu_thuoc: number;
-  gio_ot_thuong: number; gio_ot_nghi_tuan: number; gio_ot_le: number; hoa_hong: number; thuong_khac: number; khau_tru_khac: number;
-};
-const tuDong = (d: Dong): DauVaoLuong => ({
-  luongThoaThuan: Number(d.luong_thoa_thuan), tyLeKpi: d.ty_le_kpi, thuViec: d.thu_viec, congChuan: Number(d.cong_chuan), congHuong: Number(d.cong_huong), ngayLam: Number(d.ngay_lam),
-  tyLeHtKpi: d.ty_le_ht_kpi, phuCap: Number(d.phu_cap), phuCapMienThue: d.phu_cap_mien_thue, anCa: d.an_ca, dongBh: d.dong_bh, soNguoiPhuThuoc: d.so_nguoi_phu_thuoc,
-  gioOtThuong: Number(d.gio_ot_thuong), gioOtNghiTuan: Number(d.gio_ot_nghi_tuan), gioOtLe: Number(d.gio_ot_le), hoaHong: Number(d.hoa_hong), thuongKhac: Number(d.thuong_khac), khauTruKhac: Number(d.khau_tru_khac),
-});
-const cotKetQua = (v: DauVaoLuong, p: ThamSo) => {
-  const r = tinhLuong(v, p);
-  return {
-    luong_chuc_danh: r.luongChucDanh, luong_kpi: r.luongKpi, phu_cap_thuc: r.phuCapThuc, tien_an: r.tienAn, tien_ot: r.tienOt, tong_thu_nhap: r.tongThuNhap,
-    bh_xh: r.bhXh, bh_yt: r.bhYt, bh_tn: r.bhTn, giam_tru: r.giamTru, thu_nhap_tinh_thue: r.thuNhapTinhThue, thue_tncn: r.thueTncn, thuc_linh: r.thucLinh, bh_cty: r.bhCty,
-    tinh_luc: new Date().toISOString(),
-  };
-};
 
 /** Kỳ còn sửa được dòng lương khi đang "mở" hoặc "đã lập". Từ "đã kiểm" trở đi bị khoá. */
 async function kyDangSua(kyId: string) {
@@ -172,7 +154,7 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
       thieu.push(n.ho_ten);
       continue;
     }
-    const congChuan = congChuanTheoKy(t.kieu_cong as "van_phong" | "van_hanh", ky.nam, ky.thang, p.cong_chuan_van_phong);
+    const congChuan = congChuanTheoKy(t.kieu_cong as "van_phong" | "van_hanh", ky.nam, ky.thang);
     const gioOt = tongGioTheoLoai(tcTheo.get(n.id) ?? []);
     const thuong = thTheo.get(n.id) ?? { hoaHong: 0, thuongKhac: 0 };
     // Công hưởng và ngày làm lấy từ bảng công tháng (X, N, CT, P, L…): cùng một hàm với bảng chấm công nên không lệch nhau.
@@ -225,52 +207,18 @@ export async function luuDongLuong(fd: FormData): Promise<KetQuaLuong> {
   return { ok: true };
 }
 
-/** Cập nhật cả kỳ rồi tính lại: lấy lại từ hồ sơ (trạng thái Thử việc) và Thỏa thuận lương hiện tại (lương, KPI nền, phụ cấp, tiền ăn, bảo hiểm, người phụ thuộc, kiểu công), công chuẩn theo tháng, và tham số hiện hành.
- *  GIỮ NGUYÊN số liệu nhập riêng của kỳ: công hưởng, ngày làm, % hoàn thành KPI, giờ tăng ca, hoa hồng, thưởng, khấu trừ. */
+/** Cập nhật cả kỳ rồi tính lại (ép tính lại mọi dòng, dùng sau khi đổi tham số). Xem `dongBoKyTuHoSo`. */
 export async function tinhLaiKy(fd: FormData): Promise<KetQuaLuong> {
   if (!(await chiQuanTri())) return KHONG_QUYEN;
   const kyId = chuoi(fd, "ky_id", 40);
   if (!uuid(kyId)) return { loi: "Thiếu kỳ lương." };
   const kt = await kyDangSua(kyId);
   if ("loi" in kt) return { loi: kt.loi };
-  const { ky } = kt;
-  const db = createAdminClient();
-  const [{ p }, bl, nv, tt, cc] = await Promise.all([
-    docThamSo(),
-    db.from("bang_luong").select("*").eq("ky_luong_id", kyId),
-    db.from("nhan_vien").select("id, trang_thai"),
-    db.from("luong_thoa_thuan").select("*"),
-    ky.nam && ky.thang ? layBangCongThang(ky.nam, ky.thang) : Promise.resolve(null),
-  ]);
-  const congTheoNguoi = new Map((cc?.dong ?? []).map((x) => [x.nhanVienId, x.tong]));
-  const nvMap = new Map((nv.data ?? []).map((n) => [n.id, n.trang_thai]));
-  const ttMap = new Map((tt.data ?? []).map((t) => [t.nhan_vien_id, t]));
-  const data = bl.data ?? [];
-  for (const d of data) {
-    const t = ttMap.get(d.nhan_vien_id);
-    const lamMoiTuHoSo: Record<string, unknown> = {};
-    if (nvMap.has(d.nhan_vien_id)) lamMoiTuHoSo.thu_viec = nvMap.get(d.nhan_vien_id) === "Thử việc";
-    if (t) {
-      Object.assign(lamMoiTuHoSo, {
-        luong_thoa_thuan: Number(t.luong_thoa_thuan), ty_le_kpi: t.ty_le_kpi, phu_cap: Number(t.phu_cap), phu_cap_mien_thue: t.phu_cap_mien_thue, an_ca: t.an_ca,
-        dong_bh: t.dong_bh, so_nguoi_phu_thuoc: t.so_nguoi_phu_thuoc, kieu_cong: t.kieu_cong,
-      });
-    }
-    if (ky.nam && ky.thang) {
-      const congChuan = congChuanTheoKy((t?.kieu_cong ?? d.kieu_cong) as "van_phong" | "van_hanh", ky.nam, ky.thang, p.cong_chuan_van_phong);
-      lamMoiTuHoSo.cong_chuan = congChuan;
-      // Công chuẩn đổi thì công cũ có thể đã bị cắt ở mức cũ (vd 24): lấy lại từ bảng công. Công chuẩn không đổi thì giữ số đã nhập tay.
-      const tong = congTheoNguoi.get(d.nhan_vien_id);
-      const laiTuCong = Number(d.cong_chuan) !== congChuan && !!tong;
-      lamMoiTuHoSo.cong_huong = Math.min(laiTuCong ? tong!.congHuong : Number(d.cong_huong), congChuan);
-      lamMoiTuHoSo.ngay_lam = Math.min(laiTuCong ? tong!.congLam : Number(d.ngay_lam), congChuan);
-    }
-    const moi = { ...(d as unknown as Dong), ...(lamMoiTuHoSo as Partial<Dong>) };
-    const { error } = await db.from("bang_luong").update({ ...lamMoiTuHoSo, ...cotKetQua(tuDong(moi), p) } as never).eq("id", d.id);
-    if (error) return { loi: "Chưa tính lại được. Thử lại sau." };
-  }
+  const { p } = await docThamSo();
+  const r = await dongBoKyTuHoSo(kyId, p, true);
+  if (r.loi) return { loi: r.loi };
   lamMoi();
-  return { ok: true, thongBao: `Đã cập nhật từ hồ sơ và tính lại ${data.length} dòng.` };
+  return { ok: true, thongBao: `Đã cập nhật từ hồ sơ và tính lại ${r.tong} dòng.` };
 }
 
 /** Chuyển kỳ sang bước kế tiếp (chỉ đi tiến). Duyệt chỉ được khi mọi tham số đã được xác nhận. */
