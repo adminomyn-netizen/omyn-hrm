@@ -130,35 +130,29 @@ export function tinhLuong(v: DauVaoLuong, p: ThamSo): KetQuaLuong {
   const mienPhuCap = v.phuCapMienThue ? phuCapThuc : 0;
   const mienOt = Math.max(0, tienOt - otChiuThue);
   const thuNhapChiuThue = Math.max(0, tongThuNhap - mienAn - mienPhuCap - mienOt);
-  const giamTru = v.thuViec ? 0 : p.giam_tru_ban_than + p.giam_tru_phu_thuoc * v.soNguoiPhuThuoc;
+  const giamTru = p.giam_tru_ban_than + p.giam_tru_phu_thuoc * v.soNguoiPhuThuoc;
 
-  let thuNhapTinhThue: number;
-  let thueTncn: number;
-  if (v.thuViec) {
-    // thử việc / hợp đồng ngắn: khấu trừ 10% khi từ 2.000.000 đ/lần (Quy chế Điều 15.4), không giảm trừ
-    thuNhapTinhThue = thuNhapChiuThue;
-    thueTncn = thuNhapChiuThue >= p.khau_tru_vang_lai_nguong ? chiaTron(thuNhapChiuThue, bp(p.khau_tru_vang_lai_ty_le), 10000) : 0;
-  } else {
-    thuNhapTinhThue = Math.max(0, thuNhapChiuThue - bhNld - giamTru);
-    thueTncn = thueLuyTien(thuNhapTinhThue, p);
-  }
+  // Thử việc cũng KHÔNG khấu trừ 10% (chị Phượng 05/11): tính như người có thu nhập thường xuyên, thu nhập tính thuế = chịu thuế − bảo hiểm (thử việc = 0) − giảm trừ.
+  const thuNhapTinhThue = Math.max(0, thuNhapChiuThue - bhNld - giamTru);
+  const thueTncn = thueLuyTien(thuNhapTinhThue, p);
 
   const thucLinh = tongThuNhap - bhNld - thueTncn - v.khauTruKhac;
   return { luongChucDanh, luongKpi, phuCapThuc, tienAn, tienOt, tongThuNhap, bhXh, bhYt, bhTn, giamTru, thuNhapTinhThue, thueTncn, thucLinh, bhCty };
 }
 
-/** Công chuẩn của một tháng = số ngày trong tháng trừ số Chủ nhật (công ty làm thứ Hai–thứ Bảy), nên đổi theo từng tháng (24, 25, 26…).
- *  Cả văn phòng và vận hành dùng chung cách tính (chị Phượng 05/11: công chuẩn không cố định 24). Tham số `cong_chuan_van_phong` không còn dùng để tính. */
-export function congChuanTheoKy(_kieu: "van_phong" | "van_hanh", nam: number, thang: number): number {
+/** Công chuẩn của một tháng, KHÔNG đặt cứng (chị Phượng + anh Nam 05/11): số ngày trong tháng trừ các Chủ nhật; riêng khối văn phòng trừ thêm số thứ Bảy nghỉ mỗi tháng (`t7Nghi`, tham số `t7_nghi_moi_thang`, hiện 2).
+ *  Ví dụ T10/2026 văn phòng = 31 − 4 Chủ nhật − 2 thứ Bảy = 25. Khối vận hành làm cả thứ Bảy nên chỉ trừ Chủ nhật. */
+export function congChuanTheoKy(kieu: "van_phong" | "van_hanh", nam: number, thang: number, t7Nghi = 0): number {
   const soNgay = new Date(Date.UTC(nam, thang, 0)).getUTCDate();
   let chuNhat = 0;
   for (let d = 1; d <= soNgay; d++) if (new Date(Date.UTC(nam, thang - 1, d)).getUTCDay() === 0) chuNhat++;
-  return soNgay - chuNhat;
+  return Math.max(1, soNgay - chuNhat - (kieu === "van_phong" ? Math.max(0, Math.round(t7Nghi)) : 0));
 }
 
 /** Tham số mặc định (bản trong migration 0006) — dùng cho test và khi chưa đọc được từ database. */
 export const THAM_SO_MAC_DINH: ThamSo = {
-  cong_chuan_van_phong: 24,
+  cong_chuan_van_phong: 24, // không còn dùng để tính (công chuẩn tự tính theo tháng)
+  t7_nghi_moi_thang: 2,
   tien_an_ngay: 25000,
   mien_thue_tien_an: 730000,
   thu_viec_ty_le: 85,

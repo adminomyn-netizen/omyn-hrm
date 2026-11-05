@@ -20,7 +20,7 @@ export function ThueBaoHiem({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
   const tong = (f: (d: DongLuongView) => number) => dong.reduce((t, d) => t + f(d), 0);
 
   if (!kyChon) return <p className="chu-tieu-de py-14 text-center text-[24px] text-muc-3">Chưa có kỳ lương nào. Tạo kỳ ở tab Bảng lương trước.</p>;
-  const bacCuaXem = xem && !xem.thu_viec ? chiTietBacThue(xem.thu_nhap_tinh_thue, thamSo) : [];
+  const bacCuaXem = xem ? chiTietBacThue(xem.thu_nhap_tinh_thue, thamSo) : [];
   const bhNld = (d: DongLuongView) => d.bh_xh + d.bh_yt + d.bh_tn;
 
   return (
@@ -96,18 +96,12 @@ export function ThueBaoHiem({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
             <section>
               <div className="nhan-muc mb-1.5">Giảm trừ và thu nhập tính thuế</div>
               <dl className="divide-y divide-vien border-y border-vien">
-                {xem.thu_viec ? (
-                  <div className="flex justify-between py-2"><dt className="text-muc-2">Thử việc: khấu trừ {pt(thamSo.khau_tru_vang_lai_ty_le)} khi thu nhập từ {tienVN(thamSo.khau_tru_vang_lai_nguong)}, không giảm trừ</dt><dd className="tabular-nums">{tienVN(xem.thu_nhap_tinh_thue)}</dd></div>
-                ) : (
-                  <>
-                    <div className="flex justify-between py-2"><dt className="text-muc-2">Giảm trừ bản thân</dt><dd className="tabular-nums">{tienVN(thamSo.giam_tru_ban_than)}</dd></div>
-                    <div className="flex justify-between py-2"><dt className="text-muc-2">Người phụ thuộc ({xem.so_nguoi_phu_thuoc} × {tienVN(thamSo.giam_tru_phu_thuoc)})</dt><dd className="tabular-nums">{tienVN(xem.so_nguoi_phu_thuoc * thamSo.giam_tru_phu_thuoc)}</dd></div>
-                    <div className="flex justify-between py-2 font-semibold text-muc"><dt>Thu nhập tính thuế (sau khi trừ bảo hiểm và giảm trừ)</dt><dd className="tabular-nums">{tienVN(xem.thu_nhap_tinh_thue)}</dd></div>
-                  </>
-                )}
+                <div className="flex justify-between py-2"><dt className="text-muc-2">Giảm trừ bản thân</dt><dd className="tabular-nums">{tienVN(thamSo.giam_tru_ban_than)}</dd></div>
+                <div className="flex justify-between py-2"><dt className="text-muc-2">Người phụ thuộc ({xem.so_nguoi_phu_thuoc} × {tienVN(thamSo.giam_tru_phu_thuoc)})</dt><dd className="tabular-nums">{tienVN(xem.so_nguoi_phu_thuoc * thamSo.giam_tru_phu_thuoc)}</dd></div>
+                <div className="flex justify-between py-2 font-semibold text-muc"><dt>Thu nhập tính thuế (sau khi trừ bảo hiểm và giảm trừ)</dt><dd className="tabular-nums">{tienVN(xem.thu_nhap_tinh_thue)}</dd></div>
               </dl>
             </section>
-            {!xem.thu_viec && (
+            {(
               <section>
                 <div className="nhan-muc mb-1.5">Thuế lũy tiến 5 bậc</div>
                 {bacCuaXem.length === 0 ? <p className="text-muc-3">Thu nhập tính thuế bằng 0 nên không phải nộp thuế.</p> : (

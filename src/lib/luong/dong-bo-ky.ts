@@ -52,7 +52,7 @@ export async function dongBoKyTuHoSo(kyId: string, p: ThamSo, ep = false): Promi
       });
     }
     if (ky.nam && ky.thang) {
-      const congChuan = congChuanTheoKy((t?.kieu_cong ?? d.kieu_cong) as "van_phong" | "van_hanh", ky.nam, ky.thang);
+      const congChuan = congChuanTheoKy((t?.kieu_cong ?? d.kieu_cong) as "van_phong" | "van_hanh", ky.nam, ky.thang, p.t7_nghi_moi_thang ?? 2);
       moiHoSo.cong_chuan = congChuan;
       // Công chuẩn đổi thì công cũ có thể đã bị cắt ở mức cũ (vd 24): lấy lại từ bảng công. Công chuẩn không đổi thì giữ số đã nhập tay.
       const tong = congTheoNguoi.get(d.nhan_vien_id);

@@ -154,7 +154,7 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
       thieu.push(n.ho_ten);
       continue;
     }
-    const congChuan = congChuanTheoKy(t.kieu_cong as "van_phong" | "van_hanh", ky.nam, ky.thang);
+    const congChuan = congChuanTheoKy(t.kieu_cong as "van_phong" | "van_hanh", ky.nam, ky.thang, p.t7_nghi_moi_thang ?? 2);
     const gioOt = tongGioTheoLoai(tcTheo.get(n.id) ?? []);
     const thuong = thTheo.get(n.id) ?? { hoaHong: 0, thuongKhac: 0 };
     // Công hưởng và ngày làm lấy từ bảng công tháng (X, N, CT, P, L…): cùng một hàm với bảng chấm công nên không lệch nhau.

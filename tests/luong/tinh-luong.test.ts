@@ -35,13 +35,13 @@ describe("tinhLuong", () => {
     expect(r.thucLinh).toBe(50_922_400);
   });
 
-  it("C — thử việc: 85%, không BH, khấu trừ 10%", () => {
+  it("C — thử việc: 85%, không BH, không khấu trừ 10% (dưới mức giảm trừ nên không thuế)", () => {
     const r = tinhLuong({ ...DAU_VAO_TRONG, luongThoaThuan: 10_000_000, thuViec: true }, P);
     expect(r.luongChucDanh).toBe(7_650_000);
     expect(r.luongKpi).toBe(850_000);
     expect(r.bhXh + r.bhYt + r.bhTn).toBe(0);
-    expect(r.thueTncn).toBe(850_000);
-    expect(r.thucLinh).toBe(8_250_000);
+    expect(r.thueTncn).toBe(0);
+    expect(r.thucLinh).toBe(9_100_000); // 8,5tr + tiền ăn 600k
   });
 
   it("D — nghỉ nửa tháng: lương chức danh theo tỷ lệ công, KPI không theo công", () => {
@@ -105,13 +105,14 @@ describe("tinhLuong", () => {
 });
 
 describe("congChuanTheoKy", () => {
-  it("văn phòng cũng theo tháng: T11/2026 = 25, T10/2026 = 31 − 4 Chủ nhật = 27, T2/2026 = 24", () => {
-    expect(congChuanTheoKy("van_phong", 2026, 11)).toBe(25);
-    expect(congChuanTheoKy("van_phong", 2026, 10)).toBe(27);
-    expect(congChuanTheoKy("van_phong", 2026, 2)).toBe(24);
+  it("văn phòng: ngày trong tháng − Chủ nhật − 2 thứ Bảy nghỉ (T10/2026 = 31 − 4 − 2 = 25 theo chị Phượng)", () => {
+    expect(congChuanTheoKy("van_phong", 2026, 10, 2)).toBe(25);
+    expect(congChuanTheoKy("van_phong", 2026, 11, 2)).toBe(23);
+    expect(congChuanTheoKy("van_phong", 2026, 2, 2)).toBe(22);
   });
-  it("vận hành T11/2026 = 30 ngày − 5 Chủ nhật = 25 (khớp plan)", () => expect(congChuanTheoKy("van_hanh", 2026, 11)).toBe(25));
-  it("vận hành T2/2026 = 28 ngày − 4 Chủ nhật = 24", () => expect(congChuanTheoKy("van_hanh", 2026, 2)).toBe(24));
+  it("không đặt cứng: đổi số thứ Bảy nghỉ thì công chuẩn đổi theo", () => expect(congChuanTheoKy("van_phong", 2026, 10, 0)).toBe(27));
+  it("vận hành T11/2026 = 30 ngày − 5 Chủ nhật = 25 (khớp plan), không trừ thứ Bảy", () => expect(congChuanTheoKy("van_hanh", 2026, 11, 2)).toBe(25));
+  it("vận hành T2/2026 = 28 ngày − 4 Chủ nhật = 24", () => expect(congChuanTheoKy("van_hanh", 2026, 2, 2)).toBe(24));
 });
 
 describe("chiTietBacThue (tách thuế 5 bậc để hiển thị)", () => {
