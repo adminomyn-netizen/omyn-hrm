@@ -88,6 +88,7 @@ export function ThoaThuanLuong({ ds }: { ds: ThoaThuanView[] }) {
               <div className="sm:col-span-2">
                 <label className={NHAN_O} htmlFor="tt-luong">Lương thỏa thuận (gộp, chưa trừ bảo hiểm và thuế) *</label>
                 <OTien id="tt-luong" ten="luong_thoa_thuan" giaTriMacDinh={t?.luong_thoa_thuan ?? 0} />
+                <div className="mt-1 text-[12px] text-muc-3">{sua.trang_thai === "Thử việc" ? "Đang thử việc: nhập đủ 100% lương, bảng lương tự tính 85% (tỷ lệ ở Tham số lương)." : "Nhập đủ 100% lương. Khi nhân viên ở trạng thái Thử việc (Hồ sơ nhân sự), bảng lương tự tính 85% (tỷ lệ ở Tham số lương), không cần nhập tay."}</div>
               </div>
               <div>
                 <label className={NHAN_O} htmlFor="tt-kpi">% KPI nền trong lương</label>
@@ -95,8 +96,9 @@ export function ThoaThuanLuong({ ds }: { ds: ThoaThuanView[] }) {
                 <div className="mt-1 text-[12px] text-muc-3">Để trống là 0%. Xuất bảng lương xem rồi điều chỉnh sau.</div>
               </div>
               <div>
-                <label className={NHAN_O} htmlFor="tt-pc">Phụ cấp cố định mỗi tháng</label>
+                <label className={NHAN_O} htmlFor="tt-pc">Phụ cấp cố định khác mỗi tháng</label>
                 <OTien id="tt-pc" ten="phu_cap" giaTriMacDinh={t?.phu_cap ?? 0} />
+                <div className="mt-1 text-[12px] text-muc-3">Không gồm tiền ăn trưa (tiền ăn đã tự tính theo ngày công ở dưới).</div>
               </div>
               <div>
                 <label className={NHAN_O} htmlFor="tt-kieu">Kiểu công</label>
