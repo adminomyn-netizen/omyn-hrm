@@ -44,6 +44,14 @@ describe("tinhLuong", () => {
     expect(r.thucLinh).toBe(9_100_000); // 8,5tr + tiền ăn 600k
   });
 
+  it("C2 — thử việc lương cao: thuế lũy tiến theo thu nhập, không cố định 10%", () => {
+    const r = tinhLuong({ ...DAU_VAO_TRONG, luongThoaThuan: 40_000_000, tyLeKpi: 0, thuViec: true, anCa: false }, P);
+    // 85% = 34tr; trừ giảm trừ bản thân 15,5tr = 18,5tr tính thuế: 10tr×5% + 8,5tr×10% = 1.350.000
+    expect(r.thueTncn).toBe(1_350_000);
+    expect(r.thueTncn).not.toBe(3_400_000);
+    expect(r.bhXh + r.bhYt + r.bhTn).toBe(0);
+  });
+
   it("D — nghỉ nửa tháng: lương chức danh theo tỷ lệ công, KPI không theo công", () => {
     const r = tinhLuong({ ...DAU_VAO_TRONG, luongThoaThuan: 12_000_000, congHuong: 12, ngayLam: 12 }, P);
     expect(r.luongChucDanh).toBe(5_400_000);

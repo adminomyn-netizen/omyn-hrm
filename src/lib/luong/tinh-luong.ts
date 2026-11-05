@@ -179,8 +179,6 @@ export const THAM_SO_MAC_DINH: ThamSo = {
   thue_ty_le_3: 20,
   thue_ty_le_4: 30,
   thue_ty_le_5: 35,
-  khau_tru_vang_lai_ty_le: 10,
-  khau_tru_vang_lai_nguong: 2000000,
 };
 
 export const DAU_VAO_TRONG: DauVaoLuong = {
