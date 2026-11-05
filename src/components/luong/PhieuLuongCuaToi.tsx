@@ -3,7 +3,7 @@ import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 
 export type PhieuView = {
   id: string; ten_ky: string; trang_thai: string; cong_chuan: number; cong_huong: number;
-  luong_chuc_danh: number; luong_kpi: number; phu_cap_thuc: number; tien_an: number; tien_ot: number; hoa_hong: number; thuong_khac: number; tong_thu_nhap: number;
+  thu_viec?: boolean; luong_chuc_danh: number; luong_kpi: number; phu_cap_thuc: number; tien_an: number; tien_ot: number; hoa_hong: number; thuong_khac: number; tong_thu_nhap: number;
   bh_xh: number; bh_yt: number; bh_tn: number; thue_tncn: number; khau_tru_khac: number; thuc_linh: number;
 };
 
@@ -14,7 +14,7 @@ export function PhieuLuongCuaToi({ ds }: { ds: PhieuView[] }) {
     <div className="space-y-10">
       {ds.map((p) => {
         const dong: [string, number, boolean?][] = [
-          ["Lương chức danh", p.luong_chuc_danh], ["Lương KPI", p.luong_kpi], ["Phụ cấp", p.phu_cap_thuc], ["Tiền ăn", p.tien_an], ["Tăng ca", p.tien_ot], ["Hoa hồng", p.hoa_hong], ["Thưởng khác", p.thuong_khac],
+          [p.thu_viec ? "Lương thử việc" : "Lương chức danh", p.luong_chuc_danh], ["Lương KPI", p.luong_kpi], ["Phụ cấp", p.phu_cap_thuc], ["Tiền ăn", p.tien_an], ["Tăng ca", p.tien_ot], ["Hoa hồng", p.hoa_hong], ["Thưởng khác", p.thuong_khac],
           ["Tổng thu nhập", p.tong_thu_nhap, true],
           ["Bảo hiểm xã hội", -p.bh_xh], ["Bảo hiểm y tế", -p.bh_yt], ["Bảo hiểm thất nghiệp", -p.bh_tn], ["Thuế TNCN", -p.thue_tncn], ["Khấu trừ khác", -p.khau_tru_khac],
         ];

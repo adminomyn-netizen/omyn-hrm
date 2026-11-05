@@ -30,7 +30,7 @@ export default async function TrangPhieuLuong({ params }: { params: Promise<{ id
   if (!quanLy && !(nd.vaiTro === "nhan_vien" && p.nhan_vien.user_id === nd.id && ["da_duyet", "da_chi"].includes(p.ky.trang_thai))) notFound();
 
   const thu: [string, number][] = [
-    ["Lương chức danh", p.luong_chuc_danh], ["Lương KPI", p.luong_kpi], ["Phụ cấp", p.phu_cap_thuc], ["Tiền ăn", p.tien_an], ["Tăng ca", p.tien_ot], ["Hoa hồng", p.hoa_hong], ["Thưởng khác", p.thuong_khac],
+    [p.thu_viec ? "Lương thử việc" : "Lương chức danh", p.luong_chuc_danh], ["Lương KPI", p.luong_kpi], ["Phụ cấp", p.phu_cap_thuc], ["Tiền ăn", p.tien_an], ["Tăng ca", p.tien_ot], ["Hoa hồng", p.hoa_hong], ["Thưởng khác", p.thuong_khac],
   ];
   const tru: [string, number][] = [
     ["Bảo hiểm xã hội (người lao động)", p.bh_xh], ["Bảo hiểm y tế", p.bh_yt], ["Bảo hiểm thất nghiệp", p.bh_tn], ["Thuế thu nhập cá nhân", p.thue_tncn], ["Khấu trừ khác", p.khau_tru_khac],

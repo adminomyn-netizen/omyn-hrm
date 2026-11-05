@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     { t: "Khối", w: 20, f: (d) => d.khoi_ten },
     { t: "Công chuẩn", w: 11, f: (d) => Number(d.cong_chuan) },
     { t: "Công hưởng", w: 11, f: (d) => Number(d.cong_huong) },
-    { t: "Lương chức danh", w: 16, f: (d) => Number(d.luong_chuc_danh) },
+    { t: "Lương chức danh / thử việc", w: 18, f: (d) => Number(d.luong_chuc_danh) },
     { t: "Lương KPI", w: 14, f: (d) => Number(d.luong_kpi) },
     { t: "Phụ cấp", w: 13, f: (d) => Number(d.phu_cap_thuc) },
     { t: "Tiền ăn", w: 13, f: (d) => Number(d.tien_an) },

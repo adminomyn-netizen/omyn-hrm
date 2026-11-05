@@ -98,7 +98,7 @@ export function ChiTietDongLuong({ dong, thamSo, suaDuoc, xong, huy }: { dong: D
 
       <div className="rounded-[10px] border border-vien bg-giay-tram/50 px-5 py-4" aria-live="polite">
         <div className="nhan-muc pb-1">Kết quả (tính lại ngay khi bạn sửa)</div>
-        {dongKq("Lương chức danh theo công", kq.luongChucDanh)}
+        {dongKq(dong.thu_viec ? "Lương thử việc theo công" : "Lương chức danh theo công", kq.luongChucDanh)}
         {dongKq("Lương KPI", kq.luongKpi)}
         {dongKq("Phụ cấp", kq.phuCapThuc)}
         {dongKq("Tiền ăn", kq.tienAn)}
