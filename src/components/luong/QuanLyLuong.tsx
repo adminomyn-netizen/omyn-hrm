@@ -10,7 +10,7 @@ import type { ThamSo } from "@/lib/luong/tinh-luong";
 
 const TAB = [["bang", "Bảng lương"], ["thue-bh", "Thuế và bảo hiểm"], ["thoa-thuan", "Thỏa thuận lương"], ["tham-so", "Tham số"]] as const;
 
-export function QuanLyLuong({ ky, chon, dong, thamSo, thoaThuan, thamSoDs }: { ky: KyView[]; chon: string; dong: DongLuongView[]; thamSo: ThamSo; thoaThuan: ThoaThuanView[]; thamSoDs: ThamSoView[] }) {
+export function QuanLyLuong({ ky, chon, dong, thamSo, thoaThuan, thamSoDs, duocDuyet }: { ky: KyView[]; chon: string; dong: DongLuongView[]; thamSo: ThamSo; thoaThuan: ThoaThuanView[]; thamSoDs: ThamSoView[]; duocDuyet: boolean }) {
   const [tab, setTab] = useState<(typeof TAB)[number][0]>("bang");
   const chua = thamSoDs.filter((t) => !t.xac_nhan_luc).length;
   return (
@@ -22,7 +22,7 @@ export function QuanLyLuong({ ky, chon, dong, thamSo, thoaThuan, thamSoDs }: { k
           </button>
         ))}
       </div>
-      {tab === "bang" && <BangLuongKy ky={ky} chon={chon} dong={dong} thamSo={thamSo} />}
+      {tab === "bang" && <BangLuongKy ky={ky} chon={chon} dong={dong} thamSo={thamSo} duocDuyet={duocDuyet} />}
       {tab === "thue-bh" && <ThueBaoHiem ky={ky} chon={chon} dong={dong} thamSo={thamSo} />}
       {tab === "thoa-thuan" && <ThoaThuanLuong ds={thoaThuan} tienAnNgay={thamSo.tien_an_ngay} />}
       {tab === "tham-so" && <ThamSoLuong ds={thamSoDs} />}

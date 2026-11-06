@@ -16,18 +16,16 @@ export type KyView = { id: string; ten_ky: string; thang: number | null; nam: nu
 const BUOC = [
   { k: "mo", nhan: "Mở" },
   { k: "da_lap", nhan: "Đã lập" },
-  { k: "da_kiem", nhan: "Đã kiểm" },
   { k: "da_duyet", nhan: "Đã duyệt" },
   { k: "da_chi", nhan: "Đã chi" },
 ] as const;
 const TIEP: Record<string, { nhan: string; hint: string } | undefined> = {
   mo: { nhan: "Lập bảng lương", hint: "Tạo dòng lương cho mọi nhân viên đã có thỏa thuận" },
-  da_lap: { nhan: "Chuyển sang Đã kiểm", hint: "Khoá số liệu để kiểm tra" },
-  da_kiem: { nhan: "Duyệt bảng lương", hint: "Cần mọi tham số đã được xác nhận" },
+  da_lap: { nhan: "Duyệt bảng lương", hint: "Chị Lâm hoặc chị Linh duyệt. Cần mọi tham số đã được xác nhận, duyệt xong là khoá số liệu" },
   da_duyet: { nhan: "Đánh dấu Đã chi", hint: "Sau khi chuyển khoản xong" },
 };
 
-export function BangLuongKy({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: string; dong: DongLuongView[]; thamSo: ThamSo }) {
+export function BangLuongKy({ ky, chon, dong, thamSo, duocDuyet }: { ky: KyView[]; chon: string; dong: DongLuongView[]; thamSo: ThamSo; duocDuyet: boolean }) {
   const router = useRouter();
   const [hop, setHop] = useState<{ k: "tao" } | { k: "dong"; d: DongLuongView } | { k: "xoa" } | null>(null);
   const [loi, setLoi] = useState<string | undefined>();
@@ -131,7 +129,8 @@ export function BangLuongKy({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
                 </>
               )}
               {kyChon.trang_thai === "mo" && dong.length === 0 && <button type="button" className={NUT_CHU_NGUY} onClick={() => setHop({ k: "xoa" })}>Xoá kỳ</button>}
-              {TIEP[kyChon.trang_thai] && (
+              {kyChon.trang_thai === "da_lap" && !duocDuyet && <span className="text-[13px] text-muc-3">Chờ chị Lâm hoặc chị Linh duyệt</span>}
+              {TIEP[kyChon.trang_thai] && (kyChon.trang_thai !== "da_lap" || duocDuyet) && (
                 <button type="button" className={NUT_CHINH} disabled={dangXuLy} title={TIEP[kyChon.trang_thai]!.hint} onClick={() => chayKy(kyChon.trang_thai === "mo" ? lapBangLuong : chuyenKyLuong)}>
                   {dangXuLy ? "Đang xử lý" : TIEP[kyChon.trang_thai]!.nhan}
                 </button>
@@ -174,7 +173,7 @@ export function BangLuongKy({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
         </div>
       )}
 
-      <Hop mo={hop?.k === "tao"} dong={() => { setHop(null); setLoi(undefined); }} tieuDe="Tạo kỳ lương" moTa="Mỗi tháng một kỳ. Kỳ đi lần lượt: Mở → Đã lập → Đã kiểm → Đã duyệt → Đã chi.">
+      <Hop mo={hop?.k === "tao"} dong={() => { setHop(null); setLoi(undefined); }} tieuDe="Tạo kỳ lương" moTa="Mỗi tháng một kỳ. Kỳ đi lần lượt: Mở → Đã lập (nhân sự lập) → Đã duyệt (chị Lâm hoặc chị Linh) → Đã chi.">
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div><label className={NHAN_O}>Tháng</label><Chon giaTri={thang} onDoi={setThang} luaChon={Array.from({ length: 12 }, (_, i) => ({ gia_tri: String(i + 1), nhan: `Tháng ${i + 1}` }))} /></div>

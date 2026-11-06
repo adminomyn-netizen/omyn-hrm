@@ -8,12 +8,11 @@ import { congChuanTheoKy, type ThamSo } from "@/lib/luong/tinh-luong";
 import { layBangCongThang } from "@/lib/bang-cong";
 import { tongGioTheoLoai } from "@/lib/tang-ca";
 import { dbHr } from "@/lib/hr-db";
+import { buocKeTiep, duocDuyetLuong } from "@/lib/luong/nguoi-duyet";
 import { cotKetQua, dongBoKyTuHoSo, tuDong, type Dong } from "@/lib/luong/dong-bo-ky";
 
 export type KetQuaLuong = { loi?: string; ok?: boolean; thongBao?: string };
 const KHONG_QUYEN: KetQuaLuong = { loi: "Chỉ Quản trị và Kỹ thuật mới được xem và sửa lương." };
-const THU_TU = ["mo", "da_lap", "da_kiem", "da_duyet", "da_chi"] as const;
-type TrangThaiKy = (typeof THU_TU)[number];
 
 const chuoi = (fd: FormData, k: string, toiDa = 300) => String(fd.get(k) ?? "").trim().slice(0, toiDa);
 const uuid = (s: string) => /^[0-9a-f-]{36}$/i.test(s);
@@ -50,11 +49,11 @@ async function docThamSo(): Promise<{ p: ThamSo; chuaXacNhan: number }> {
   return { p, chuaXacNhan: chua };
 }
 
-/** Kỳ còn sửa được dòng lương khi đang "mở" hoặc "đã lập". Từ "đã kiểm" trở đi bị khoá. */
+/** Kỳ còn sửa được dòng lương khi đang "mở" hoặc "đã lập". Từ khi duyệt trở đi bị khoá. */
 async function kyDangSua(kyId: string) {
   const { data } = await createAdminClient().from("ky_luong").select("id, thang, nam, trang_thai").eq("id", kyId).maybeSingle();
   if (!data) return { loi: "Không tìm thấy kỳ lương." as const };
-  if (!["mo", "da_lap"].includes(data.trang_thai)) return { loi: "Kỳ lương đã khoá sửa (từ bước Đã kiểm). Không đổi được số liệu." as const };
+  if (!["mo", "da_lap"].includes(data.trang_thai)) return { loi: "Kỳ lương đã khoá sửa (từ khi đã duyệt). Không đổi được số liệu." as const };
   return { ky: data };
 }
 
@@ -223,15 +222,16 @@ export async function tinhLaiKy(fd: FormData): Promise<KetQuaLuong> {
 
 /** Chuyển kỳ sang bước kế tiếp (chỉ đi tiến). Duyệt chỉ được khi mọi tham số đã được xác nhận. */
 export async function chuyenKyLuong(fd: FormData): Promise<KetQuaLuong> {
-  if (!(await chiQuanTri())) return KHONG_QUYEN;
+  const nd = await chiQuanTri();
+  if (!nd) return KHONG_QUYEN;
   const kyId = chuoi(fd, "ky_id", 40);
   if (!uuid(kyId)) return { loi: "Thiếu kỳ lương." };
   const db = createAdminClient();
   const { data: ky } = await db.from("ky_luong").select("trang_thai").eq("id", kyId).maybeSingle();
   if (!ky) return { loi: "Không tìm thấy kỳ lương." };
-  const i = THU_TU.indexOf(ky.trang_thai as TrangThaiKy);
-  if (i < 0 || i >= THU_TU.length - 1) return { loi: "Kỳ lương đã ở bước cuối." };
-  const den = THU_TU[i + 1];
+  const den = buocKeTiep(ky.trang_thai);
+  if (!den) return { loi: "Kỳ lương đã ở bước cuối." };
+  if (den === "da_duyet" && !duocDuyetLuong(nd.id)) return { loi: "Chỉ chị Lâm hoặc chị Linh được duyệt bảng lương." };
   const { count } = await db.from("bang_luong").select("id", { count: "exact", head: true }).eq("ky_luong_id", kyId);
   if (den === "da_lap" && (count ?? 0) === 0) return { loi: "Chưa có dòng lương nào. Bấm \"Lập bảng lương\" trước." };
   if (den === "da_duyet") {
@@ -240,6 +240,8 @@ export async function chuyenKyLuong(fd: FormData): Promise<KetQuaLuong> {
   }
   const { error } = await db.from("ky_luong").update({ trang_thai: den, chuyen_luc: new Date().toISOString(), ...(den === "da_chi" ? { da_thanh_toan: true } : {}) }).eq("id", kyId);
   if (error) return { loi: "Chưa chuyển được bước. Thử lại sau." };
+  // Lưu vết ai chuyển bước nào, lúc nào (đặc biệt là người duyệt).
+  await db.from("nhat_ky").insert({ nguoi_thuc_hien: nd.id, bang: "ky_luong", hanh_dong: den === "da_duyet" ? "DUYET" : "CHUYEN_BUOC", ban_ghi: kyId, truoc: { trang_thai: ky.trang_thai }, sau: { trang_thai: den, nguoi: nd.hoTen } });
   if (den === "da_duyet" || den === "da_chi") {
     // Gửi phiếu lương cho từng người (như nút "Gửi bảng lương" bên Lark): thông báo chung chung, không ghi số tiền để khỏi lộ trên màn hình khoá.
     const [{ data: ky2 }, { data: dong }] = await Promise.all([db.from("ky_luong").select("thang, nam").eq("id", kyId).maybeSingle(), db.from("bang_luong").select("nhan_vien:nhan_vien_id(user_id)").eq("ky_luong_id", kyId)]);

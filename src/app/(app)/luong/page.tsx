@@ -8,6 +8,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { phepNamDuoc } from "@/lib/quy-phep";
 import { layPhepNamDaDung, layDongLuongCuaKy, layKyLuong, layNhanVienIdTheoUser, layPhieuLuongCuaToi, layThamSoLuong, layThoaThuanLuong } from "@/lib/data";
 import { layNguoiDungDaDuyet } from "@/lib/auth";
+import { duocDuyetLuong } from "@/lib/luong/nguoi-duyet";
 import { dongBoKyTuHoSo } from "@/lib/luong/dong-bo-ky";
 import { THAM_SO_MAC_DINH, type ThamSo } from "@/lib/luong/tinh-luong";
 import type { DongLuongView } from "@/components/luong/ChiTietDongLuong";
@@ -64,7 +65,7 @@ export default async function TrangLuong({ searchParams }: { searchParams: Promi
   return (
     <div className="space-y-8">
       <TieuDeTrang tieuDe="Lương" phu="Kỳ lương, thỏa thuận lương và tham số tính lương" />
-      <QuanLyLuong ky={ky} chon={chon} dong={dong} thamSo={thamSo} thoaThuan={thoaThuan} thamSoDs={thamSoDs} />
+      <QuanLyLuong ky={ky} chon={chon} dong={dong} thamSo={thamSo} thoaThuan={thoaThuan} thamSoDs={thamSoDs} duocDuyet={duocDuyetLuong(nd.id)} />
     </div>
   );
 }

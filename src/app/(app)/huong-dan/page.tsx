@@ -29,6 +29,17 @@ const NHAN_VIEN: HuongDan = {
       ],
     },
     {
+      tieuDe: "Công việc hằng ngày",
+      sac: "tim",
+      buoc: [
+        { tieuDe: "Lập danh sách việc hôm nay", noiDung: <p>Vào mục <b>Công việc</b>, gõ vào ô &quot;Thêm việc cần làm hôm nay…&quot; rồi bấm Enter. Chưa có việc hằng ngày thì bấm <b>Chưa có việc hằng ngày? Thêm từ mẫu</b>, chọn mẫu theo mảng của bạn (kinh doanh, kho, marketing, kế toán, nhân sự hoặc mẫu chung) rồi sửa tên và số lượng cho đúng thực tế. Mỗi lần thêm xong có dòng &quot;Đã thêm việc…&quot; báo thành công. Giám đốc, Phó giám đốc và Kỹ thuật nhận thông báo bạn vừa thêm việc gì, thuộc phòng ban nào.</p> },
+        { tieuDe: "Việc lặp hằng ngày", noiDung: <p>Bấm <b>Thêm chi tiết</b>, bật <b>Lặp lại hằng ngày</b>, nhập số lượng cần làm mỗi ngày và đơn vị (cuộc gọi, bài, đơn…). Tick xong hôm nay thì ngày mai việc tự mở lại. Muốn dừng hẳn thì chọn <b>Huỷ việc</b>.</p> },
+        { tieuDe: "Gắn link minh chứng trước khi hoàn thành", noiDung: <p>Mở việc, dán link vào ô <b>Link minh chứng</b> (bảng tính, tài liệu, ảnh, bài đăng… phải bắt đầu bằng https), có thể ghi chú ngắn. <b>Chưa có link thì không bấm hoàn thành được</b>: nút đánh dấu xong bị khoá và hiện &quot;Cần gắn link minh chứng trước khi hoàn thành&quot;.</p> },
+        { tieuDe: "Nộp báo cáo cuối ngày", noiDung: <p>Ở ô <b>Báo cáo công việc hôm nay</b>, ghi <b>Kết quả hôm nay</b> (đã làm gì, còn dở gì, vướng gì), dán link nếu có, rồi nộp. Trong ngày còn sửa được bằng <b>Sửa báo cáo</b>. Giám đốc, Phó giám đốc và Kỹ thuật không phải nộp.</p> },
+        { tieuDe: "Các mốc nhắc", noiDung: <p>08:30 nhắc việc đầu ngày. 16:45 nhắc sắp hết ngày làm. 17:30 và 19:30 nhắc lại nếu bạn chưa nộp báo cáo. Nhắc hiện ở biểu tượng chuông; muốn nhận cả thông báo trên điện thoại thì thêm app vào màn hình chính và cho phép thông báo.</p> },
+      ],
+    },
+    {
       tieuDe: "Khi cần nghỉ hoặc làm khác thường",
       sac: "xanh",
       buoc: [
@@ -73,6 +84,14 @@ const QUAN_TRI: HuongDan = {
       ],
     },
     {
+      tieuDe: "Công việc hằng ngày của công ty",
+      sac: "tim",
+      buoc: [
+        { tieuDe: "Bạn cũng lập việc và nộp báo cáo", noiDung: <p>Trừ Giám đốc, Phó giám đốc và Kỹ thuật, mọi người kể cả bộ phận Hành chính nhân sự đều lập việc hôm nay, gắn link minh chứng khi hoàn thành và nộp báo cáo cuối ngày ở mục <b>Công việc</b>.</p> },
+        { tieuDe: "Xem tổng quan (Giám đốc, Phó giám đốc, Kỹ thuật)", noiDung: <p>Vào <b>Công việc → Tổng quan báo cáo</b>, hoặc xem thẻ <b>Báo cáo công việc hôm nay</b> ở Tổng quan. Mỗi người một dòng: đã nộp báo cáo hay chưa, từng việc đã xong hay chưa, link minh chứng, và nhãn <b>Mới thêm hôm nay</b>. Chuyển ngày bằng nút ngày phía trên. Khoảng 17:45 – 19:00 và 20:00 – 21:30 hệ thống gửi tổng hợp những ai chưa nộp.</p> },
+      ],
+    },
+    {
       tieuDe: "Khi có người mới hoặc thay đổi nhân sự",
       sac: "luc",
       buoc: [
@@ -101,7 +120,7 @@ const QUAN_TRI: HuongDan = {
       buoc: [
         { tieuDe: "Kiểm tham số và thỏa thuận lương", noiDung: <p>Vào <b>Bảng lương</b>. Tab <b>Tham số</b>: kiểm mức bảo hiểm, giảm trừ, biểu thuế rồi bấm <b>Xác nhận tất cả</b> (cần xác nhận trước khi duyệt kỳ thật). Tab <b>Thỏa thuận lương</b>: nhập cho từng người lương thỏa thuận, % KPI, phụ cấp, ăn ca, có đóng bảo hiểm không, số người phụ thuộc.</p> },
         { tieuDe: "Tạo kỳ và lập bảng lương", noiDung: <p>Tab <b>Bảng lương</b> → <b>Tạo kỳ lương</b> (chọn tháng, năm) → <b>Lập bảng lương</b>. Công lấy tự động từ Bảng công tháng. Mở từng dòng để nhập giờ tăng ca, hoa hồng, thưởng, khấu trừ khác; sửa công nếu cần.</p> },
-        { tieuDe: "Đối chiếu thuế, bảo hiểm rồi chốt", noiDung: <p>Tab <b>Thuế và bảo hiểm</b> cho thấy cách ra từng số (bảo hiểm, giảm trừ, 5 bậc thuế). Chuyển kỳ qua <b>Đã kiểm → Đã duyệt → Đã chi</b>; từ bước Đã kiểm trở đi không sửa được dòng. Bấm <b>Xuất Excel</b> để lưu bảng lương, hoặc mở dòng của từng người bấm <b>In phiếu</b>.</p> },
+        { tieuDe: "Đối chiếu thuế, bảo hiểm rồi chốt", noiDung: <p>Tab <b>Thuế và bảo hiểm</b> cho thấy cách ra từng số (bảo hiểm, giảm trừ, 5 bậc thuế). Bảng lương chỉ có hai bước người: chị Phượng bấm <b>Lập bảng lương</b>, rồi chị Lâm hoặc chị Linh bấm <b>Duyệt bảng lương</b> (người khác không thấy nút duyệt). Sau khi duyệt, đánh dấu <b>Đã chi</b> khi chuyển khoản xong; từ khi duyệt trở đi không sửa được dòng. Bấm <b>Xuất Excel</b> để lưu bảng lương, hoặc mở dòng của từng người bấm <b>In phiếu</b>.</p> },
       ],
     },
   ],
