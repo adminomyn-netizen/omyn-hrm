@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { chanHoanThanhThieuMinhChung as chan, chuTongHopBaoCao, chuanHoaLink, tinThemViec, mienBaoCaoCv, mocTongHopBaoCao, nhacBaoCaoCv, tenMienLink } from "@/lib/bao-cao-cv";
+import { tinhTrang, type Viec } from "@/lib/cong-viec";
 import { MAU_CONG_VIEC, sapMauTheoKhoi } from "@/lib/mau-cong-viec";
 
 const g = (h: number, m = 0) => h * 60 + m;
@@ -129,4 +130,13 @@ describe("thông báo nhân sự vừa thêm việc", () => {
     expect(t.noiDung).toBe("An đã thêm: a; b; c và 2 việc nữa.");
     expect(tinThemViec({ hoTen: "An", khoi: "X", tieuDe: ["x".repeat(100)] }).noiDung).toContain("…");
   });
+});
+
+describe("việc lặp hằng ngày không bị đóng vĩnh viễn", () => {
+  const v: Viec = { id: "1", tieuDe: "Chấm công vào và ra", loai: "Hằng ngày", nguoiLamId: "n", han: null, uuTien: "Trung bình", mucTieu: 1, daLam: 0, donVi: "", lapLai: "Hằng ngày", trangThai: "Chưa làm" };
+  it("tick xong hôm nay (da_lam = mục tiêu) thì xong; hôm sau số hôm nay về 0 thì lại là việc hôm nay", () => {
+    expect(tinhTrang(v, 1, "2026-11-06")).toBe("xong");
+    expect(tinhTrang(v, 0, "2026-11-07")).toBe("hom-nay");
+  });
+  it("bỏ tick (da_lam = 0) thì mở lại ngay trong ngày", () => expect(tinhTrang(v, 0, "2026-11-06")).toBe("hom-nay"));
 });

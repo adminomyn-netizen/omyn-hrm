@@ -2,7 +2,7 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import { CalendarClock, Check, Minus, Plus, Undo2 } from "lucide-react";
-import { doiTrangThaiCongViec, ghiNhanCongViec, luuCongViec, xoaCongViec } from "@/app/(app)/cong-viec/actions";
+import { datTienDoHomNay, doiTrangThaiCongViec, ghiNhanCongViec, luuCongViec, xoaCongViec } from "@/app/(app)/cong-viec/actions";
 import { Chon } from "@/components/ui/Chon";
 import { Hop } from "@/components/ui/Hop";
 import { NgayChon } from "@/components/ui/NgayChon";
@@ -31,6 +31,7 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy, baoCao, phaiB
   const [sua, setSua] = useState<DongCv | "moi" | null>(null);
   const [dang, bat] = useTransition();
   const [loi, setLoi] = useState("");
+  const [tb, setTb] = useState("");
   const nhanNguoi = useMemo(() => new Map(nguoi.map((x) => [x.id, x.ten])), [nguoi]);
   const tt = (d: DongCv) => tinhTrang(d.v, d.daLamHomNay, homNay);
   const cuaToi = dong.filter((d) => d.v.nguoiLamId === toiId && d.v.trangThai !== "Huỷ");
@@ -40,14 +41,14 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy, baoCao, phaiB
   const trongPhamVi = dong.filter((d) => phamVi === "nhom" || d.v.nguoiLamId === toiId);
   const dem = demTheoTinhTrang(trongPhamVi.map(tt));
   const danhSach = xepViec(trongPhamVi.map((d) => ({ v: d.v, tt: tt(d), d }))).filter((x) => (loc === "viec" ? x.tt !== "xong" && x.tt !== "huy" : x.tt === loc));
-  const chay = (f: () => Promise<{ loi?: string }>) => bat(async () => { const r = await f(); setLoi(r.loi ?? ""); });
+  const chay = (f: () => Promise<{ loi?: string }>) => bat(async () => { setTb(""); const r = await f(); setLoi(r.loi ?? ""); });
   const nhanh = useRef<HTMLInputElement>(null);
   const themNhanh = () => {
     const ten = nhanh.current?.value.trim();
     if (!ten || !toiId) return;
     const fd = new FormData();
     Object.entries({ tieu_de: ten, nguoi_lam_id: toiId, loai: "Vận hành", uu_tien: "Trung bình", muc_tieu_so: "1", lap_lai: "Không", han: homNay }).forEach(([k, v]) => fd.set(k, v));
-    chay(async () => { const r = await luuCongViec(fd); if (!r.loi && nhanh.current) nhanh.current.value = ""; return r; });
+    chay(async () => { const r = await luuCongViec(fd); if (!r.loi) { if (nhanh.current) nhanh.current.value = ""; setTb(`Đã thêm việc “${ten}”.`); } return r; });
   };
 
   return (
@@ -69,6 +70,7 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy, baoCao, phaiB
         <button type="button" onClick={() => setSua("moi")} className={`${NUT_PHU} ${quanLy ? "" : "ml-auto"} flex items-center gap-1.5`}><Plus strokeWidth={1.8} className="h-4 w-4" />Thêm chi tiết</button>
       </div>
       {loi && <p role="alert" className="mb-3 rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</p>}
+      {tb && !loi && <p role="status" className="mb-3 rounded-nho bg-nhan-nhat px-3 py-2.5 text-[14px] text-nhan-dam">{tb}</p>}
 
       {danhSach.length === 0 ? (
         <p className="rounded-nho border border-vien bg-giay-sang p-6 text-center text-[14px] text-muc-3">{loc === "viec" ? "Không còn việc nào cần làm. Gõ vào ô phía trên để thêm việc mới." : "Chưa có việc nào ở mục này."}</p>
@@ -81,7 +83,7 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy, baoCao, phaiB
             return (
               <li key={d.v.id} className={`the-noi rounded-nho border border-vien bg-giay-sang p-4 ${dongXong ? "opacity-70" : ""}`}>
                 <div className="flex items-start gap-3">
-                  <button type="button" onClick={() => chay(() => doiTrangThaiCongViec(d.v.id, t === "xong" ? "Chưa làm" : "Hoàn thành"))} disabled={dang} aria-label={t === "xong" ? "Mở lại việc" : "Đánh dấu đã xong"} title={t !== "xong" && phaiBaoCao && !d.coMinhChung ? "Cần gắn link minh chứng trước khi hoàn thành" : undefined}
+                  <button type="button" onClick={() => chay(() => (d.v.lapLai === "Hằng ngày" ? datTienDoHomNay(d.v.id, t === "xong" ? 0 : d.v.mucTieu) : doiTrangThaiCongViec(d.v.id, t === "xong" ? "Chưa làm" : "Hoàn thành")))} disabled={dang} aria-label={t === "xong" ? "Mở lại việc" : "Đánh dấu đã xong"} title={t !== "xong" && phaiBaoCao && !d.coMinhChung ? "Cần gắn link minh chứng trước khi hoàn thành" : undefined}
                     className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-nho border ${t === "xong" ? "border-transparent nut-vang" : "border-vien-dam hover:bg-giay-tram"}`}>
                     {t === "xong" ? <Check strokeWidth={2.2} className="h-4 w-4" /> : null}
                   </button>
@@ -117,13 +119,13 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy, baoCao, phaiB
       )}
 
       <Hop mo={sua !== null} dong={() => setSua(null)} tieuDe={sua === "moi" ? "Thêm việc" : "Sửa việc"} rong="rong">
-        {sua !== null && <FormCv key={sua === "moi" ? "moi" : sua.v.id} coSan={sua === "moi" ? undefined : sua} nguoi={nguoi} toiId={toiId} homNay={homNay} xong={() => setSua(null)} />}
+        {sua !== null && <FormCv key={sua === "moi" ? "moi" : sua.v.id} coSan={sua === "moi" ? undefined : sua} nguoi={nguoi} toiId={toiId} homNay={homNay} xong={() => setSua(null)} daThem={(ten) => { setLoi(""); setTb(`Đã thêm việc “${ten}”.`); }} />}
       </Hop>
     </div>
   );
 }
 
-function FormCv({ coSan, nguoi, toiId, homNay, xong }: { coSan?: DongCv; nguoi: Nguoi[]; toiId: string | null; homNay: string; xong: () => void }) {
+function FormCv({ coSan, nguoi, toiId, homNay, xong, daThem }: { coSan?: DongCv; nguoi: Nguoi[]; toiId: string | null; homNay: string; xong: () => void; daThem: (ten: string) => void }) {
   const [loi, setLoi] = useState("");
   const [dang, bat] = useTransition();
   const ref = useRef<HTMLFormElement>(null);
@@ -131,7 +133,7 @@ function FormCv({ coSan, nguoi, toiId, homNay, xong }: { coSan?: DongCv; nguoi: 
   const gui = () => {
     if (!ref.current?.reportValidity()) return;
     const fd = new FormData(ref.current);
-    bat(async () => { const r = await luuCongViec(fd); if (r.loi) setLoi(r.loi); else xong(); });
+    bat(async () => { const r = await luuCongViec(fd); if (r.loi) setLoi(r.loi); else { if (!coSan) daThem(String(fd.get("tieu_de") ?? "")); xong(); } });
   };
   const bo = (muc: "huy" | "xoa") => {
     if (!coSan || (muc === "xoa" && !window.confirm("Xoá việc này? Không khôi phục được."))) return;

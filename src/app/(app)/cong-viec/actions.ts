@@ -7,7 +7,7 @@ import { dbHr } from "@/lib/hr-db";
 import { homNayHcm } from "@/lib/kpi-data";
 import { chanHoanThanhThieuMinhChung, chuanHoaLink, mienBaoCaoCv, tinThemViec } from "@/lib/bao-cao-cv";
 import { nguoiNhanTongHopBaoCao } from "@/lib/bao-cao-cv-data";
-import { guiChoNguoiDung } from "@/lib/push";
+import { guiThongBaoCongViec } from "@/lib/thong-bao-cv";
 import { MAU_CONG_VIEC } from "@/lib/mau-cong-viec";
 
 export type KetQuaCv = { loi?: string; ok?: boolean };
@@ -63,7 +63,7 @@ async function baoQuanLyThemViec(nguoiLamId: string, tieuDe: string[]) {
     if (!nv) return;
     const tin = tinThemViec({ hoTen: nv.ho_ten as string, khoi: (nv.khoi as { ten?: string } | null)?.ten, tieuDe });
     const nhan = (await nguoiNhanTongHopBaoCao()).filter((u) => u !== nd.id);
-    if (nhan.length) await guiChoNguoiDung(nhan, { ...tin, url: "/cong-viec/tong-quan", tag: `viec-moi-${nguoiLamId}-${Date.now()}` });
+    if (nhan.length) await guiThongBaoCongViec(nhan, { ...tin, url: "/cong-viec/tong-quan", tag: `viec-moi-${nguoiLamId}-${Date.now()}` });
   } catch (e) {
     console.error("[bao-quan-ly-them-viec] lỗi", (e as Error).message);
   }
@@ -210,9 +210,10 @@ export async function doiTrangThaiCongViec(
     .maybeSingle();
   if (!v) return { loi: "Không tìm thấy việc." };
   if (!(await duocThaoTac(v.nguoi_lam_id))) return KHONG_QUYEN;
+  if (trangThai === "Hoàn thành" && v.lap_lai === "Hằng ngày") return { loi: "Việc lặp hằng ngày không kết thúc bằng một lần bấm: ghi số đã làm hôm nay (hoặc tick xong hôm nay). Muốn dừng hẳn thì chọn Huỷ." };
   if (trangThai === "Hoàn thành") {
     const { phaiBaoCao } = await thaoTacVien();
-    const lap = v.lap_lai === "Hằng ngày";
+    const lap = false;
     const chan = chanHoanThanhThieuMinhChung({ phaiCoMinhChung: phaiBaoCao, lapLai: lap, daLamMoi: v.muc_tieu_so, mucTieu: v.muc_tieu_so, coMinhChung: phaiBaoCao ? await coMinhChungChoViec(id, lap) : true, dichHoanThanh: true });
     if (chan) return { loi: chan };
   }
@@ -317,4 +318,24 @@ export async function themViecTuMau(ma: string): Promise<KetQuaCv & { them?: num
   if (moi.length) await baoQuanLyThemViec(toi.id, moi.map((m) => m.tieu_de));
   lamMoi();
   return { ok: true, them: moi.length };
+}
+
+/** Đặt số đã làm HÔM NAY của một việc lặp hằng ngày (tick xong = đủ mục tiêu, bỏ tick = 0). Chạm mục tiêu thì người phải báo cáo cần có link minh chứng của hôm nay.
+ *  Việc lặp KHÔNG bao giờ bị đóng vĩnh viễn: ngày mai số hôm nay tính lại từ 0. */
+export async function datTienDoHomNay(id: string, soLam: number): Promise<KetQuaCv> {
+  if (!UUID.test(id) || !Number.isFinite(soLam)) return { loi: "Việc không hợp lệ." };
+  const db = dbHr();
+  const { data: v } = await db.from("cong_viec").select("nguoi_lam_id, lap_lai, muc_tieu_so").eq("id", id).maybeSingle();
+  if (!v) return { loi: "Không tìm thấy việc." };
+  if (v.lap_lai !== "Hằng ngày") return { loi: "Việc này không lặp hằng ngày." };
+  if (!(await duocThaoTac(v.nguoi_lam_id))) return KHONG_QUYEN;
+  const moi = Math.max(0, Math.min(Math.trunc(soLam), 1_000_000));
+  const { phaiBaoCao } = await thaoTacVien();
+  const chan = chanHoanThanhThieuMinhChung({ phaiCoMinhChung: phaiBaoCao, lapLai: true, daLamMoi: moi, mucTieu: v.muc_tieu_so, coMinhChung: phaiBaoCao ? await coMinhChungChoViec(id, true) : true, dichHoanThanh: false });
+  if (chan) return { loi: chan };
+  const ngay = homNayHcm();
+  const { error } = await db.from("cong_viec_ngay").upsert({ cong_viec_id: id, ngay, da_lam: moi, cap_nhat_luc: new Date().toISOString() }, { onConflict: "cong_viec_id,ngay" });
+  if (error) return { loi: "Chưa ghi được." };
+  lamMoi();
+  return { ok: true };
 }

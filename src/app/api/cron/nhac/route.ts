@@ -5,6 +5,7 @@ import { guiChoNguoiDung } from "@/lib/push";
 import { NHAN_THIEU, layNguoiQuanLy, nguoiPhaiChamCong, nhacHienTai, ngayLamViecTruoc, thieuNgayTruoc } from "@/lib/nhac-cong";
 import { nhacHr } from "@/lib/nhac-hr-data";
 import { nhacBaoCaoCongViec } from "@/lib/nhac-bao-cao-cv";
+import { guiThongBaoCongViec } from "@/lib/thong-bao-cv";
 import { kyCanBaoHomNay, tinhTongHop } from "@/lib/tong-hop-hieu-suat";
 
 export const dynamic = "force-dynamic";
@@ -25,11 +26,12 @@ export async function GET(req: Request) {
 
   const hom = ngayHomNayHCM(), g = gioHienTaiHCM(), phut = Number(g.slice(0, 2)) * 60 + Number(g.slice(3, 5));
   let daGui = 0;
-  const gui = async (userId: string, khung: string, tin: Parameters<typeof guiChoNguoiDung>[1]) => {
+  const gui = async (userId: string, khung: string, tin: Parameters<typeof guiChoNguoiDung>[1], trongApp = false) => {
     // Chèn trước, trùng khoá thì đã gửi rồi: bỏ qua.
     const { error } = await db.from("nhac_da_gui").insert({ user_id: userId, ngay: hom, khung });
     if (error) return;
-    daGui += (await guiChoNguoiDung([userId], { ...tin, tag: `${khung}-${hom}` })).thanhCong;
+    if (trongApp) await guiThongBaoCongViec([userId], { ...tin, tag: `${khung}-${hom}` }).catch(() => undefined);
+    else daGui += (await guiChoNguoiDung([userId], { ...tin, tag: `${khung}-${hom}` })).thanhCong;
   };
 
   const ds = await nguoiPhaiChamCong(hom);

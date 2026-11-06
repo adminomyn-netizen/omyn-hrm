@@ -49,7 +49,7 @@ export type DongBaoCao = {
   nhanVienId: string; hoTen: string; chucDanh: string; khoi: string; phai: boolean;
   soViec: number; xong: number; quaHan: number;
   baoCao: { tomTat: string; link: string | null; nopLuc: string } | null;
-  minhChung: { tieuDe: string; link: string; ghiChu: string | null }[];
+  viec: { tieuDe: string; xong: boolean; link: string | null; ghiChu: string | null; moiHomNay: boolean }[];
 };
 export type TongQuanBaoCao = { ngay: string; dong: DongBaoCao[]; phaiNop: number; daNop: number };
 
@@ -63,7 +63,7 @@ export async function layTongQuanBaoCao(ngay: string): Promise<TongQuanBaoCao> {
   if (ids.length === 0) return { ngay, dong: [], phaiNop: 0, daNop: 0 };
   const phai = new Set(phaiDs.map((n) => n.nhanVienId));
   const [{ data: cv }, { data: bc }] = await Promise.all([
-    db.from("cong_viec").select("id, tieu_de, nguoi_lam_id, han, lap_lai, muc_tieu_so, trang_thai").in("nguoi_lam_id", ids).neq("trang_thai", "Huỷ").limit(5000),
+    db.from("cong_viec").select("id, tieu_de, nguoi_lam_id, han, lap_lai, muc_tieu_so, trang_thai, tao_luc").in("nguoi_lam_id", ids).neq("trang_thai", "Huỷ").limit(5000),
     db.from("cong_viec_bao_cao").select("nhan_vien_id, tom_tat, link, nop_luc").eq("ngay", ngay).in("nhan_vien_id", ids),
   ]);
   const cvIds = (cv ?? []).map((c) => c.id as string);
@@ -72,20 +72,23 @@ export async function layTongQuanBaoCao(ngay: string): Promise<TongQuanBaoCao> {
   const baoCaoTheo = new Map((bc ?? []).map((b) => [b.nhan_vien_id as string, b]));
   const dong: DongBaoCao[] = nguoi.map((n) => {
     let soViec = 0, xong = 0, quaHan = 0;
-    const minhChung: DongBaoCao["minhChung"] = [];
+    const viec: DongBaoCao["viec"] = [];
     for (const c of (cv ?? []).filter((x) => x.nguoi_lam_id === n.id)) {
       const homNay = ngayCv.get(c.id as string);
       const lap = c.lap_lai === "Hằng ngày";
-      if (lap || c.han === ngay) {
+      const moiHomNay = !!c.tao_luc && new Date(c.tao_luc as string).toLocaleDateString("en-CA", { timeZone: "Asia/Ho_Chi_Minh" }) === ngay;
+      const trongNgay = lap || c.han === ngay;
+      const xongViec = lap ? Number(homNay?.da_lam ?? 0) >= Number(c.muc_tieu_so) : c.trang_thai === "Hoàn thành";
+      if (trongNgay) {
         soViec++;
-        if (lap ? Number(homNay?.da_lam ?? 0) >= Number(c.muc_tieu_so) : c.trang_thai === "Hoàn thành") xong++;
+        if (xongViec) xong++;
       } else if (c.han && c.han < ngay && c.trang_thai !== "Hoàn thành") quaHan++;
-      if (homNay?.link_bao_cao) minhChung.push({ tieuDe: c.tieu_de as string, link: homNay.link_bao_cao as string, ghiChu: (homNay.ghi_chu as string | null) ?? null });
+      if (trongNgay || moiHomNay || homNay?.link_bao_cao) viec.push({ tieuDe: c.tieu_de as string, xong: xongViec, link: (homNay?.link_bao_cao as string | null) ?? null, ghiChu: (homNay?.ghi_chu as string | null) ?? null, moiHomNay });
     }
     const b = baoCaoTheo.get(n.id);
     return {
       nhanVienId: n.id, hoTen: n.ho_ten, chucDanh: n.chuc_danh ?? "", khoi: n.khoi?.ten ?? "", phai: phai.has(n.id), soViec, xong, quaHan,
-      baoCao: b ? { tomTat: b.tom_tat as string, link: (b.link as string | null) ?? null, nopLuc: b.nop_luc as string } : null, minhChung,
+      baoCao: b ? { tomTat: b.tom_tat as string, link: (b.link as string | null) ?? null, nopLuc: b.nop_luc as string } : null, viec,
     };
   });
   dong.sort((a, b) => Number(b.phai && !b.baoCao) - Number(a.phai && !a.baoCao) || a.hoTen.localeCompare(b.hoTen, "vi"));
