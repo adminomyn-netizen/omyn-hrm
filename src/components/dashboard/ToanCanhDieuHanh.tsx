@@ -11,6 +11,7 @@ import { bangXepHang, homNayHcm } from "@/lib/kpi-data";
 import { taiBsc } from "@/lib/bsc-data";
 import { hrCanChuY, thongKeCongViec } from "@/lib/dieu-hanh-data";
 import { congNgay } from "@/lib/nhac-hr";
+import { TheBaoCaoCongViec } from "@/components/dashboard/TheBaoCaoCongViec";
 
 const TIEN = (n: number) => `${n.toLocaleString("vi-VN", { maximumFractionDigits: 0 })} đ`;
 const TRIEU = (n: number) => (n >= 1e9 ? `${(n / 1e9).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} tỷ` : n >= 1e6 ? `${(n / 1e6).toLocaleString("vi-VN", { maximumFractionDigits: 1 })} tr` : TIEN(n));
@@ -54,6 +55,8 @@ export async function ToanCanhDieuHanh() {
           <li key={t.nhan}><Link href={t.href} className="the-noi block h-full rounded-nho border border-vien bg-giay-sang p-4 hover:[box-shadow:var(--bong-2)]"><div className="text-[12px] text-muc-3">{t.nhan}</div><div className="chu-tieu-de mt-1 text-[26px] leading-tight text-nhan-dam">{t.so}</div><div className="mt-0.5 truncate text-[12px] text-muc-3">{t.phu}</div></Link></li>
         ))}
       </ul>
+
+      <TheBaoCaoCongViec />
 
       <div className="grid gap-x-12 gap-y-10 lg:grid-cols-2">
         <MucTrang tieuDe={`Thi đua KPI · ${docKy(thang)?.nhan ?? ""}`} phai={<Xem href="/kpi" nhan="Bảng xếp hạng" />}>

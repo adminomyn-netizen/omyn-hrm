@@ -6,6 +6,7 @@ import { LoiChaoDongHo } from "@/components/dashboard/LoiChaoDongHo";
 import { NUT_CHINH, NUT_PHU } from "@/components/ui/dinh-dang";
 import { layTongQuanCuaToi } from "@/lib/data";
 import { gioMayChu, ngayVN } from "@/lib/dinh-dang";
+import { TheBaoCaoCongViec } from "@/components/dashboard/TheBaoCaoCongViec";
 
 const kieuDon = (t: string) => (t === "Đã duyệt" ? "tot" : t === "Từ chối" ? "loi" : "cho");
 const gio = (g: string | null | undefined) => (g ? g.slice(0, 5) : "--:--");
@@ -34,6 +35,8 @@ export async function TongQuanCuaToi({ userId, hoTen }: { userId: string; hoTen:
         <Link href="/don-tu" className={`${NUT_PHU} inline-flex items-center`}>Nộp đơn</Link>
         <Link href="/cham-cong" className={`${NUT_CHINH} inline-flex items-center`}>{daChamVao && !d.homNay?.gio_ra ? "Chấm công ra" : "Chấm công"}</Link>
       </LoiChaoDongHo>
+
+      <TheBaoCaoCongViec />
 
       <HangChiSo
         muc={[

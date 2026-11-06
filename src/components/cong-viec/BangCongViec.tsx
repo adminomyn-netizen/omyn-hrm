@@ -8,9 +8,13 @@ import { Hop } from "@/components/ui/Hop";
 import { NgayChon } from "@/components/ui/NgayChon";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { NHAN_O, NUT_CHINH, NUT_CHU_NGUY, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
+import { BaoCaoCuoiNgay, type BaoCaoHomNay } from "@/components/cong-viec/BaoCaoCuoiNgay";
+import { MauCongViec } from "@/components/cong-viec/MauCongViec";
+import { MinhChungViec } from "@/components/cong-viec/MinhChungViec";
+import type { MauCv } from "@/lib/mau-cong-viec";
 import { demTheoTinhTrang, phanTramTienDo, tinhTrang, xepViec, type TinhTrang, type Viec } from "@/lib/cong-viec";
 
-export type DongCv = { v: Viec; moTa: string; nguoiGiaoId: string | null; daLamHomNay: number };
+export type DongCv = { v: Viec; moTa: string; nguoiGiaoId: string | null; daLamHomNay: number; link: string | null; ghiChuNgay: string | null; coMinhChung: boolean };
 type Nguoi = { id: string; ten: string };
 
 const BO_LOC: { ma: "viec" | TinhTrang; nhan: string }[] = [
@@ -21,7 +25,7 @@ const NHAN: Record<TinhTrang, string> = { xong: "Đã xong", huy: "Đã huỷ", 
 const NGAY = (s: string | null) => (s ? s.split("-").reverse().slice(0, 2).join("/") : "");
 
 /** Công việc: ô thêm nhanh một dòng, thẻ gọn có thanh tiến độ và nút +1, bấm vào thẻ để sửa chi tiết. Nhân viên chỉ thấy việc của mình; trưởng phòng thấy thêm cấp dưới. */
-export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy }: { dong: DongCv[]; nguoi: Nguoi[]; toiId: string | null; homNay: string; quanLy: boolean }) {
+export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy, baoCao, phaiBaoCao, mau }: { dong: DongCv[]; nguoi: Nguoi[]; toiId: string | null; homNay: string; quanLy: boolean; baoCao: BaoCaoHomNay; phaiBaoCao: boolean; mau: Pick<MauCv, "ma" | "ten" | "viec">[] }) {
   const [loc, setLoc] = useState<"viec" | TinhTrang>("viec");
   const [phamVi, setPhamVi] = useState<"toi" | "nhom">(quanLy ? "nhom" : "toi");
   const [sua, setSua] = useState<DongCv | "moi" | null>(null);
@@ -29,6 +33,10 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy }: { dong: Don
   const [loi, setLoi] = useState("");
   const nhanNguoi = useMemo(() => new Map(nguoi.map((x) => [x.id, x.ten])), [nguoi]);
   const tt = (d: DongCv) => tinhTrang(d.v, d.daLamHomNay, homNay);
+  const cuaToi = dong.filter((d) => d.v.nguoiLamId === toiId && d.v.trangThai !== "Huỷ");
+  const viecHomNay = cuaToi.filter((d) => d.v.lapLai === "Hằng ngày" || d.v.han === homNay);
+  const xongHomNay = viecHomNay.filter((d) => tt(d) === "xong").length;
+  const chuaCoViecNgay = !!toiId && !cuaToi.some((d) => d.v.lapLai === "Hằng ngày");
   const trongPhamVi = dong.filter((d) => phamVi === "nhom" || d.v.nguoiLamId === toiId);
   const dem = demTheoTinhTrang(trongPhamVi.map(tt));
   const danhSach = xepViec(trongPhamVi.map((d) => ({ v: d.v, tt: tt(d), d }))).filter((x) => (loc === "viec" ? x.tt !== "xong" && x.tt !== "huy" : x.tt === loc));
@@ -44,6 +52,8 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy }: { dong: Don
 
   return (
     <div>
+      {toiId && phaiBaoCao && <BaoCaoCuoiNgay baoCao={baoCao} soViec={viecHomNay.length} xong={xongHomNay} />}
+      {chuaCoViecNgay && <MauCongViec mau={mau} />}
       {toiId && (
         <div className="mb-4 flex gap-2">
           <input ref={nhanh} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), themNhanh())} placeholder="Thêm việc cần làm hôm nay… rồi bấm Enter" aria-label="Thêm việc nhanh" className={O_NHAP} />
@@ -71,7 +81,7 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy }: { dong: Don
             return (
               <li key={d.v.id} className={`the-noi rounded-nho border border-vien bg-giay-sang p-4 ${dongXong ? "opacity-70" : ""}`}>
                 <div className="flex items-start gap-3">
-                  <button type="button" onClick={() => chay(() => doiTrangThaiCongViec(d.v.id, t === "xong" ? "Chưa làm" : "Hoàn thành"))} disabled={dang} aria-label={t === "xong" ? "Mở lại việc" : "Đánh dấu đã xong"}
+                  <button type="button" onClick={() => chay(() => doiTrangThaiCongViec(d.v.id, t === "xong" ? "Chưa làm" : "Hoàn thành"))} disabled={dang} aria-label={t === "xong" ? "Mở lại việc" : "Đánh dấu đã xong"} title={t !== "xong" && phaiBaoCao && !d.coMinhChung ? "Cần gắn link minh chứng trước khi hoàn thành" : undefined}
                     className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-nho border ${t === "xong" ? "border-transparent nut-vang" : "border-vien-dam hover:bg-giay-tram"}`}>
                     {t === "xong" ? <Check strokeWidth={2.2} className="h-4 w-4" /> : null}
                   </button>
@@ -86,6 +96,7 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy }: { dong: Don
                     </span>
                   </button>
                 </div>
+                {!dongXong || d.link ? <MinhChungViec key={`${d.v.id}-${d.link ?? ""}`} id={d.v.id} link={d.link} ghiChu={d.ghiChuNgay} /> : null}
                 {d.v.mucTieu > 1 || d.v.lapLai === "Hằng ngày" ? (
                   <div className="mt-3 flex items-center gap-3">
                     <div className="h-2 flex-1 overflow-hidden rounded-tag bg-giay-tram" role="progressbar" aria-valuenow={pt} aria-valuemin={0} aria-valuemax={100} aria-label="Tiến độ"><div className="h-full bg-nhan" style={{ width: `${pt}%` }} /></div>
