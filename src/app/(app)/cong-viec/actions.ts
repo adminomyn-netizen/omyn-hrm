@@ -46,9 +46,9 @@ async function thaoTacVien() {
   return { nd, phaiBaoCao: !mienBaoCaoCv(nd.vaiTro, data?.chuc_danh, data?.quyen_giam_doc) };
 }
 
-/** Việc này đã có link minh chứng chưa: việc lặp tính của HÔM NAY; việc một lần tính bất kỳ ngày nào đã gắn. */
+/** Việc này đã có minh chứng (link HOẶC ghi chú) chưa: việc lặp tính của HÔM NAY; việc một lần tính bất kỳ ngày nào đã gắn. */
 async function coMinhChungChoViec(id: string, lapLai: boolean): Promise<boolean> {
-  let q = dbHr().from("cong_viec_ngay").select("cong_viec_id", { head: true, count: "exact" }).eq("cong_viec_id", id).not("link_bao_cao", "is", null);
+  let q = dbHr().from("cong_viec_ngay").select("cong_viec_id", { head: true, count: "exact" }).eq("cong_viec_id", id).or("link_bao_cao.not.is.null,ghi_chu.not.is.null");
   if (lapLai) q = q.eq("ngay", homNayHcm());
   const { count } = await q;
   return (count ?? 0) > 0;
@@ -259,7 +259,7 @@ async function nhanVienCuaToi() {
   return data ? { id: data.id as string, userId: nd.id } : null;
 }
 
-/** Gắn link minh chứng (và ghi chú ngắn) cho một việc HÔM NAY. Giữ nguyên số đã làm; chỉ nhận http/https. Để trống link là xoá. */
+/** Gắn minh chứng cho một việc HÔM NAY: link (không bắt buộc, chỉ nhận http/https) và/hoặc ghi chú ngắn. Có một trong hai là đủ. Giữ nguyên số đã làm. Để trống cả hai là xoá. */
 export async function luuMinhChungCongViec(id: string, link: string, ghiChu: string): Promise<KetQuaCv> {
   if (!UUID.test(id)) return { loi: "Việc không hợp lệ." };
   const l = chuanHoaLink(link);
@@ -275,7 +275,7 @@ export async function luuMinhChungCongViec(id: string, link: string, ghiChu: str
     { cong_viec_id: id, ngay, da_lam: Number(h?.da_lam ?? 0), link_bao_cao: l || null, ghi_chu: note || null, cap_nhat_luc: new Date().toISOString() },
     { onConflict: "cong_viec_id,ngay" },
   );
-  if (error) return { loi: "Chưa lưu được link minh chứng." };
+  if (error) return { loi: "Chưa lưu được minh chứng." };
   lamMoi();
   return { ok: true };
 }

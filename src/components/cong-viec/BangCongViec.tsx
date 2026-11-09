@@ -83,7 +83,7 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy, baoCao, phaiB
             return (
               <li key={d.v.id} className={`the-noi rounded-nho border border-vien bg-giay-sang p-4 ${dongXong ? "opacity-70" : ""}`}>
                 <div className="flex items-start gap-3">
-                  <button type="button" onClick={() => chay(() => (d.v.lapLai === "Hằng ngày" ? datTienDoHomNay(d.v.id, t === "xong" ? 0 : d.v.mucTieu) : doiTrangThaiCongViec(d.v.id, t === "xong" ? "Chưa làm" : "Hoàn thành")))} disabled={dang} aria-label={t === "xong" ? "Mở lại việc" : "Đánh dấu đã xong"} title={t !== "xong" && phaiBaoCao && !d.coMinhChung ? "Cần gắn link minh chứng trước khi hoàn thành" : undefined}
+                  <button type="button" onClick={() => chay(() => (d.v.lapLai === "Hằng ngày" ? datTienDoHomNay(d.v.id, t === "xong" ? 0 : d.v.mucTieu) : doiTrangThaiCongViec(d.v.id, t === "xong" ? "Chưa làm" : "Hoàn thành")))} disabled={dang} aria-label={t === "xong" ? "Mở lại việc" : "Đánh dấu đã xong"} title={t !== "xong" && phaiBaoCao && !d.coMinhChung ? "Cần thêm minh chứng (link hoặc ghi chú) trước khi hoàn thành" : undefined}
                     className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-nho border ${t === "xong" ? "border-transparent nut-vang" : "border-vien-dam hover:bg-giay-tram"}`}>
                     {t === "xong" ? <Check strokeWidth={2.2} className="h-4 w-4" /> : null}
                   </button>
@@ -98,7 +98,7 @@ export function BangCongViec({ dong, nguoi, toiId, homNay, quanLy, baoCao, phaiB
                     </span>
                   </button>
                 </div>
-                {!dongXong || d.link ? <MinhChungViec key={`${d.v.id}-${d.link ?? ""}`} id={d.v.id} link={d.link} ghiChu={d.ghiChuNgay} /> : null}
+                {!dongXong || d.link || d.ghiChuNgay ? <MinhChungViec key={`${d.v.id}-${d.link ?? ""}-${d.ghiChuNgay ?? ""}`} id={d.v.id} link={d.link} ghiChu={d.ghiChuNgay} /> : null}
                 {d.v.mucTieu > 1 || d.v.lapLai === "Hằng ngày" ? (
                   <div className="mt-3 flex items-center gap-3">
                     <div className="h-2 flex-1 overflow-hidden rounded-tag bg-giay-tram" role="progressbar" aria-valuenow={pt} aria-valuemin={0} aria-valuemax={100} aria-label="Tiến độ"><div className="h-full bg-nhan" style={{ width: `${pt}%` }} /></div>

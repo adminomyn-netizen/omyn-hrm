@@ -47,7 +47,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
     truong: [
       chu("ma_ke_hoach", "Mã kế hoạch"), chu("ky_lap", "Kỳ lập ngân sách", { goiY: "Tháng 11/2026" }), nv("nguoi_lap", "Người lập kế hoạch"),
       dm("don_vi", "Đơn vị làm việc", "Đơn vị làm việc"), dm("bo_phan", "Bộ phận", "Bộ phận"),
-      chu("link_du_toan", "Link dự toán ngân sách"), tien("tong_du_toan", "Tổng dự toán ngân sách"), BANG_CHU("tong_du_toan"),
+      chu("link_du_toan", "Link dự toán ngân sách", { batBuoc: false }), tien("tong_du_toan", "Tổng dự toán ngân sách"), BANG_CHU("tong_du_toan"),
       chu("so_voi_thang_truoc", "So với dự toán tháng trước"), chu("ly_do_tang_giam", "Lý do tăng/giảm"), chu("ghi_chu", "Ghi chú"),
     ],
   },
@@ -187,7 +187,7 @@ export const MAU_PHIEU: readonly MauPhieu[] = [
       tep("ho_so", "Hồ sơ đính kèm"),
       chon("hinh_thuc_thanh_toan", "Hình thức thanh toán", ["Tiền mặt", "Chuyển khoản", "Tiền mặt quỹ"], { batBuoc: false }),
       BUT_TOAN("but_toan_chi_phi", "Bút toán ghi nhận chi phí"), BUT_TOAN("but_toan_thanh_toan", "Bút toán ghi nhận thanh toán"),
-      chu("link_dinh_kem", "Link đính kèm"),
+      chu("link_dinh_kem", "Link đính kèm", { batBuoc: false }),
     ],
   },
   {

@@ -36,7 +36,7 @@ export function BaoCaoCuoiNgay({ baoCao, soViec, xong }: { baoCao: BaoCaoHomNay;
       {mo && (
         <form ref={ref} className="mt-3 space-y-3" onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLElement).tagName !== "TEXTAREA" && e.preventDefault()}>
           <div><label htmlFor="bc-tt" className={NHAN_O}>Kết quả hôm nay *</label><textarea id="bc-tt" name="tom_tat" defaultValue={baoCao?.tomTat ?? ""} placeholder="Đã làm được gì, còn dở gì, vướng gì" className={`${O_NHIEU_DONG} min-h-[88px]`} maxLength={2000} /></div>
-          <div><label htmlFor="bc-lk" className={NHAN_O}>Link minh chứng</label><input id="bc-lk" name="link" defaultValue={baoCao?.link ?? ""} inputMode="url" placeholder="Dán link bảng tính, tài liệu, ảnh, bài đăng… (bắt đầu bằng https)" className={O_NHAP} /></div>
+          <div><label htmlFor="bc-lk" className={NHAN_O}>Link minh chứng (không bắt buộc)</label><input id="bc-lk" name="link" defaultValue={baoCao?.link ?? ""} inputMode="url" placeholder="Dán link bảng tính, tài liệu, ảnh, bài đăng… (bắt đầu bằng https)" className={O_NHAP} /></div>
           {loi && <p role="alert" className="rounded-nho bg-loi-nen px-3 py-2.5 text-[14px] text-loi">{loi}</p>}
           <div className="flex justify-end gap-2">
             {baoCao && <button type="button" onClick={() => { setMo(false); setLoi(""); }} className="text-[13px] text-muc-3 hover:text-muc">Đóng</button>}

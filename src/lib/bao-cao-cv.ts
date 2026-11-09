@@ -30,11 +30,11 @@ const P = (g: number, p = 0) => g * 60 + p;
 export function nhacBaoCaoCv(phut: number, soViec: number, daNop: boolean): NhacBaoCao | null {
   if (phut >= P(8, 30) && phut < P(10)) {
     return soViec > 0
-      ? { khung: "cv_sang", tieuDe: "Việc hôm nay", noiDung: `Hôm nay bạn có ${soViec} việc. Cập nhật tiến độ trong ngày và nhớ gắn link minh chứng.`, url: "/cong-viec" }
+      ? { khung: "cv_sang", tieuDe: "Việc hôm nay", noiDung: `Hôm nay bạn có ${soViec} việc. Cập nhật tiến độ trong ngày, kèm link hoặc ghi chú minh chứng.`, url: "/cong-viec" }
       : { khung: "cv_sang", tieuDe: "Chưa có việc hôm nay", noiDung: "Danh sách việc hôm nay đang trống. Thêm việc (có mẫu gợi ý) để cuối ngày báo cáo kết quả.", url: "/cong-viec" };
   }
   if (daNop) return null;
-  if (phut >= P(16, 45) && phut < P(17, 30)) return { khung: "cv_c1", tieuDe: "Sắp hết ngày làm", noiDung: "Nhớ nộp báo cáo kết quả công việc hôm nay, kèm link minh chứng.", url: "/cong-viec" };
+  if (phut >= P(16, 45) && phut < P(17, 30)) return { khung: "cv_c1", tieuDe: "Sắp hết ngày làm", noiDung: "Nhớ nộp báo cáo kết quả công việc hôm nay (link không bắt buộc).", url: "/cong-viec" };
   if (phut >= P(17, 30) && phut < P(19, 30)) return { khung: "cv_c2", tieuDe: "Bạn chưa nộp báo cáo công việc", noiDung: "Nộp báo cáo kết quả công việc hôm nay để Giám đốc nắm tiến độ.", url: "/cong-viec" };
   if (phut >= P(19, 30) && phut < P(21, 30)) return { khung: "cv_c3", tieuDe: "Vẫn chưa nộp báo cáo công việc", noiDung: "Nộp báo cáo trước khi hết ngày. Chưa làm được gì thì ghi rõ lý do.", url: "/cong-viec" };
   return null;
@@ -57,14 +57,14 @@ export function chuTongHopBaoCao(daNop: number, tong: number, chuaNop: string[])
 }
 
 /** Quy tắc "không có minh chứng thì không được bấm Hoàn thành" (chị Lâm 06/11), áp cho người PHẢI báo cáo (không phải Giám đốc/Phó giám đốc/Kỹ thuật).
- *  · Việc lặp hằng ngày: chỉ ghi nhận bớt/thêm từng phần được; khi số làm trong ngày CHẠM mục tiêu thì cần link minh chứng của HÔM NAY.
- *  · Việc một lần: bấm Hoàn thành (hoặc ghi nhận đủ số) cần có link minh chứng (bất kỳ ngày nào đã gắn cho việc đó).
+ *  · Việc lặp hằng ngày: chỉ ghi nhận bớt/thêm từng phần được; khi số làm trong ngày CHẠM mục tiêu thì cần minh chứng của HÔM NAY (link HOẶC ghi chú; việc như phỏng vấn không có link thì ghi chú, chị Phượng 09/11).
+ *  · Việc một lần: bấm Hoàn thành (hoặc ghi nhận đủ số) cần có minh chứng, link hoặc ghi chú (bất kỳ ngày nào đã gắn cho việc đó).
  *  Trả về câu báo lỗi khi bị chặn, null khi được phép. */
 export function chanHoanThanhThieuMinhChung(o: { phaiCoMinhChung: boolean; lapLai: boolean; daLamMoi: number; mucTieu: number; coMinhChung: boolean; dichHoanThanh: boolean }): string | null {
   if (!o.phaiCoMinhChung || o.coMinhChung) return null;
   const chamMuc = o.lapLai ? o.daLamMoi >= o.mucTieu : o.dichHoanThanh || o.daLamMoi >= o.mucTieu;
   if (!chamMuc) return null;
-  return "Cần gắn link minh chứng cho việc này trước khi bấm hoàn thành. Bấm \"Thêm link\" dưới tên việc, dán link rồi lưu.";
+  return "Cần có minh chứng cho việc này trước khi bấm hoàn thành. Bấm \"Thêm minh chứng\" dưới tên việc: dán link minh chứng nếu có, không có link thì ghi chú ngắn đã làm gì rồi lưu.";
 }
 
 /** Nội dung báo cho Giám đốc / Phó giám đốc / Kỹ thuật khi một nhân sự vừa thêm việc: ai, phòng ban nào, việc gì. */
