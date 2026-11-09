@@ -90,10 +90,10 @@ describe("kiểm tra phiếu", () => {
     // Đã thêm dòng thì vẫn phải ghi tên hạng mục.
     expect(kiemTraPhieu(tu, { hang_muc_chi_phi: [{}] }, CTX).loi["hang_muc_chi_phi.0.hang_muc_chi"]).toBeTruthy();
   });
-  it("tệp bắt buộc tính theo số tệp đã đính; kết thúc không được trước bắt đầu; nhiều người nhận", () => {
+  it("tệp đính kèm không bắt buộc, vẫn nhận khi có; kết thúc không được trước bắt đầu; nhiều người nhận", () => {
     const bg = mauTheoMa("ban-giao-tai-san")!;
     const base = { ngay_ban_giao: "2026-11-01", nguoi_nhan: [u(1), u(2), u(1)], muc_dich: "x" };
-    expect(kiemTraPhieu(bg, base, CTX).loi.tai_lieu).toBeTruthy();
+    expect(kiemTraPhieu(bg, base, CTX).loi.tai_lieu).toBeUndefined();
     const ok = kiemTraPhieu(bg, base, { ...CTX, soTep: { tai_lieu: 1 } });
     expect(ok.loi).toEqual({});
     expect(ok.sach.nguoi_nhan).toEqual([u(1), u(2)]);
@@ -237,10 +237,10 @@ describe("ô bổ sung sau khi so với form Lark", () => {
     expect(r.sach.tong_de_nghi).toBe(750_000);
     expect(kiemTraPhieu(m, {}, CTX).loi.chi_tiet_chi_phi).toBeUndefined();
   });
-  it("khen thưởng/kỷ luật: 3 tệp kỷ luật chỉ bắt buộc khi loại là Kỷ luật; điều chỉnh nhân sự cần tệp quyết định", () => {
+  it("khen thưởng/kỷ luật: các tệp kỷ luật và khen thưởng không bắt buộc", () => {
     const m = mauTheoMa("de-xuat-khen-thuong-ky-luat")!;
     const kl = kiemTraPhieu(m, { loai: "Kỷ luật" }, CTX).loi;
-    expect(kl.ban_tuong_trinh && kl.thong_bao_hop_ky_luat && kl.bien_ban_xu_ly_ky_luat).toBeTruthy();
+    expect(kl.ban_tuong_trinh || kl.thong_bao_hop_ky_luat || kl.bien_ban_xu_ly_ky_luat).toBeUndefined();
     const kt = kiemTraPhieu(m, { loai: "Khen thưởng" }, CTX).loi;
     expect(kt.ban_tuong_trinh).toBeUndefined();
   });
