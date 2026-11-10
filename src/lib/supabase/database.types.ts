@@ -24,6 +24,7 @@ export type Database = {
           cong_chuan: number
           cong_huong: number
           dong_bh: boolean
+          khau_tru_10: boolean
           ghi_chu: string | null
           giam_tru: number
           gio_ot_le: number
@@ -65,6 +66,7 @@ export type Database = {
           cong_chuan?: number
           cong_huong?: number
           dong_bh?: boolean
+          khau_tru_10?: boolean
           ghi_chu?: string | null
           giam_tru?: number
           gio_ot_le?: number
@@ -106,6 +108,7 @@ export type Database = {
           cong_chuan?: number
           cong_huong?: number
           dong_bh?: boolean
+          khau_tru_10?: boolean
           ghi_chu?: string | null
           giam_tru?: number
           gio_ot_le?: number
@@ -729,6 +732,7 @@ export type Database = {
           an_ca: boolean
           cap_nhat_luc: string
           dong_bh: boolean
+          khau_tru_10: boolean
           ghi_chu: string | null
           kieu_cong: string
           luong_thoa_thuan: number
@@ -742,6 +746,7 @@ export type Database = {
           an_ca?: boolean
           cap_nhat_luc?: string
           dong_bh?: boolean
+          khau_tru_10?: boolean
           ghi_chu?: string | null
           kieu_cong?: string
           luong_thoa_thuan: number
@@ -755,6 +760,7 @@ export type Database = {
           an_ca?: boolean
           cap_nhat_luc?: string
           dong_bh?: boolean
+          khau_tru_10?: boolean
           ghi_chu?: string | null
           kieu_cong?: string
           luong_thoa_thuan?: number

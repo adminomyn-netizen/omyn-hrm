@@ -8,6 +8,8 @@ export type DauVaoLuong = {
   luongThoaThuan: number; // gộp: lương chức danh + KPI khoán
   tyLeKpi: number; // % KPI nền trong lương thỏa thuận (Ban điều hành = 0)
   thuViec: boolean;
+  /** Khấu trừ thuế 10% thay cho biểu lũy tiến (nhân sự bật riêng từng người, vd thử việc / chưa ký HĐ). Bỏ trống = tắt. */
+  khauTru10?: boolean;
   congChuan: number; // ngày
   congHuong: number; // ngày (bước 0,5)
   ngayLam: number; // ngày đi làm thực tế (tính tiền ăn)
@@ -132,9 +134,18 @@ export function tinhLuong(v: DauVaoLuong, p: ThamSo): KetQuaLuong {
   const thuNhapChiuThue = Math.max(0, tongThuNhap - mienAn - mienPhuCap - mienOt);
   const giamTru = p.giam_tru_ban_than + p.giam_tru_phu_thuoc * v.soNguoiPhuThuoc;
 
-  // Thử việc cũng KHÔNG khấu trừ 10% (chị Phượng 05/11): tính như người có thu nhập thường xuyên, thu nhập tính thuế = chịu thuế − bảo hiểm (thử việc = 0) − giảm trừ.
-  const thuNhapTinhThue = Math.max(0, thuNhapChiuThue - bhNld - giamTru);
-  const thueTncn = thueLuyTien(thuNhapTinhThue, p);
+  // Mặc định mọi người (kể cả thử việc) tính lũy tiến: thu nhập tính thuế = chịu thuế − bảo hiểm (thử việc = 0) − giảm trừ.
+  // Chỉ khi nhân sự BẬT "khấu trừ 10%" cho người đó (chị Phượng 10/11): 10% trên thu nhập chịu thuế, không giảm trừ, khi từ ngưỡng (Quy chế Điều 15.4).
+  let thuNhapTinhThue: number;
+  let thueTncn: number;
+  if (v.khauTru10) {
+    const nguong = p.khau_tru_vang_lai_nguong ?? 2_000_000;
+    thuNhapTinhThue = thuNhapChiuThue;
+    thueTncn = thuNhapChiuThue >= nguong ? chiaTron(thuNhapChiuThue, bp(p.khau_tru_vang_lai_ty_le ?? 10), 10000) : 0;
+  } else {
+    thuNhapTinhThue = Math.max(0, thuNhapChiuThue - bhNld - giamTru);
+    thueTncn = thueLuyTien(thuNhapTinhThue, p);
+  }
 
   const thucLinh = tongThuNhap - bhNld - thueTncn - v.khauTruKhac;
   return { luongChucDanh, luongKpi, phuCapThuc, tienAn, tienOt, tongThuNhap, bhXh, bhYt, bhTn, giamTru, thuNhapTinhThue, thueTncn, thucLinh, bhCty };
@@ -156,6 +167,8 @@ export const THAM_SO_MAC_DINH: ThamSo = {
   tien_an_ngay: 25000,
   mien_thue_tien_an: 730000,
   thu_viec_ty_le: 85,
+  khau_tru_vang_lai_ty_le: 10,
+  khau_tru_vang_lai_nguong: 2000000,
   ot_thuong: 150,
   ot_nghi_tuan: 200,
   ot_le: 300,

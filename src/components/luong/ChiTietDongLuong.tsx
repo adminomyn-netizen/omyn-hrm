@@ -10,7 +10,7 @@ import { luuDongLuong } from "@/app/(app)/luong/actions";
 
 export type DongLuongView = {
   id: string; ho_ten: string; chuc_danh: string; khoi_ten: string;
-  luong_thoa_thuan: number; ty_le_kpi: number; thu_viec: boolean; cong_chuan: number; cong_huong: number; ngay_lam: number; ty_le_ht_kpi: number;
+  luong_thoa_thuan: number; ty_le_kpi: number; thu_viec: boolean; khau_tru_10?: boolean; cong_chuan: number; cong_huong: number; ngay_lam: number; ty_le_ht_kpi: number;
   phu_cap: number; phu_cap_mien_thue: boolean; an_ca: boolean; dong_bh: boolean; so_nguoi_phu_thuoc: number;
   gio_ot_thuong: number; gio_ot_nghi_tuan: number; gio_ot_le: number; hoa_hong: number; thuong_khac: number; khau_tru_khac: number; ghi_chu: string | null;
   luong_chuc_danh: number; luong_kpi: number; phu_cap_thuc: number; tien_an: number; tien_ot: number; tong_thu_nhap: number;
@@ -35,7 +35,7 @@ export function ChiTietDongLuong({ dong, thamSo, suaDuoc, xong, huy }: { dong: D
 
   const kq = useMemo(() => {
     const dauVao: DauVaoLuong = {
-      luongThoaThuan: dong.luong_thoa_thuan, tyLeKpi: dong.ty_le_kpi, thuViec: dong.thu_viec, congChuan: dong.cong_chuan, congHuong: Math.min(so(v.congHuong), dong.cong_chuan), ngayLam: so(v.ngayLam),
+      luongThoaThuan: dong.luong_thoa_thuan, tyLeKpi: dong.ty_le_kpi, thuViec: dong.thu_viec, khauTru10: !!dong.khau_tru_10, congChuan: dong.cong_chuan, congHuong: Math.min(so(v.congHuong), dong.cong_chuan), ngayLam: so(v.ngayLam),
       tyLeHtKpi: Math.min(so(v.tyLeHtKpi), 200), phuCap: dong.phu_cap, phuCapMienThue: dong.phu_cap_mien_thue, anCa: dong.an_ca, dongBh: dong.dong_bh, soNguoiPhuThuoc: dong.so_nguoi_phu_thuoc,
       gioOtThuong: so(v.otThuong), gioOtNghiTuan: so(v.otNghi), gioOtLe: so(v.otLe), hoaHong: v.hoaHong, thuongKhac: v.thuongKhac, khauTruKhac: v.khauTru,
     };

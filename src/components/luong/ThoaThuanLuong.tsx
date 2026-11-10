@@ -13,7 +13,7 @@ import { tienVN } from "@/lib/dinh-dang";
 
 export type ThoaThuanView = {
   id: string; ho_ten: string; chuc_danh: string; khoi_ten: string; trang_thai: string;
-  thoaThuan: { luong_thoa_thuan: number; ty_le_kpi: number; phu_cap: number; phu_cap_mien_thue: boolean; an_ca: boolean; dong_bh: boolean; so_nguoi_phu_thuoc: number; kieu_cong: string; ghi_chu: string | null } | null;
+  thoaThuan: { luong_thoa_thuan: number; ty_le_kpi: number; phu_cap: number; phu_cap_mien_thue: boolean; an_ca: boolean; dong_bh: boolean; khau_tru_10?: boolean; so_nguoi_phu_thuoc: number; kieu_cong: string; ghi_chu: string | null } | null;
 };
 
 /** Thỏa thuận lương của từng người: lương gộp, % KPI, phụ cấp, tiền ăn, bảo hiểm, người phụ thuộc, kiểu công. Dòng lương mỗi kỳ sẽ CHỤP lại các số này. */
@@ -110,6 +110,10 @@ export function ThoaThuanLuong({ ds, tienAnNgay }: { ds: ThoaThuanView[]; tienAn
               </div>
               <div className="flex flex-col gap-3 sm:col-span-2">
                 <Gat ten="dong_bh" nhan="Đóng bảo hiểm (BHXH, BHYT, BHTN)" giaTriMacDinh={t?.dong_bh ?? true} />
+                <div>
+                  <Gat ten="khau_tru_10" nhan="Khấu trừ thuế 10% (thử việc, chưa ký hợp đồng)" giaTriMacDinh={t?.khau_tru_10 ?? false} />
+                  <div className="mt-1 text-[12px] text-muc-3">Tắt: tính thuế lũy tiến có giảm trừ. Bật: trừ 10% trên thu nhập chịu thuế, không giảm trừ, khi từ ngưỡng ở Tham số lương.</div>
+                </div>
                 <Gat ten="an_ca" nhan="Hưởng tiền ăn theo ngày đi làm" giaTriMacDinh={t?.an_ca ?? true} />
                 <div>
                   <label className={NHAN_O} htmlFor="tt-an">Phụ cấp ăn trưa (tự động)</label>

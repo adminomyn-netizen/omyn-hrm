@@ -4,12 +4,12 @@ import { congChuanTheoKy, tinhLuong, type DauVaoLuong, type ThamSo } from "@/lib
 import { layBangCongThang } from "@/lib/bang-cong";
 
 export type Dong = {
-  luong_thoa_thuan: number; ty_le_kpi: number; thu_viec: boolean; cong_chuan: number; cong_huong: number; ngay_lam: number; ty_le_ht_kpi: number;
+  luong_thoa_thuan: number; ty_le_kpi: number; thu_viec: boolean; khau_tru_10?: boolean; cong_chuan: number; cong_huong: number; ngay_lam: number; ty_le_ht_kpi: number;
   phu_cap: number; phu_cap_mien_thue: boolean; an_ca: boolean; dong_bh: boolean; so_nguoi_phu_thuoc: number;
   gio_ot_thuong: number; gio_ot_nghi_tuan: number; gio_ot_le: number; hoa_hong: number; thuong_khac: number; khau_tru_khac: number;
 };
 export const tuDong = (d: Dong): DauVaoLuong => ({
-  luongThoaThuan: Number(d.luong_thoa_thuan), tyLeKpi: d.ty_le_kpi, thuViec: d.thu_viec, congChuan: Number(d.cong_chuan), congHuong: Number(d.cong_huong), ngayLam: Number(d.ngay_lam),
+  luongThoaThuan: Number(d.luong_thoa_thuan), tyLeKpi: d.ty_le_kpi, thuViec: d.thu_viec, khauTru10: !!d.khau_tru_10, congChuan: Number(d.cong_chuan), congHuong: Number(d.cong_huong), ngayLam: Number(d.ngay_lam),
   tyLeHtKpi: d.ty_le_ht_kpi, phuCap: Number(d.phu_cap), phuCapMienThue: d.phu_cap_mien_thue, anCa: d.an_ca, dongBh: d.dong_bh, soNguoiPhuThuoc: d.so_nguoi_phu_thuoc,
   gioOtThuong: Number(d.gio_ot_thuong), gioOtNghiTuan: Number(d.gio_ot_nghi_tuan), gioOtLe: Number(d.gio_ot_le), hoaHong: Number(d.hoa_hong), thuongKhac: Number(d.thuong_khac), khauTruKhac: Number(d.khau_tru_khac),
 });
@@ -48,7 +48,7 @@ export async function dongBoKyTuHoSo(kyId: string, p: ThamSo, ep = false): Promi
     if (t) {
       Object.assign(moiHoSo, {
         luong_thoa_thuan: Number(t.luong_thoa_thuan), ty_le_kpi: t.ty_le_kpi, phu_cap: Number(t.phu_cap), phu_cap_mien_thue: t.phu_cap_mien_thue, an_ca: t.an_ca,
-        dong_bh: t.dong_bh, so_nguoi_phu_thuoc: t.so_nguoi_phu_thuoc, kieu_cong: t.kieu_cong,
+        dong_bh: t.dong_bh, so_nguoi_phu_thuoc: t.so_nguoi_phu_thuoc, kieu_cong: t.kieu_cong, khau_tru_10: t.khau_tru_10,
       });
     }
     if (ky.nam && ky.thang) {

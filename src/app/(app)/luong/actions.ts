@@ -73,7 +73,7 @@ export async function luuThoaThuan(fd: FormData): Promise<KetQuaLuong> {
 
   const { error } = await createAdminClient().from("luong_thoa_thuan").upsert({
     nhan_vien_id: nvId, luong_thoa_thuan: luong, ty_le_kpi: kpi, phu_cap: tien(fd, "phu_cap"), phu_cap_mien_thue: bool(fd, "phu_cap_mien_thue"),
-    an_ca: bool(fd, "an_ca"), dong_bh: bool(fd, "dong_bh"), so_nguoi_phu_thuoc: phuThuoc, kieu_cong: kieu, ghi_chu: chuoi(fd, "ghi_chu") || null, cap_nhat_luc: new Date().toISOString(),
+    an_ca: bool(fd, "an_ca"), dong_bh: bool(fd, "dong_bh"), khau_tru_10: bool(fd, "khau_tru_10"), so_nguoi_phu_thuoc: phuThuoc, kieu_cong: kieu, ghi_chu: chuoi(fd, "ghi_chu") || null, cap_nhat_luc: new Date().toISOString(),
   });
   if (error) return { loi: "Chưa lưu được thỏa thuận lương. Thử lại sau." };
   lamMoi();
@@ -162,7 +162,7 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
     const ngayCham = Math.min(tong?.congLam ?? 0, congChuan);
     const dong: Dong = {
       luong_thoa_thuan: Number(t.luong_thoa_thuan), ty_le_kpi: t.ty_le_kpi, thu_viec: n.trang_thai === "Thử việc", cong_chuan: congChuan, cong_huong: congHuong, ngay_lam: ngayCham,
-      ty_le_ht_kpi: 100, phu_cap: Number(t.phu_cap), phu_cap_mien_thue: t.phu_cap_mien_thue, an_ca: t.an_ca, dong_bh: t.dong_bh, so_nguoi_phu_thuoc: t.so_nguoi_phu_thuoc,
+      ty_le_ht_kpi: 100, phu_cap: Number(t.phu_cap), phu_cap_mien_thue: t.phu_cap_mien_thue, an_ca: t.an_ca, dong_bh: t.dong_bh, khau_tru_10: t.khau_tru_10, so_nguoi_phu_thuoc: t.so_nguoi_phu_thuoc,
       gio_ot_thuong: gioOt.thuong, gio_ot_nghi_tuan: gioOt.nghiTuan, gio_ot_le: gioOt.le, hoa_hong: thuong.hoaHong, thuong_khac: thuong.thuongKhac, khau_tru_khac: 0,
     };
     moi.push({ ky_luong_id: kyId, nhan_vien_id: n.id, kieu_cong: t.kieu_cong, ...dong, ...cotKetQua(tuDong(dong), p) });

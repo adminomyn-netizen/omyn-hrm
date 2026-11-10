@@ -20,7 +20,7 @@ export function ThueBaoHiem({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
   const tong = (f: (d: DongLuongView) => number) => dong.reduce((t, d) => t + f(d), 0);
 
   if (!kyChon) return <p className="chu-tieu-de py-14 text-center text-[24px] text-muc-3">Chưa có kỳ lương nào. Tạo kỳ ở tab Bảng lương trước.</p>;
-  const bacCuaXem = xem ? chiTietBacThue(xem.thu_nhap_tinh_thue, thamSo) : [];
+  const bacCuaXem = xem && !xem.khau_tru_10 ? chiTietBacThue(xem.thu_nhap_tinh_thue, thamSo) : [];
   const bhNld = (d: DongLuongView) => d.bh_xh + d.bh_yt + d.bh_tn;
 
   return (
@@ -93,6 +93,12 @@ export function ThueBaoHiem({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
               </dl>
               <p className="mt-1.5 text-[13px] text-muc-3">{xem.thu_viec ? "Đang thử việc nên chưa đóng bảo hiểm." : !xem.dong_bh ? "Thỏa thuận lương ghi không đóng bảo hiểm." : `Tính trên lương chức danh, có trần: BHXH/BHYT ${tienVN(thamSo.tran_dong_bhxh_bhyt)}, BHTN ${tienVN(thamSo.tran_dong_bhtn)}. Công ty đóng thêm ${tienVN(xem.bh_cty)}.`}</p>
             </section>
+            {xem.khau_tru_10 ? (
+              <section>
+                <div className="nhan-muc mb-1.5">Khấu trừ thuế 10%</div>
+                <p className="text-[14px] text-muc-2">Người này được bật khấu trừ 10% ở Thỏa thuận lương: thuế = {pt(thamSo.khau_tru_vang_lai_ty_le ?? 10)} trên thu nhập chịu thuế {tienVN(xem.thu_nhap_tinh_thue)}, không giảm trừ, khi từ {tienVN(thamSo.khau_tru_vang_lai_nguong ?? 2000000)}. Tắt ô này nếu muốn tính lũy tiến.</p>
+              </section>
+            ) : (<>
             <section>
               <div className="nhan-muc mb-1.5">Giảm trừ và thu nhập tính thuế</div>
               <dl className="divide-y divide-vien border-y border-vien">
@@ -116,6 +122,7 @@ export function ThueBaoHiem({ ky, chon, dong, thamSo }: { ky: KyView[]; chon: st
                 )}
               </section>
             )}
+            </>)}
             <div className="flex items-center justify-between border-t border-vien pt-4">
               <div className="text-[15px] font-semibold text-muc">Thuế TNCN: {tienVN(xem.thue_tncn)}</div>
               <button type="button" className={NUT_PHU} onClick={() => setXem(null)}>Đóng</button>

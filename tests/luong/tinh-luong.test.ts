@@ -148,3 +148,22 @@ describe("tổng thuế theo bậc khớp tinhLuong", () => {
     }
   });
 });
+
+describe("khấu trừ thuế 10% tuỳ chọn từng người (chị Phượng 10/11)", () => {
+  const thuViec = { ...DAU_VAO_TRONG, thuViec: true, luongThoaThuan: 10_000_000, tyLeKpi: 0 };
+  it("tắt: thử việc vẫn lũy tiến (thu nhập thấp → thuế 0)", () => {
+    expect(tinhLuong(thuViec, P).thueTncn).toBe(0);
+  });
+  it("bật: 10% trên thu nhập chịu thuế, không giảm trừ", () => {
+    const r = tinhLuong({ ...thuViec, khauTru10: true }, P);
+    expect(r.thuNhapTinhThue).toBeGreaterThan(0);
+    // 10tr × 85% = 8.500.000 (tiền ăn được miễn thuế) → 10% = 850.000
+    expect(r.thuNhapTinhThue).toBe(8_500_000);
+    expect(r.thueTncn).toBe(850_000);
+    expect(r.thucLinh).toBe(r.tongThuNhap - r.thueTncn);
+  });
+  it("bật nhưng dưới ngưỡng 2 triệu → không khấu trừ", () => {
+    const r = tinhLuong({ ...thuViec, khauTru10: true, luongThoaThuan: 2_000_000, congHuong: 1, ngayLam: 1 }, P);
+    expect(r.thueTncn).toBe(0);
+  });
+});
