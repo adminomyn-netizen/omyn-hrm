@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buocKeTiep, duocDuyetLuong, NGUOI_DUYET_LUONG } from "@/lib/luong/nguoi-duyet";
+import { buocKeTiep, duocDatKhauTru10, duocDuyetLuong, NGUOI_DUYET_LUONG } from "@/lib/luong/nguoi-duyet";
 
 describe("người duyệt bảng lương", () => {
   it("chỉ chị Lâm và chị Linh được duyệt", () => {
@@ -24,5 +24,10 @@ describe("người duyệt bảng lương", () => {
   it("kỳ cũ còn kẹt ở đã kiểm vẫn đi tiếp sang duyệt", () => {
     expect(buocKeTiep("da_kiem")).toBe("da_duyet");
     expect(buocKeTiep("khong-co")).toBeNull();
+  });
+  it("chỉ chị Lâm/chị Linh bật tắt khấu trừ 10%, nhân sự (Phượng) và Kỹ thuật không", () => {
+    for (const id of Object.keys(NGUOI_DUYET_LUONG)) expect(duocDatKhauTru10(id)).toBe(true);
+    expect(duocDatKhauTru10("afa13a1f-035c-4dcc-ba20-9dd4c6161eee")).toBe(false);
+    expect(duocDatKhauTru10("03bedad0-7f28-428c-80bb-14216ba92f31")).toBe(false);
   });
 });

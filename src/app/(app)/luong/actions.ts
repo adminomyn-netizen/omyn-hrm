@@ -8,7 +8,7 @@ import { congChuanTheoKy, type ThamSo } from "@/lib/luong/tinh-luong";
 import { layBangCongThang } from "@/lib/bang-cong";
 import { tongGioTheoLoai } from "@/lib/tang-ca";
 import { dbHr } from "@/lib/hr-db";
-import { buocKeTiep, duocDuyetLuong } from "@/lib/luong/nguoi-duyet";
+import { buocKeTiep, duocDatKhauTru10, duocDuyetLuong } from "@/lib/luong/nguoi-duyet";
 import { cotKetQua, dongBoKyTuHoSo, tuDong, type Dong } from "@/lib/luong/dong-bo-ky";
 
 export type KetQuaLuong = { loi?: string; ok?: boolean; thongBao?: string };
@@ -59,7 +59,8 @@ async function kyDangSua(kyId: string) {
 
 // ─────────────── thỏa thuận lương ───────────────
 export async function luuThoaThuan(fd: FormData): Promise<KetQuaLuong> {
-  if (!(await chiQuanTri())) return KHONG_QUYEN;
+  const nd = await chiQuanTri();
+  if (!nd) return KHONG_QUYEN;
   const nvId = chuoi(fd, "nhan_vien_id", 40);
   if (!uuid(nvId)) return { loi: "Thiếu nhân viên." };
   const luong = tien(fd, "luong_thoa_thuan");
@@ -73,7 +74,9 @@ export async function luuThoaThuan(fd: FormData): Promise<KetQuaLuong> {
 
   const { error } = await createAdminClient().from("luong_thoa_thuan").upsert({
     nhan_vien_id: nvId, luong_thoa_thuan: luong, ty_le_kpi: kpi, phu_cap: tien(fd, "phu_cap"), phu_cap_mien_thue: bool(fd, "phu_cap_mien_thue"),
-    an_ca: bool(fd, "an_ca"), dong_bh: bool(fd, "dong_bh"), khau_tru_10: bool(fd, "khau_tru_10"), so_nguoi_phu_thuoc: phuThuoc, kieu_cong: kieu, ghi_chu: chuoi(fd, "ghi_chu") || null, cap_nhat_luc: new Date().toISOString(),
+    an_ca: bool(fd, "an_ca"), dong_bh: bool(fd, "dong_bh"), so_nguoi_phu_thuoc: phuThuoc, kieu_cong: kieu, ghi_chu: chuoi(fd, "ghi_chu") || null, cap_nhat_luc: new Date().toISOString(),
+    // Ô khấu trừ 10% chỉ chị Lâm/chị Linh đổi được; người khác lưu thì giữ nguyên giá trị cũ (không gửi cột này).
+    ...(duocDatKhauTru10(nd.id) ? { khau_tru_10: bool(fd, "khau_tru_10") } : {}),
   });
   if (error) return { loi: "Chưa lưu được thỏa thuận lương. Thử lại sau." };
   lamMoi();

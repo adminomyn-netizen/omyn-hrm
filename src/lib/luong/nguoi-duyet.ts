@@ -10,6 +10,9 @@ export const NGUOI_DUYET_LUONG: Record<string, string> = {
 
 export const duocDuyetLuong = (userId: string | null | undefined): boolean => !!userId && Object.prototype.hasOwnProperty.call(NGUOI_DUYET_LUONG, userId);
 
+/** Chỉ chị Lâm / chị Linh được bật tắt "khấu trừ thuế 10%" cho từng người (chị Lâm 10/11: "để mình tự setup, đừng để nhân sự tự set"). Nhân sự chỉ xem. */
+export const duocDatKhauTru10 = duocDuyetLuong;
+
 /** Bước kế tiếp của kỳ. "da_kiem" là bước cũ đã bỏ: kỳ nào còn kẹt ở đó đi thẳng sang duyệt. */
 export const THU_TU_KY = ["mo", "da_lap", "da_duyet", "da_chi"] as const;
 export type TrangThaiKy = (typeof THU_TU_KY)[number];

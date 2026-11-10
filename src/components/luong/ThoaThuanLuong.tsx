@@ -17,7 +17,7 @@ export type ThoaThuanView = {
 };
 
 /** Thỏa thuận lương của từng người: lương gộp, % KPI, phụ cấp, tiền ăn, bảo hiểm, người phụ thuộc, kiểu công. Dòng lương mỗi kỳ sẽ CHỤP lại các số này. */
-export function ThoaThuanLuong({ ds, tienAnNgay }: { ds: ThoaThuanView[]; tienAnNgay: number }) {
+export function ThoaThuanLuong({ ds, tienAnNgay, duocSuaKhauTru10 }: { ds: ThoaThuanView[]; tienAnNgay: number; duocSuaKhauTru10: boolean }) {
   const router = useRouter();
   const [sua, setSua] = useState<ThoaThuanView | null>(null);
   const [loi, setLoi] = useState<string | undefined>();
@@ -110,10 +110,18 @@ export function ThoaThuanLuong({ ds, tienAnNgay }: { ds: ThoaThuanView[]; tienAn
               </div>
               <div className="flex flex-col gap-3 sm:col-span-2">
                 <Gat ten="dong_bh" nhan="Đóng bảo hiểm (BHXH, BHYT, BHTN)" giaTriMacDinh={t?.dong_bh ?? true} />
-                <div>
-                  <Gat ten="khau_tru_10" nhan="Khấu trừ thuế 10% (thử việc, chưa ký hợp đồng)" giaTriMacDinh={t?.khau_tru_10 ?? false} />
-                  <div className="mt-1 text-[12px] text-muc-3">Tắt: tính thuế lũy tiến có giảm trừ. Bật: trừ 10% trên thu nhập chịu thuế, không giảm trừ, khi từ ngưỡng ở Tham số lương.</div>
-                </div>
+                {duocSuaKhauTru10 ? (
+                  <div>
+                    <Gat ten="khau_tru_10" nhan="Khấu trừ thuế 10% (thử việc, chưa ký hợp đồng)" giaTriMacDinh={t?.khau_tru_10 ?? false} />
+                    <div className="mt-1 text-[12px] text-muc-3">Tắt: tính thuế lũy tiến có giảm trừ. Bật: trừ 10% trên thu nhập chịu thuế, không giảm trừ, khi từ ngưỡng ở Tham số lương.</div>
+                  </div>
+                ) : (
+                  <div>
+                    <div className={NHAN_O}>Khấu trừ thuế 10%</div>
+                    <div className="text-[14px] text-muc">{t?.khau_tru_10 ? "Đang bật" : "Đang tắt (tính thuế lũy tiến)"}</div>
+                    <div className="mt-1 text-[12px] text-muc-3">Chỉ chị Lâm hoặc chị Linh đổi được ô này.</div>
+                  </div>
+                )}
                 <Gat ten="an_ca" nhan="Hưởng tiền ăn theo ngày đi làm" giaTriMacDinh={t?.an_ca ?? true} />
                 <div>
                   <label className={NHAN_O} htmlFor="tt-an">Phụ cấp ăn trưa (tự động)</label>
