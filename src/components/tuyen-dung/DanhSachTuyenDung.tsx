@@ -11,6 +11,8 @@ import { NUT_CHINH, NUT_CHU, NUT_CHU_NGUY, NUT_PHU } from "@/components/ui/dinh-
 import { FormTin, type JdLuaChon, type KhoiLuaChon, type TinCoSan } from "./FormTin";
 import { FormUngVien, type UngVien } from "./FormUngVien";
 import { KenhDangTin } from "./KenhDangTin";
+import { PhieuPhongVan, kieuKetLuan, type NguoiPv, type PhieuPv } from "./PhieuPhongVan";
+import { diemTrungBinhPv } from "@/lib/phieu-pv";
 import type { KenhDang } from "@/lib/data-tuyen-dung";
 import { doiBuocUngVien, xoaTin, xoaUngVien } from "@/app/(app)/tuyen-dung/actions";
 import { BUOC_UNG_VIEN } from "@/lib/tuyen-dung";
@@ -25,12 +27,15 @@ const kieuTin = (t: string) => (t === "Đang tuyển" ? "tot" : t === "Đang ph�
 type Hop =
   | { k: "tin"; tin?: Tin }
   | { k: "xoa-tin"; tin: Tin }
-  | { k: "uv"; man: "them" | { sua: UngVien } | { xoa: UngVien } };
+  | { k: "uv"; man: "them" | { sua: UngVien } | { xoa: UngVien } }
+  | { k: "pv"; uv: UngVien };
 
 /** Tuyển dụng dạng bảng theo bước: chọn tin ở trên, các cột là từng bước, KÉO thẻ sang cột khác để đổi bước (hoặc bấm thẻ → sửa). */
 export function DanhSachTuyenDung({
   tin,
   ungVien,
+  phieuPv = [],
+  nguoiPv = [],
   kenh,
   khoi,
   jd,
@@ -39,6 +44,8 @@ export function DanhSachTuyenDung({
 }: {
   tin: Tin[];
   ungVien: UngVien[];
+  phieuPv?: PhieuPv[];
+  nguoiPv?: NguoiPv[];
   kenh: KenhDang[];
   khoi: KhoiLuaChon[];
   jd?: JdLuaChon[];
@@ -251,6 +258,17 @@ export function DanhSachTuyenDung({
                             <a href={u.link_cv} target="_blank" rel="noopener noreferrer" draggable={false} className="rounded-tag bg-giay-tram px-2 py-px text-[11px] font-medium text-muc-2 hover:text-muc">Xem CV</a>
                           )}
                         </div>
+                        {(() => {
+                          const ds = phieuPv.filter((x) => x.ung_vien_id === u.id);
+                          if (ds.length === 0) return null;
+                          const tb = diemTrungBinhPv(ds[0].tieu_chi);
+                          return (
+                            <button type="button" draggable={false} onClick={() => setHop({ k: "pv", uv: u })} className="mt-2 flex items-center gap-1.5 text-left">
+                              <NhanTrangThai kieu={kieuKetLuan(ds[0].ket_luan)}>PV: {ds[0].ket_luan}{tb !== null ? ` · ${tb}/5` : ""}</NhanTrangThai>
+                              {ds.length > 1 && <span className="text-[11px] text-muc-3">{ds.length} phiếu</span>}
+                            </button>
+                          );
+                        })()}
                         <div className="mt-2.5 text-[12px] text-muc-3">
                           {u.ngay_phong_van ? `Phỏng vấn ${ngayVN(u.ngay_phong_van)}` : `Nộp ${ngayVN(u.ngay_nhan_ho_so)}`}
                         </div>
@@ -302,7 +320,10 @@ export function DanhSachTuyenDung({
             {typeof hop.man === "object" && "sua" in hop.man && (
               <div className="space-y-3">
                 <FormUngVien key={hop.man.sua.id} tinId={tinChon.id} coSan={hop.man.sua} xong={() => { dong(); lamMoi(); }} huy={dong} />
-                <div className="text-right">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <button type="button" className={NUT_PHU} onClick={() => { if (typeof hop.man === "object" && "sua" in hop.man) setHop({ k: "pv", uv: hop.man.sua }); }}>
+                    Phiếu đánh giá phỏng vấn{phieuPv.filter((x) => typeof hop.man === "object" && "sua" in hop.man && x.ung_vien_id === hop.man.sua.id).length > 0 ? ` (${phieuPv.filter((x) => typeof hop.man === "object" && "sua" in hop.man && x.ung_vien_id === hop.man.sua.id).length})` : ""}
+                  </button>
                   <button type="button" className={NUT_CHU_NGUY} onClick={() => { if (typeof hop.man === "object" && "sua" in hop.man) setHop({ k: "uv", man: { xoa: hop.man.sua } }); }}>Xoá ứng viên này</button>
                 </div>
               </div>
@@ -322,6 +343,21 @@ export function DanhSachTuyenDung({
               </div>
             )}
           </>
+        )}
+      </Hop>
+
+      {/* phiếu đánh giá phỏng vấn */}
+      <Hop mo={hop?.k === "pv"} dong={dong} tieuDe="Phiếu đánh giá phỏng vấn" moTa={hop?.k === "pv" ? hop.uv.ho_ten : undefined}>
+        {hop?.k === "pv" && (
+          <PhieuPhongVan
+            key={hop.uv.id}
+            ungVienId={hop.uv.id}
+            hoTen={hop.uv.ho_ten}
+            phieu={phieuPv.filter((x) => x.ung_vien_id === hop.uv.id)}
+            nguoi={nguoiPv}
+            xong={lamMoi}
+            quayLai={() => { if (hop.k === "pv") setHop({ k: "uv", man: { sua: hop.uv } }); }}
+          />
         )}
       </Hop>
     </>

@@ -10,6 +10,9 @@ import { layKenhDang, layYeuCauTuyenDung } from "@/lib/data-tuyen-dung";
 import { tinhBaoCaoTuyenDung } from "@/lib/tuyen-dung";
 import { yeuCauVaiTro } from "@/lib/auth";
 import { layJd } from "@/lib/data-jd";
+import { dbHr } from "@/lib/hr-db";
+import { docTieuChi } from "@/lib/phieu-pv";
+import type { PhieuPv } from "@/components/tuyen-dung/PhieuPhongVan";
 
 const TAB = [
   { ma: "yeu-cau", ten: "Yêu cầu" },
@@ -23,6 +26,12 @@ export default async function TrangTuyenDung({ searchParams }: { searchParams: P
   const { tab: tabThamSo, tin: tinThamSo, dang } = await searchParams;
   await yeuCauVaiTro(["admin", "ky_thuat"]);
   const [{ tin, ungVien }, khoi, yeuCau, kenh, jdRows] = await Promise.all([layTuyenDungDayDu(), layDanhSachKhoi(), layYeuCauTuyenDung(), layKenhDang(), layJd()]);
+  const [{ data: pvTho }, { data: nvPv }] = await Promise.all([
+    dbHr().from("danh_gia_phong_van").select("*").order("ngay", { ascending: false }).order("tao_luc", { ascending: false }).limit(2000),
+    dbHr().from("nhan_vien").select("id, ho_ten").neq("trang_thai", "Đã nghỉ").order("ho_ten").limit(1000),
+  ]);
+  const phieuPv: PhieuPv[] = (pvTho ?? []).map((r) => ({ ...(r as unknown as PhieuPv), tieu_chi: docTieuChi((r as { tieu_chi?: unknown }).tieu_chi) }));
+  const nguoiPv = (nvPv ?? []).map((n) => ({ id: String(n.id), ho_ten: String(n.ho_ten) }));
   const choTiepNhan = yeuCau.filter((y) => y.trang_thai === "Chờ tiếp nhận").length;
   // Link cũ (?tin=…, ?dang=1) luôn mở tab Tin; không chỉ định thì ưu tiên Yêu cầu khi còn yêu cầu chờ tiếp nhận.
   const tab = tabThamSo === "yeu-cau" || tabThamSo === "tin" || tabThamSo === "bao-cao" ? tabThamSo : tinThamSo || dang ? "tin" : choTiepNhan > 0 ? "yeu-cau" : "tin";
@@ -49,6 +58,8 @@ export default async function TrangTuyenDung({ searchParams }: { searchParams: P
         <DanhSachTuyenDung
           tin={tin.map((t) => ({ id: t.id, vi_tri: t.vi_tri, khoi_id: t.khoi_id, khoi_ten: t.khoi_ten, so_luong_can: t.so_luong_can, trang_thai: t.trang_thai, han_nop: t.han_nop, mo_ta: t.mo_ta }))}
           ungVien={ungVien}
+          phieuPv={phieuPv}
+          nguoiPv={nguoiPv}
           kenh={kenh}
           jd={jdRows}
           khoi={khoiLC}

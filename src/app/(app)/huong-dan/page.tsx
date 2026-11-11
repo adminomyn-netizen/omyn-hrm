@@ -96,7 +96,7 @@ const QUAN_TRI: HuongDan = {
       sac: "luc",
       buoc: [
         { tieuDe: "Hồ sơ nhân sự", noiDung: <p>Mục <b>Hồ sơ nhân sự</b>: thêm, sửa hồ sơ, cho nghỉ việc. Có nhiều người cùng lúc thì bấm <b>Nhập từ Excel</b>: tải tệp mẫu, điền, bấm Kiểm tra để xem dòng nào lỗi, sửa hết lỗi rồi mới bấm Nhập. Tên Khối trong tệp phải đúng với danh mục.</p> },
-        { tieuDe: "Khối, tuyển dụng, đánh giá", noiDung: <p><b>Khối và phòng ban</b> để thêm sửa khối và vị trí; <b>Tuyển dụng</b> để đăng tin và theo dõi ứng viên qua từng vòng; <b>Đánh giá hiệu suất</b> để ghi điểm và xếp loại theo kỳ.</p> },
+        { tieuDe: "Khối, tuyển dụng, đánh giá", noiDung: <p><b>Khối và phòng ban</b> để thêm sửa khối và vị trí; <b>Tuyển dụng</b> để đăng tin và theo dõi ứng viên qua từng vòng (mở một ứng viên → nút <b>Phiếu đánh giá phỏng vấn</b>: chấm 1–5 sáu tiêu chí, ghi điểm mạnh, điểm cần lưu ý và kết luận Đạt / Cân nhắc / Không đạt; mỗi vòng hoặc mỗi người phỏng vấn một phiếu, lưu phiếu không tự đổi bước của ứng viên); <b>Đánh giá hiệu suất</b> để ghi điểm và xếp loại theo kỳ.</p> },
         { tieuDe: "Lưu ý về quyền", noiDung: <p>Bạn không đưa được ai vào vị trí tự có quyền Quản trị (Hành chính nhân sự, lãnh đạo): việc đó do tài khoản Kỹ thuật làm. Duyệt tài khoản mới đăng ký cũng do Kỹ thuật làm.</p> },
       ],
     },
