@@ -113,7 +113,7 @@ export function ThoaThuanLuong({ ds, tienAnNgay, duocSuaKhauTru10 }: { ds: ThoaT
                 {duocSuaKhauTru10 ? (
                   <div>
                     <Gat ten="khau_tru_10" nhan="Khấu trừ thuế 10% (thử việc, chưa ký hợp đồng)" giaTriMacDinh={t?.khau_tru_10 ?? false} />
-                    <div className="mt-1 text-[12px] text-muc-3">Tắt: tính thuế lũy tiến có giảm trừ. Bật: trừ 10% trên thu nhập chịu thuế, không giảm trừ, khi từ ngưỡng ở Tham số lương.</div>
+                    <div className="mt-1 text-[12px] text-muc-3">Người đang thử việc luôn bị trừ 10% tự động, không cần bật ô này. Với người đã chính thức — tắt: tính thuế lũy tiến có giảm trừ; bật: trừ 10% trên thu nhập chịu thuế, không giảm trừ, khi từ ngưỡng ở Tham số lương.</div>
                   </div>
                 ) : (
                   <div>

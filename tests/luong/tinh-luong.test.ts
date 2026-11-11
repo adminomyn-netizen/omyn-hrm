@@ -35,20 +35,19 @@ describe("tinhLuong", () => {
     expect(r.thucLinh).toBe(50_922_400);
   });
 
-  it("C — thử việc: 85%, không BH, không khấu trừ 10% (dưới mức giảm trừ nên không thuế)", () => {
+  it("C — thử việc: 85%, không BH, tự khấu trừ 10% trên thu nhập chịu thuế", () => {
     const r = tinhLuong({ ...DAU_VAO_TRONG, luongThoaThuan: 10_000_000, thuViec: true }, P);
     expect(r.luongChucDanh).toBe(7_650_000);
     expect(r.luongKpi).toBe(850_000);
     expect(r.bhXh + r.bhYt + r.bhTn).toBe(0);
-    expect(r.thueTncn).toBe(0);
-    expect(r.thucLinh).toBe(9_100_000); // 8,5tr + tiền ăn 600k
+    expect(r.thueTncn).toBe(850_000); // 10% × 8,5tr (tiền ăn 600k miễn thuế)
+    expect(r.thucLinh).toBe(8_250_000); // 9,1tr − 850k
   });
 
-  it("C2 — thử việc lương cao: thuế lũy tiến theo thu nhập, không cố định 10%", () => {
+  it("C2 — thử việc lương cao: 10% trên toàn bộ thu nhập chịu thuế, không giảm trừ", () => {
     const r = tinhLuong({ ...DAU_VAO_TRONG, luongThoaThuan: 40_000_000, tyLeKpi: 0, thuViec: true, anCa: false }, P);
-    // 85% = 34tr; trừ giảm trừ bản thân 15,5tr = 18,5tr tính thuế: 10tr×5% + 8,5tr×10% = 1.350.000
-    expect(r.thueTncn).toBe(1_350_000);
-    expect(r.thueTncn).not.toBe(3_400_000);
+    // 85% = 34tr; 10% không giảm trừ = 3.400.000
+    expect(r.thueTncn).toBe(3_400_000);
     expect(r.bhXh + r.bhYt + r.bhTn).toBe(0);
   });
 
@@ -149,10 +148,17 @@ describe("tổng thuế theo bậc khớp tinhLuong", () => {
   });
 });
 
-describe("khấu trừ thuế 10% tuỳ chọn từng người (chị Phượng 10/11)", () => {
+describe("khấu trừ thuế 10%: thử việc tự động, người chính thức bật riêng (chị Phượng 10/11, chị Lâm 11/11)", () => {
   const thuViec = { ...DAU_VAO_TRONG, thuViec: true, luongThoaThuan: 10_000_000, tyLeKpi: 0 };
-  it("tắt: thử việc vẫn lũy tiến (thu nhập thấp → thuế 0)", () => {
-    expect(tinhLuong(thuViec, P).thueTncn).toBe(0);
+  const chinhThuc = { ...DAU_VAO_TRONG, thuViec: false, luongThoaThuan: 10_000_000, tyLeKpi: 0 };
+  it("thử việc không bật ô nào vẫn bị 10%", () => {
+    expect(tinhLuong(thuViec, P).thueTncn).toBe(850_000);
+  });
+  it("chính thức, ô tắt: vẫn lũy tiến (thu nhập thấp → thuế 0)", () => {
+    expect(tinhLuong(chinhThuc, P).thueTncn).toBe(0);
+  });
+  it("chính thức, ô bật: 10% trên thu nhập chịu thuế", () => {
+    expect(tinhLuong({ ...chinhThuc, khauTru10: true }, P).thueTncn).toBe(1_000_000);
   });
   it("bật: 10% trên thu nhập chịu thuế, không giảm trừ", () => {
     const r = tinhLuong({ ...thuViec, khauTru10: true }, P);

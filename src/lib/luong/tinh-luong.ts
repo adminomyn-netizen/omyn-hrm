@@ -134,11 +134,11 @@ export function tinhLuong(v: DauVaoLuong, p: ThamSo): KetQuaLuong {
   const thuNhapChiuThue = Math.max(0, tongThuNhap - mienAn - mienPhuCap - mienOt);
   const giamTru = p.giam_tru_ban_than + p.giam_tru_phu_thuoc * v.soNguoiPhuThuoc;
 
-  // Mặc định mọi người (kể cả thử việc) tính lũy tiến: thu nhập tính thuế = chịu thuế − bảo hiểm (thử việc = 0) − giảm trừ.
-  // Chỉ khi nhân sự BẬT "khấu trừ 10%" cho người đó (chị Phượng 10/11): 10% trên thu nhập chịu thuế, không giảm trừ, khi từ ngưỡng (Quy chế Điều 15.4).
+  // Người đang THỬ VIỆC luôn khấu trừ 10% (chị Lâm 11/11); người đã chính thức mặc định lũy tiến (chịu thuế − bảo hiểm − giảm trừ),
+  // trừ khi chị Lâm/chị Linh bật riêng ô "khấu trừ 10%". 10% tính trên thu nhập chịu thuế, không giảm trừ, khi từ ngưỡng (Quy chế Điều 15.4).
   let thuNhapTinhThue: number;
   let thueTncn: number;
-  if (v.khauTru10) {
+  if (v.thuViec || v.khauTru10) {
     const nguong = p.khau_tru_vang_lai_nguong ?? 2_000_000;
     thuNhapTinhThue = thuNhapChiuThue;
     thueTncn = thuNhapChiuThue >= nguong ? chiaTron(thuNhapChiuThue, bp(p.khau_tru_vang_lai_ty_le ?? 10), 10000) : 0;
