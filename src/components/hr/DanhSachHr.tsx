@@ -4,6 +4,7 @@ import { useMemo, useRef, useState, useTransition } from "react";
 import { CalendarClock, Paperclip, Pencil, Plus, Search } from "lucide-react";
 import { luuBanGhiHr, xoaBanGhiHr } from "@/app/(app)/hr/actions";
 import { Chon } from "@/components/ui/Chon";
+import Link from "next/link";
 import { Hop } from "@/components/ui/Hop";
 import { nhomDong } from "@/lib/nhom-danh-sach";
 import { NgayChon } from "@/components/ui/NgayChon";
@@ -171,6 +172,9 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khong
         </ul>
       )}
       <Hop mo={sua !== null} dong={() => setSua(null)} tieuDe={sua === "moi" ? `Thêm: ${muc.ten}` : `Sửa: ${muc.ten}`} rong="rong">
+        {muc.ma === "offer-tuyen-dung" && sua !== null && sua !== "moi" && (
+          <p className="mb-3 text-[14px]"><Link href={`/thu-moi-nhan-viec/${sua.id}`} className="font-medium text-nhan-dam hover:underline">Xem và in thư mời nhận việc →</Link></p>
+        )}
         {sua !== null && <FormHr key={sua === "moi" ? "moi" : sua.id} muc={muc} coSan={sua === "moi" ? undefined : sua} nv={nv} khoi={khoi} tc={tc} khongXoa={khongXoa} xong={() => setSua(null)} />}
         {hienTep && sua !== null && (
           <div className="mt-5 border-t border-vien pt-4">
