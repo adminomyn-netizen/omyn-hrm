@@ -174,6 +174,9 @@ export function DanhSachHr({ muc, dong, nv, khoi, tc = {}, chiXem = false, khong
         </ul>
       )}
       <Hop mo={sua !== null} dong={() => setSua(null)} tieuDe={sua === "moi" ? `Thêm: ${muc.ten}` : `Sửa: ${muc.ten}`} rong="rong">
+        {muc.ma === "hop-dong-lao-dong" && sua !== null && sua !== "moi" && (
+          <p className="mb-3 text-[14px]"><Link href={`/in-hop-dong-lao-dong/${sua.id}`} className="font-medium text-nhan-dam hover:underline">Xem và in hợp đồng →</Link></p>
+        )}
         {muc.ma === "offer-tuyen-dung" && sua !== null && sua !== "moi" && (
           <p className="mb-3 text-[14px]"><Link href={`/thu-moi-nhan-viec/${sua.id}`} className="font-medium text-nhan-dam hover:underline">Xem và in thư mời nhận việc →</Link></p>
         )}
