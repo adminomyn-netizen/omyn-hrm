@@ -27,7 +27,7 @@ async function nguoiQuanTri(muc: MucHr, xoa = false) {
   return q.muc === "nhap" && (!xoa || q.xoa) ? nd : null;
 }
 
-type Dong = Record<string, string | number | boolean | null>;
+type Dong = Record<string, string | number | boolean | string[] | null>;
 const laVoucher = (r: Record<string, unknown>): Voucher => ({
   id: String(r.id), ma: String(r.ma), loai: String(r.loai), giaTri: Number(r.gia_tri), giamToiDa: r.giam_toi_da == null ? null : Number(r.giam_toi_da), donToiThieu: Number(r.don_toi_thieu),
   kenh: String(r.kenh), tuNgay: String(r.tu_ngay), denNgay: String(r.den_ngay), gioiHanLuot: r.gioi_han_luot == null ? null : Number(r.gioi_han_luot),
@@ -90,9 +90,9 @@ export async function luuBanGhiHr(fd: FormData): Promise<KetQuaHr> {
   const id = String(fd.get("id") ?? "");
   if (id && !/^[0-9a-f-]{36}$/i.test(id))
     return { loi: "Bản ghi không hợp lệ." };
-  const dong: Record<string, string | number | boolean | null> = {};
+  const dong: Record<string, string | number | boolean | string[] | null> = {};
   for (const c of muc.cot) {
-    const r = chuanHoaGiaTri(c, String(fd.get(c.k) ?? ""));
+    const r = chuanHoaGiaTri(c, c.kieu === "nhieuNv" ? fd.getAll(c.k).map(String).join(",") : String(fd.get(c.k) ?? ""));
     if ("loi" in r) return { loi: r.loi };
     dong[c.k] = r.v;
   }

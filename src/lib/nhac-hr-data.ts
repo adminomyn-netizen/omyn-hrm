@@ -31,12 +31,18 @@ export async function nhacHr(c: NgCanh): Promise<number> {
   };
 
   // 1. Phỏng vấn sắp tới → người phỏng vấn
-  const { data: pv } = await db.from("lich_phong_van").select("id, ten_ung_vien, vi_tri, vong, thoi_gian, hinh_thuc, dia_diem, nguoi_phong_van_id")
-    .eq("ket_qua", "Chờ").gte("thoi_gian", new Date(c.nowMs).toISOString()).lte("thoi_gian", new Date(c.nowMs + 65 * 60_000).toISOString()).not("nguoi_phong_van_id", "is", null);
-  const uPv = await userCua((pv ?? []).map((p) => p.nguoi_phong_van_id));
-  for (const p of pv ?? []) {
-    const u = uPv.get(p.nguoi_phong_van_id), ph = phutToiPhongVan(Date.parse(p.thoi_gian), c.nowMs);
-    if (u && ph) await gui(u, `pv1h_${p.id}`, { tieuDe: `Phỏng vấn lúc ${gio(p.thoi_gian)}`, noiDung: `${p.ten_ung_vien ?? "Ứng viên"}${p.vi_tri ? ` (${p.vi_tri})` : ""} · ${p.vong} · ${p.hinh_thuc}${p.dia_diem ? ` · ${p.dia_diem}` : ""}`, url: "/hr/lich-phong-van" });
+  const { data: pvTho } = await db.from("lich_phong_van").select("id, ten_ung_vien, vi_tri, vong, thoi_gian, hinh_thuc, dia_diem, nguoi_phong_van_id, nguoi_phong_van_ids")
+    .eq("ket_qua", "Chờ").gte("thoi_gian", new Date(c.nowMs).toISOString()).lte("thoi_gian", new Date(c.nowMs + 65 * 60_000).toISOString());
+  // Nhiều người phỏng vấn mỗi lịch; dữ liệu cũ chỉ có cột một người.
+  const pv = (pvTho ?? []).map((p) => ({ ...p, ds: (Array.isArray(p.nguoi_phong_van_ids) && p.nguoi_phong_van_ids.length ? p.nguoi_phong_van_ids : p.nguoi_phong_van_id ? [p.nguoi_phong_van_id] : []) as string[] })).filter((p) => p.ds.length > 0);
+  const uPv = await userCua(pv.flatMap((p) => p.ds));
+  for (const p of pv) {
+    const ph = phutToiPhongVan(Date.parse(p.thoi_gian), c.nowMs);
+    if (!ph) continue;
+    for (const nvId of p.ds) {
+      const u = uPv.get(nvId);
+      if (u) await gui(u, `pv1h_${p.id}`, { tieuDe: `Phỏng vấn lúc ${gio(p.thoi_gian)}`, noiDung: `${p.ten_ung_vien ?? "Ứng viên"}${p.vi_tri ? ` (${p.vi_tri})` : ""} · ${p.vong} · ${p.hinh_thuc}${p.dia_diem ? ` · ${p.dia_diem}` : ""}`, url: "/hr/lich-phong-van" });
+    }
   }
 
   // 2. Tóm tắt sáng cho HCNS + nhắc mentor

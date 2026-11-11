@@ -8,12 +8,13 @@ import Link from "next/link";
 import { Hop } from "@/components/ui/Hop";
 import { nhomDong } from "@/lib/nhom-danh-sach";
 import { NgayChon } from "@/components/ui/NgayChon";
+import { ChonNhieuNguoi } from "@/components/hr/ChonNhieuNguoi";
 import { TepDinhKem } from "@/components/hr/TepDinhKem";
 import { NhanTrangThai } from "@/components/ui/NhanTrangThai";
 import { NHAN_O, NUT_CHINH, NUT_CHU_NGUY, NUT_PHU, O_NHAP, O_NHIEU_DONG } from "@/components/ui/dinh-dang";
 import type { CotHr, MucHr } from "@/lib/hr-module";
 
-type Dong = Record<string, string | number | boolean | null> & { id: string };
+type Dong = Record<string, string | number | boolean | string[] | null> & { id: string };
 type Tra = { id: string; ten: string };
 
 const NGAY = (s: unknown) => (typeof s === "string" && s ? s.slice(0, 10).split("-").reverse().join("/") : "");
@@ -36,6 +37,7 @@ function hienGiaTri(c: CotHr, d: Dong, nv: Map<string, string>, khoi: Map<string
     case "gio": return GIO(v);
     case "tien": return TIEN(v);
     case "nv": return nv.get(String(v)) ?? "";
+    case "nhieuNv": return (Array.isArray(v) ? v : []).map((i) => nv.get(String(i)) ?? "").filter(Boolean).join(", ");
     case "khoi": return khoi.get(String(v)) ?? "";
     case "tc": return tc.get(String(v)) ?? "";
     case "co": return v ? "Có" : "Không";
@@ -218,6 +220,7 @@ function FormHr({ muc, coSan, nv, khoi, tc, khongXoa, xong }: { khongXoa: boolea
               case "ngay": return <NgayChon id={id} ten={c.k} giaTriMacDinh={macDinh(c).slice(0, 10)} batBuoc={c.batBuoc} />;
               case "gio": return <input id={id} name={c.k} type="datetime-local" required={c.batBuoc} defaultValue={coSan?.[c.k] ? new Date(String(coSan[c.k])).toLocaleString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" }).slice(0, 16).replace(" ", "T") : ""} className={O_NHAP} />;
               case "chon": return <Chon id={id} ten={c.k} trong="Chọn" giaTriMacDinh={macDinh(c)} luaChon={(c.luaChon ?? []).map((x) => ({ gia_tri: x, nhan: x }))} />;
+              case "nhieuNv": return <ChonNhieuNguoi id={id} ten={c.k} nv={nv} daChon={Array.isArray(coSan?.[c.k]) ? (coSan?.[c.k] as string[]) : []} />;
               case "nv": return <Chon id={id} ten={c.k} trong="Chọn nhân viên" giaTriMacDinh={macDinh(c)} luaChon={nv.map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;
               case "khoi": return <Chon id={id} ten={c.k} trong="Chọn khối" giaTriMacDinh={macDinh(c)} luaChon={khoi.map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;
               case "tc": return <Chon id={id} ten={c.k} trong="Chọn" giaTriMacDinh={macDinh(c)} luaChon={(tc[c.bangTc ?? ""] ?? []).map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;

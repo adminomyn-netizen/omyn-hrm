@@ -3,7 +3,7 @@
 
 const KENH_ND = ["Facebook", "TikTok", "Shopee", "Zalo", "Website", "Khác"] as const;
 
-export type KieuCot = "chu" | "nhieu" | "so" | "tien" | "ngay" | "gio" | "chon" | "co" | "nv" | "khoi" | "tc";
+export type KieuCot = "chu" | "nhieu" | "so" | "tien" | "ngay" | "gio" | "chon" | "co" | "nv" | "nhieuNv" | "khoi" | "tc";
 
 export type CotHr = {
   k: string;
@@ -134,7 +134,7 @@ export const HR_MUC: readonly MucHr[] = [
       { k: "thoi_gian", nhan: "Thời gian", kieu: "gio", batBuoc: true, the: true },
       { k: "hinh_thuc", nhan: "Hình thức", kieu: "chon", luaChon: ["Trực tiếp", "Online", "Điện thoại"], mac: "Trực tiếp", the: true },
       { k: "dia_diem", nhan: "Địa điểm / link", kieu: "chu" },
-      { k: "nguoi_phong_van_id", nhan: "Người phỏng vấn", kieu: "nv", the: true },
+      { k: "nguoi_phong_van_ids", nhan: "Người phỏng vấn", kieu: "nhieuNv", the: true, goiY: "Chọn một hoặc nhiều người cùng phỏng vấn" },
       { k: "ket_qua", nhan: "Kết quả", kieu: "chon", luaChon: ["Chờ", "Đạt", "Không đạt", "Hoãn", "Vắng mặt"], mac: "Chờ" },
       { k: "nhan_xet", nhan: "Nhận xét", kieu: "nhieu", rong: true },
     ],
@@ -1308,7 +1308,7 @@ export const timMucHr = (ma: string) => HR_MUC.find((m) => m.ma === ma);
 export const coTepDinhKem = (m: MucHr) => !!m.dinhKem || m.cot.some((c) => /^link/.test(c.k));
 
 /** Giá trị gửi lên → giá trị lưu, theo kiểu cột. Trả { loi } khi sai. */
-export function chuanHoaGiaTri(c: CotHr, tho: string): { v: string | number | boolean | null } | { loi: string } {
+export function chuanHoaGiaTri(c: CotHr, tho: string): { v: string | number | boolean | string[] | null } | { loi: string } {
   const s = tho.trim();
   if (c.batBuoc && !s && c.kieu !== "co") return { loi: `Nhập “${c.nhan}”.` };
   switch (c.kieu) {
@@ -1329,6 +1329,13 @@ export function chuanHoaGiaTri(c: CotHr, tho: string): { v: string | number | bo
     }
     case "chon": return !s ? { v: null } : c.luaChon?.includes(s) ? { v: s } : { loi: `“${c.nhan}” chưa hợp lệ.` };
     case "co": return { v: s === "1" || s === "on" || s === "true" };
+    case "nhieuNv": {
+      // Nhiều mã nhân viên ngăn cách bằng dấu phẩy; bỏ trùng, giữ thứ tự.
+      const ds = [...new Set(s.split(",").map((x) => x.trim()).filter(Boolean))];
+      if (ds.some((x) => !/^[0-9a-f-]{36}$/i.test(x))) return { loi: `“${c.nhan}” chưa hợp lệ.` };
+      if (ds.length > 20) return { loi: `“${c.nhan}” chọn tối đa 20 người.` };
+      return { v: ds };
+    }
     case "nv": case "khoi": case "tc": return !s ? { v: null } : /^[0-9a-f-]{36}$/i.test(s) ? { v: s } : { loi: `“${c.nhan}” chưa hợp lệ.` };
   }
 }

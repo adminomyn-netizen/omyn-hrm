@@ -25,3 +25,20 @@ describe("phiếu đánh giá phỏng vấn", () => {
     expect(docTieuChi("rác")).toEqual([]);
   });
 });
+
+import { chuanHoaGiaTri, type CotHr } from "@/lib/hr-module";
+describe("lịch phỏng vấn: chọn nhiều người", () => {
+  const c: CotHr = { k: "nguoi_phong_van_ids", nhan: "Người phỏng vấn", kieu: "nhieuNv" };
+  const A = "3c82fe09-31a2-4711-a7e3-ca5ea72f6d61", B = "6272ee71-a07d-4105-998b-ef1cc5f9c9b3";
+  it("nhiều người: giữ thứ tự, bỏ trùng", () => {
+    expect(chuanHoaGiaTri(c, `${A},${B},${A}`)).toEqual({ v: [A, B] });
+  });
+  it("để trống → mảng rỗng, không lỗi", () => {
+    expect(chuanHoaGiaTri(c, "")).toEqual({ v: [] });
+  });
+  it("mã sai hoặc quá 20 người bị từ chối", () => {
+    expect("loi" in chuanHoaGiaTri(c, `${A},abc`)).toBe(true);
+    const nhieu = Array.from({ length: 21 }, (_, i) => `00000000-0000-0000-0000-${String(i).padStart(12, "0")}`).join(",");
+    expect("loi" in chuanHoaGiaTri(c, nhieu)).toBe(true);
+  });
+});
