@@ -56,6 +56,13 @@ const NHAN_VIEN: HuongDan = {
       ],
     },
     {
+      tieuDe: "Nội quy và chính sách",
+      sac: "xanh",
+      buoc: [
+        { tieuDe: "Xem và tải nội quy", noiDung: <p>Vào <b>Nội quy & chính sách</b> (menu Nhân sự): nội quy lao động, quy chế thưởng phạt và mẫu hợp đồng. Bấm <b>Tải về</b> để lưu file.</p> },
+      ],
+    },
+    {
       tieuDe: "Cuối tháng",
       sac: "hong",
       buoc: [
@@ -98,6 +105,14 @@ const QUAN_TRI: HuongDan = {
         { tieuDe: "Hồ sơ nhân sự", noiDung: <p>Mục <b>Hồ sơ nhân sự</b>: thêm, sửa hồ sơ, cho nghỉ việc. Có nhiều người cùng lúc thì bấm <b>Nhập từ Excel</b>: tải tệp mẫu, điền, bấm Kiểm tra để xem dòng nào lỗi, sửa hết lỗi rồi mới bấm Nhập. Tên Khối trong tệp phải đúng với danh mục.</p> },
         { tieuDe: "Khối, tuyển dụng, đánh giá", noiDung: <p><b>Khối và phòng ban</b> để thêm sửa khối và vị trí; <b>Tuyển dụng</b> để đăng tin và theo dõi ứng viên qua từng vòng (mở một ứng viên → nút <b>Phiếu đánh giá phỏng vấn</b>: chấm 1–5 sáu tiêu chí, ghi điểm mạnh, điểm cần lưu ý và kết luận Đạt / Cân nhắc / Không đạt; mỗi vòng hoặc mỗi người phỏng vấn một phiếu, lưu phiếu không tự đổi bước của ứng viên); <b>Offer</b> nằm ở Tuyển dụng → Sổ tuyển dụng → Offer: nhập ứng viên, vị trí, lương đề xuất, hạn trả lời, ngày nhận việc, người ký… rồi mở dòng đó bấm <b>Xem và in thư mời nhận việc</b> (in hoặc lưu PDF; chỗ chưa nhập để dấu chấm điền tay); <b>Hợp đồng lao động</b> nằm ở Hồ sơ & hợp đồng → Hợp đồng lao động: thêm hợp đồng (loại, số, từ ngày – đến ngày) và các ô nội dung (chức danh, công việc, địa điểm, mức lương, phụ cấp, thời giờ làm việc, người đại diện ký), rồi mở dòng đó bấm <b>Xem và in hợp đồng</b>; thông tin cá nhân lấy từ hồ sơ cá nhân, chỗ thiếu để dấu chấm, bản in là bản nháp cần rà pháp lý trước khi ký; <b>Đánh giá hiệu suất</b> để ghi điểm và xếp loại theo kỳ.</p> },
         { tieuDe: "Lưu ý về quyền", noiDung: <p>Bạn không đưa được ai vào vị trí tự có quyền Quản trị (Hành chính nhân sự, lãnh đạo): việc đó do tài khoản Kỹ thuật làm. Duyệt tài khoản mới đăng ký cũng do Kỹ thuật làm.</p> },
+      ],
+    },
+    {
+      tieuDe: "Nội quy và chính sách",
+      sac: "xanh",
+      buoc: [
+        { tieuDe: "Tải nội quy, quy chế thưởng phạt, mẫu hợp đồng", noiDung: <p>Vào <b>Nội quy & chính sách</b> → khung <b>Tải tài liệu lên</b>: chọn loại (nội quy lao động, quy chế thưởng phạt, mẫu hợp đồng thử việc/HĐLĐ, khác), đặt tên, ghi chú nếu cần (ví dụ có hiệu lực từ ngày nào), chọn tệp (tối đa 25 MB) rồi bấm <b>Tải lên</b>. Muốn thay bản mới thì tải bản mới lên và xoá bản cũ. Mọi thay đổi đều được ghi vào nhật ký.</p> },
+        { tieuDe: "Căn cứ kỷ luật", noiDung: <p>Khi ghi kỷ luật, ô <b>Căn cứ (điều trong nội quy)</b> nên ghi đúng số điều trong nội quy đang tải lên mục này.</p> },
       ],
     },
     {

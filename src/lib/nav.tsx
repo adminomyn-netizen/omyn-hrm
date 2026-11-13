@@ -182,6 +182,14 @@ const menuGoc: MucMenu[] = [
     moTa: "Việc của bạn và của nhóm: thêm nhanh một dòng, ghi số lượng đã làm, theo dõi việc quá hạn.",
   },
   {
+    ten: "Nội quy & chính sách",
+    duong_dan: "/noi-quy",
+    nhom: "Nhân sự",
+    phan: 5,
+    icon: BookOpen,
+    moTa: "Nội quy lao động, quy chế thưởng phạt và mẫu hợp đồng: xem và tải về.",
+  },
+  {
     ten: "KPI và đánh giá",
     duong_dan: "/kpi",
     nhom: "Nhân sự",
