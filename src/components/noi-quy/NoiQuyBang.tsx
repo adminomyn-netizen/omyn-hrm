@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Chon } from "@/components/ui/Chon";
 import { NHAN_O, NUT_CHINH, NUT_CHU, NUT_CHU_NGUY } from "@/components/ui/dinh-dang";
 import { dungLuong } from "@/lib/tep-dinh-kem";
-import { LOAI_NOI_QUY, kiemTepNoiQuy } from "@/lib/noi-quy";
+import { NHOM_NOI_QUY, kiemTepNoiQuy } from "@/lib/noi-quy";
 import { layLinkNoiQuy, taoLinkNoiQuy, xacNhanNoiQuy, xoaNoiQuy } from "@/app/(app)/noi-quy/actions";
 
 export type TaiLieu = { id: string; loai: string; ten: string; ghiChu: string; tenTep: string; kichThuoc: number; nguoiTai: string; taoLuc: string };
@@ -18,7 +18,7 @@ export function NoiQuyBang({ ds, quanLy }: { ds: TaiLieu[]; quanLy: boolean }) {
   const [dangXuLy, startXuLy] = useTransition();
   const [loi, setLoi] = useState<string | undefined>();
   const [tb, setTb] = useState<string | undefined>();
-  const [loai, setLoai] = useState<string>(LOAI_NOI_QUY[0].ma);
+  const [loai, setLoai] = useState<string>(NHOM_NOI_QUY[0].luuLoai);
   const [ten, setTen] = useState("");
   const [ghiChu, setGhiChu] = useState("");
   const [tep, setTep] = useState<File | null>(null);
@@ -73,7 +73,7 @@ export function NoiQuyBang({ ds, quanLy }: { ds: TaiLieu[]; quanLy: boolean }) {
     });
   };
 
-  const cuaLoai = (ma: string) => ds.filter((t) => t.loai === ma);
+  const cuaNhom = (loai: readonly string[]) => ds.filter((t) => loai.includes(t.loai));
 
   return (
     <div className="space-y-8">
@@ -83,8 +83,8 @@ export function NoiQuyBang({ ds, quanLy }: { ds: TaiLieu[]; quanLy: boolean }) {
           <p className="mt-1 text-[13px] text-muc-3">Tệp PDF, Word, Excel, ảnh… tối đa 25 MB. Ai đăng nhập cũng xem và tải được.</p>
           <div className="mt-4 grid gap-4 sm:grid-cols-2">
             <div>
-              <span className={`${NHAN_O} block`}>Loại tài liệu</span>
-              <Chon giaTri={loai} onDoi={setLoai} luaChon={LOAI_NOI_QUY.map((l) => ({ gia_tri: l.ma, nhan: l.ten }))} />
+              <span className={`${NHAN_O} block`}>Nhóm tài liệu</span>
+              <Chon giaTri={loai} onDoi={setLoai} luaChon={NHOM_NOI_QUY.map((n) => ({ gia_tri: n.luuLoai, nhan: n.ten }))} />
             </div>
             <div>
               <label htmlFor="nq-ten" className={NHAN_O}>Tên tài liệu *</label>
@@ -107,8 +107,8 @@ export function NoiQuyBang({ ds, quanLy }: { ds: TaiLieu[]; quanLy: boolean }) {
 
       {(loi || tb) && <div role={loi ? "alert" : "status"} className={`rounded-nho px-3 py-2.5 text-[14px] ${loi ? "bg-loi-nen text-loi" : "bg-nhan-nhat text-nhan-dam"}`}>{loi ?? tb}</div>}
 
-      {LOAI_NOI_QUY.map((l) => {
-        const ds2 = cuaLoai(l.ma);
+      {NHOM_NOI_QUY.map((l) => {
+        const ds2 = cuaNhom(l.loai);
         if (ds2.length === 0 && !quanLy) return null;
         return (
           <section key={l.ma} aria-label={l.ten}>

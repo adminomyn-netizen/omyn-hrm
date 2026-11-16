@@ -25,7 +25,7 @@ export default async function TrangNoiQuy() {
   }));
   return (
     <>
-      <TieuDeTrang tieuDe="Nội quy & chính sách" phu="Nội quy lao động, quy chế thưởng phạt và mẫu hợp đồng. Mở để xem hoặc tải về." />
+      <TieuDeTrang tieuDe="Nội quy & chính sách" phu="Cơ chế, nội quy và các loại hợp đồng, phụ lục. Bấm Tải về để xem." />
       <NoiQuyBang ds={ds} quanLy={duocQuanLyNoiQuy(nd.vaiTro)} />
     </>
   );

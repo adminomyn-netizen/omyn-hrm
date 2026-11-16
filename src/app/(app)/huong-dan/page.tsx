@@ -59,7 +59,7 @@ const NHAN_VIEN: HuongDan = {
       tieuDe: "Nội quy và chính sách",
       sac: "xanh",
       buoc: [
-        { tieuDe: "Xem và tải nội quy", noiDung: <p>Vào <b>Nội quy & chính sách</b> (menu Nhân sự): nội quy lao động, quy chế thưởng phạt và mẫu hợp đồng. Bấm <b>Tải về</b> để lưu file.</p> },
+        { tieuDe: "Xem và tải nội quy", noiDung: <p>Vào <b>Nội quy & chính sách</b> (menu Nhân sự): gồm 2 nhóm: <b>Cơ chế & nội quy</b> và <b>Hợp đồng & phụ lục</b>. Bấm <b>Tải về</b> để lưu file.</p> },
       ],
     },
     {
@@ -111,7 +111,7 @@ const QUAN_TRI: HuongDan = {
       tieuDe: "Nội quy và chính sách",
       sac: "xanh",
       buoc: [
-        { tieuDe: "Tải nội quy, quy chế thưởng phạt, mẫu hợp đồng", noiDung: <p>Vào <b>Nội quy & chính sách</b> → khung <b>Tải tài liệu lên</b>: chọn loại (nội quy lao động, quy chế thưởng phạt, mẫu hợp đồng thử việc/HĐLĐ, khác), đặt tên, ghi chú nếu cần (ví dụ có hiệu lực từ ngày nào), chọn tệp (tối đa 25 MB) rồi bấm <b>Tải lên</b>. Muốn thay bản mới thì tải bản mới lên và xoá bản cũ. Mọi thay đổi đều được ghi vào nhật ký.</p> },
+        { tieuDe: "Tải cơ chế, nội quy, hợp đồng, phụ lục", noiDung: <p>Vào <b>Nội quy & chính sách</b> → khung <b>Tải tài liệu lên</b>: chọn nhóm (Cơ chế & nội quy, hoặc Hợp đồng & phụ lục), đặt tên, ghi chú nếu cần (ví dụ có hiệu lực từ ngày nào), chọn tệp (tối đa 25 MB) rồi bấm <b>Tải lên</b>. Muốn thay bản mới thì tải bản mới lên và xoá bản cũ. Mọi thay đổi đều được ghi vào nhật ký.</p> },
         { tieuDe: "Căn cứ kỷ luật", noiDung: <p>Khi ghi kỷ luật, ô <b>Căn cứ (điều trong nội quy)</b> nên ghi đúng số điều trong nội quy đang tải lên mục này.</p> },
       ],
     },

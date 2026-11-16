@@ -12,6 +12,12 @@ export type LoaiNoiQuy = (typeof LOAI_NOI_QUY)[number]["ma"];
 export const laLoaiNoiQuy = (v: string): v is LoaiNoiQuy => LOAI_NOI_QUY.some((l) => l.ma === v);
 export const tenLoaiNoiQuy = (v: string) => LOAI_NOI_QUY.find((l) => l.ma === v)?.ten ?? v;
 
+/** Hiển thị và tải lên theo 2 nhóm (chị Phượng 16/11). Cột `loai` trong DB giữ nguyên 4 giá trị cũ; tài liệu cũ tự rơi vào nhóm tương ứng. */
+export const NHOM_NOI_QUY = [
+  { ma: "co_che_noi_quy", ten: "Cơ chế & nội quy", loai: ["noi_quy", "thuong_phat", "khac"], luuLoai: "noi_quy" },
+  { ma: "hop_dong_phu_luc", ten: "Hợp đồng & phụ lục", loai: ["hop_dong_mau"], luuLoai: "hop_dong_mau" },
+] as const;
+
 /** Chỉ Quản trị và Kỹ thuật tải lên, thay, xoá. Người khác chỉ xem và tải. */
 export const duocQuanLyNoiQuy = (vaiTro: string | null | undefined) => vaiTro === "admin" || vaiTro === "ky_thuat";
 

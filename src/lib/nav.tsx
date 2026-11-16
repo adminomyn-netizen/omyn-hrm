@@ -187,7 +187,7 @@ const menuGoc: MucMenu[] = [
     nhom: "Nhân sự",
     phan: 5,
     icon: BookOpen,
-    moTa: "Nội quy lao động, quy chế thưởng phạt và mẫu hợp đồng: xem và tải về.",
+    moTa: "Cơ chế, nội quy và các loại hợp đồng, phụ lục: xem và tải về.",
   },
   {
     ten: "KPI và đánh giá",
