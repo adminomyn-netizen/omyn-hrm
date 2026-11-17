@@ -3,39 +3,42 @@
 import { revalidatePath } from "next/cache";
 import { dbHr } from "@/lib/hr-db";
 import { layNguoiDungHienTai } from "@/lib/auth";
-import { chiTieuThangApCho, thangNhapHopLe } from "@/lib/kpi";
-import { docChiTieuThang, homNayHcm, nguoiNhapDuoc, taiNen } from "@/lib/kpi-data";
+import { chuanChucDanh, thangNhapHopLe } from "@/lib/kpi";
+import { docCoChe, homNayHcm, nguoiChamDuoc, taiNen } from "@/lib/kpi-data";
 
-export type KetQuaKpiThang = { loi?: string; ok?: boolean; daLuu?: number };
+export type KetQuaChamThang = { loi?: string; ok?: boolean; daLuu?: number };
 
-/** Lưu kết quả KPI một tháng. Ô tên `v|<mã người>|<mã chỉ tiêu>`; ô trống = xoá kết quả đã nhập.
- * Quyền kiểm ở máy chủ: người ngoài danh sách nhập được, hoặc chỉ tiêu không áp cho chức danh/khối của họ, bị từ chối cả lô. Mọi thay đổi để lại nhật ký (trigger). */
-export async function luuKetQuaKpiThang(fd: FormData): Promise<KetQuaKpiThang> {
+/** Lưu điểm chấm KPI một tháng. Ô tên `v|<mã người>|<mã nhóm>` = % hoàn thành 0–100; ô trống = xoá điểm đã chấm.
+ * Quyền kiểm ở máy chủ cho cả lô: chỉ Ban lãnh đạo (Quản trị/Kỹ thuật, HCNS) hoặc trưởng phòng với cấp dưới trực tiếp; nhóm phải thuộc cơ chế của đúng chức danh người đó.
+ * Tỷ trọng được ghi kèm tại lúc chấm. Mọi thay đổi để lại nhật ký (trigger). */
+export async function luuChamKpiThang(fd: FormData): Promise<KetQuaChamThang> {
   const thang = String(fd.get("thang") ?? "");
-  if (!thangNhapHopLe(thang, homNayHcm())) return { loi: "Tháng không hợp lệ: chỉ nhập cho tháng này hoặc 2 tháng trước." };
+  if (!thangNhapHopLe(thang, homNayHcm())) return { loi: "Tháng không hợp lệ: chỉ chấm cho tháng này hoặc 2 tháng trước." };
   const nen = await taiNen();
-  const duoc = new Map(nguoiNhapDuoc(nen).map((n) => [n.id, n]));
-  const ct = new Map((await docChiTieuThang()).map((c) => [c.id, c]));
+  const duoc = new Map(nguoiChamDuoc(nen).map((n) => [n.id, n]));
+  const coChe = await docCoChe();
+  const nhomCua = new Map<string, { chucDanh: string; tyTrong: number; ten: string }>();
+  for (const c of coChe) for (const n of c.nhom) nhomCua.set(n.id, { chucDanh: chuanChucDanh(c.ten), tyTrong: n.tyTrong, ten: n.ten });
   const nd = await layNguoiDungHienTai();
-  const luu: { nhan_vien_id: string; chi_tieu_id: string; thang: string; thuc_te: number; nguoi_nhap: string | null; cap_nhat_luc: string }[] = [];
-  const xoa: { nv: string; ct: string }[] = [];
+  const luu: { nhan_vien_id: string; nhom_id: string; thang: string; ty_le: number; ty_trong: number; nguoi_cham: string | null; cap_nhat_luc: string }[] = [];
+  const xoa: { nv: string; nhom: string }[] = [];
   for (const [k, raw] of fd.entries()) {
     if (!k.startsWith("v|")) continue;
-    const [, nvId, ctId] = k.split("|");
-    const nv = duoc.get(nvId), c = ct.get(ctId);
-    if (!nv || !c || chiTieuThangApCho([c], nv.chucDanh, nv.khoiId).length === 0) return { loi: "Có ô không thuộc quyền nhập của bạn. Tải lại trang rồi nhập lại." };
+    const [, nvId, nhomId] = k.split("|");
+    const nv = duoc.get(nvId), nh = nhomCua.get(nhomId);
+    if (!nv || !nh || chuanChucDanh(nv.chucDanh) !== nh.chucDanh) return { loi: "Có ô không thuộc quyền chấm của bạn. Tải lại trang rồi chấm lại." };
     const s = String(raw).trim().replace(",", ".");
-    if (s === "") { xoa.push({ nv: nvId, ct: ctId }); continue; }
+    if (s === "") { xoa.push({ nv: nvId, nhom: nhomId }); continue; }
     const n = Number(s);
-    if (!Number.isFinite(n) || n < 0 || n > 1e12) return { loi: `Giá trị “${String(raw).slice(0, 20)}” của chỉ tiêu “${c.ten}” chưa hợp lệ (số không âm).` };
-    luu.push({ nhan_vien_id: nvId, chi_tieu_id: ctId, thang: `${thang}-01`, thuc_te: n, nguoi_nhap: nd?.id ?? null, cap_nhat_luc: new Date().toISOString() });
+    if (!Number.isFinite(n) || n < 0 || n > 100) return { loi: `“${String(raw).slice(0, 20)}” ở nhóm “${nh.ten}” chưa hợp lệ: nhập % hoàn thành từ 0 đến 100.` };
+    luu.push({ nhan_vien_id: nvId, nhom_id: nhomId, thang: `${thang}-01`, ty_le: Math.round(n * 100) / 100, ty_trong: nh.tyTrong, nguoi_cham: nd?.id ?? null, cap_nhat_luc: new Date().toISOString() });
   }
   const db = dbHr();
   if (luu.length) {
-    const { error } = await db.from("kpi_ket_qua_thang").upsert(luu, { onConflict: "nhan_vien_id,chi_tieu_id,thang" });
+    const { error } = await db.from("kpi_cham_thang").upsert(luu, { onConflict: "nhan_vien_id,nhom_id,thang" });
     if (error) return { loi: "Chưa lưu được. Thử lại sau ít phút." };
   }
-  for (const x of xoa) await db.from("kpi_ket_qua_thang").delete().eq("nhan_vien_id", x.nv).eq("chi_tieu_id", x.ct).eq("thang", `${thang}-01`);
+  for (const x of xoa) await db.from("kpi_cham_thang").delete().eq("nhan_vien_id", x.nv).eq("nhom_id", x.nhom).eq("thang", `${thang}-01`);
   revalidatePath("/kpi/thang");
   return { ok: true, daLuu: luu.length };
 }

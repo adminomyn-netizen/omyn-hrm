@@ -111,9 +111,9 @@ const QUAN_TRI: HuongDan = {
       tieuDe: "KPI theo vị trí (tháng)",
       sac: "xanh",
       buoc: [
-        { tieuDe: "Đặt chỉ tiêu cho từng vị trí", noiDung: <p>Vào <b>KPI và đánh giá</b>, dòng Thiết lập chọn <b>Chỉ tiêu KPI theo tháng (vị trí)</b>. Thêm chỉ tiêu: gõ đúng <b>chức danh</b> trong hồ sơ nhân sự, tên chỉ tiêu, <b>mục tiêu cả tháng</b>, đơn vị, trọng số 1 đến 10. Chức danh gõ không khớp hồ sơ thì chưa ai thấy chỉ tiêu đó.</p> },
-        { tieuDe: "Nhập kết quả tháng", noiDung: <p>Vào <b>Thi đua KPI</b> → <b>KPI theo vị trí (tháng)</b>. Chọn tháng (tháng này hoặc 2 tháng trước), nhập số thực tế rồi bấm <b>Lưu kết quả tháng</b>. Nhân viên nhập của mình, trưởng phòng nhập cho cấp dưới, Quản trị nhập cho mọi người. Ô trống là chưa báo, không bị tính 0.</p> },
-        { tieuDe: "Cách tính điểm", noiDung: <p>Mỗi chỉ tiêu: % đạt = thực tế chia mục tiêu (tối đa 120%). Chỉ tiêu &quot;càng thấp càng tốt&quot; tính ngược lại. Điểm tháng là trung bình có trọng số các chỉ tiêu đã báo.</p> },
+        { tieuDe: "Lập cơ chế cho một vị trí", noiDung: <p>Vào <b>KPI và đánh giá</b>, dòng Thiết lập chọn <b>Cơ chế KPI theo vị trí</b>, bấm Thêm mới. Gõ đúng <b>chức danh</b> trong hồ sơ nhân sự, điền mô tả công việc, mục đích, nguyên tắc, quy trình. Có file Word hoặc PDF của cơ chế thì tải lên ngay trong dòng đó.</p> },
+        { tieuDe: "Thêm nhóm công việc và tỷ trọng", noiDung: <p>Dòng Thiết lập <b>Nhóm công việc &amp; tỷ trọng</b>: chọn vị trí, ghi tên nhóm, nội dung đánh giá và tỷ trọng %. Tổng các nhóm của một vị trí nên bằng 100%, trang KPI sẽ báo nếu lệch.</p> },
+        { tieuDe: "Chấm điểm hằng tháng", noiDung: <p>Vào <b>Thi đua KPI</b> → <b>KPI theo vị trí (tháng)</b>, chọn tháng (tháng này hoặc 2 tháng trước), nhập <b>% hoàn thành</b> (0 đến 100) cho từng nhóm rồi bấm <b>Lưu điểm tháng</b>. Quản trị/HCNS chấm cho mọi người, trưởng phòng chấm cho cấp dưới trực tiếp. Điểm = tổng (% hoàn thành × tỷ trọng), tối đa 100. Nhóm để trống là chưa chấm, không bị tính 0. Nhân viên xem cơ chế và điểm của chính mình.</p> },
       ],
     },
     {

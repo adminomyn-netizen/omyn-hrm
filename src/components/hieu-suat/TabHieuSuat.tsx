@@ -17,7 +17,8 @@ const TAB: {
 
 const THIET_LAP = [
   { ten: "Chỉ tiêu KPI", href: "/hr/kpi-chi-tieu" },
-  { ten: "Chỉ tiêu KPI theo tháng (vị trí)", href: "/hr/kpi-chi-tieu-thang" },
+  { ten: "Cơ chế KPI theo vị trí", href: "/hr/kpi-co-che" },
+  { ten: "Nhóm công việc & tỷ trọng", href: "/hr/kpi-co-che-nhom" },
   { ten: "Mức khen thưởng", href: "/hr/kpi-thuong" },
   { ten: "BSC: góc nhìn", href: "/hr/bsc-goc-nhin" },
   { ten: "BSC: mục tiêu", href: "/hr/bsc-muc-tieu" },

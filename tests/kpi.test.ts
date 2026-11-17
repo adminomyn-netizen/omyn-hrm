@@ -100,51 +100,46 @@ describe("kyGanDay", () => {
   });
 });
 
-import { chiTieuThangApCho, chuanChucDanh, diemThangCacNguoi, thangGanDay, thangNhapHopLe, type ChiTieuThang, type KetQuaThang, type NguoiThang } from "@/lib/kpi";
+import { chuanChucDanh, diemThangCuaNguoi, thangGanDay, thangNhapHopLe, tongTyTrong } from "@/lib/kpi";
 
-describe("KPI theo vị trí, theo tháng", () => {
-  const ct = (id: string, chucDanh: string, muc: number, trongSo = 1, chieu: ChiTieuThang["chieu"] = "Càng cao càng tốt", khoiId: string | null = null): ChiTieuThang => ({ id, chucDanh, khoiId, ten: id, donVi: "", mucTieuThang: muc, trongSo, chieu });
-  const n = (id: string, chucDanh: string | null, khoiId: string | null = "k1"): NguoiThang => ({ id, hoTen: id, khoiId, chucDanh });
-  const r = (nv: string, c: string, thucTe: number): KetQuaThang => ({ nhanVienId: nv, chiTieuId: c, thang: "2026-11-01", thucTe });
+describe("Cơ chế KPI theo vị trí, chấm theo tháng", () => {
+  const c = (nhomId: string, tyLe: number, tyTrong: number) => ({ nhomId, tyLe, tyTrong });
 
   it("chức danh so khớp không phân biệt hoa thường và khoảng trắng", () => {
     expect(chuanChucDanh("  Kế  toán Tổng hợp ")).toBe("kế toán tổng hợp");
-    expect(chiTieuThangApCho([ct("a", "Kế toán tổng hợp", 10)], "kế toán  tổng hợp", "k1")).toHaveLength(1);
-    expect(chiTieuThangApCho([ct("a", "Kế toán", 10)], "Nhân viên", "k1")).toHaveLength(0);
-    expect(chiTieuThangApCho([ct("a", "Kế toán", 10)], null, "k1")).toHaveLength(0);
+    expect(chuanChucDanh(null)).toBe("");
   });
-  it("chỉ tiêu gắn khối chỉ áp cho đúng khối", () => {
-    const cs = [ct("a", "Nhân viên", 10, 1, "Càng cao càng tốt", "k2")];
-    expect(chiTieuThangApCho(cs, "Nhân viên", "k1")).toHaveLength(0);
-    expect(chiTieuThangApCho(cs, "Nhân viên", "k2")).toHaveLength(1);
+  it("tổng tỷ trọng cộng đúng (mẫu 15+20+15+25+25 = 100)", () => {
+    expect(tongTyTrong([{ tyTrong: 15 }, { tyTrong: 20 }, { tyTrong: 15 }, { tyTrong: 25 }, { tyTrong: 25 }])).toBe(100);
+    expect(tongTyTrong([{ tyTrong: 40 }, { tyTrong: 30 }])).toBe(70);
   });
-  it("điểm = trung bình có trọng số % đạt, trần 120%, chiều đảo", () => {
-    const cts = [ct("c1", "Sale", 100, 3), ct("c2", "Sale", 2, 1, "Càng thấp càng tốt")];
-    const d = diemThangCacNguoi([n("x", "Sale")], cts, [r("x", "c1", 50), r("x", "c2", 4)]).get("x")!;
-    // c1 = 50%, c2 = 2/4 = 50% → 50
-    expect(d.diem).toBe(50);
-    const d2 = diemThangCacNguoi([n("x", "Sale")], cts, [r("x", "c1", 500), r("x", "c2", 0)]).get("x")!;
-    expect(d2.diem).toBe(120);
+  it("điểm = Σ % hoàn thành × tỷ trọng / 100", () => {
+    const d = diemThangCuaNguoi([c("a", 100, 15), c("b", 80, 20), c("c", 100, 15), c("d", 50, 25), c("e", 90, 25)], 5);
+    // 15 + 16 + 15 + 12,5 + 22,5 = 81
+    expect(d.diem).toBe(81);
+    expect(d.daCham).toBe(5);
+    expect(d.tong).toBe(5);
   });
-  it("chỉ tiêu chưa báo không bị tính 0, chỉ đếm số đã báo", () => {
-    const cts = [ct("c1", "Sale", 100), ct("c2", "Sale", 10)];
-    const d = diemThangCacNguoi([n("x", "Sale")], cts, [r("x", "c1", 80)]).get("x")!;
-    expect(d.diem).toBe(80);
-    expect(d.daBao).toBe(1);
-    expect(d.tong).toBe(2);
-    expect(d.chiTiet[1].phanTram).toBeNull();
+  it("nhóm chưa chấm không bị tính 0: chỉ cộng nhóm đã chấm và báo đã chấm n/m", () => {
+    const d = diemThangCuaNguoi([c("a", 100, 15), c("b", 50, 20)], 5);
+    expect(d.diem).toBe(25);
+    expect(d.daCham).toBe(2);
+    expect(d.tong).toBe(5);
   });
-  it("chưa báo gì thì không có điểm; người không có chỉ tiêu thì vắng mặt", () => {
-    const m = diemThangCacNguoi([n("x", "Sale"), n("y", "Kho")], [ct("c1", "Sale", 100)], []);
-    expect(m.get("x")!.diem).toBeNull();
-    expect(m.has("y")).toBe(false);
-  });
-  it("thực tế 0 với chỉ tiêu càng cao là 0%, không phải chưa báo", () => {
-    const d = diemThangCacNguoi([n("x", "Sale")], [ct("c1", "Sale", 100)], [r("x", "c1", 0)]).get("x")!;
+  it("chưa chấm nhóm nào thì không có điểm; chấm 0% là 0 điểm, không phải chưa chấm", () => {
+    expect(diemThangCuaNguoi([], 5).diem).toBeNull();
+    const d = diemThangCuaNguoi([c("a", 0, 20)], 5);
     expect(d.diem).toBe(0);
-    expect(d.daBao).toBe(1);
+    expect(d.daCham).toBe(1);
   });
-  it("tháng nhập hợp lệ: tháng này và 2 tháng trước, không tương lai", () => {
+  it("điểm không vượt 100 kể cả khi tổng tỷ trọng cấu hình lố", () => {
+    expect(diemThangCuaNguoi([c("a", 100, 70), c("b", 100, 60)], 2).diem).toBe(100);
+  });
+  it("tỷ trọng ghi tại lúc chấm: đổi tỷ trọng sau này không làm đổi điểm đã chấm", () => {
+    const daCham = [c("a", 100, 30)];
+    expect(diemThangCuaNguoi(daCham, 1).diem).toBe(30);
+  });
+  it("tháng chấm hợp lệ: tháng này và 2 tháng trước, không tương lai", () => {
     expect(thangNhapHopLe("2026-11", "2026-11-17")).toBe(true);
     expect(thangNhapHopLe("2026-09", "2026-11-17")).toBe(true);
     expect(thangNhapHopLe("2026-08", "2026-11-17")).toBe(false);

@@ -136,28 +136,29 @@ export function kyGanDay(homNay: string): { nhan: string; ma: string }[] {
   ];
 }
 
-/* ───────── KPI theo vị trí (chức danh), mục tiêu và kết quả THEO THÁNG (chị Lâm 17/11) ─────────
- * Quy tắc: chỉ tiêu gắn với chức danh (so khớp không phân biệt hoa thường/khoảng trắng) và tuỳ chọn một khối.
- * % đạt = thực tế / mục tiêu tháng, trần 120%, chiều "càng thấp càng tốt" đảo như `tiLeDat`.
- * Điểm tháng = trung bình có trọng số các chỉ tiêu ĐÃ có kết quả; chỉ tiêu chưa nhập không bị tính 0 mà hiện "chưa báo". */
+/* ───────── Cơ chế KPI theo vị trí, chấm theo THÁNG (mẫu chị Phượng 17/11) ─────────
+ * Mỗi vị trí (= chức danh trong hồ sơ, so khớp không phân biệt hoa thường/khoảng trắng) có các nhóm công việc, mỗi nhóm một tỷ trọng %
+ * (tổng nên là 100). Ban lãnh đạo chấm "% hoàn thành" 0–100 cho từng nhóm; điểm tháng = Σ (% hoàn thành × tỷ trọng) / 100, tối đa 100.
+ * Nhóm chưa chấm không bị tính 0: hiện "chưa chấm" và điểm chỉ cộng các nhóm đã chấm. */
 
-export type ChiTieuThang = { id: string; chucDanh: string; khoiId: string | null; ten: string; donVi: string; mucTieuThang: number; trongSo: number; chieu: Chieu };
-export type KetQuaThang = { nhanVienId: string; chiTieuId: string; thang: string; thucTe: number };
-export type NguoiThang = { id: string; hoTen: string; khoiId: string | null; chucDanh: string | null };
-export type DongChiTieuThang = { chiTieuId: string; ten: string; donVi: string; mucTieu: number; chieu: Chieu; trongSo: number; thucTe: number | null; phanTram: number | null };
-export type DiemThangNguoi = { diem: number | null; daBao: number; tong: number; chiTiet: DongChiTieuThang[] };
+export type NhomKpi = { id: string; ten: string; noiDung: string; tyTrong: number };
+export type ChamNhom = { nhomId: string; tyLe: number; tyTrong: number };
+export type DiemThang = { diem: number | null; daCham: number; tong: number };
 
 /** Chức danh để so khớp: bỏ khoảng trắng thừa, chữ thường, chuẩn dựng sẵn. */
 export const chuanChucDanh = (s: string | null | undefined) => (s ?? "").normalize("NFC").replace(/\s+/g, " ").trim().toLowerCase();
 
-/** Chỉ tiêu tháng áp cho một người: đúng chức danh, và (không gắn khối hoặc đúng khối của người đó). */
-export function chiTieuThangApCho<T extends { chucDanh: string; khoiId: string | null }>(cts: readonly T[], chucDanh: string | null, khoiId: string | null): T[] {
-  const cd = chuanChucDanh(chucDanh);
-  if (!cd) return [];
-  return cts.filter((c) => chuanChucDanh(c.chucDanh) === cd && (c.khoiId === null || c.khoiId === khoiId));
+/** Tổng tỷ trọng các nhóm của một vị trí (nên bằng 100). */
+export const tongTyTrong = (nhom: readonly { tyTrong: number }[]) => lamTron(nhom.reduce((a, n) => a + n.tyTrong, 0));
+
+/** Điểm tháng của một người từ các nhóm đã chấm; `tongNhom` là số nhóm của vị trí. Chưa chấm nhóm nào thì không có điểm. */
+export function diemThangCuaNguoi(cham: readonly ChamNhom[], tongNhom: number): DiemThang {
+  if (cham.length === 0) return { diem: null, daCham: 0, tong: tongNhom };
+  const diem = cham.reduce((a, c) => a + (c.tyLe * c.tyTrong) / 100, 0);
+  return { diem: lamTron(Math.min(100, diem)), daCham: cham.length, tong: tongNhom };
 }
 
-/** Tháng nhập hợp lệ: `YYYY-MM`, không ở tương lai, và chỉ tháng này hoặc 2 tháng trước (để báo chậm và sửa). */
+/** Tháng chấm hợp lệ: `YYYY-MM`, không ở tương lai, và chỉ tháng này hoặc 2 tháng trước (để chấm chậm và sửa). */
 export function thangNhapHopLe(thang: string, homNay: string): boolean {
   const m = /^(\d{4})-(\d{2})$/.exec(thang);
   if (!m || Number(m[2]) < 1 || Number(m[2]) > 12) return false;
@@ -166,7 +167,7 @@ export function thangNhapHopLe(thang: string, homNay: string): boolean {
   return cach >= 0 && cach <= 2;
 }
 
-/** Ba tháng cho phép nhập, từ mới tới cũ, kèm nhãn. */
+/** Ba tháng cho phép chấm, từ mới tới cũ, kèm nhãn. */
 export function thangGanDay(homNay: string): { nhan: string; ma: string }[] {
   const y = Number(homNay.slice(0, 4)), mo = Number(homNay.slice(5, 7));
   return [0, 1, 2].map((i) => {
@@ -174,23 +175,4 @@ export function thangGanDay(homNay: string): { nhan: string; ma: string }[] {
     const ny = Math.floor(t / 12), nm = (t % 12) + 1;
     return { nhan: i === 0 ? "Tháng này" : i === 1 ? "Tháng trước" : `Tháng ${nm}/${ny}`, ma: `${ny}-${hai(nm)}` };
   });
-}
-
-/** Điểm tháng của từng người trong `nguoi`, trên kết quả `kq` đã lọc đúng tháng. Người không có chỉ tiêu nào áp cho họ thì không có mặt trong kết quả. */
-export function diemThangCacNguoi(nguoi: readonly NguoiThang[], cts: readonly ChiTieuThang[], kq: readonly KetQuaThang[]): Map<string, DiemThangNguoi> {
-  const thuc = new Map(kq.map((r) => [`${r.nhanVienId}|${r.chiTieuId}`, r.thucTe]));
-  const ra = new Map<string, DiemThangNguoi>();
-  for (const n of nguoi) {
-    const ap = chiTieuThangApCho(cts, n.chucDanh, n.khoiId);
-    if (ap.length === 0) continue;
-    let tong = 0, trong = 0, daBao = 0;
-    const chiTiet: DongChiTieuThang[] = ap.map((c) => {
-      const t = thuc.get(`${n.id}|${c.id}`);
-      const pt = t === undefined ? null : lamTron(tiLeDat(t, c.mucTieuThang, c.chieu) * 100);
-      if (pt !== null) { tong += pt * c.trongSo; trong += c.trongSo; daBao += 1; }
-      return { chiTieuId: c.id, ten: c.ten, donVi: c.donVi, mucTieu: c.mucTieuThang, chieu: c.chieu, trongSo: c.trongSo, thucTe: t ?? null, phanTram: pt };
-    });
-    ra.set(n.id, { diem: trong > 0 ? lamTron(tong / trong) : null, daBao, tong: ap.length, chiTiet });
-  }
-  return ra;
 }

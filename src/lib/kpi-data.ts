@@ -4,7 +4,7 @@ import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { dbHr } from "@/lib/hr-db";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { khongCanChamCong } from "@/lib/chuc-danh";
-import { diemCacNguoi, diemCacPhong, xepHang, type ChiTieu, type ChiTieuThang, type Chieu, type DiemChiTieu, type Ky, type KetQuaNgay, type KetQuaThang, type NguoiKpi, type XepHang } from "@/lib/kpi";
+import { diemCacNguoi, diemCacPhong, xepHang, type ChiTieu, type Chieu, type DiemChiTieu, type Ky, type KetQuaNgay, type NguoiKpi, type XepHang, type ChamNhom, type NhomKpi } from "@/lib/kpi";
 
 export const homNayHcm = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
 
@@ -101,16 +101,32 @@ export async function tinhBang(nen: Nen, ky: Ky) {
   return { hangPhong, toanCongTy, trongPhong, chiTiet, soNgayCoBao, daBaoHomNay };
 }
 
-/** Chỉ tiêu theo tháng của từng vị trí (đang dùng). Bảng riêng nên không lẫn với KPI thi đua theo ngày. */
-export async function docChiTieuThang(): Promise<ChiTieuThang[]> {
-  const { data } = await dbHr().from("kpi_chi_tieu_thang").select("id, chuc_danh, khoi_id, ten, don_vi, muc_tieu_thang, trong_so, chieu").eq("hoat_dong", true).order("tao_luc").limit(1000);
-  return (data ?? []).map((x) => ({ id: x.id, chucDanh: x.chuc_danh, khoiId: x.khoi_id, ten: x.ten, donVi: x.don_vi ?? "", mucTieuThang: Number(x.muc_tieu_thang), trongSo: x.trong_so, chieu: x.chieu as Chieu }));
+export type CoChe = { id: string; ten: string; moTa: string; mucDich: string; nguyenTac: string; quyTrinh: string; nhom: NhomKpi[] };
+
+/** Cơ chế KPI của các vị trí đang dùng, kèm các nhóm công việc (đang dùng) theo thứ tự. */
+export async function docCoChe(): Promise<CoChe[]> {
+  const db = dbHr();
+  const [cc, nh] = await Promise.all([
+    db.from("kpi_co_che_vi_tri").select("id, ten, mo_ta_cong_viec, muc_dich, nguyen_tac, quy_trinh").eq("hoat_dong", true).order("ten").limit(500),
+    db.from("kpi_co_che_nhom").select("id, co_che_id, ten, noi_dung, ty_trong").eq("hoat_dong", true).order("stt").order("tao_luc").limit(5000),
+  ]);
+  return (cc.data ?? []).map((c) => ({
+    id: c.id, ten: c.ten, moTa: c.mo_ta_cong_viec ?? "", mucDich: c.muc_dich ?? "", nguyenTac: c.nguyen_tac ?? "", quyTrinh: c.quy_trinh ?? "",
+    nhom: (nh.data ?? []).filter((n) => n.co_che_id === c.id).map((n) => ({ id: n.id, ten: n.ten, noiDung: n.noi_dung ?? "", tyTrong: Number(n.ty_trong) })),
+  }));
 }
 
-/** Kết quả tháng `thang` (`YYYY-MM`). */
-export async function docKetQuaThang(thang: string): Promise<KetQuaThang[]> {
+/** Điểm đã chấm của tháng `thang` (`YYYY-MM`). */
+export async function docChamThang(thang: string): Promise<(ChamNhom & { nhanVienId: string })[]> {
   const db = dbHr();
-  const dong = await docHet<{ nhan_vien_id: string; chi_tieu_id: string; thang: string; thuc_te: number | string }>((a, b) =>
-    db.from("kpi_ket_qua_thang").select("nhan_vien_id, chi_tieu_id, thang, thuc_te").eq("thang", `${thang}-01`).order("id").range(a, b));
-  return dong.map((r) => ({ nhanVienId: r.nhan_vien_id, chiTieuId: r.chi_tieu_id, thang: r.thang, thucTe: Number(r.thuc_te) }));
+  const dong = await docHet<{ nhan_vien_id: string; nhom_id: string; ty_le: number | string; ty_trong: number | string }>((a, b) =>
+    db.from("kpi_cham_thang").select("nhan_vien_id, nhom_id, ty_le, ty_trong").eq("thang", `${thang}-01`).order("id").range(a, b));
+  return dong.map((r) => ({ nhanVienId: r.nhan_vien_id, nhomId: r.nhom_id, tyLe: Number(r.ty_le), tyTrong: Number(r.ty_trong) }));
+}
+
+/** Ban lãnh đạo chấm: Quản trị/Kỹ thuật (kể cả HCNS) chấm cho cả công ty; trưởng phòng (người được trỏ quan_ly_id) chấm cho cấp dưới trực tiếp. Không ai tự chấm cho mình, trừ Quản trị. */
+export function nguoiChamDuoc(nen: Awaited<ReturnType<typeof taiNen>>): NguoiKpiDay[] {
+  const { nguoi, toi } = nen;
+  if (toi.xemToanCongTy) return nguoi;
+  return nguoi.filter((n) => !!toi.nhanVienId && n.quanLyId === toi.nhanVienId && n.id !== toi.nhanVienId);
 }
