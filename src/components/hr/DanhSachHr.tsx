@@ -226,7 +226,15 @@ function FormHr({ muc, coSan, nv, khoi, tc, khongXoa, xong }: { khongXoa: boolea
               case "nhieuNv": return <ChonNhieuNguoi id={id} ten={c.k} nv={nv} daChon={Array.isArray(coSan?.[c.k]) ? (coSan?.[c.k] as string[]) : []} />;
               case "nv": return <Chon id={id} ten={c.k} trong="Chọn nhân viên" giaTriMacDinh={macDinh(c)} luaChon={nv.map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;
               case "khoi": return <Chon id={id} ten={c.k} trong="Chọn khối" giaTriMacDinh={macDinh(c)} luaChon={khoi.map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;
-              case "tc": return <Chon id={id} ten={c.k} trong="Chọn" giaTriMacDinh={macDinh(c)} luaChon={(tc[c.bangTc ?? ""] ?? []).map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />;
+              case "tc": {
+                const ds = tc[c.bangTc ?? ""] ?? [];
+                return (
+                  <>
+                    <Chon id={id} ten={c.k} trong="Chọn" giaTriMacDinh={macDinh(c)} luaChon={ds.map((x) => ({ gia_tri: x.id, nhan: x.ten }))} />
+                    {ds.length === 0 && c.taoTc && <p className="mt-1.5 text-[13px] text-muc-3">Chưa có {c.nhan.toLowerCase()} nào để chọn. Tạo trước ở <Link href={c.taoTc.href} className="text-nhan-dam underline-offset-4 hover:underline">{c.taoTc.nhan}</Link>.</p>}
+                  </>
+                );
+              }
               default: return <input id={id} name={c.k} required={c.batBuoc} placeholder={c.goiY} defaultValue={macDinh(c)} className={O_NHAP} />;
             }
           })();

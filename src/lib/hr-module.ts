@@ -20,6 +20,8 @@ export type CotHr = {
   goiY?: string;
   /** Với kieu "tc": bảng được tham chiếu (có cột id, ten) — chọn trong danh sách bảng đó. */
   bangTc?: string;
+  /** Với kieu "tc": nơi tạo lựa chọn khi danh sách còn trống (đường dẫn + tên). */
+  taoTc?: { href: string; nhan: string };
   /** Cột số được để trống (lưu null thay vì 0). */
   coTheTrong?: boolean;
   /** Khoảng giá trị hợp lệ [nhỏ nhất, lớn nhất] cho cột số. */
@@ -209,7 +211,7 @@ export const HR_MUC: readonly MucHr[] = [
     sapXep: { cot: "tao_luc" }, trong: "Chưa có nhóm nào. Chọn vị trí đã có cơ chế, ghi tên nhóm, nội dung đánh giá và tỷ trọng.",
     locTheo: ["co_che_id"],
     cot: [
-      { k: "co_che_id", nhan: "Vị trí", kieu: "tc", bangTc: "kpi_co_che_vi_tri", batBuoc: true, the: true },
+      { k: "co_che_id", nhan: "Vị trí", kieu: "tc", bangTc: "kpi_co_che_vi_tri", taoTc: { href: "/hr/kpi-co-che", nhan: "Cơ chế KPI theo vị trí" }, batBuoc: true, the: true },
       { k: "stt", nhan: "Số thứ tự", kieu: "so", mac: 1, the: true, khoang: [1, 50] },
       { k: "ten", nhan: "Nhóm công việc", kieu: "chu", batBuoc: true },
       { k: "ty_trong", nhan: "Tỷ trọng (%)", kieu: "so", batBuoc: true, mac: 10, the: true, khoang: [1, 100] },
