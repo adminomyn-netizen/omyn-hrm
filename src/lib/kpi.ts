@@ -135,3 +135,62 @@ export function kyGanDay(homNay: string): { nhan: string; ma: string }[] {
     { nhan: "Quý này", ma: kyChua(homNay, "quy") }, { nhan: "Quý trước", ma: quyTruoc },
   ];
 }
+
+/* ───────── KPI theo vị trí (chức danh), mục tiêu và kết quả THEO THÁNG (chị Lâm 17/11) ─────────
+ * Quy tắc: chỉ tiêu gắn với chức danh (so khớp không phân biệt hoa thường/khoảng trắng) và tuỳ chọn một khối.
+ * % đạt = thực tế / mục tiêu tháng, trần 120%, chiều "càng thấp càng tốt" đảo như `tiLeDat`.
+ * Điểm tháng = trung bình có trọng số các chỉ tiêu ĐÃ có kết quả; chỉ tiêu chưa nhập không bị tính 0 mà hiện "chưa báo". */
+
+export type ChiTieuThang = { id: string; chucDanh: string; khoiId: string | null; ten: string; donVi: string; mucTieuThang: number; trongSo: number; chieu: Chieu };
+export type KetQuaThang = { nhanVienId: string; chiTieuId: string; thang: string; thucTe: number };
+export type NguoiThang = { id: string; hoTen: string; khoiId: string | null; chucDanh: string | null };
+export type DongChiTieuThang = { chiTieuId: string; ten: string; donVi: string; mucTieu: number; chieu: Chieu; trongSo: number; thucTe: number | null; phanTram: number | null };
+export type DiemThangNguoi = { diem: number | null; daBao: number; tong: number; chiTiet: DongChiTieuThang[] };
+
+/** Chức danh để so khớp: bỏ khoảng trắng thừa, chữ thường, chuẩn dựng sẵn. */
+export const chuanChucDanh = (s: string | null | undefined) => (s ?? "").normalize("NFC").replace(/\s+/g, " ").trim().toLowerCase();
+
+/** Chỉ tiêu tháng áp cho một người: đúng chức danh, và (không gắn khối hoặc đúng khối của người đó). */
+export function chiTieuThangApCho<T extends { chucDanh: string; khoiId: string | null }>(cts: readonly T[], chucDanh: string | null, khoiId: string | null): T[] {
+  const cd = chuanChucDanh(chucDanh);
+  if (!cd) return [];
+  return cts.filter((c) => chuanChucDanh(c.chucDanh) === cd && (c.khoiId === null || c.khoiId === khoiId));
+}
+
+/** Tháng nhập hợp lệ: `YYYY-MM`, không ở tương lai, và chỉ tháng này hoặc 2 tháng trước (để báo chậm và sửa). */
+export function thangNhapHopLe(thang: string, homNay: string): boolean {
+  const m = /^(\d{4})-(\d{2})$/.exec(thang);
+  if (!m || Number(m[2]) < 1 || Number(m[2]) > 12) return false;
+  const soThang = (y: number, mo: number) => y * 12 + mo;
+  const cach = soThang(Number(homNay.slice(0, 4)), Number(homNay.slice(5, 7))) - soThang(Number(m[1]), Number(m[2]));
+  return cach >= 0 && cach <= 2;
+}
+
+/** Ba tháng cho phép nhập, từ mới tới cũ, kèm nhãn. */
+export function thangGanDay(homNay: string): { nhan: string; ma: string }[] {
+  const y = Number(homNay.slice(0, 4)), mo = Number(homNay.slice(5, 7));
+  return [0, 1, 2].map((i) => {
+    const t = y * 12 + (mo - 1) - i;
+    const ny = Math.floor(t / 12), nm = (t % 12) + 1;
+    return { nhan: i === 0 ? "Tháng này" : i === 1 ? "Tháng trước" : `Tháng ${nm}/${ny}`, ma: `${ny}-${hai(nm)}` };
+  });
+}
+
+/** Điểm tháng của từng người trong `nguoi`, trên kết quả `kq` đã lọc đúng tháng. Người không có chỉ tiêu nào áp cho họ thì không có mặt trong kết quả. */
+export function diemThangCacNguoi(nguoi: readonly NguoiThang[], cts: readonly ChiTieuThang[], kq: readonly KetQuaThang[]): Map<string, DiemThangNguoi> {
+  const thuc = new Map(kq.map((r) => [`${r.nhanVienId}|${r.chiTieuId}`, r.thucTe]));
+  const ra = new Map<string, DiemThangNguoi>();
+  for (const n of nguoi) {
+    const ap = chiTieuThangApCho(cts, n.chucDanh, n.khoiId);
+    if (ap.length === 0) continue;
+    let tong = 0, trong = 0, daBao = 0;
+    const chiTiet: DongChiTieuThang[] = ap.map((c) => {
+      const t = thuc.get(`${n.id}|${c.id}`);
+      const pt = t === undefined ? null : lamTron(tiLeDat(t, c.mucTieuThang, c.chieu) * 100);
+      if (pt !== null) { tong += pt * c.trongSo; trong += c.trongSo; daBao += 1; }
+      return { chiTieuId: c.id, ten: c.ten, donVi: c.donVi, mucTieu: c.mucTieuThang, chieu: c.chieu, trongSo: c.trongSo, thucTe: t ?? null, phanTram: pt };
+    });
+    ra.set(n.id, { diem: trong > 0 ? lamTron(tong / trong) : null, daBao, tong: ap.length, chiTiet });
+  }
+  return ra;
+}

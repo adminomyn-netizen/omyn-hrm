@@ -99,3 +99,61 @@ describe("kyGanDay", () => {
     expect(m("2027-01-01")).toMatchObject({ "Hôm qua": "2026-12-31", "Tháng trước": "2026-12", "Quý này": "2027-Q1", "Quý trước": "2026-Q4" });
   });
 });
+
+import { chiTieuThangApCho, chuanChucDanh, diemThangCacNguoi, thangGanDay, thangNhapHopLe, type ChiTieuThang, type KetQuaThang, type NguoiThang } from "@/lib/kpi";
+
+describe("KPI theo vị trí, theo tháng", () => {
+  const ct = (id: string, chucDanh: string, muc: number, trongSo = 1, chieu: ChiTieuThang["chieu"] = "Càng cao càng tốt", khoiId: string | null = null): ChiTieuThang => ({ id, chucDanh, khoiId, ten: id, donVi: "", mucTieuThang: muc, trongSo, chieu });
+  const n = (id: string, chucDanh: string | null, khoiId: string | null = "k1"): NguoiThang => ({ id, hoTen: id, khoiId, chucDanh });
+  const r = (nv: string, c: string, thucTe: number): KetQuaThang => ({ nhanVienId: nv, chiTieuId: c, thang: "2026-11-01", thucTe });
+
+  it("chức danh so khớp không phân biệt hoa thường và khoảng trắng", () => {
+    expect(chuanChucDanh("  Kế  toán Tổng hợp ")).toBe("kế toán tổng hợp");
+    expect(chiTieuThangApCho([ct("a", "Kế toán tổng hợp", 10)], "kế toán  tổng hợp", "k1")).toHaveLength(1);
+    expect(chiTieuThangApCho([ct("a", "Kế toán", 10)], "Nhân viên", "k1")).toHaveLength(0);
+    expect(chiTieuThangApCho([ct("a", "Kế toán", 10)], null, "k1")).toHaveLength(0);
+  });
+  it("chỉ tiêu gắn khối chỉ áp cho đúng khối", () => {
+    const cs = [ct("a", "Nhân viên", 10, 1, "Càng cao càng tốt", "k2")];
+    expect(chiTieuThangApCho(cs, "Nhân viên", "k1")).toHaveLength(0);
+    expect(chiTieuThangApCho(cs, "Nhân viên", "k2")).toHaveLength(1);
+  });
+  it("điểm = trung bình có trọng số % đạt, trần 120%, chiều đảo", () => {
+    const cts = [ct("c1", "Sale", 100, 3), ct("c2", "Sale", 2, 1, "Càng thấp càng tốt")];
+    const d = diemThangCacNguoi([n("x", "Sale")], cts, [r("x", "c1", 50), r("x", "c2", 4)]).get("x")!;
+    // c1 = 50%, c2 = 2/4 = 50% → 50
+    expect(d.diem).toBe(50);
+    const d2 = diemThangCacNguoi([n("x", "Sale")], cts, [r("x", "c1", 500), r("x", "c2", 0)]).get("x")!;
+    expect(d2.diem).toBe(120);
+  });
+  it("chỉ tiêu chưa báo không bị tính 0, chỉ đếm số đã báo", () => {
+    const cts = [ct("c1", "Sale", 100), ct("c2", "Sale", 10)];
+    const d = diemThangCacNguoi([n("x", "Sale")], cts, [r("x", "c1", 80)]).get("x")!;
+    expect(d.diem).toBe(80);
+    expect(d.daBao).toBe(1);
+    expect(d.tong).toBe(2);
+    expect(d.chiTiet[1].phanTram).toBeNull();
+  });
+  it("chưa báo gì thì không có điểm; người không có chỉ tiêu thì vắng mặt", () => {
+    const m = diemThangCacNguoi([n("x", "Sale"), n("y", "Kho")], [ct("c1", "Sale", 100)], []);
+    expect(m.get("x")!.diem).toBeNull();
+    expect(m.has("y")).toBe(false);
+  });
+  it("thực tế 0 với chỉ tiêu càng cao là 0%, không phải chưa báo", () => {
+    const d = diemThangCacNguoi([n("x", "Sale")], [ct("c1", "Sale", 100)], [r("x", "c1", 0)]).get("x")!;
+    expect(d.diem).toBe(0);
+    expect(d.daBao).toBe(1);
+  });
+  it("tháng nhập hợp lệ: tháng này và 2 tháng trước, không tương lai", () => {
+    expect(thangNhapHopLe("2026-11", "2026-11-17")).toBe(true);
+    expect(thangNhapHopLe("2026-09", "2026-11-17")).toBe(true);
+    expect(thangNhapHopLe("2026-08", "2026-11-17")).toBe(false);
+    expect(thangNhapHopLe("2026-12", "2026-11-17")).toBe(false);
+    expect(thangNhapHopLe("2026-13", "2026-11-17")).toBe(false);
+    expect(thangNhapHopLe("2025-12", "2026-01-05")).toBe(true);
+    expect(thangNhapHopLe("2026-11-01", "2026-11-17")).toBe(false);
+  });
+  it("thangGanDay qua đầu năm", () => {
+    expect(thangGanDay("2026-01-10").map((t) => t.ma)).toEqual(["2026-01", "2025-12", "2025-11"]);
+  });
+});

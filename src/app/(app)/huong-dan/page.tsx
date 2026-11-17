@@ -108,6 +108,15 @@ const QUAN_TRI: HuongDan = {
       ],
     },
     {
+      tieuDe: "KPI theo vị trí (tháng)",
+      sac: "xanh",
+      buoc: [
+        { tieuDe: "Đặt chỉ tiêu cho từng vị trí", noiDung: <p>Vào <b>KPI và đánh giá</b>, dòng Thiết lập chọn <b>Chỉ tiêu KPI theo tháng (vị trí)</b>. Thêm chỉ tiêu: gõ đúng <b>chức danh</b> trong hồ sơ nhân sự, tên chỉ tiêu, <b>mục tiêu cả tháng</b>, đơn vị, trọng số 1 đến 10. Chức danh gõ không khớp hồ sơ thì chưa ai thấy chỉ tiêu đó.</p> },
+        { tieuDe: "Nhập kết quả tháng", noiDung: <p>Vào <b>Thi đua KPI</b> → <b>KPI theo vị trí (tháng)</b>. Chọn tháng (tháng này hoặc 2 tháng trước), nhập số thực tế rồi bấm <b>Lưu kết quả tháng</b>. Nhân viên nhập của mình, trưởng phòng nhập cho cấp dưới, Quản trị nhập cho mọi người. Ô trống là chưa báo, không bị tính 0.</p> },
+        { tieuDe: "Cách tính điểm", noiDung: <p>Mỗi chỉ tiêu: % đạt = thực tế chia mục tiêu (tối đa 120%). Chỉ tiêu &quot;càng thấp càng tốt&quot; tính ngược lại. Điểm tháng là trung bình có trọng số các chỉ tiêu đã báo.</p> },
+      ],
+    },
+    {
       tieuDe: "Nội quy và chính sách",
       sac: "xanh",
       buoc: [

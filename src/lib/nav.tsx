@@ -195,7 +195,7 @@ const menuGoc: MucMenu[] = [
     nhom: "Nhân sự",
     phan: 5,
     icon: Trophy,
-    moTa: "Chấm KPI hằng ngày, xếp hạng thi đua theo ngày/tháng/quý và đánh giá kỳ.",
+    moTa: "Chấm KPI hằng ngày, KPI theo vị trí theo tháng, xếp hạng thi đua theo ngày/tháng/quý và đánh giá kỳ.",
   },
   {
     ten: "Đánh giá hiệu suất",

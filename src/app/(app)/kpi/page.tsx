@@ -74,6 +74,9 @@ export default async function TrangKpi({
           <PencilLine strokeWidth={1.7} className="h-4 w-4" aria-hidden />
           Nhập kết quả
         </Link>
+        <Link href="/kpi/thang" className={`${NUT_PHU} inline-flex items-center gap-2`}>
+          KPI theo vị trí (tháng)
+        </Link>
       </TieuDeTrang>
 
       <nav aria-label="Chọn kỳ" className="mb-6 flex flex-wrap gap-2">

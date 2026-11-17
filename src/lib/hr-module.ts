@@ -191,6 +191,22 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
+    ma: "kpi-chi-tieu-thang", ten: "Chỉ tiêu KPI theo tháng", nhom: "KPI & thi đua", bang: "kpi_chi_tieu_thang", tieuDe: "ten",
+    moTa: "Chỉ tiêu và mục tiêu THÁNG cho từng vị trí (chức danh trong hồ sơ nhân sự). Kết quả nhập ở KPI → KPI theo vị trí (tháng).",
+    sapXep: { cot: "tao_luc" }, trong: "Chưa có chỉ tiêu theo vị trí. Thêm chỉ tiêu đầu tiên: chọn chức danh, ghi mục tiêu của tháng.",
+    locTheo: ["chuc_danh"],
+    cot: [
+      { k: "chuc_danh", nhan: "Vị trí (chức danh)", kieu: "chu", batBuoc: true, the: true, goiY: "Gõ đúng chức danh trong hồ sơ nhân sự" },
+      { k: "ten", nhan: "Tên chỉ tiêu", kieu: "chu", batBuoc: true },
+      { k: "muc_tieu_thang", nhan: "Mục tiêu cả tháng", kieu: "so", batBuoc: true, mac: 1, the: true, goiY: "Phải lớn hơn 0" },
+      { k: "don_vi", nhan: "Đơn vị", kieu: "chu", the: true, goiY: "đơn / bài / %" },
+      { k: "trong_so", nhan: "Trọng số (1-10)", kieu: "so", mac: 1, the: true, khoang: [1, 10] },
+      { k: "chieu", nhan: "Chiều tốt", kieu: "chon", luaChon: ["Càng cao càng tốt", "Càng thấp càng tốt"], mac: "Càng cao càng tốt", the: true },
+      { k: "khoi_id", nhan: "Chỉ áp cho khối (trống = mọi khối)", kieu: "khoi" },
+      { k: "hoat_dong", nhan: "Đang dùng", kieu: "co", mac: true },
+    ],
+  },
+  {
     ma: "kpi-thuong", ten: "Khen thưởng thi đua", nhom: "KPI & thi đua", bang: "kpi_thuong", tieuDe: "pham_vi", chiGiamDocSua: true,
     moTa: "Phần thưởng cho hạng 1-2-3 theo tháng/quý, cho phòng, cá nhân trong phòng và cá nhân toàn công ty.",
     sapXep: { cot: "tao_luc" }, trong: "Chưa có mức thưởng. Thêm mức cho hạng 1 của tháng.",

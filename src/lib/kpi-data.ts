@@ -4,11 +4,11 @@ import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { dbHr } from "@/lib/hr-db";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { khongCanChamCong } from "@/lib/chuc-danh";
-import { diemCacNguoi, diemCacPhong, xepHang, type ChiTieu, type Chieu, type DiemChiTieu, type Ky, type KetQuaNgay, type NguoiKpi, type XepHang } from "@/lib/kpi";
+import { diemCacNguoi, diemCacPhong, xepHang, type ChiTieu, type ChiTieuThang, type Chieu, type DiemChiTieu, type Ky, type KetQuaNgay, type KetQuaThang, type NguoiKpi, type XepHang } from "@/lib/kpi";
 
 export const homNayHcm = () => new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Ho_Chi_Minh" });
 
-export type NguoiKpiDay = NguoiKpi & { quanLyId: string | null; ma: string | null; userId: string | null };
+export type NguoiKpiDay = NguoiKpi & { quanLyId: string | null; ma: string | null; userId: string | null; chucDanh: string | null };
 export type Toi = { nhanVienId: string | null; khoiId: string | null; vaiTro: "admin" | "ky_thuat" | "nhan_vien"; hoTen: string; laTruongPhong: boolean; xemToanCongTy: boolean };
 
 /** Sếp, Kỹ thuật và HCNS (đều là vai trò admin/ky_thuat) xem và nhập cho cả công ty. */
@@ -37,7 +37,7 @@ export async function docNen() {
   const kyThuat = new Set<string>();
   const { data: us } = await createAdminClient().auth.admin.listUsers({ page: 1, perPage: 1000 });
   for (const u of us?.users ?? []) if (u.app_metadata?.vai_tro === "ky_thuat") kyThuat.add(u.id);
-  const nguoi: NguoiKpiDay[] = (nv.data ?? []).filter((x) => !khongCanChamCong(x.user_id && kyThuat.has(x.user_id) ? "ky_thuat" : "nhan_vien", x.chuc_danh, x.quyen_giam_doc)).map((x) => ({ id: x.id, hoTen: x.ho_ten, khoiId: x.khoi_id, quanLyId: x.quan_ly_id, ma: x.ma_nhan_vien, userId: x.user_id }));
+  const nguoi: NguoiKpiDay[] = (nv.data ?? []).filter((x) => !khongCanChamCong(x.user_id && kyThuat.has(x.user_id) ? "ky_thuat" : "nhan_vien", x.chuc_danh, x.quyen_giam_doc)).map((x) => ({ id: x.id, hoTen: x.ho_ten, khoiId: x.khoi_id, quanLyId: x.quan_ly_id, ma: x.ma_nhan_vien, userId: x.user_id, chucDanh: x.chuc_danh ?? null }));
   const chiTieu: (ChiTieu & { donVi: string })[] = (ct.data ?? []).map((x) => ({ id: x.id, khoiId: x.khoi_id, ten: x.ten, donVi: x.don_vi ?? "", mucTieuNgay: Number(x.muc_tieu_ngay), trongSo: x.trong_so, chieu: x.chieu as Chieu }));
   const khoi = new Map<string, string>((kh.data ?? []).map((x) => [x.id, x.ten]));
   return { nguoi, chiTieu, khoi };
@@ -99,4 +99,18 @@ export async function tinhBang(nen: Nen, ky: Ky) {
   const soNgayCoBao = new Set(kq.map((r) => r.ngay)).size;
   const daBaoHomNay = (id: string, ngay: string) => kq.some((r) => r.nhanVienId === id && r.ngay === ngay);
   return { hangPhong, toanCongTy, trongPhong, chiTiet, soNgayCoBao, daBaoHomNay };
+}
+
+/** Chỉ tiêu theo tháng của từng vị trí (đang dùng). Bảng riêng nên không lẫn với KPI thi đua theo ngày. */
+export async function docChiTieuThang(): Promise<ChiTieuThang[]> {
+  const { data } = await dbHr().from("kpi_chi_tieu_thang").select("id, chuc_danh, khoi_id, ten, don_vi, muc_tieu_thang, trong_so, chieu").eq("hoat_dong", true).order("tao_luc").limit(1000);
+  return (data ?? []).map((x) => ({ id: x.id, chucDanh: x.chuc_danh, khoiId: x.khoi_id, ten: x.ten, donVi: x.don_vi ?? "", mucTieuThang: Number(x.muc_tieu_thang), trongSo: x.trong_so, chieu: x.chieu as Chieu }));
+}
+
+/** Kết quả tháng `thang` (`YYYY-MM`). */
+export async function docKetQuaThang(thang: string): Promise<KetQuaThang[]> {
+  const db = dbHr();
+  const dong = await docHet<{ nhan_vien_id: string; chi_tieu_id: string; thang: string; thuc_te: number | string }>((a, b) =>
+    db.from("kpi_ket_qua_thang").select("nhan_vien_id, chi_tieu_id, thang, thuc_te").eq("thang", `${thang}-01`).order("id").range(a, b));
+  return dong.map((r) => ({ nhanVienId: r.nhan_vien_id, chiTieuId: r.chi_tieu_id, thang: r.thang, thucTe: Number(r.thuc_te) }));
 }
