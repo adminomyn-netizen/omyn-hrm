@@ -15,6 +15,8 @@ export type DongLuongView = {
   gio_ot_thuong: number; gio_ot_nghi_tuan: number; gio_ot_le: number; hoa_hong: number; thuong_khac: number; khau_tru_khac: number; ghi_chu: string | null;
   luong_chuc_danh: number; luong_kpi: number; phu_cap_thuc: number; tien_an: number; tien_ot: number; tong_thu_nhap: number;
   bh_xh: number; bh_yt: number; bh_tn: number; giam_tru: number; thu_nhap_tinh_thue: number; thue_tncn: number; thuc_linh: number; bh_cty: number;
+  /** Điểm KPI theo vị trí của tháng lương (nếu vị trí có cơ chế). */
+  diem_kpi?: { diem: number | null; daCham: number; tong: number; viTri: string; thang: string };
 };
 
 const so = (s: string) => {
@@ -84,6 +86,16 @@ export function ChiTietDongLuong({ dong, thamSo, suaDuoc, xong, huy }: { dong: D
         {o("Công hưởng lương", "congHuong", `tối đa ${dong.cong_chuan}`)}
         {o("Ngày đi làm (tiền ăn)", "ngayLam")}
         {o("% hoàn thành KPI", "tyLeHtKpi", "tối đa 120%")}
+        {dong.diem_kpi && (
+          <div className="col-span-2 sm:col-span-3 rounded-nho border border-vien bg-giay-sang p-3 text-[14px] text-muc-2">
+            {dong.diem_kpi.diem === null
+              ? <>KPI theo vị trí “{dong.diem_kpi.viTri}” tháng {dong.diem_kpi.thang.slice(5)}/{dong.diem_kpi.thang.slice(0, 4)}: chưa chấm.</>
+              : <>
+                  <p>KPI theo vị trí “{dong.diem_kpi.viTri}” tháng {dong.diem_kpi.thang.slice(5)}/{dong.diem_kpi.thang.slice(0, 4)}: <strong className="text-muc">{dong.diem_kpi.diem}/100 điểm</strong>, đã chấm {dong.diem_kpi.daCham}/{dong.diem_kpi.tong} nhóm.{dong.diem_kpi.daCham < dong.diem_kpi.tong ? " Còn nhóm chưa chấm nên điểm có thể chưa đủ." : ""}</p>
+                  {suaDuoc && <button type="button" className={`${NUT_PHU} mt-2`} onClick={() => setV((x) => ({ ...x, tyLeHtKpi: String(Math.round(dong.diem_kpi!.diem!)) }))}>Dùng điểm này làm % hoàn thành KPI</button>}
+                </>}
+          </div>
+        )}
         {o("Giờ tăng ca ngày thường", "otThuong")}
         {o("Giờ tăng ca nghỉ tuần", "otNghi")}
         {o("Giờ tăng ca ngày lễ", "otLe")}

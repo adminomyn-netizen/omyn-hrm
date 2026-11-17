@@ -11,6 +11,8 @@ import { layNguoiDungDaDuyet } from "@/lib/auth";
 import { duocDuyetLuong } from "@/lib/luong/nguoi-duyet";
 import { dongBoKyTuHoSo } from "@/lib/luong/dong-bo-ky";
 import { THAM_SO_MAC_DINH, type ThamSo } from "@/lib/luong/tinh-luong";
+import { docCoChe, docChamThang } from "@/lib/kpi-data";
+import { chuanChucDanh, diemThangCuaNguoi } from "@/lib/kpi";
 import type { DongLuongView } from "@/components/luong/ChiTietDongLuong";
 
 export default async function TrangLuong({ searchParams }: { searchParams: Promise<{ ky?: string }> }) {
@@ -61,6 +63,20 @@ export default async function TrangLuong({ searchParams }: { searchParams: Promi
     luong_chuc_danh: Number(d.luong_chuc_danh), luong_kpi: Number(d.luong_kpi), phu_cap_thuc: Number(d.phu_cap_thuc), tien_an: Number(d.tien_an), tien_ot: Number(d.tien_ot), tong_thu_nhap: Number(d.tong_thu_nhap),
     bh_xh: Number(d.bh_xh), bh_yt: Number(d.bh_yt), bh_tn: Number(d.bh_tn), giam_tru: Number(d.giam_tru), thu_nhap_tinh_thue: Number(d.thu_nhap_tinh_thue), thue_tncn: Number(d.thue_tncn), thuc_linh: Number(d.thuc_linh), bh_cty: Number(d.bh_cty),
   })) as DongLuongView[];
+
+  // Điểm KPI theo vị trí của đúng tháng lương (chấm ở KPI → KPI theo vị trí). Chỉ để gợi ý ở chi tiết dòng lương, không tự đổi tiền.
+  const kyChon = ky.find((k) => k.id === chon);
+  if (kyChon && dong.length > 0) {
+    const thangKpi = `${kyChon.nam}-${String(kyChon.thang).padStart(2, "0")}`;
+    const [coChe, cham] = await Promise.all([docCoChe(), docChamThang(thangKpi)]).catch(() => [[], []] as const);
+    for (const d of dong) {
+      const cc = coChe.find((c) => chuanChucDanh(c.ten) === chuanChucDanh(d.chuc_danh));
+      if (!cc) continue;
+      const nhomIds = new Set(cc.nhom.map((h) => h.id));
+      const r = diemThangCuaNguoi(cham.filter((x) => x.nhanVienId === (d as unknown as { nhan_vien_id: string }).nhan_vien_id && nhomIds.has(x.nhomId)), cc.nhom.length);
+      d.diem_kpi = { ...r, viTri: cc.ten, thang: thangKpi };
+    }
+  }
 
   return (
     <div className="space-y-8">
