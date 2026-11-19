@@ -142,7 +142,7 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
-    ma: "offer-tuyen-dung", ten: "Offer", nhom: "Tuyển dụng", bang: "offer_tuyen_dung", tieuDe: "ten_ung_vien", trangThai: "trang_thai",
+    ma: "offer-tuyen-dung", dinhKem: true, ten: "Offer", nhom: "Tuyển dụng", bang: "offer_tuyen_dung", tieuDe: "ten_ung_vien", trangThai: "trang_thai",
     moTa: "Thư mời nhận việc: mức lương đề xuất, hạn trả lời, ngày nhận việc và kết quả.",
     sapXep: { cot: "tao_luc", giam: true }, canhBao: { cot: "han_tra_loi", ngay: 3, nhan: "Sắp hết hạn trả lời" }, trong: "Chưa có offer nào. Thêm khi ứng viên đã qua vòng cuối.",
     cot: [
