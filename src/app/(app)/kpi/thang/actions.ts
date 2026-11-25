@@ -3,10 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { dbHr } from "@/lib/hr-db";
 import { layNguoiDungHienTai } from "@/lib/auth";
-import { chuanChucDanh, thangNhapHopLe } from "@/lib/kpi";
+import { coCheCuaNguoi, thangNhapHopLe } from "@/lib/kpi";
+import { dongBoKpiVaoLuong } from "@/lib/luong/kpi-vao-luong";
 import { docCoChe, homNayHcm, nguoiChamDuoc, taiNen } from "@/lib/kpi-data";
 
-export type KetQuaChamThang = { loi?: string; ok?: boolean; daLuu?: number };
+export type KetQuaChamThang = { loi?: string; ok?: boolean; daLuu?: number; daVaoLuong?: number };
 
 /** Lưu điểm chấm KPI một tháng. Ô tên `v|<mã người>|<mã nhóm>` = % hoàn thành 0–100; ô trống = xoá điểm đã chấm.
  * Quyền kiểm ở máy chủ cho cả lô: chỉ Ban lãnh đạo (Quản trị/Kỹ thuật, HCNS) hoặc trưởng phòng với cấp dưới trực tiếp; nhóm phải thuộc cơ chế của đúng chức danh người đó.
@@ -17,8 +18,8 @@ export async function luuChamKpiThang(fd: FormData): Promise<KetQuaChamThang> {
   const nen = await taiNen();
   const duoc = new Map(nguoiChamDuoc(nen).map((n) => [n.id, n]));
   const coChe = await docCoChe();
-  const nhomCua = new Map<string, { chucDanh: string; tyTrong: number; ten: string }>();
-  for (const c of coChe) for (const n of c.nhom) nhomCua.set(n.id, { chucDanh: chuanChucDanh(c.ten), tyTrong: n.tyTrong, ten: n.ten });
+  const nhomCua = new Map<string, { coCheId: string; tyTrong: number; ten: string }>();
+  for (const c of coChe) for (const n of c.nhom) nhomCua.set(n.id, { coCheId: c.id, tyTrong: n.tyTrong, ten: n.ten });
   const nd = await layNguoiDungHienTai();
   const luu: { nhan_vien_id: string; nhom_id: string; thang: string; ty_le: number; ty_trong: number; nguoi_cham: string | null; cap_nhat_luc: string }[] = [];
   const xoa: { nv: string; nhom: string }[] = [];
@@ -26,7 +27,7 @@ export async function luuChamKpiThang(fd: FormData): Promise<KetQuaChamThang> {
     if (!k.startsWith("v|")) continue;
     const [, nvId, nhomId] = k.split("|");
     const nv = duoc.get(nvId), nh = nhomCua.get(nhomId);
-    if (!nv || !nh || chuanChucDanh(nv.chucDanh) !== nh.chucDanh) return { loi: "Có ô không thuộc quyền chấm của bạn. Tải lại trang rồi chấm lại." };
+    if (!nv || !nh || coCheCuaNguoi(coChe, nv)?.id !== nh.coCheId) return { loi: "Có ô không thuộc quyền chấm của bạn. Tải lại trang rồi chấm lại." };
     const s = String(raw).trim().replace(",", ".");
     if (s === "") { xoa.push({ nv: nvId, nhom: nhomId }); continue; }
     const n = Number(s);
@@ -39,6 +40,9 @@ export async function luuChamKpiThang(fd: FormData): Promise<KetQuaChamThang> {
     if (error) return { loi: "Chưa lưu được. Thử lại sau ít phút." };
   }
   for (const x of xoa) await db.from("kpi_cham_thang").delete().eq("nhan_vien_id", x.nv).eq("nhom_id", x.nhom).eq("thang", `${thang}-01`);
+  // Chấm đủ các nhóm thì mức hưởng tự đi vào dòng lương của đúng tháng (kỳ chưa duyệt).
+  const dongLuong = await dongBoKpiVaoLuong(thang).catch(() => ({ capNhat: 0 }));
   revalidatePath("/kpi/thang");
-  return { ok: true, daLuu: luu.length };
+  if (dongLuong.capNhat > 0) revalidatePath("/luong");
+  return { ok: true, daLuu: luu.length, daVaoLuong: dongLuong.capNhat };
 }

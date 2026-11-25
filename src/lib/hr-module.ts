@@ -194,10 +194,11 @@ export const HR_MUC: readonly MucHr[] = [
   },
   {
     ma: "kpi-co-che", dinhKem: true, ten: "Cơ chế KPI theo vị trí", nhom: "KPI & thi đua", bang: "kpi_co_che_vi_tri", tieuDe: "ten",
-    moTa: "Mỗi vị trí một cơ chế: mô tả công việc, mục đích, nguyên tắc, quy trình; tải file cơ chế (Word, PDF) lên đây. Các nhóm công việc và tỷ trọng thêm ở “Nhóm công việc & tỷ trọng”. Chấm điểm hằng tháng ở KPI → KPI theo vị trí (tháng).",
+    moTa: "Cơ chế KPI áp cho cả vị trí (để trống ô nhân sự) hoặc riêng cho một người (chọn nhân sự: người đó có bộ nhóm công việc và tỷ trọng riêng, được ưu tiên hơn cơ chế chung). Có mô tả công việc, mục đích, nguyên tắc, quy trình; tải file cơ chế (Word, PDF) lên đây. Các nhóm công việc và tỷ trọng thêm ở “Nhóm công việc & tỷ trọng”. Chấm điểm hằng tháng ở KPI → KPI theo vị trí (tháng).",
     sapXep: { cot: "ten" }, trong: "Chưa có cơ chế nào. Thêm vị trí đầu tiên, rồi thêm các nhóm công việc và tỷ trọng.",
     cot: [
-      { k: "ten", nhan: "Vị trí (chức danh)", kieu: "chu", batBuoc: true, goiY: "Gõ đúng chức danh trong hồ sơ nhân sự, ví dụ: Kế toán nội bộ" },
+      { k: "nhan_vien_id", nhan: "Áp dụng riêng cho nhân sự", kieu: "nv", the: true },
+      { k: "ten", nhan: "Tên cơ chế (vị trí / chức danh)", kieu: "chu", batBuoc: true, goiY: "Cơ chế chung: gõ đúng chức danh trong hồ sơ, ví dụ Kế toán nội bộ. Cơ chế riêng một người: ghi kèm tên, ví dụ Kế toán nội bộ - Nguyễn Văn A" },
       { k: "mo_ta_cong_viec", nhan: "Mô tả công việc chính", kieu: "nhieu", rong: true, goiY: "Mỗi ý một dòng" },
       { k: "muc_dich", nhan: "Mục đích đánh giá", kieu: "nhieu", rong: true },
       { k: "nguyen_tac", nhan: "Trách nhiệm và nguyên tắc đánh giá", kieu: "nhieu", rong: true },

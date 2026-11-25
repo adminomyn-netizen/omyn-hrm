@@ -9,6 +9,7 @@ import { layBangCongThang } from "@/lib/bang-cong";
 import { tongGioTheoLoai } from "@/lib/tang-ca";
 import { dbHr } from "@/lib/hr-db";
 import { buocKeTiep, duocDatKhauTru10, duocDuyetLuong } from "@/lib/luong/nguoi-duyet";
+import { dongBoKpiVaoLuong } from "@/lib/luong/kpi-vao-luong";
 import { cotKetQua, dongBoKyTuHoSo, tuDong, type Dong } from "@/lib/luong/dong-bo-ky";
 
 export type KetQuaLuong = { loi?: string; ok?: boolean; thongBao?: string };
@@ -175,6 +176,7 @@ export async function lapBangLuong(fd: FormData): Promise<KetQuaLuong> {
     if (error) return { loi: "Chưa lập được bảng lương. Thử lại sau." };
     if (ky.trang_thai === "mo") await db.from("ky_luong").update({ trang_thai: "da_lap", chuyen_luc: new Date().toISOString() }).eq("id", kyId);
   }
+  if (moi.length > 0 && ky.nam && ky.thang) await dongBoKpiVaoLuong(`${ky.nam}-${String(ky.thang).padStart(2, "0")}`).catch(() => undefined);
   lamMoi();
   const tb = `Đã lập ${moi.length} dòng lương.` + (thieu.length ? ` ${thieu.length} người chưa có thỏa thuận lương nên chưa có dòng: ${thieu.slice(0, 5).join(", ")}${thieu.length > 5 ? "…" : ""}.` : "");
   return { ok: true, thongBao: tb };

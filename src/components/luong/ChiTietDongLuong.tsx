@@ -95,6 +95,7 @@ export function ChiTietDongLuong({ dong, thamSo, suaDuoc, xong, huy }: { dong: D
                   <p>KPI theo vị trí “{dong.diem_kpi.viTri}” tháng {dong.diem_kpi.thang.slice(5)}/{dong.diem_kpi.thang.slice(0, 4)}: <strong className="text-muc">{dong.diem_kpi.diem}/100 điểm</strong>, đã chấm {dong.diem_kpi.daCham}/{dong.diem_kpi.tong} nhóm.{dong.diem_kpi.daCham < dong.diem_kpi.tong ? " Còn nhóm chưa chấm nên điểm có thể chưa đủ." : ""}</p>
                   <p className="mt-1">Theo thang điểm: {dong.diem_kpi.diem} điểm được hưởng <strong className="text-muc">{mucHuongKpi(dong.diem_kpi.diem)}%</strong> KPI (90–100: 100% · 80–89: 80% · 70–79: 60% · 50–69: 40% · dưới 50: 0%).</p>
                   {suaDuoc && <button type="button" className={`${NUT_PHU} mt-2`} onClick={() => setV((x) => ({ ...x, tyLeHtKpi: String(mucHuongKpi(dong.diem_kpi!.diem!)) }))}>Dùng mức hưởng {mucHuongKpi(dong.diem_kpi.diem)}% làm % hoàn thành KPI</button>}
+                  <p className="mt-1.5 text-[13px] text-muc-3">Chấm đủ các nhóm ở KPI theo vị trí thì % này tự điền vào ô trên (kỳ chưa duyệt). Muốn đổi tay thì sửa ở đây sau lần chấm cuối.</p>
                 </>}
           </div>
         )}

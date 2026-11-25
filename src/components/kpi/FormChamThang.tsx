@@ -3,7 +3,7 @@
 import { useState, useTransition } from "react";
 import { luuChamKpiThang } from "@/app/(app)/kpi/thang/actions";
 import { NUT_CHINH, O_NHAP } from "@/components/ui/dinh-dang";
-import { diemThangCuaNguoi } from "@/lib/kpi";
+import { diemThangCuaNguoi, mucHuongKpi } from "@/lib/kpi";
 
 export type NhomForm = { id: string; ten: string; tyTrong: number };
 export type NguoiChamForm = { id: string; ten: string; cuaViTri: string; nhom: NhomForm[]; gia: Record<string, string> };
@@ -26,7 +26,7 @@ export function FormChamThang({ thang, nguoi }: { thang: string; nguoi: NguoiCha
     <form
       action={(fd) => bat(async () => {
         const r = await luuChamKpiThang(fd);
-        datTin(r.loi ? { loi: r.loi } : { ok: `Đã lưu ${r.daLuu ?? 0} ô.` });
+        datTin(r.loi ? { loi: r.loi } : { ok: `Đã lưu ${r.daLuu ?? 0} ô.${r.daVaoLuong ? ` Đã cập nhật % KPI vào ${r.daVaoLuong} dòng lương.` : ""}` });
       })}
       className="space-y-6"
     >
@@ -42,7 +42,7 @@ export function FormChamThang({ thang, nguoi }: { thang: string; nguoi: NguoiCha
                   <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
                     <span className="text-[15px] font-semibold text-muc">{n.ten}</span>
                     <span className="text-[13px] text-muc-2">
-                      {d.diem === null ? "Chưa có điểm" : `Điểm tháng ${d.diem.toLocaleString("vi-VN")}/100`} · đã chấm {d.daCham}/{d.tong} nhóm
+                      {d.diem === null ? "Chưa có điểm" : `Điểm tháng ${d.diem.toLocaleString("vi-VN")}/100`}{d.diem !== null && d.daCham === d.tong ? ` · hưởng ${mucHuongKpi(d.diem)}% KPI` : ""} · đã chấm {d.daCham}/{d.tong} nhóm
                     </span>
                   </div>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">

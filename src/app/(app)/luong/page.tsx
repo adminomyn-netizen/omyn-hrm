@@ -12,7 +12,7 @@ import { duocDuyetLuong } from "@/lib/luong/nguoi-duyet";
 import { dongBoKyTuHoSo } from "@/lib/luong/dong-bo-ky";
 import { THAM_SO_MAC_DINH, type ThamSo } from "@/lib/luong/tinh-luong";
 import { docCoChe, docChamThang } from "@/lib/kpi-data";
-import { chuanChucDanh, diemThangCuaNguoi } from "@/lib/kpi";
+import { coCheCuaNguoi, diemThangCuaNguoi } from "@/lib/kpi";
 import type { DongLuongView } from "@/components/luong/ChiTietDongLuong";
 
 export default async function TrangLuong({ searchParams }: { searchParams: Promise<{ ky?: string }> }) {
@@ -70,7 +70,7 @@ export default async function TrangLuong({ searchParams }: { searchParams: Promi
     const thangKpi = `${kyChon.nam}-${String(kyChon.thang).padStart(2, "0")}`;
     const [coChe, cham] = await Promise.all([docCoChe(), docChamThang(thangKpi)]).catch(() => [[], []] as const);
     for (const d of dong) {
-      const cc = coChe.find((c) => chuanChucDanh(c.ten) === chuanChucDanh(d.chuc_danh));
+      const cc = coCheCuaNguoi(coChe, { id: (d as unknown as { nhan_vien_id: string }).nhan_vien_id, chucDanh: d.chuc_danh });
       if (!cc) continue;
       const nhomIds = new Set(cc.nhom.map((h) => h.id));
       const r = diemThangCuaNguoi(cham.filter((x) => x.nhanVienId === (d as unknown as { nhan_vien_id: string }).nhan_vien_id && nhomIds.has(x.nhomId)), cc.nhom.length);

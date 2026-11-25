@@ -101,17 +101,17 @@ export async function tinhBang(nen: Nen, ky: Ky) {
   return { hangPhong, toanCongTy, trongPhong, chiTiet, soNgayCoBao, daBaoHomNay };
 }
 
-export type CoChe = { id: string; ten: string; moTa: string; mucDich: string; nguyenTac: string; quyTrinh: string; nhom: NhomKpi[] };
+export type CoChe = { id: string; nhanVienId: string | null; ten: string; moTa: string; mucDich: string; nguyenTac: string; quyTrinh: string; nhom: NhomKpi[] };
 
 /** Cơ chế KPI của các vị trí đang dùng, kèm các nhóm công việc (đang dùng) theo thứ tự. */
 export async function docCoChe(): Promise<CoChe[]> {
   const db = dbHr();
   const [cc, nh] = await Promise.all([
-    db.from("kpi_co_che_vi_tri").select("id, ten, mo_ta_cong_viec, muc_dich, nguyen_tac, quy_trinh").eq("hoat_dong", true).order("ten").limit(500),
+    db.from("kpi_co_che_vi_tri").select("id, ten, nhan_vien_id, mo_ta_cong_viec, muc_dich, nguyen_tac, quy_trinh").eq("hoat_dong", true).order("ten").limit(500),
     db.from("kpi_co_che_nhom").select("id, co_che_id, ten, noi_dung, ty_trong").eq("hoat_dong", true).order("stt").order("tao_luc").limit(5000),
   ]);
   return (cc.data ?? []).map((c) => ({
-    id: c.id, ten: c.ten, moTa: c.mo_ta_cong_viec ?? "", mucDich: c.muc_dich ?? "", nguyenTac: c.nguyen_tac ?? "", quyTrinh: c.quy_trinh ?? "",
+    id: c.id, nhanVienId: c.nhan_vien_id ?? null, ten: c.ten, moTa: c.mo_ta_cong_viec ?? "", mucDich: c.muc_dich ?? "", nguyenTac: c.nguyen_tac ?? "", quyTrinh: c.quy_trinh ?? "",
     nhom: (nh.data ?? []).filter((n) => n.co_che_id === c.id).map((n) => ({ id: n.id, ten: n.ten, noiDung: n.noi_dung ?? "", tyTrong: Number(n.ty_trong) })),
   }));
 }

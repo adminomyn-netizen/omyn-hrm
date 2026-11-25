@@ -5,7 +5,7 @@ import { FormChamThang, type NguoiChamForm } from "@/components/kpi/FormChamThan
 import { TepDinhKem } from "@/components/hr/TepDinhKem";
 import { TabHieuSuat } from "@/components/hieu-suat/TabHieuSuat";
 import { TieuDeTrang } from "@/components/ui/TieuDeTrang";
-import { chuanChucDanh, diemThangCuaNguoi, thangGanDay, thangNhapHopLe, tongTyTrong } from "@/lib/kpi";
+import { chuanChucDanh, coCheCuaNguoi, diemThangCuaNguoi, thangGanDay, thangNhapHopLe, tongTyTrong } from "@/lib/kpi";
 import { docChamThang, docCoChe, homNayHcm, nguoiChamDuoc, taiNen } from "@/lib/kpi-data";
 
 const SO = (n: number) => n.toLocaleString("vi-VN");
@@ -23,15 +23,16 @@ export default async function TrangKpiThang({ searchParams }: { searchParams: Pr
   const duocCham = nguoiChamDuoc(nen);
   const chamCua = (nvId: string) => cham.filter((c) => c.nhanVienId === nvId);
 
+  const tenNguoi = new Map(nen.nguoi.map((n) => [n.id, n.hoTen]));
   const khoi = coChe.map((c) => {
-    const cd = chuanChucDanh(c.ten);
-    const nguoiCham = duocCham.filter((n) => chuanChucDanh(n.chucDanh) === cd && c.nhom.length > 0);
-    const cuaToi = !!toiRow && chuanChucDanh(toiRow.chucDanh) === cd;
+    const nguoiCham = duocCham.filter((n) => coCheCuaNguoi(coChe, n)?.id === c.id && c.nhom.length > 0);
+    const cuaToi = !!toiRow && coCheCuaNguoi(coChe, toiRow)?.id === c.id;
     return { c, nguoiCham, cuaToi };
   }).filter((x) => admin || x.nguoiCham.length > 0 || x.cuaToi);
 
   const coNguoi = new Set(nen.nguoi.map((n) => chuanChucDanh(n.chucDanh)));
-  const viTriChuaCoNguoi = admin ? coChe.filter((c) => !coNguoi.has(chuanChucDanh(c.ten))).map((c) => c.ten) : [];
+  const viTriChuaCoNguoi = admin ? coChe.filter((c) => !c.nhanVienId && !coNguoi.has(chuanChucDanh(c.ten))).map((c) => c.ten) : [];
+  const coCheRiengNguoiLa = admin ? coChe.filter((c) => c.nhanVienId && !tenNguoi.has(c.nhanVienId)).map((c) => c.ten) : [];
   const lechTyTrong = admin ? coChe.filter((c) => c.nhom.length > 0 && tongTyTrong(c.nhom) !== 100).map((c) => `${c.ten} (${SO(tongTyTrong(c.nhom))}%)`) : [];
 
   return (
@@ -52,6 +53,7 @@ export default async function TrangKpiThang({ searchParams }: { searchParams: Pr
         ))}
       </nav>
       {viTriChuaCoNguoi.length > 0 && <p className="mb-3 rounded-nho border border-vien bg-giay-sang p-4 text-[14px] text-muc-2">Chưa có ai mang chức danh: {viTriChuaCoNguoi.join(", ")}. Tên vị trí phải trùng chức danh trong hồ sơ nhân sự thì mới chấm được.</p>}
+      {coCheRiengNguoiLa.length > 0 && <p className="mb-3 rounded-nho border border-vien bg-giay-sang p-4 text-[14px] text-muc-2">Cơ chế riêng này gắn với người không còn trong danh sách đang làm: {coCheRiengNguoiLa.join(", ")}.</p>}
       {lechTyTrong.length > 0 && <p className="mb-3 rounded-nho border border-vien bg-giay-sang p-4 text-[14px] text-muc-2">Tổng tỷ trọng chưa bằng 100%: {lechTyTrong.join(", ")}.</p>}
 
       {khoi.length === 0 ? (
@@ -67,7 +69,10 @@ export default async function TrangKpiThang({ searchParams }: { searchParams: Pr
             const diemToi = cuaToi && toiRow ? diemThangCuaNguoi(chamCua(toiRow.id), c.nhom.length) : null;
             return (
               <section key={c.id} aria-label={c.ten} className="space-y-4">
-                <h2 className="chu-tieu-de text-[22px] text-muc">{c.ten}</h2>
+                <div>
+                  <h2 className="chu-tieu-de text-[22px] text-muc">{c.ten}</h2>
+                  <p className="mt-1 text-[13px] text-muc-3">{c.nhanVienId ? <>Cơ chế riêng của <strong className="font-semibold text-muc-2">{tenNguoi.get(c.nhanVienId) ?? "nhân sự đã chọn"}</strong>.</> : <>Áp cho mọi người có chức danh “{c.ten}” chưa có cơ chế riêng.</>}</p>
+                </div>
                 <details className="the-noi rounded-nho border border-vien bg-giay-sang p-4">
                   <summary className="cursor-pointer text-[14px] font-medium text-nhan-dam">Xem cơ chế KPI của vị trí này</summary>
                   <div className="mt-4 space-y-4 text-[14px] text-muc-2">
@@ -101,7 +106,7 @@ export default async function TrangKpiThang({ searchParams }: { searchParams: Pr
                   </div>
                 )}
                 {form.length > 0 && <FormChamThang key={`${c.id}-${thang}`} thang={thang} nguoi={form} />}
-                {admin && form.length === 0 && c.nhom.length > 0 && <p className="text-[14px] text-muc-3">Chưa có ai mang chức danh “{c.ten}” để chấm.</p>}
+                {admin && form.length === 0 && c.nhom.length > 0 && <p className="text-[14px] text-muc-3">{c.nhanVienId ? "Người này chưa có trong danh sách đang làm nên chưa chấm được." : `Chưa có ai mang chức danh “${c.ten}” để chấm.`}</p>}
               </section>
             );
           })}

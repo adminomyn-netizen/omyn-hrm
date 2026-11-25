@@ -158,6 +158,11 @@ export function diemThangCuaNguoi(cham: readonly ChamNhom[], tongNhom: number): 
   return { diem: lamTron(Math.min(100, diem)), daCham: cham.length, tong: tongNhom };
 }
 
+/** Cơ chế áp cho một người: cơ chế riêng của chính người đó (nhanVienId) được ưu tiên; không có thì cơ chế chung của chức danh (nhanVienId để trống). */
+export function coCheCuaNguoi<T extends { ten: string; nhanVienId: string | null }>(coChe: readonly T[], nv: { id: string; chucDanh: string | null | undefined }): T | undefined {
+  return coChe.find((c) => c.nhanVienId === nv.id) ?? coChe.find((c) => !c.nhanVienId && chuanChucDanh(c.ten) === chuanChucDanh(nv.chucDanh));
+}
+
 /** Thang điểm → mức hưởng KPI (mẫu chị Phượng 17/11, mục 2 "Thang điểm và mức hưởng KPI"): 90–100 = 100%, 80–89 = 80%, 70–79 = 60%, 50–69 = 40%, dưới 50 = 0%.
  * Điểm có số lẻ nên lấy theo mốc dưới: 89,5 vẫn thuộc nhóm 80–89. */
 export const THANG_MUC_HUONG: readonly { tu: number; den: number | null; nhan: string; huong: number }[] = [
