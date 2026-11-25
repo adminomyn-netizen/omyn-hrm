@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { diemCacNguoi, diemCacPhong, docKy, kyGanDay, kyChua, ngayNhapHopLe, tiLeDat, xepHang, type ChiTieu, type KetQuaNgay, type NguoiKpi } from "@/lib/kpi";
+import { mucHuongKpi, diemCacNguoi, diemCacPhong, docKy, kyGanDay, kyChua, ngayNhapHopLe, tiLeDat, xepHang, type ChiTieu, type KetQuaNgay, type NguoiKpi } from "@/lib/kpi";
 
 const CT_CAO: ChiTieu = { id: "ct1", khoiId: null, ten: "Cuộc gọi", mucTieuNgay: 20, trongSo: 1, chieu: "Càng cao càng tốt" };
 const CT_THAP: ChiTieu = { id: "ct2", khoiId: null, ten: "Lỗi", mucTieuNgay: 2, trongSo: 1, chieu: "Càng thấp càng tốt" };
@@ -150,5 +150,11 @@ describe("Cơ chế KPI theo vị trí, chấm theo tháng", () => {
   });
   it("thangGanDay qua đầu năm", () => {
     expect(thangGanDay("2026-01-10").map((t) => t.ma)).toEqual(["2026-01", "2025-12", "2025-11"]);
+  });
+});
+
+describe("mucHuongKpi (thang chị Phượng)", () => {
+  it("các mốc", () => {
+    expect([100, 90, 89.5, 89, 80, 79, 70, 69, 50, 49.9, 0].map(mucHuongKpi)).toEqual([100, 100, 80, 80, 80, 60, 60, 40, 40, 0, 0]);
   });
 });

@@ -158,6 +158,19 @@ export function diemThangCuaNguoi(cham: readonly ChamNhom[], tongNhom: number): 
   return { diem: lamTron(Math.min(100, diem)), daCham: cham.length, tong: tongNhom };
 }
 
+/** Thang điểm → mức hưởng KPI (mẫu chị Phượng 17/11, mục 2 "Thang điểm và mức hưởng KPI"): 90–100 = 100%, 80–89 = 80%, 70–79 = 60%, 50–69 = 40%, dưới 50 = 0%.
+ * Điểm có số lẻ nên lấy theo mốc dưới: 89,5 vẫn thuộc nhóm 80–89. */
+export const THANG_MUC_HUONG: readonly { tu: number; den: number | null; nhan: string; huong: number }[] = [
+  { tu: 90, den: 100, nhan: "90 – 100 điểm", huong: 100 },
+  { tu: 80, den: 89, nhan: "80 – 89 điểm", huong: 80 },
+  { tu: 70, den: 79, nhan: "70 – 79 điểm", huong: 60 },
+  { tu: 50, den: 69, nhan: "50 – 69 điểm", huong: 40 },
+  { tu: 0, den: null, nhan: "Dưới 50 điểm", huong: 0 },
+];
+export function mucHuongKpi(diem: number): number {
+  return (THANG_MUC_HUONG.find((b) => diem >= b.tu) ?? THANG_MUC_HUONG[THANG_MUC_HUONG.length - 1]).huong;
+}
+
 /** Tháng chấm hợp lệ: `YYYY-MM`, không ở tương lai, và chỉ tháng này hoặc 2 tháng trước (để chấm chậm và sửa). */
 export function thangNhapHopLe(thang: string, homNay: string): boolean {
   const m = /^(\d{4})-(\d{2})$/.exec(thang);
