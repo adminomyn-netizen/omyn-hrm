@@ -320,6 +320,14 @@ const menuGoc: MucMenu[] = [
     moTa: "Nhập quyết toán của sàn, so từng đơn: phí sàn, thực nhận, đơn lệch.",
   },
   {
+    ten: "Lãi lỗ theo kênh",
+    duong_dan: "/kinh-doanh/lai-lo-kenh",
+    nhom: "Kinh doanh",
+    icon: FileSpreadsheet,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Doanh thu, hoàn trả, lãi gộp và phí sàn từng kênh trong tháng.",
+  },
+  {
     ten: "Ghép trạng thái sàn",
     duong_dan: "/hr/ghep-trang-thai-san",
     nhom: "Kinh doanh",
