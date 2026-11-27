@@ -7,12 +7,13 @@ import { docTatCa } from "@/lib/hr-db";
 import { tienVN, ngayVN } from "@/lib/dinh-dang";
 import { ngayHomNayHCM } from "@/lib/data";
 import { doiSoatCod } from "@/lib/kho";
+import { NhapDoiSoatVanChuyen } from "@/components/kho/NhapDoiSoatVanChuyen";
 
 const nguyen = (s: string | undefined, mac: number) => { const n = Number(s); return Number.isInteger(n) && n >= 1 && n <= 180 ? n : mac; };
 
 /** Đối soát COD theo đơn vị vận chuyển: tiền thu hộ, đã nhận, còn treo, đơn quá hạn. Số tự tính từ sổ đóng gói và giao hàng. */
 export default async function TrangCod({ searchParams }: { searchParams: Promise<{ han?: string }> }) {
-  await yeuCauQuyenSo("Tài chính & Kho");
+  const { chiXem } = await yeuCauQuyenSo("Tài chính & Kho");
   const han = nguyen((await searchParams).han, 7);
   const homNay = ngayHomNayHCM();
   const dr = await docTatCa<{ id: string; ma_don: string; don_vi_van_chuyen: string | null; trang_thai: string; ngay: string; ngay_giao: string | null; thu_ho: number; cod_da_nhan: number; phi_van_chuyen: number | null }>(
@@ -52,6 +53,13 @@ export default async function TrangCod({ searchParams }: { searchParams: Promise
             </table>
           </section>
         </>
+      )}
+      {!chiXem && (
+        <section className="mb-6" aria-label="Nhập đối soát của đơn vị vận chuyển">
+          <h2 className="chu-tieu-de mb-2 text-[20px] text-muc">Nhập đối soát của đơn vị vận chuyển</h2>
+          <p className="mb-3 text-[13px] text-muc-2">Khớp theo mã vận đơn ghi ở sổ Đóng gói và giao hàng, rồi cập nhật COD đã nhận, ngày nhận và phí vận chuyển. Bắt buộc có cột Mã vận đơn và COD đã chuyển; tuỳ chọn COD thu hộ (để so với sổ), Phí vận chuyển, Ngày chuyển tiền. Số trong file ghi đè số đã nhận của đơn; nhập lại cùng file cho cùng kết quả.</p>
+          <NhapDoiSoatVanChuyen />
+        </section>
       )}
       {r.nhanDu.length > 0 && <p className="mb-4 rounded-nho border border-vien px-4 py-3 text-[13px] text-canh-bao">Đơn nhận nhiều hơn tiền thu hộ, cần xem lại: {r.nhanDu.map((d) => d.ma).join(", ")}.</p>}
       <p className="rounded-nho border border-vien px-4 py-3 text-[13px] text-muc-2">Số ngày quá hạn mặc định 7 là TẠM, chỉnh ở ô trên. Đơn thiếu ngày giao thì tính từ ngày đơn. Đơn hoàn hoặc trả không tính là khoản phải thu.</p>
