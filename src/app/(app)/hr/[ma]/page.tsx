@@ -53,8 +53,10 @@ export default async function TrangMucHr({
   const tc: Record<string, { id: string; ten: string }[]> = {};
   await Promise.all(
     bangTc.map(async (b) => {
-      tc[b] = ((await db.from(b).select("id, ten").order("ten").limit(1000))
-        .data ?? []) as { id: string; ten: string }[];
+      // Bảng không có cột "ten" thì lấy cột gọi tên của nó làm nhãn (đơn lẻ gọi bằng mã đơn).
+      const cotTen = b === "kd_don_le" ? "ma_don" : "ten";
+      tc[b] = ((await db.from(b).select(cotTen === "ten" ? "id, ten" : `id, ten:${cotTen}`).order(b === "kd_don_le" ? "ngay" : "ten", { ascending: b !== "kd_don_le" }).limit(1000))
+        .data ?? []) as unknown as { id: string; ten: string }[];
     }),
   );
   const coTep = coTepDinhKem(muc) && !!(await quyenTep(nd, muc.ma)).muc;

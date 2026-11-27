@@ -820,6 +820,21 @@ export const HR_MUC: readonly MucHr[] = [
     ],
   },
   {
+    ma: "don-hoan", ten: "Đơn hoàn", nhom: "Kinh doanh", bang: "kd_don_hoan", tieuDe: "don_le_id", trangThai: "tinh_trang_hang",
+    moTa: "Ghi mỗi lần hoàn của một đơn trong Sổ đơn lẻ: loại hoàn, lý do, mã vận đơn hoàn, tiền hoàn và TÌNH TRẠNG HÀNG HOÀN (chờ về, nhận đủ, nhận thiếu, hỏng). Đổi đơn sang Hoàn trả ở Sổ đơn lẻ thì kho tự coi hàng đã về; ở đây theo dõi hàng thật sự về chưa. Màn Hàng hoàn cần xử lý liệt kê đơn hoàn chưa ghi và hàng chưa về.",
+    sapXep: { cot: "ngay_hoan", giam: true }, trong: "Chưa có đơn hoàn nào.",
+    cot: [
+      { k: "don_le_id", nhan: "Đơn lẻ", kieu: "tc", bangTc: "kd_don_le", batBuoc: true, the: true },
+      { k: "ngay_hoan", nhan: "Ngày hoàn", kieu: "ngay", batBuoc: true, the: true },
+      { k: "loai", nhan: "Loại hoàn", kieu: "chon", luaChon: ["Trả hàng và hoàn tiền", "Chỉ hoàn tiền", "Giao không thành công"], mac: "Trả hàng và hoàn tiền", the: true },
+      { k: "ly_do", nhan: "Lý do", kieu: "chon", luaChon: ["Hàng lỗi hoặc hỏng", "Sai mẫu hoặc sai hàng", "Không đúng mô tả", "Khách đổi ý", "Giao không được", "Khác"], the: true },
+      { k: "ma_van_don_hoan", nhan: "Mã vận đơn hoàn", kieu: "chu" },
+      { k: "so_tien_hoan", nhan: "Tiền hoàn (đ)", kieu: "tien", coTheTrong: true, the: true },
+      { k: "tinh_trang_hang", nhan: "Tình trạng hàng hoàn", kieu: "chon", luaChon: ["Chờ hàng về", "Đã nhận đủ", "Nhận thiếu", "Hỏng, không bán lại", "Không cần trả hàng"], mac: "Chờ hàng về" },
+      { k: "ghi_chu", nhan: "Ghi chú", kieu: "nhieu", rong: true },
+    ],
+  },
+  {
     ma: "don-le-dong-hang", ten: "Dòng hàng đơn lẻ", nhom: "Kinh doanh", bang: "kd_don_le_dong", tieuDe: "don_le_id",
     moTa: "Sản phẩm trong đơn lẻ: số lượng, đơn giá, chiết khấu. Đơn đã giao có dòng hàng thì kho tự xuất đúng số lượng (chia lô hạn gần trước), sửa hay xoá dòng hàng thì kho tự theo. Cũng để màn Lãi gộp theo kênh tính lãi thực tế cho kênh lẻ (cần giá vốn đã duyệt).",
     sapXep: { cot: "tao_luc", giam: true }, trong: "Chưa có dòng hàng nào. Tạo đơn ở màn Sổ đơn lẻ trước.",
