@@ -53,9 +53,10 @@ export default async function TrangMucHr({
   const tc: Record<string, { id: string; ten: string }[]> = {};
   await Promise.all(
     bangTc.map(async (b) => {
-      // Bảng không có cột "ten" thì lấy cột gọi tên của nó làm nhãn (đơn lẻ gọi bằng mã đơn).
-      const cotTen = b === "kd_don_le" ? "ma_don" : "ten";
-      tc[b] = ((await db.from(b).select(cotTen === "ten" ? "id, ten" : `id, ten:${cotTen}`).order(b === "kd_don_le" ? "ngay" : "ten", { ascending: b !== "kd_don_le" }).limit(1000))
+      // Bảng không có cột "ten" thì lấy cột gọi tên của nó làm nhãn, mới nhất lên đầu (đơn lẻ gọi bằng mã đơn, phiên live bằng chủ đề).
+      const cotTen = b === "kd_don_le" ? "ma_don" : b === "kd_phien_live" ? "chu_de" : "ten";
+      const moiNhatTruoc = cotTen !== "ten";
+      tc[b] = ((await db.from(b).select(cotTen === "ten" ? "id, ten" : `id, ten:${cotTen}`).order(moiNhatTruoc ? "ngay" : "ten", { ascending: !moiNhatTruoc }).limit(1000))
         .data ?? []) as unknown as { id: string; ten: string }[];
     }),
   );
