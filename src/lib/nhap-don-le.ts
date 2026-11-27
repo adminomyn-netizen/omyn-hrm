@@ -2,7 +2,7 @@
 export type TrangThaiDonLe = "Đang xử lý" | "Đã giao" | "Hoàn trả" | "Huỷ";
 /** Một dòng hàng của đơn trong file (sàn xuất mỗi sản phẩm một dòng, lặp lại mã đơn). */
 export type HangDoc = { dong: number; sku: string | null; tenSp: string | null; soLuong: number; donGia: number | null };
-export type DonLeDoc = { dong: number; ngay: string; maDon: string; tenKhach: string | null; dienThoai: string | null; giaTri: number; trangThai: TrangThaiDonLe; hang: HangDoc[] };
+export type DonLeDoc = { dong: number; ngay: string; maDon: string; tenKhach: string | null; dienThoai: string | null; giaTri: number; trangThai: TrangThaiDonLe; /** Chữ trạng thái GỐC trong file (mã của sàn), null nếu file không có cột trạng thái. */ trangThaiSan: string | null; hang: HangDoc[] };
 export type LoiDong = { dong: number; loi: string };
 
 const bo = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d").replace(/Đ/g, "D").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
@@ -118,7 +118,7 @@ export function docBangDonLe(text: string): { don: DonLeDoc[]; loi: LoiDong[]; c
     const giaTri = docTien(r[cot.tien] ?? "");
     if (giaTri === null || giaTri <= 0) return void loi.push({ dong, loi: `Tiền “${r[cot.tien] ?? ""}” không hợp lệ (cần lớn hơn 0).` });
     const sdt = cot.sdt >= 0 ? chuanSdt(r[cot.sdt]) : "";
-    const d: DonLeDoc = { dong, ngay, maDon, giaTri, tenKhach: cot.ten >= 0 && r[cot.ten]?.trim() ? r[cot.ten].trim() : null, dienThoai: sdt.length >= 9 ? sdt : null, trangThai: cot.tt >= 0 ? docTrangThai(r[cot.tt] ?? "") : "Đang xử lý", hang: [] };
+    const d: DonLeDoc = { dong, ngay, maDon, giaTri, tenKhach: cot.ten >= 0 && r[cot.ten]?.trim() ? r[cot.ten].trim() : null, dienThoai: sdt.length >= 9 ? sdt : null, trangThai: cot.tt >= 0 ? docTrangThai(r[cot.tt] ?? "") : "Đang xử lý", trangThaiSan: cot.tt >= 0 && (r[cot.tt] ?? "").trim() ? (r[cot.tt] ?? "").trim() : null, hang: [] };
     if (coHang) { const h = docHang(r, dong); if (h) d.hang.push(h); }
     theoMa.set(maDon, d); don.push(d);
   });

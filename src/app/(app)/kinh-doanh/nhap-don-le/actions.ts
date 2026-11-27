@@ -8,6 +8,7 @@ import { ghiLichSuNhanSu } from "@/lib/nhan-su-lich-su";
 import ExcelJS from "exceljs";
 import { chuanSdt, docBangDonLe, donGiaCacDong, hangExcelThanhBang, khopSanPham, type DonLeDoc, type LoiDong, type SanPhamKhop } from "@/lib/nhap-don-le";
 import { dongBoKhoDonLe } from "@/lib/kho-don-le";
+import { dungBangGhep, ghepTrangThai, type DongGhep } from "@/lib/trang-thai-san";
 
 export type KetQuaNhap = {
   loi?: string; thieuCot?: string[];
@@ -15,7 +16,7 @@ export type KetQuaNhap = {
   chiKiem?: boolean;
   moi?: number; daCo?: number; khachMoi?: number; khachKhop?: number; vangLai?: number; daGiao?: number; tongTien?: number; loiDong?: LoiDong[];
   /** Dòng hàng: số dòng sẽ ghi (đã ghi), số đơn cũ được bổ sung hàng, dòng bị bỏ vì chưa có sản phẩm trong danh mục, tên sản phẩm chưa có (tối đa 20), cảnh báo đọc file. */
-  hangGhi?: number; donBoSung?: number; hangBoQua?: number; spChuaCo?: string[]; canhBao?: LoiDong[]; coHang?: boolean;
+  /** Mã trạng thái gốc của sàn trong file chưa có dòng ghép (tối đa 20) — đơn đó được suy theo chữ, nên thêm dòng ghép. */ maChuaGhep?: string[]; hangGhi?: number; donBoSung?: number; hangBoQua?: number; spChuaCo?: string[]; canhBao?: LoiDong[]; coHang?: boolean;
 };
 const KENH = ["Shopee", "TikTok Shop", "Facebook", "Zalo", "Điện thoại", "Khác"];
 const TOI_DA = 2000;
@@ -35,6 +36,13 @@ export async function nhapDonLeTuBang(text: string, kenh: string, taoKhach: bool
   if (r.don.length + r.loi.length > TOI_DA) return { loi: `Tối đa ${TOI_DA} dòng mỗi lần, hãy chia nhỏ file.` };
 
   const db = dbHr();
+  const bangGhep = dungBangGhep(((await db.from("kd_trang_thai_san_map").select("nen_tang, ma_san, trang_thai_noi_bo, hoat_dong")).data ?? []) as DongGhep[], kenh);
+  const maChuaGhep = new Set<string>();
+  for (const d of r.don) {
+    const g = ghepTrangThai(d.trangThaiSan, bangGhep);
+    d.trangThai = g.trangThai;
+    if (!g.ghepDuoc && d.trangThaiSan) maChuaGhep.add(d.trangThaiSan);
+  }
   const [daCoRows, khach] = await Promise.all([
     docTatCa<{ id: string; ma_don: string; trang_thai: string; gia_tri: number }>("kd_don_le", "id, ma_don, trang_thai, gia_tri", (q) => q.eq("kenh", kenh)),
     docTatCa<{ id: string; dien_thoai: string | null }>("kd_khach_le", "id, dien_thoai"),
@@ -85,7 +93,7 @@ export async function nhapDonLeTuBang(text: string, kenh: string, taoKhach: bool
   const hangMoiDon = canNhap.reduce((a, d) => a + (keHoach.get(d.maDon)?.length ?? 0), 0);
   const hangBoSung = [...donCuBoSung.keys()].reduce((a, m) => a + (keHoach.get(m)?.length ?? 0), 0);
   const tong = {
-    coHang, hangGhi: hangMoiDon + hangBoSung, donBoSung: donCuBoSung.size, hangBoQua, spChuaCo: [...chuaCo].slice(0, 20), canhBao: r.canhBao.slice(0, 50),
+    coHang, maChuaGhep: [...maChuaGhep].slice(0, 20), hangGhi: hangMoiDon + hangBoSung, donBoSung: donCuBoSung.size, hangBoQua, spChuaCo: [...chuaCo].slice(0, 20), canhBao: r.canhBao.slice(0, 50),
     moi: canNhap.length, daCo: r.don.length - canNhap.length, khachMoi: sdtMoi.size, khachKhop: khop, vangLai,
     daGiao: canNhap.filter((d) => d.trangThai === "Đã giao").length, tongTien: canNhap.reduce((a, d) => a + d.giaTri, 0), loiDong: r.loi,
   };
@@ -98,7 +106,7 @@ export async function nhapDonLeTuBang(text: string, kenh: string, taoKhach: bool
     for (const k of moiKh ?? []) khachTheoSdt.set(chuanSdt(k.dien_thoai as string), k.id as string);
   }
   const idDonMoi = new Map<string, string>();
-  const dong = canNhap.map((d) => ({ ngay: d.ngay, ma_don: d.maDon, kenh, khach_le_id: d.dienThoai ? (khachTheoSdt.get(d.dienThoai) ?? null) : null, gia_tri: d.giaTri, trang_thai: d.trangThai, ghi_chu: "Nhập từ file" }));
+  const dong = canNhap.map((d) => ({ ngay: d.ngay, ma_don: d.maDon, kenh, khach_le_id: d.dienThoai ? (khachTheoSdt.get(d.dienThoai) ?? null) : null, gia_tri: d.giaTri, trang_thai: d.trangThai, trang_thai_san: d.trangThaiSan, ghi_chu: "Nhập từ file" }));
   for (let i = 0; i < dong.length; i += 500) {
     const { data: ghi, error } = await db.from("kd_don_le").insert(dong.slice(i, i + 500)).select("id, ma_don");
     for (const x of ghi ?? []) idDonMoi.set(x.ma_don as string, x.id as string);

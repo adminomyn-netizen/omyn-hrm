@@ -47,8 +47,8 @@ describe("nhập đơn lẻ từ bảng", () => {
     const r = docBangDonLe(t);
     expect(r.thieuCot).toEqual([]);
     expect(r.don).toEqual([
-      { dong: 2, ngay: "2026-11-03", maDon: "A1", tenKhach: "An", dienThoai: "0912345678", giaTri: 1250000, trangThai: "Đã giao", hang: [] },
-      { dong: 7, ngay: "2026-11-01", maDon: "A4", tenKhach: "Chi", dienThoai: "0988000111", giaTri: 300000, trangThai: "Huỷ", hang: [] },
+      { dong: 2, ngay: "2026-11-03", maDon: "A1", tenKhach: "An", dienThoai: "0912345678", giaTri: 1250000, trangThai: "Đã giao", trangThaiSan: "Hoàn thành", hang: [] },
+      { dong: 7, ngay: "2026-11-01", maDon: "A4", tenKhach: "Chi", dienThoai: "0988000111", giaTri: 300000, trangThai: "Huỷ", trangThaiSan: "Đã hủy", hang: [] },
     ]);
     expect(r.loi.map((l) => l.dong)).toEqual([3, 4, 5, 6]);
   });

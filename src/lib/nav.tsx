@@ -296,6 +296,14 @@ const menuGoc: MucMenu[] = [
     moTa: "Doanh thu theo đơn so với tiền sàn chuyển về, theo tháng.",
   },
   {
+    ten: "Ghép trạng thái sàn",
+    duong_dan: "/hr/ghep-trang-thai-san",
+    nhom: "Kinh doanh",
+    icon: FileSpreadsheet,
+    chiVaiTro: CHI_QUAN_LY,
+    moTa: "Mã trạng thái gốc của sàn ứng với trạng thái nội bộ nào.",
+  },
+  {
     ten: "Đại lý và khách sỉ",
     duong_dan: "/hr/dai-ly-khach-si",
     nhom: "Kinh doanh",

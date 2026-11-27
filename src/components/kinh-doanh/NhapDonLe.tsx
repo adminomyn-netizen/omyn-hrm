@@ -44,6 +44,7 @@ export function NhapDonLe() {
             <li>Khách: {so(kq.khachKhop ?? 0)} khớp số điện thoại, {so(kq.khachMoi ?? 0)} khách mới, {so(kq.vangLai ?? 0)} đơn không gắn khách (không tích điểm).</li>
             {kq.coHang && <li>Dòng hàng: {so(kq.hangGhi ?? 0)} dòng{kq.chiKiem ? " sẽ được ghi" : " đã ghi"} (đơn đã giao tự trừ kho, tính lãi gộp){(kq.donBoSung ?? 0) > 0 ? `, trong đó bổ sung hàng cho ${so(kq.donBoSung!)} đơn đã có` : ""}.</li>}
             {(kq.hangBoQua ?? 0) > 0 && <li className="text-canh-bao">{so(kq.hangBoQua!)} dòng hàng chưa ghi vì sản phẩm chưa có trong danh mục (khớp theo mã hoặc tên): {kq.spChuaCo!.join(", ")}{kq.spChuaCo!.length >= 20 ? " …" : ""}. Thêm sản phẩm vào danh mục rồi bấm Nhập lại: đơn đã có mà chưa có hàng sẽ được bổ sung.</li>}
+            {(kq.maChuaGhep?.length ?? 0) > 0 && <li className="text-canh-bao">Trạng thái gốc của sàn chưa có dòng ghép: {kq.maChuaGhep!.join(", ")}. Em tạm suy theo chữ; vào Ghép trạng thái sàn thêm dòng để đơn sau luôn đúng.</li>}
             {(kq.canhBao?.length ?? 0) > 0 && <li className="text-canh-bao">{kq.canhBao!.slice(0, 5).map((l) => `dòng ${l.dong}: ${l.loi}`).join(" · ")}{kq.canhBao!.length > 5 ? " …" : ""}</li>}
             {(kq.loiDong?.length ?? 0) > 0 && <li className="text-canh-bao">{kq.loiDong!.length} dòng lỗi, không nhập: {kq.loiDong!.slice(0, 10).map((l) => `dòng ${l.dong}: ${l.loi}`).join(" · ")}{kq.loiDong!.length > 10 ? " …" : ""}</li>}
           </ul>
